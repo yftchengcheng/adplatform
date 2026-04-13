@@ -66,6 +66,7 @@ export function AdTemplate({
   const [currentImage, setCurrentImage] = useState<string>("");
   const [isVisible, setIsVisible] = useState(false);
   const [currentButtonConfig, setCurrentButtonConfig] = useState<AdButtonConfig | null>(null);
+  const [previewToast, setPreviewToast] = useState<string | null>(null);
 
   // 宏替换函数
   const resolveMacro = (macro: string): string => {
@@ -102,6 +103,12 @@ export function AdTemplate({
     return url;
   };
 
+  // 显示预览提示
+  const showPreviewToast = (message: string) => {
+    setPreviewToast(message);
+    setTimeout(() => setPreviewToast(null), 2000);
+  };
+
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -112,12 +119,14 @@ export function AdTemplate({
   }, [isOpen]);
 
   const handleButton1Click = () => {
-    if (previewMode) return;
-    
     if (config.button1.action === "jump") {
       const url = resolveLandingPageUrl(config.button1);
       if (url) {
-        window.open(url, "_blank");
+        if (previewMode) {
+          showPreviewToast(`将跳转到: ${url}`);
+        } else {
+          window.open(url, "_blank");
+        }
       } else {
         onButton1Click?.(config.button1);
       }
@@ -133,12 +142,14 @@ export function AdTemplate({
   };
 
   const handleButton2Click = () => {
-    if (previewMode) return;
-    
     if (config.button2.action === "jump") {
       const url = resolveLandingPageUrl(config.button2);
       if (url) {
-        window.open(url, "_blank");
+        if (previewMode) {
+          showPreviewToast(`将跳转到: ${url}`);
+        } else {
+          window.open(url, "_blank");
+        }
       } else {
         onButton2Click?.(config.button2);
       }
@@ -155,11 +166,15 @@ export function AdTemplate({
 
   // 点击图片跳转到落地页
   const handleImageClick = () => {
-    if (previewMode || !currentButtonConfig) return;
+    if (!currentButtonConfig) return;
     const url = resolveLandingPageUrl(currentButtonConfig);
     if (url) {
       setShowImageModal(false);
-      window.open(url, "_blank");
+      if (previewMode) {
+        showPreviewToast(`将跳转到: ${url}`);
+      } else {
+        window.open(url, "_blank");
+      }
     }
   };
 
@@ -167,6 +182,13 @@ export function AdTemplate({
 
   return (
     <>
+      {/* Preview Toast */}
+      {previewToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white px-4 py-2 rounded-lg text-sm shadow-lg">
+          {previewToast}
+        </div>
+      )}
+
       {/* Backdrop */}
       <div
         className={cn(
