@@ -15,6 +15,7 @@ import {
   Trash2,
   Power,
   PowerOff,
+  X,
 } from "lucide-react";
 import {
   Table,
@@ -42,8 +43,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ComponentFilters, PaginationState } from "@/lib/component-types";
-import { useComponents } from "@/contexts/component-context";
+import { useComponents, AdComponentItem } from "@/contexts/component-context";
+import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 
 export function ComponentList() {
   const { components, toggleStatus, deleteComponent } = useComponents();
@@ -61,6 +64,7 @@ export function ComponentList() {
   });
   const [sortField, setSortField] = useState<string>("updateTime");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [previewComponent, setPreviewComponent] = useState<AdComponentItem | null>(null);
 
   // 更新 total
   useEffect(() => {
@@ -450,7 +454,10 @@ export function ComponentList() {
                     </TableCell>
                     <TableCell className="font-mono text-sm">{component.id}</TableCell>
                     <TableCell>
-                      <button className="text-blue-500 hover:text-blue-600 hover:underline">
+                      <button 
+                        className="text-blue-500 hover:text-blue-600 hover:underline"
+                        onClick={() => setPreviewComponent(component)}
+                      >
                         查看
                       </button>
                     </TableCell>
@@ -519,7 +526,10 @@ export function ComponentList() {
                               </>
                             )}
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="cursor-pointer"
+                            onClick={() => setPreviewComponent(component)}
+                          >
                             <Eye className="w-4 h-4 mr-2" />
                             预览
                           </DropdownMenuItem>
@@ -592,6 +602,40 @@ export function ComponentList() {
             </div>
           </div>
         </div>
+
+        {/* Preview Modal */}
+        <Dialog open={!!previewComponent} onOpenChange={() => setPreviewComponent(null)}>
+          <DialogContent className="max-w-[400px] p-0 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-gray-900">组件预览</h3>
+                <p className="text-sm text-gray-500">{previewComponent?.name}</p>
+              </div>
+              <button
+                onClick={() => setPreviewComponent(null)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 bg-gray-100">
+              {previewComponent?.type === "dual_button" && previewComponent?.config ? (
+                <AdTemplate
+                  config={previewComponent.config as unknown as AdTemplateConfig}
+                  isOpen={true}
+                  onClose={() => {}}
+                />
+              ) : (
+                <div className="bg-white rounded-lg p-6 text-center text-gray-500">
+                  <p className="text-sm">该组件类型暂不支持预览</p>
+                  <p className="text-xs mt-2 text-gray-400">
+                    当前支持：选择磁贴(双按钮)
+                  </p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
