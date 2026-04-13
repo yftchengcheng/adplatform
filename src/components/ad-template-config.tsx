@@ -117,55 +117,155 @@ function ImageUpload({
   value,
   onChange,
   label,
-  accept = "image/*",
+  width = 472,
+  height = 164,
+  maxSize = 1, // MB
+  accept = "image/jpeg,image/png,image/gif,image/webp",
 }: {
   value?: string;
   onChange: (url: string) => void;
-  label: string;
+  onError?: (message: string) => void;
+  label?: string;
+  width?: number;
+  height?: number;
+  maxSize?: number;
   accept?: string;
 }) {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // In real app, upload to server and get URL
+  const [error, setError] = React.useState<string>("");
+  const [previewUrl, setPreviewUrl] = React.useState<string>("");
+  const [imageDimensions, setImageDimensions] = React.useState<{width: number, height: number} | null>(null);
+
+  // 验证图片
+  const validateImage = (file: File): Promise<{valid: boolean, error?: string, dimensions?: {width: number, height: number}}> => {
+    return new Promise((resolve) => {
+      // 验证文件类型
+      const allowedTypes = accept.split(",").map(t => t.trim());
+      const fileType = file.type;
+      const isValidType = allowedTypes.some(type => {
+        if (type === "image/*") return fileType.startsWith("image/");
+        return fileType === type;
+      });
+      
+      if (!isValidType) {
+        resolve({ valid: false, error: `不支持的图片格式，请上传 ${accept} 格式` });
+        return;
+      }
+
+      // 验证文件大小
+      const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > maxSize) {
+        resolve({ valid: false, error: `图片大小不能超过 ${maxSize}MB，当前 ${fileSizeMB.toFixed(2)}MB` });
+        return;
+      }
+
+      // 验证图片尺寸
       const reader = new FileReader();
-      reader.onload = () => {
-        onChange(reader.result as string);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          if (img.width !== width || img.height !== height) {
+            resolve({ 
+              valid: false, 
+              error: `图片尺寸应为 ${width}×${height}px，当前 ${img.width}×${img.height}px`,
+              dimensions: { width: img.width, height: img.height }
+            });
+          } else {
+            resolve({ valid: true, dimensions: { width: img.width, height: img.height } });
+          }
+        };
+        img.onerror = () => {
+          resolve({ valid: false, error: "图片加载失败，请重新上传" });
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => {
+        resolve({ valid: false, error: "文件读取失败" });
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
-  if (value) {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setError("");
+    
+    const result = await validateImage(file);
+    if (!result.valid) {
+      setError(result.error || "图片验证失败");
+      return;
+    }
+
+    // 读取并预览图片
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setPreviewUrl(dataUrl);
+      setImageDimensions(result.dimensions || null);
+      onChange(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemove = () => {
+    setPreviewUrl("");
+    setImageDimensions(null);
+    setError("");
+    onChange("");
+  };
+
+  // 显示的图片（优先显示已上传的预览，否则显示新选择的）
+  const displayUrl = previewUrl || value;
+
+  if (displayUrl) {
     return (
-      <div className="relative rounded-lg border border-gray-200 overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={value}
-          alt={label}
-          className="w-full h-32 object-cover"
-        />
-        <button
-          onClick={() => onChange("")}
-          className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white text-xs"
-        >
-          删除
-        </button>
+      <div className="space-y-2">
+        <div className="relative rounded-lg border border-gray-200 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={displayUrl}
+            alt={label}
+            className="w-full h-32 object-cover"
+          />
+          <button
+            onClick={handleRemove}
+            className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white text-xs"
+          >
+            删除
+          </button>
+          {imageDimensions && (
+            <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+              {imageDimensions.width}×{imageDimensions.height}px
+            </div>
+          )}
+        </div>
+        {error && (
+          <p className="text-xs text-red-500">{error}</p>
+        )}
       </div>
     );
   }
 
   return (
-    <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
-      <Upload className="w-8 h-8 text-gray-400 mb-2" />
-      <span className="text-sm text-gray-500">{label}</span>
-      <input
-        type="file"
-        accept={accept}
-        onChange={handleFileChange}
-        className="hidden"
-      />
-    </label>
+    <div className="space-y-2">
+      <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
+        <Upload className="w-8 h-8 text-gray-400 mb-2" />
+        <span className="text-sm text-gray-500">{label || "点击上传图片"}</span>
+        <span className="text-xs text-gray-400 mt-1">
+          尺寸: {width}×{height}px, 大小&lt;{maxSize}MB
+        </span>
+        <input
+          type="file"
+          accept={accept}
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </label>
+      {error && (
+        <p className="text-xs text-red-500">{error}</p>
+      )}
+    </div>
   );
 }
 
