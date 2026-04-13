@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import Link from "next/link";
 import {
   Search,
   Plus,
@@ -276,10 +277,12 @@ export function ComponentList() {
                 管理和配置您的广告组件
               </p>
             </div>
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              <Plus className="w-4 h-4 mr-2" />
-              创建
-            </Button>
+            <Link href="/components/create">
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                <Plus className="w-4 h-4 mr-2" />
+                创建
+              </Button>
+            </Link>
           </div>
         </div>
       </header>

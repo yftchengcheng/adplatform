@@ -61,6 +61,7 @@
 - 广告模板核心组件：`src/components/ad-template.tsx`
 - 广告配置面板：`src/components/ad-template-config.tsx`
 - 组件列表页面：`src/components/component-list.tsx`
+- 组件选择页面：`src/app/components/create/page.tsx`
 - 演示页面：`src/app/page.tsx`
 - 类型定义：`src/lib/component-types.ts`
 
@@ -74,6 +75,16 @@
   - 批量操作：批量开启、批量暂停
   - 分页：智能分页组件
   - 操作菜单：编辑、开启/暂停、预览、删除
+
+### 组件选择页面
+- **路由**：`/components/create`
+- **用途**：选择组件样式模板
+- **功能特性**：
+  - 静态组件：双按钮磁贴、投票磁贴、图片磁贴、电商磁贴、优惠券磁贴、推广卡片、游戏礼包码
+  - 动效组件：红包雨、翻卡、翻红包、翻宝箱、宝箱雨、刮刮卡、砸蛋、弹窗(红包)
+  - 分类筛选：全部/静态组件/动效组件
+  - 组件卡片展示：图标、名称、描述、选择按钮
+  - 步骤指示器：选择样式 → 填写内容
 
 ### 广告组件功能
 

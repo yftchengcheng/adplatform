@@ -16,6 +16,127 @@ export type ComponentType =
   | "coupon"            // 优惠券磁贴
   | "promotion_card"    // 推广卡片
   | "game_gift"         // 游戏礼包码;
+
+// 组件样式模板（用于选择页面）
+export interface ComponentStyleTemplate {
+  id: ComponentType;
+  name: string;
+  category: ComponentCategory;
+  description: string;
+  icon: string;
+  preview?: string;
+}
+
+// 组件样式模板列表
+export const componentStyleTemplates: ComponentStyleTemplate[] = [
+  // 静态组件
+  {
+    id: "dual_button",
+    name: "双按钮磁贴",
+    category: "static",
+    description: "上文下按钮结构，支持跳转落地页或显示图片",
+    icon: "layout-grid",
+  },
+  {
+    id: "vote",
+    name: "投票磁贴",
+    category: "static",
+    description: "用于留资收集，收集用户投票信息",
+    icon: "check-square",
+  },
+  {
+    id: "image",
+    name: "图片磁贴",
+    category: "static",
+    description: "纯图片展示，支持点击跳转",
+    icon: "image",
+  },
+  {
+    id: "ecommerce",
+    name: "电商磁贴",
+    category: "static",
+    description: "电商场景专用，展示商品信息",
+    icon: "shopping-bag",
+  },
+  {
+    id: "coupon",
+    name: "优惠券磁贴",
+    category: "static",
+    description: "优惠券领取组件",
+    icon: "ticket",
+  },
+  {
+    id: "promotion_card",
+    name: "推广卡片",
+    category: "static",
+    description: "推广信息展示，最多叠加10个",
+    icon: "layers",
+  },
+  {
+    id: "game_gift",
+    name: "游戏礼包码",
+    category: "static",
+    description: "游戏礼包码领取组件",
+    icon: "gift",
+  },
+  // 动效组件
+  {
+    id: "redpacket_rain",
+    name: "红包雨",
+    category: "animation",
+    description: "红包从顶部降落，吸引用户点击",
+    icon: "dollar-sign",
+  },
+  {
+    id: "flip_card",
+    name: "翻卡",
+    category: "animation",
+    description: "翻牌互动，揭晓隐藏奖励",
+    icon: "layers-3",
+  },
+  {
+    id: "flip_redpacket",
+    name: "翻红包",
+    category: "animation",
+    description: "翻动红包获取奖励",
+    icon: "gift",
+  },
+  {
+    id: "flip_treasure",
+    name: "翻宝箱",
+    category: "animation",
+    description: "开启宝箱获取惊喜奖励",
+    icon: "box",
+  },
+  {
+    id: "treasure_rain",
+    name: "宝箱雨",
+    category: "animation",
+    description: "宝箱从顶部降落",
+    icon: "cloud-rain",
+  },
+  {
+    id: "scratch_card",
+    name: "刮刮卡",
+    category: "animation",
+    description: "刮开涂层揭晓奖励",
+    icon: "pen-tool",
+  },
+  {
+    id: "smash_egg",
+    name: "砸蛋",
+    category: "animation",
+    description: "砸碎金蛋获取奖励",
+    icon: "egg",
+  },
+  {
+    id: "popup_redpacket",
+    name: "弹窗(红包)",
+    category: "animation",
+    description: "弹窗形式展示红包",
+    icon: "bell",
+  },
+];
 export type ComponentStatus = "enabled" | "disabled";
 
 // 组件分类映射
