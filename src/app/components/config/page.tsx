@@ -151,7 +151,6 @@ function ConfigContent() {
             <AdTemplateConfigPanel
               config={config}
               onChange={handleConfigChange}
-              onPreview={() => setIsPreviewOpen(true)}
             />
           </div>
 
@@ -265,15 +264,6 @@ function ConfigContent() {
           </div>
         </div>
       </main>
-
-      {/* Full screen preview modal */}
-      {isPreviewOpen && (
-        <AdTemplate
-          config={config}
-          isOpen={isPreviewOpen}
-          onClose={() => setIsPreviewOpen(false)}
-        />
-      )}
     </div>
   );
 }
