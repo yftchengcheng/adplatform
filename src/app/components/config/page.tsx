@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useState, useCallback, Suspense } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdTemplateConfig, AdTemplate } from "@/components/ad-template";
 import { AdTemplateConfigPanel } from "@/components/ad-template-config";
+import { useComponents } from "@/contexts/component-context";
+import { ComponentType } from "@/lib/component-types";
 
 function ConfigContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const type = searchParams.get("type");
+  const type = (searchParams.get("type") || "dual_button") as ComponentType;
+  const { addComponent } = useComponents();
 
   // 默认配置
   const [config, setConfig] = useState<AdTemplateConfig>({
@@ -41,9 +43,15 @@ function ConfigContent() {
   }, []);
 
   const handleSave = () => {
-    // 保存逻辑
-    console.log("保存配置:", config);
-    alert("配置保存成功！");
+    // 保存到全局状态
+    addComponent({
+      name: config.title || "未命名组件",
+      category: "static",
+      type: type,
+      status: "enabled",
+      config: config as unknown as Record<string, unknown>,
+    });
+    alert("组件保存成功！");
     router.push("/");
   };
 

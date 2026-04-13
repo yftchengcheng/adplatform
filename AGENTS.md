@@ -62,6 +62,8 @@
 - 广告配置面板：`src/components/ad-template-config.tsx`
 - 组件列表页面：`src/components/component-list.tsx`
 - 组件选择页面：`src/app/components/create/page.tsx`
+- 配置页面：`src/app/components/config/page.tsx`
+- 组件上下文：`src/contexts/component-context.tsx`
 - 演示页面：`src/app/page.tsx`
 - 类型定义：`src/lib/component-types.ts`
 
@@ -85,6 +87,18 @@
   - 分类筛选：全部/静态组件/动效组件
   - 组件卡片展示：图标、名称、描述、选择按钮
   - 步骤指示器：选择样式 → 填写内容
+  - 点击卡片跳转到配置页面
+
+### 完整创建链路
+1. **组件列表** `/` → 点击"创建"
+2. **选择样式** `/components/create` → 点击"选择磁贴(双按钮)"
+3. **配置页面** `/components/config?type=dual_button` → 点击"保存"
+4. **返回列表** → 新增记录显示在列表顶部
+
+### 数据管理
+- **状态管理**：`src/contexts/component-context.tsx`
+- **存储方式**：localStorage 持久化
+- **数据字段**：id、name、category、type、templateCount、status、editor、updateTime、config
 
 ### 广告组件功能
 

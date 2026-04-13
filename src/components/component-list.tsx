@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -42,12 +42,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { AdComponent, ComponentFilters, PaginationState } from "@/lib/component-types";
-import { mockComponents } from "@/lib/component-types";
+import { ComponentFilters, PaginationState } from "@/lib/component-types";
+import { useComponents } from "@/contexts/component-context";
 
 export function ComponentList() {
-  // 状态
-  const [components, setComponents] = useState<AdComponent[]>(mockComponents);
+  const { components, toggleStatus, deleteComponent } = useComponents();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<ComponentFilters>({
     category: "all",
@@ -58,10 +57,15 @@ export function ComponentList() {
   const [pagination, setPagination] = useState<PaginationState>({
     page: 1,
     pageSize: 10,
-    total: mockComponents.length,
+    total: 0,
   });
   const [sortField, setSortField] = useState<string>("updateTime");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // 更新 total
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, total: components.length }));
+  }, [components.length]);
 
   // 筛选和分页后的数据
   const filteredData = useMemo(() => {
@@ -176,32 +180,28 @@ export function ComponentList() {
 
   // 批量操作
   const handleBatchEnable = () => {
-    setComponents((prev) =>
-      prev.map((item) =>
-        selectedIds.has(item.id) ? { ...item, status: "enabled" } : item
-      )
-    );
+    selectedIds.forEach(id => {
+      const comp = components.find(c => c.id === id);
+      if (comp && comp.status === "disabled") {
+        toggleStatus(id);
+      }
+    });
     setSelectedIds(new Set());
   };
 
   const handleBatchDisable = () => {
-    setComponents((prev) =>
-      prev.map((item) =>
-        selectedIds.has(item.id) ? { ...item, status: "disabled" } : item
-      )
-    );
+    selectedIds.forEach(id => {
+      const comp = components.find(c => c.id === id);
+      if (comp && comp.status === "enabled") {
+        toggleStatus(id);
+      }
+    });
     setSelectedIds(new Set());
   };
 
   // 单个操作
   const handleToggleStatus = (id: string) => {
-    setComponents((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, status: item.status === "enabled" ? "disabled" : "enabled" }
-          : item
-      )
-    );
+    toggleStatus(id);
   };
 
   const handleDelete = (id: string) => {
@@ -211,7 +211,7 @@ export function ComponentList() {
       return;
     }
     if (confirm(`确定要删除组件"${component?.name}"吗？`)) {
-      setComponents((prev) => prev.filter((item) => item.id !== id));
+      deleteComponent(id);
     }
   };
 
