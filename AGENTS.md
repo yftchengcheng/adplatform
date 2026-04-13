@@ -63,6 +63,7 @@
 - 组件列表页面：`src/components/component-list.tsx`
 - 组件选择页面：`src/app/components/create/page.tsx`
 - 配置页面：`src/app/components/config/page.tsx`
+- 组件预览页面：`src/app/components/preview/page.tsx`
 - 组件上下文：`src/contexts/component-context.tsx`
 - 演示页面：`src/app/page.tsx`
 - 类型定义：`src/lib/component-types.ts`
@@ -92,8 +93,9 @@
 ### 完整创建链路
 1. **组件列表** `/` → 点击"创建"
 2. **选择样式** `/components/create` → 点击"选择磁贴(双按钮)"
-3. **配置页面** `/components/config?type=dual_button` → 点击"保存"
-4. **返回列表** → 新增记录显示在列表顶部
+3. **配置页面** `/components/config?type=dual_button` → 填写内容 → 点击"预览"或"保存"
+4. **预览页面** `/components/preview?config=xxx` → 查看效果 → 点击"返回"或"列表"
+5. **返回列表** → 新增记录显示在列表顶部
 
 ### 数据管理
 - **状态管理**：`src/contexts/component-context.tsx`

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdTemplateConfig, AdTemplate } from "@/components/ad-template";
 import { AdTemplateConfigPanel } from "@/components/ad-template-config";
@@ -59,6 +59,13 @@ function ConfigContent() {
     router.push("/components/create");
   };
 
+  const handlePreview = () => {
+    // 将配置编码并跳转到预览页面
+    const configJson = JSON.stringify(config);
+    const encoded = btoa(encodeURIComponent(configJson));
+    router.push(`/components/preview?config=${encoded}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -76,6 +83,10 @@ function ConfigContent() {
               <h1 className="text-xl font-bold text-gray-900">选择磁贴(双按钮)</h1>
               <p className="text-sm text-gray-500">配置组件内容和样式</p>
             </div>
+            <Button variant="outline" onClick={handlePreview} className="gap-2">
+              <Eye className="w-4 h-4" />
+              预览
+            </Button>
             <Button variant="outline" onClick={handleBack}>
               取消
             </Button>

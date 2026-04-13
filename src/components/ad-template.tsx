@@ -66,7 +66,6 @@ export function AdTemplate({
   const [currentImage, setCurrentImage] = useState<string>("");
   const [isVisible, setIsVisible] = useState(false);
   const [currentButtonConfig, setCurrentButtonConfig] = useState<AdButtonConfig | null>(null);
-  const [previewToast, setPreviewToast] = useState<string | null>(null);
 
   // 宏替换函数
   const resolveMacro = (macro: string): string => {
@@ -103,12 +102,6 @@ export function AdTemplate({
     return url;
   };
 
-  // 显示预览提示
-  const showPreviewToast = (message: string) => {
-    setPreviewToast(message);
-    setTimeout(() => setPreviewToast(null), 2000);
-  };
-
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -123,7 +116,8 @@ export function AdTemplate({
       const url = resolveLandingPageUrl(config.button1);
       if (url) {
         if (previewMode) {
-          showPreviewToast(`将跳转到: ${url}`);
+          // 预览模式下在当前页面跳转
+          window.location.href = url;
         } else {
           window.open(url, "_blank");
         }
@@ -146,7 +140,8 @@ export function AdTemplate({
       const url = resolveLandingPageUrl(config.button2);
       if (url) {
         if (previewMode) {
-          showPreviewToast(`将跳转到: ${url}`);
+          // 预览模式下在当前页面跳转
+          window.location.href = url;
         } else {
           window.open(url, "_blank");
         }
@@ -171,7 +166,8 @@ export function AdTemplate({
     if (url) {
       setShowImageModal(false);
       if (previewMode) {
-        showPreviewToast(`将跳转到: ${url}`);
+        // 预览模式下在当前页面跳转
+        window.location.href = url;
       } else {
         window.open(url, "_blank");
       }
@@ -182,13 +178,6 @@ export function AdTemplate({
 
   return (
     <>
-      {/* Preview Toast */}
-      {previewToast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white px-4 py-2 rounded-lg text-sm shadow-lg">
-          {previewToast}
-        </div>
-      )}
-
       {/* Backdrop */}
       <div
         className={cn(
