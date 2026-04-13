@@ -115,12 +115,8 @@ export function AdTemplate({
     if (config.button1.action === "jump") {
       const url = resolveLandingPageUrl(config.button1);
       if (url) {
-        if (previewMode) {
-          // 预览模式下在当前页面跳转
-          window.location.href = url;
-        } else {
-          window.open(url, "_blank");
-        }
+        // 始终在新页面打开
+        window.open(url, "_blank");
       } else {
         onButton1Click?.(config.button1);
       }
@@ -139,12 +135,8 @@ export function AdTemplate({
     if (config.button2.action === "jump") {
       const url = resolveLandingPageUrl(config.button2);
       if (url) {
-        if (previewMode) {
-          // 预览模式下在当前页面跳转
-          window.location.href = url;
-        } else {
-          window.open(url, "_blank");
-        }
+        // 始终在新页面打开
+        window.open(url, "_blank");
       } else {
         onButton2Click?.(config.button2);
       }
@@ -165,12 +157,8 @@ export function AdTemplate({
     const url = resolveLandingPageUrl(currentButtonConfig);
     if (url) {
       setShowImageModal(false);
-      if (previewMode) {
-        // 预览模式下在当前页面跳转
-        window.location.href = url;
-      } else {
-        window.open(url, "_blank");
-      }
+      // 始终在新页面打开
+      window.open(url, "_blank");
     }
   };
 

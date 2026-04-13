@@ -16,7 +16,7 @@ function ConfigContent() {
   const { addComponent } = useComponents();
 
   // 默认配置
-  const [config, setConfig] = useState<AdTemplateConfig>({
+  const defaultConfig: AdTemplateConfig = {
     title: "限时特惠活动",
     subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
     button1: {
@@ -34,12 +34,38 @@ function ConfigContent() {
     macroVariables: {
       image_url: "https://picsum.photos/472/164",
     },
+  };
+
+  // 从 sessionStorage 恢复配置
+  const [config, setConfig] = useState<AdTemplateConfig>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("component_config");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return defaultConfig;
+        }
+      }
+    }
+    return defaultConfig;
   });
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  // 保存配置到 sessionStorage
   const handleConfigChange = useCallback((newConfig: AdTemplateConfig) => {
     setConfig(newConfig);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("component_config", JSON.stringify(newConfig));
+    }
+  }, []);
+
+  // 清空 sessionStorage
+  const clearSavedConfig = useCallback(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("component_config");
+    }
   }, []);
 
   const handleSave = () => {
@@ -51,6 +77,7 @@ function ConfigContent() {
       status: "enabled",
       config: config as unknown as Record<string, unknown>,
     });
+    clearSavedConfig();
     alert("组件保存成功！");
     router.push("/");
   };

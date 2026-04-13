@@ -99,7 +99,9 @@
 
 ### 数据管理
 - **状态管理**：`src/contexts/component-context.tsx`
-- **存储方式**：localStorage 持久化
+- **存储方式**：
+  - 组件列表：localStorage 持久化
+  - 配置页面：sessionStorage（预览返回后数据不丢失）
 - **数据字段**：id、name、category、type、templateCount、status、editor、updateTime、config
 
 ### 广告组件功能
