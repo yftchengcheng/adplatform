@@ -41,6 +41,22 @@ const initialComponents: AdComponentItem[] = [
     status: "enabled",
     editor: "admin@adtalos.com",
     updateTime: "2026-04-13 10:30:00",
+    config: {
+      title: "限时特惠活动",
+      subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
+      button1: {
+        text: "立即领取",
+        action: "jump",
+        landingPageUrl: "https://example.com/claim",
+      },
+      button2: {
+        text: "查看详情",
+        action: "show_image",
+        imageUrl: "https://picsum.photos/472/164",
+      },
+      action: "open",
+      defaultLandingPageUrl: "https://example.com/default",
+    },
   },
   {
     id: "A100002",
@@ -51,6 +67,11 @@ const initialComponents: AdComponentItem[] = [
     status: "enabled",
     editor: "admin@adtalos.com",
     updateTime: "2026-04-12 15:20:00",
+    config: {
+      title: "新用户红包雨",
+      subtitle: "恭喜获得新人红包，点击领取",
+      action: "open",
+    },
   },
   {
     id: "A100003",
@@ -61,6 +82,11 @@ const initialComponents: AdComponentItem[] = [
     status: "enabled",
     editor: "yufutang@adtalos.com",
     updateTime: "2026-04-11 09:45:00",
+    config: {
+      title: "会员专享优惠券",
+      subtitle: "您有一张专属优惠券待领取",
+      action: "open",
+    },
   },
 ];
 

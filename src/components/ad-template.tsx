@@ -56,13 +56,21 @@ const defaultConfig: AdTemplateConfig = {
 };
 
 export function AdTemplate({
-  config = defaultConfig,
+  config,
   isOpen = true,
   onClose,
   onButton1Click,
   onButton2Click,
   previewMode = false,
 }: AdTemplateProps) {
+  // 合并默认配置，确保所有必需字段存在
+  const finalConfig: AdTemplateConfig = {
+    ...defaultConfig,
+    ...config,
+    button1: { ...defaultConfig.button1, ...config?.button1 },
+    button2: { ...defaultConfig.button2, ...config?.button2 },
+  };
+  
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [isVisible, setIsVisible] = useState(false);
@@ -70,9 +78,9 @@ export function AdTemplate({
 
   // 宏替换函数
   const resolveMacro = (macro: string): string => {
-    if (!macro || !config.macroVariables) return macro;
+    if (!macro || !finalConfig.macroVariables) return macro;
     let result = macro;
-    Object.entries(config.macroVariables).forEach(([key, value]) => {
+    Object.entries(finalConfig.macroVariables).forEach(([key, value]) => {
       result = result.replace(new RegExp(`\\$\\{${key}\\}`, 'g'), value);
       result = result.replace(new RegExp(`\\$${key}`, 'g'), value);
     });
@@ -109,8 +117,8 @@ export function AdTemplate({
       return resolveMacro(button.landingPageUrl);
     }
     // 最后使用默认链接
-    if (config.defaultLandingPageUrl) {
-      return resolveMacro(config.defaultLandingPageUrl);
+    if (finalConfig.defaultLandingPageUrl) {
+      return resolveMacro(finalConfig.defaultLandingPageUrl);
     }
     return undefined;
   };
@@ -125,43 +133,43 @@ export function AdTemplate({
   }, [isOpen]);
 
   const handleButton1Click = () => {
-    if (config.button1.action === "jump") {
-      const url = resolveLandingPageUrl(config.button1);
+    if (finalConfig.button1.action === "jump") {
+      const url = resolveLandingPageUrl(finalConfig.button1);
       if (url) {
         // 始终在新页面打开
         window.open(url, "_blank");
       } else {
-        onButton1Click?.(config.button1);
+        onButton1Click?.(finalConfig.button1);
       }
-    } else if (config.button1.action === "show_image") {
-      const image = resolveButtonImage(config.button1);
+    } else if (finalConfig.button1.action === "show_image") {
+      const image = resolveButtonImage(finalConfig.button1);
       if (image) {
         setCurrentImage(image);
-        setCurrentButtonConfig(config.button1);
+        setCurrentButtonConfig(finalConfig.button1);
         setShowImageModal(true);
       }
     }
-    onButton1Click?.(config.button1);
+    onButton1Click?.(finalConfig.button1);
   };
 
   const handleButton2Click = () => {
-    if (config.button2.action === "jump") {
-      const url = resolveLandingPageUrl(config.button2);
+    if (finalConfig.button2.action === "jump") {
+      const url = resolveLandingPageUrl(finalConfig.button2);
       if (url) {
         // 始终在新页面打开
         window.open(url, "_blank");
       } else {
-        onButton2Click?.(config.button2);
+        onButton2Click?.(finalConfig.button2);
       }
-    } else if (config.button2.action === "show_image") {
-      const image = resolveButtonImage(config.button2);
+    } else if (finalConfig.button2.action === "show_image") {
+      const image = resolveButtonImage(finalConfig.button2);
       if (image) {
         setCurrentImage(image);
-        setCurrentButtonConfig(config.button2);
+        setCurrentButtonConfig(finalConfig.button2);
         setShowImageModal(true);
       }
     }
-    onButton2Click?.(config.button2);
+    onButton2Click?.(finalConfig.button2);
   };
 
   // 点击图片跳转到落地页
@@ -212,12 +220,12 @@ export function AdTemplate({
           <div className="px-5 pt-6 pb-4">
             {/* Title */}
             <h2 className="text-xl font-bold text-gray-900 pr-8 leading-tight">
-              {config.title}
+              {finalConfig.title}
             </h2>
 
             {/* Subtitle */}
             <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-              {config.subtitle}
+              {finalConfig.subtitle}
             </p>
           </div>
 
@@ -234,7 +242,7 @@ export function AdTemplate({
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
-              {config.button1.text}
+              {finalConfig.button1.text}
             </button>
 
             <button
@@ -248,7 +256,7 @@ export function AdTemplate({
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
-              {config.button2.text}
+              {finalConfig.button2.text}
             </button>
           </div>
         </div>

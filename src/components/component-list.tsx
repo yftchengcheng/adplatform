@@ -15,7 +15,6 @@ import {
   Trash2,
   Power,
   PowerOff,
-  X,
 } from "lucide-react";
 import {
   Table,
@@ -609,19 +608,6 @@ export function ComponentList() {
             <DialogTitle className="sr-only">
               组件预览 - {previewComponent?.name}
             </DialogTitle>
-            {/* 头部 */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
-              <div>
-                <h3 className="font-medium text-gray-900">组件预览</h3>
-                <p className="text-sm text-gray-500">{previewComponent?.name}</p>
-              </div>
-              <button
-                onClick={() => setPreviewComponent(null)}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
             
             {/* 预览区域 - 手机模拟器 */}
             <div className="p-8 bg-gradient-to-b from-gray-100 to-gray-200 flex justify-center">
@@ -643,7 +629,8 @@ export function ComponentList() {
                   
                   {/* 内容区域 */}
                   <div className="h-[calc(100%-96px)] overflow-auto">
-                    {previewComponent?.type === "dual_button" && previewComponent?.config ? (
+                    {/* 支持所有有 config 的组件类型 */}
+                    {previewComponent?.config ? (
                       <AdTemplate
                         config={previewComponent.config as unknown as AdTemplateConfig}
                         isOpen={true}
@@ -655,9 +642,12 @@ export function ComponentList() {
                           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                             <Eye className="w-8 h-8" />
                           </div>
-                          <p className="text-sm">该组件类型暂不支持预览</p>
+                          <p className="text-sm">该组件暂无配置数据</p>
                           <p className="text-xs mt-2 text-gray-400">
-                            当前支持：选择磁贴(双按钮)
+                            请先编辑并保存组件配置
+                          </p>
+                          <p className="text-xs mt-1 text-gray-500">
+                            类型: {previewComponent?.type}
                           </p>
                         </div>
                       </div>
@@ -680,22 +670,22 @@ export function ComponentList() {
             {/* 底部信息 */}
             <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between text-sm">
-                <div className="text-gray-500">
-                  <span>组件ID: </span>
-                  <span className="font-mono text-gray-700">{previewComponent?.id}</span>
-                </div>
                 <div className="flex items-center gap-4">
+                  <span className="text-gray-500">
+                    <span className="font-medium text-gray-700">{previewComponent?.name}</span>
+                    <span className="ml-2 font-mono text-xs text-gray-400">{previewComponent?.id}</span>
+                  </span>
                   <Badge variant={previewComponent?.status === "enabled" ? "default" : "secondary"}>
                     {previewComponent?.status === "enabled" ? "已启用" : "已暂停"}
                   </Badge>
-                  <Link
-                    href={`/components/config?type=${previewComponent?.type}`}
-                    className="text-blue-500 hover:text-blue-600 hover:underline"
-                    onClick={() => setPreviewComponent(null)}
-                  >
-                    编辑组件
-                  </Link>
                 </div>
+                <Link
+                  href={`/components/config?type=${previewComponent?.type}`}
+                  className="text-blue-500 hover:text-blue-600 hover:underline"
+                  onClick={() => setPreviewComponent(null)}
+                >
+                  编辑组件
+                </Link>
               </div>
             </div>
           </DialogContent>
