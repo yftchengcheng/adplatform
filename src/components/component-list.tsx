@@ -43,7 +43,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ComponentFilters, PaginationState } from "@/lib/component-types";
 import { useComponents, AdComponentItem } from "@/contexts/component-context";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
@@ -606,6 +606,9 @@ export function ComponentList() {
         {/* Preview Modal - 手机模拟器样式 */}
         <Dialog open={!!previewComponent} onOpenChange={() => setPreviewComponent(null)}>
           <DialogContent className="max-w-2xl p-0 overflow-hidden">
+            <DialogTitle className="sr-only">
+              组件预览 - {previewComponent?.name}
+            </DialogTitle>
             {/* 头部 */}
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
               <div>
