@@ -197,10 +197,6 @@ function ButtonConfigSection({
     onChange({ ...config, action });
   };
 
-  const handleLandingPageChange = (url: string) => {
-    onChange({ ...config, landingPageUrl: url });
-  };
-
   const handleImageChange = (imageUrl: string) => {
     onChange({ ...config, imageUrl });
   };
@@ -370,25 +366,28 @@ function ButtonConfigSection({
                 )}
               </div>
 
-              {config.imageUrl && (
+              {(config.imageUrl || config.imageMacro) && (
                 <div className="space-y-2">
-                  <label className="text-xs text-gray-500">落地页链接</label>
-                  <Input
-                    value={config.landingPageUrl || ""}
-                    onChange={(e) => handleLandingPageChange(e.target.value)}
-                    placeholder="点击图片后跳转的链接"
-                  />
-                </div>
-              )}
-
-              {config.imageMacro && !config.imageUrl && (
-                <div className="space-y-2">
-                  <label className="text-xs text-gray-500">落地页链接</label>
-                  <Input
-                    value={config.landingPageUrl || ""}
-                    onChange={(e) => handleLandingPageChange(e.target.value)}
-                    placeholder="点击图片后跳转的链接"
-                  />
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-500">落地页链接</label>
+                    <ModeToggle
+                      value={landingPageMode}
+                      onChange={setLandingPageMode}
+                    />
+                  </div>
+                  {landingPageMode === "input" ? (
+                    <Input
+                      value={config.landingPageUrl || ""}
+                      onChange={(e) => onChange({ ...config, landingPageUrl: e.target.value, landingPageMacro: undefined })}
+                      placeholder="点击图片后跳转的链接"
+                    />
+                  ) : (
+                    <Input
+                      value={config.landingPageMacro || ""}
+                      onChange={(e) => onChange({ ...config, landingPageMacro: e.target.value, landingPageUrl: undefined })}
+                      placeholder="请输入落地页宏变量，如 ${landing_page_url}"
+                    />
+                  )}
                 </div>
               )}
             </div>
