@@ -46,6 +46,7 @@ const iconMap: Record<string, React.ReactNode> = {
   "pen-tool": <PenTool className="w-10 h-10" />,
   "egg": <Egg className="w-10 h-10" />,
   "bell": <Bell className="w-10 h-10" />,
+  "vote": <CheckSquare className="w-10 h-10" />,
 };
 
 export default function ComponentCreatePage() {
@@ -70,6 +71,8 @@ export default function ComponentCreatePage() {
     // 根据组件类型跳转到对应的配置页面
     if (template.id === "dual_button") {
       router.push("/components/config?type=dual_button");
+    } else if (template.id === "vote") {
+      router.push("/components/config?type=vote");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);
