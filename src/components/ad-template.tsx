@@ -8,6 +8,7 @@ export interface AdButtonConfig {
   text: string;
   action: "jump" | "show_image";
   landingPageUrl?: string;
+  landingPageMacro?: string; // 落地页宏变量
   imageUrl?: string;
   imageMacro?: string;
   resultText?: string;
@@ -94,12 +95,24 @@ export function AdTemplate({
 
   // 解析落地页链接
   const resolveLandingPageUrl = (button: AdButtonConfig): string | undefined => {
-    const url = resolveMacro(button.landingPageUrl || config.defaultLandingPageUrl || "");
-    // 如果宏替换后仍然包含 ${} 或 $，说明没有对应的变量，返回 undefined
-    if (url.includes('${') || url.startsWith('$')) {
-      return undefined;
+    // 优先使用宏变量
+    if (button.landingPageMacro) {
+      const resolved = resolveMacro(button.landingPageMacro);
+      // 如果宏替换后仍然包含 ${} 或 $，说明没有对应的变量，返回 undefined
+      if (resolved.includes('${') || resolved.startsWith('$')) {
+        return undefined;
+      }
+      return resolved;
     }
-    return url;
+    // 其次使用直接输入的链接
+    if (button.landingPageUrl) {
+      return resolveMacro(button.landingPageUrl);
+    }
+    // 最后使用默认链接
+    if (config.defaultLandingPageUrl) {
+      return resolveMacro(config.defaultLandingPageUrl);
+    }
+    return undefined;
   };
 
   useEffect(() => {

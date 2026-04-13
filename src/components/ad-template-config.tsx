@@ -185,6 +185,9 @@ function ButtonConfigSection({
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const [textMode, setTextMode] = useState<"input" | "macro">("input");
+  const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">(
+    config.landingPageMacro ? "macro" : "input"
+  );
 
   const handleTextChange = (text: string) => {
     onChange({ ...config, text });
@@ -275,17 +278,31 @@ function ButtonConfigSection({
           {/* Action Config */}
           {config.action === "jump" && (
             <div className="space-y-2">
-              <label className="text-xs text-gray-500">落地页链接</label>
-              <Input
-                value={config.landingPageUrl}
-                onChange={(e) => handleLandingPageChange(e.target.value)}
-                placeholder={
-                  defaultLandingPageUrl
-                    ? `不配置默认使用: ${defaultLandingPageUrl}`
-                    : "请输入落地页链接"
-                }
-              />
-              {!config.landingPageUrl && defaultLandingPageUrl && (
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-gray-500">落地页链接</label>
+                <ModeToggle
+                  value={landingPageMode}
+                  onChange={setLandingPageMode}
+                />
+              </div>
+              {landingPageMode === "input" ? (
+                <Input
+                  value={config.landingPageUrl || ""}
+                  onChange={(e) => onChange({ ...config, landingPageUrl: e.target.value, landingPageMacro: undefined })}
+                  placeholder={
+                    defaultLandingPageUrl
+                      ? `不配置默认使用: ${defaultLandingPageUrl}`
+                      : "请输入落地页链接"
+                  }
+                />
+              ) : (
+                <Input
+                  value={config.landingPageMacro || ""}
+                  onChange={(e) => onChange({ ...config, landingPageMacro: e.target.value, landingPageUrl: undefined })}
+                  placeholder="请输入落地页宏变量，如 ${landing_page_url}"
+                />
+              )}
+              {!config.landingPageUrl && !config.landingPageMacro && defaultLandingPageUrl && (
                 <p className="text-xs text-gray-400">
                   当前将使用广告素材链接: {defaultLandingPageUrl}
                 </p>

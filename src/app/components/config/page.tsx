@@ -22,17 +22,20 @@ function ConfigContent() {
     button1: {
       text: "立即领取",
       action: "jump",
-      landingPageUrl: "",
+      landingPageMacro: "${landing_url}",
     },
     button2: {
       text: "查看详情",
       action: "show_image",
       imageMacro: "${image_url}",
+      landingPageMacro: "${detail_url}",
     },
     action: "open",
     defaultLandingPageUrl: "",
     macroVariables: {
       image_url: "https://picsum.photos/472/164",
+      landing_url: "https://example.com/claim",
+      detail_url: "https://example.com/detail",
     },
   };
 
