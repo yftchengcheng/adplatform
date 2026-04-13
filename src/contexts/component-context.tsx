@@ -155,20 +155,33 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
 
   // 加载数据
   const loadComponents = useCallback(async () => {
+    // 去重辅助函数
+    const deduplicate = (items: AdComponentItem[]): AdComponentItem[] => {
+      const seen = new Set<string>();
+      return items.filter(item => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      });
+    };
+
     // 检查 Supabase 是否可用
     if (!isSupabaseAvailable()) {
       console.log("Supabase 不可用，降级到 localStorage");
       const stored = localStorage.getItem("ad_components");
       if (stored) {
         try {
-          setComponents(JSON.parse(stored));
+          const parsed = JSON.parse(stored);
+          setComponents(deduplicate(parsed));
         } catch {
-          setComponents(initialComponents);
-          localStorage.setItem("ad_components", JSON.stringify(initialComponents));
+          const deduplicated = deduplicate(initialComponents);
+          setComponents(deduplicated);
+          localStorage.setItem("ad_components", JSON.stringify(deduplicated));
         }
       } else {
-        setComponents(initialComponents);
-        localStorage.setItem("ad_components", JSON.stringify(initialComponents));
+        const deduplicated = deduplicate(initialComponents);
+        setComponents(deduplicated);
+        localStorage.setItem("ad_components", JSON.stringify(deduplicated));
       }
       setError("数据库连接不可用，使用本地缓存");
       return;
@@ -187,31 +200,63 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
 
       if (data && data.length > 0) {
         const formatted = data.map(toFrontendFormat);
-        setComponents(formatted);
+        // 去重：以 id 为 key，保持第一个出现的记录
+        const seen = new Set<string>();
+        const deduplicated = formatted.filter(item => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+        setComponents(deduplicated);
         // 同步到 localStorage 缓存
-        localStorage.setItem("ad_components", JSON.stringify(formatted));
+        localStorage.setItem("ad_components", JSON.stringify(deduplicated));
       } else {
-        // 数据库为空，加载初始数据
-        setComponents(initialComponents);
-        localStorage.setItem("ad_components", JSON.stringify(initialComponents));
+        // 数据库为空，加载初始数据（去重）
+        const seen = new Set<string>();
+        const deduplicated = initialComponents.filter(item => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+        setComponents(deduplicated);
+        localStorage.setItem("ad_components", JSON.stringify(deduplicated));
         // 初始化数据库数据
-        for (const item of initialComponents) {
+        for (const item of deduplicated) {
           await client.from("ad_components").insert(toDbFormat(item));
         }
       }
       setError(null);
     } catch (err) {
       console.error("数据库加载失败，降级到 localStorage:", err);
-      // 降级到 localStorage
+      // 降级到 localStorage（去重）
       const stored = localStorage.getItem("ad_components");
       if (stored) {
         try {
-          setComponents(JSON.parse(stored));
+          const parsed = JSON.parse(stored);
+          const seen = new Set<string>();
+          const deduplicated = parsed.filter((item: AdComponentItem) => {
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return true;
+          });
+          setComponents(deduplicated);
         } catch {
-          setComponents(initialComponents);
+          const seen = new Set<string>();
+          const deduplicated = initialComponents.filter(item => {
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return true;
+          });
+          setComponents(deduplicated);
         }
       } else {
-        setComponents(initialComponents);
+        const seen = new Set<string>();
+        const deduplicated = initialComponents.filter(item => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+        setComponents(deduplicated);
       }
       setError("数据库连接失败，使用本地缓存");
     }
@@ -234,15 +279,10 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
     
-    // 生成新ID
-    const stored = localStorage.getItem("componentIds");
-    const existingIds: string[] = stored ? JSON.parse(stored) : [];
-    const maxId = existingIds.reduce((max, id) => {
-      const num = parseInt(id.replace("A", ""), 10);
-      return num > max ? num : max;
-    }, 100000);
-    const newId = `A${maxId + 1}`;
-    localStorage.setItem("componentIds", JSON.stringify([...existingIds, newId]));
+    // 生成新ID - 使用时间戳确保唯一性
+    const timestamp = Date.now();
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    const newId = `A${timestamp}${randomSuffix}`.slice(-12);
     
     const newComponent: AdComponentItem = {
       ...component,
