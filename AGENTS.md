@@ -62,7 +62,6 @@
 - 广告配置面板：`src/components/ad-template-config.tsx`
 - 组件列表页面：`src/components/component-list.tsx`
 - 组件选择页面：`src/app/components/create/page.tsx`
-- 组件配置页面：`src/app/components/config/page.tsx`
 - 演示页面：`src/app/page.tsx`
 - 类型定义：`src/lib/component-types.ts`
 
@@ -86,15 +85,6 @@
   - 分类筛选：全部/静态组件/动效组件
   - 组件卡片展示：图标、名称、描述、选择按钮
   - 步骤指示器：选择样式 → 填写内容
-
-### 组件配置页面
-- **路由**：`/components/config?type=xxx`
-- **用途**：配置选定的组件内容
-- **功能特性**：
-  - 步骤指示器（选择样式✓ → 填写内容）
-  - 左侧配置面板：基础配置、按钮1/2配置、宏变量
-  - 右侧实时预览：手机模拟器展示效果
-  - 支持选择磁贴(双按钮)组件完整配置
 
 ### 广告组件功能
 
