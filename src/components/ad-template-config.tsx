@@ -314,7 +314,13 @@ function ButtonConfigSection({
                   value={config.imageMacro ? "macro" : "custom"}
                   onValueChange={(v) => {
                     if (v === "custom") {
-                      onChange({ ...config, imageMacro: undefined });
+                      onChange({ ...config, imageMacro: undefined, imageUrl: "" });
+                    } else if (v === "macro") {
+                      onChange({ 
+                        ...config, 
+                        imageMacro: "${image_url}",
+                        imageUrl: "" 
+                      });
                     }
                   }}
                 >
@@ -330,11 +336,14 @@ function ButtonConfigSection({
 
               <div className="space-y-2">
                 {config.imageMacro ? (
-                  <Input
-                    value={config.imageMacro}
-                    onChange={(e) => handleImageMacroChange(e.target.value)}
-                    placeholder="请输入图片宏变量"
-                  />
+                  <div className="space-y-2">
+                    <label className="text-xs text-gray-500">图片宏变量</label>
+                    <Input
+                      value={config.imageMacro}
+                      onChange={(e) => handleImageMacroChange(e.target.value)}
+                      placeholder="请输入图片宏变量，如 ${image_url}"
+                    />
+                  </div>
                 ) : (
                   <ImageUpload
                     value={config.imageUrl || ""}
@@ -345,6 +354,17 @@ function ButtonConfigSection({
               </div>
 
               {config.imageUrl && (
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500">落地页链接</label>
+                  <Input
+                    value={config.landingPageUrl || ""}
+                    onChange={(e) => handleLandingPageChange(e.target.value)}
+                    placeholder="点击图片后跳转的链接"
+                  />
+                </div>
+              )}
+
+              {config.imageMacro && !config.imageUrl && (
                 <div className="space-y-2">
                   <label className="text-xs text-gray-500">落地页链接</label>
                   <Input

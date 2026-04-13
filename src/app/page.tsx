@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AdTemplateConfig, AdTemplate } from "@/components/ad-template";
 import { AdTemplateConfigPanel } from "@/components/ad-template-config";
 
-// Default configuration
+// Default configuration with macro variables
 const defaultConfig: AdTemplateConfig = {
   title: "限时特惠活动",
   subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
@@ -16,12 +16,17 @@ const defaultConfig: AdTemplateConfig = {
   button2: {
     text: "查看详情",
     action: "show_image",
-    imageUrl: "",
+    imageMacro: "${image_url}",
     resultText: "",
     buttonClickText: "",
   },
   action: "open",
   defaultLandingPageUrl: "https://example.com/default",
+  // 宏变量映射（实际使用时由服务端传入）
+  macroVariables: {
+    image_url: "https://picsum.photos/472/164",
+    title: "限时特惠",
+  },
 };
 
 export default function Home() {

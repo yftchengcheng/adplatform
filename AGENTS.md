@@ -73,6 +73,10 @@
   - 支持输入模式和宏替换
   - 移动端优化的触摸交互
   - 圆角设计和渐变按钮
+- **宏替换功能**：
+  - 支持 `${变量名}` 格式的宏替换
+  - 通过 `macroVariables` 字段传入变量映射
+  - 支持按钮落地页链接、图片宏的动态替换
 
 #### AdTemplateConfigPanel（配置面板）
 - **用途**：广告模板的可视化配置界面
@@ -98,10 +102,14 @@ const config: AdTemplateConfig = {
   button2: {
     text: "查看详情",
     action: "show_image",
-    imageUrl: "https://example.com/image.jpg",
+    imageMacro: "${image_url}", // 图片宏模式
   },
   action: "open",
   defaultLandingPageUrl: "https://example.com/default",
+  // 宏变量映射
+  macroVariables: {
+    image_url: "https://example.com/promotion.jpg",
+  },
 };
 
 <AdTemplate

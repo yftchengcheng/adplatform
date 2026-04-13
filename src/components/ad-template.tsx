@@ -21,6 +21,8 @@ export interface AdTemplateConfig {
   button2: AdButtonConfig;
   action: "open" | "show_image" | "custom";
   defaultLandingPageUrl?: string;
+  // 宏替换变量映射
+  macroVariables?: Record<string, string>;
 }
 
 export interface AdTemplateProps {
@@ -64,6 +66,31 @@ export function AdTemplate({
   const [currentImage, setCurrentImage] = useState<string>("");
   const [isVisible, setIsVisible] = useState(false);
 
+  // 宏替换函数
+  const resolveMacro = (macro: string): string => {
+    if (!macro || !config.macroVariables) return macro;
+    let result = macro;
+    Object.entries(config.macroVariables).forEach(([key, value]) => {
+      result = result.replace(new RegExp(`\\$\\{${key}\\}`, 'g'), value);
+      result = result.replace(new RegExp(`\\$${key}`, 'g'), value);
+    });
+    return result;
+  };
+
+  // 解析按钮的图片资源（支持 imageUrl 或 imageMacro）
+  const resolveButtonImage = (button: AdButtonConfig): string | undefined => {
+    if (button.imageUrl) return button.imageUrl;
+    if (button.imageMacro) {
+      const resolved = resolveMacro(button.imageMacro);
+      // 如果宏替换后仍然包含 ${} 或 $，说明没有对应的变量，返回 undefined
+      if (resolved.includes('${') || resolved.startsWith('$')) {
+        return undefined;
+      }
+      return resolved;
+    }
+    return undefined;
+  };
+
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -77,15 +104,16 @@ export function AdTemplate({
     if (previewMode) return;
     
     if (config.button1.action === "jump") {
-      const url = config.button1.landingPageUrl || config.defaultLandingPageUrl;
-      if (url) {
+      const url = resolveMacro(config.button1.landingPageUrl || config.defaultLandingPageUrl || "");
+      if (url && !url.includes('${') && !url.startsWith('$')) {
         window.open(url, "_blank");
       } else {
         onButton1Click?.(config.button1);
       }
     } else if (config.button1.action === "show_image") {
-      if (config.button1.imageUrl) {
-        setCurrentImage(config.button1.imageUrl);
+      const image = resolveButtonImage(config.button1);
+      if (image) {
+        setCurrentImage(image);
         setShowImageModal(true);
       }
     }
@@ -96,15 +124,16 @@ export function AdTemplate({
     if (previewMode) return;
     
     if (config.button2.action === "jump") {
-      const url = config.button2.landingPageUrl || config.defaultLandingPageUrl;
-      if (url) {
+      const url = resolveMacro(config.button2.landingPageUrl || config.defaultLandingPageUrl || "");
+      if (url && !url.includes('${') && !url.startsWith('$')) {
         window.open(url, "_blank");
       } else {
         onButton2Click?.(config.button2);
       }
     } else if (config.button2.action === "show_image") {
-      if (config.button2.imageUrl) {
-        setCurrentImage(config.button2.imageUrl);
+      const image = resolveButtonImage(config.button2);
+      if (image) {
+        setCurrentImage(image);
         setShowImageModal(true);
       }
     }
