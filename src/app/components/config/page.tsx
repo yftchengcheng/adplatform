@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AdTemplateConfig, AdTemplate } from "@/components/ad-template";
 import { AdTemplateConfigPanel } from "@/components/ad-template-config";
 import { useComponents } from "@/contexts/component-context";
+import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
 
 function ConfigContent() {
@@ -14,6 +15,7 @@ function ConfigContent() {
   const searchParams = useSearchParams();
   const type = (searchParams.get("type") || "dual_button") as ComponentType;
   const { addComponent } = useComponents();
+  const { showToast } = useToast();
 
   // 默认配置
   const defaultConfig: AdTemplateConfig = {
@@ -71,18 +73,26 @@ function ConfigContent() {
     }
   }, []);
 
-  const handleSave = () => {
-    // 保存到全局状态
-    addComponent({
-      name: config.title || "未命名组件",
-      category: "static",
-      type: type,
-      status: "enabled",
-      config: config as unknown as Record<string, unknown>,
-    });
-    clearSavedConfig();
-    alert("组件保存成功！");
-    router.push("/");
+  const handleSave = async () => {
+    try {
+      // 保存到全局状态（异步写入数据库）
+      await addComponent({
+        name: config.title || "未命名组件",
+        category: "static",
+        type: type,
+        status: "enabled",
+        config: config as unknown as Record<string, unknown>,
+      });
+      clearSavedConfig();
+      showToast("组件保存成功！", "success");
+      // 延迟跳转，让用户看到成功提示
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } catch (error) {
+      console.error("保存失败:", error);
+      showToast("保存失败，请重试", "error");
+    }
   };
 
   const handleBack = () => {
