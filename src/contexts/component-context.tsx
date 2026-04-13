@@ -94,28 +94,6 @@ function toDbFormat(item: AdComponentItem): Omit<DbAdComponent, "update_time"> &
   };
 }
 
-// 生成唯一ID
-async function generateId(client: ReturnType<typeof getSupabaseClient>): Promise<string> {
-  const { data, error } = await client.from("ad_components").select("id").order("id", { ascending: false }).limit(1);
-  if (error) {
-    // 降级：从 localStorage 获取
-    const stored = localStorage.getItem("componentIds");
-    const existingIds: string[] = stored ? JSON.parse(stored) : [];
-    const maxId = existingIds.reduce((max, id) => {
-      const num = parseInt(id.replace("A", ""), 10);
-      return num > max ? num : max;
-    }, 100000);
-    return `A${maxId + 1}`;
-  }
-  
-  if (data && data.length > 0) {
-    const lastId = data[0].id;
-    const num = parseInt(lastId.replace("A", ""), 10);
-    return `A${num + 1}`;
-  }
-  return "A100001";
-}
-
 // Context 接口
 interface ComponentContextType {
   components: AdComponentItem[];
@@ -139,8 +117,37 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // 检查 Supabase 是否可用
+  const isSupabaseAvailable = useCallback((): boolean => {
+    try {
+      getSupabaseClient();
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   // 加载数据
   const loadComponents = useCallback(async () => {
+    // 检查 Supabase 是否可用
+    if (!isSupabaseAvailable()) {
+      console.log("Supabase 不可用，降级到 localStorage");
+      const stored = localStorage.getItem("ad_components");
+      if (stored) {
+        try {
+          setComponents(JSON.parse(stored));
+        } catch {
+          setComponents(initialComponents);
+          localStorage.setItem("ad_components", JSON.stringify(initialComponents));
+        }
+      } else {
+        setComponents(initialComponents);
+        localStorage.setItem("ad_components", JSON.stringify(initialComponents));
+      }
+      setError("数据库连接不可用，使用本地缓存");
+      return;
+    }
+
     try {
       const client = getSupabaseClient();
       const { data, error: dbError } = await client
@@ -182,7 +189,7 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       }
       setError("数据库连接失败，使用本地缓存");
     }
-  }, []);
+  }, [isSupabaseAvailable]);
 
   // 初始化加载
   useEffect(() => {
@@ -198,11 +205,18 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   const addComponent = useCallback(async (
     component: Omit<AdComponentItem, "id" | "updateTime" | "templateCount" | "editor">
   ) => {
-    const client = getSupabaseClient();
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
     
-    const newId = await generateId(client);
+    // 生成新ID
+    const stored = localStorage.getItem("componentIds");
+    const existingIds: string[] = stored ? JSON.parse(stored) : [];
+    const maxId = existingIds.reduce((max, id) => {
+      const num = parseInt(id.replace("A", ""), 10);
+      return num > max ? num : max;
+    }, 100000);
+    const newId = `A${maxId + 1}`;
+    localStorage.setItem("componentIds", JSON.stringify([...existingIds, newId]));
     
     const newComponent: AdComponentItem = {
       ...component,
@@ -212,17 +226,20 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       updateTime: timeStr,
     };
 
-    // 保存到数据库
-    try {
-      const { error: dbError } = await client
-        .from("ad_components")
-        .insert(toDbFormat(newComponent));
-      
-      if (dbError) {
-        throw new Error(`保存失败: ${dbError.message}`);
+    // 尝试保存到数据库
+    if (isSupabaseAvailable()) {
+      try {
+        const client = getSupabaseClient();
+        const { error: dbError } = await client
+          .from("ad_components")
+          .insert(toDbFormat(newComponent));
+        
+        if (dbError) {
+          console.error("数据库保存失败:", dbError);
+        }
+      } catch (err) {
+        console.error("数据库保存失败:", err);
       }
-    } catch (err) {
-      console.error("数据库保存失败:", err);
     }
 
     // 更新本地状态
@@ -231,14 +248,12 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, [saveToStorage, isSupabaseAvailable]);
 
   // 更新组件
   const updateComponent = useCallback(async (id: string, updates: Partial<AdComponentItem>) => {
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
-    
-    const client = getSupabaseClient();
     
     // 准备更新数据
     const dbUpdates: Partial<DbAdComponent> = {};
@@ -250,18 +265,21 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     if (updates.config !== undefined) dbUpdates.config = updates.config;
     dbUpdates.update_time = timeStr;
 
-    // 更新数据库
-    try {
-      const { error: dbError } = await client
-        .from("ad_components")
-        .update(dbUpdates)
-        .eq("id", id);
-      
-      if (dbError) {
-        throw new Error(`更新失败: ${dbError.message}`);
+    // 尝试更新数据库
+    if (isSupabaseAvailable()) {
+      try {
+        const client = getSupabaseClient();
+        const { error: dbError } = await client
+          .from("ad_components")
+          .update(dbUpdates)
+          .eq("id", id);
+        
+        if (dbError) {
+          console.error("数据库更新失败:", dbError);
+        }
+      } catch (err) {
+        console.error("数据库更新失败:", err);
       }
-    } catch (err) {
-      console.error("数据库更新失败:", err);
     }
 
     // 更新本地状态
@@ -274,24 +292,25 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, [saveToStorage, isSupabaseAvailable]);
 
   // 删除组件
   const deleteComponent = useCallback(async (id: string) => {
-    const client = getSupabaseClient();
-    
-    // 从数据库删除
-    try {
-      const { error: dbError } = await client
-        .from("ad_components")
-        .delete()
-        .eq("id", id);
-      
-      if (dbError) {
-        throw new Error(`删除失败: ${dbError.message}`);
+    // 尝试从数据库删除
+    if (isSupabaseAvailable()) {
+      try {
+        const client = getSupabaseClient();
+        const { error: dbError } = await client
+          .from("ad_components")
+          .delete()
+          .eq("id", id);
+        
+        if (dbError) {
+          console.error("数据库删除失败:", dbError);
+        }
+      } catch (err) {
+        console.error("数据库删除失败:", err);
       }
-    } catch (err) {
-      console.error("数据库删除失败:", err);
     }
 
     // 更新本地状态
@@ -300,30 +319,31 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, [saveToStorage, isSupabaseAvailable]);
 
   // 切换状态
   const toggleStatus = useCallback(async (id: string) => {
-    const client = getSupabaseClient();
-    
     // 查找当前组件
     const component = components.find(item => item.id === id);
     if (!component) return;
 
     const newStatus = component.status === "enabled" ? "disabled" : "enabled";
     
-    // 更新数据库
-    try {
-      const { error: dbError } = await client
-        .from("ad_components")
-        .update({ status: newStatus })
-        .eq("id", id);
-      
-      if (dbError) {
-        throw new Error(`状态更新失败: ${dbError.message}`);
+    // 尝试更新数据库
+    if (isSupabaseAvailable()) {
+      try {
+        const client = getSupabaseClient();
+        const { error: dbError } = await client
+          .from("ad_components")
+          .update({ status: newStatus })
+          .eq("id", id);
+        
+        if (dbError) {
+          console.error("数据库状态更新失败:", dbError);
+        }
+      } catch (err) {
+        console.error("数据库状态更新失败:", err);
       }
-    } catch (err) {
-      console.error("数据库状态更新失败:", err);
     }
 
     // 更新本地状态
@@ -336,7 +356,7 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [components, saveToStorage]);
+  }, [components, saveToStorage, isSupabaseAvailable]);
 
   // 获取单个组件
   const getComponent = useCallback((id: string) => {
