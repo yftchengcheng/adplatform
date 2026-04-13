@@ -46,6 +46,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ComponentFilters, PaginationState } from "@/lib/component-types";
 import { useComponents, AdComponentItem } from "@/contexts/component-context";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
+import { VoteTemplate, VoteTemplateConfig } from "@/components/vote-template";
 
 export function ComponentList() {
   const { components, toggleStatus, deleteComponent } = useComponents();
@@ -631,11 +632,19 @@ export function ComponentList() {
                   <div className="h-[calc(100%-96px)] overflow-auto">
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
-                      <AdTemplate
-                        config={previewComponent.config as unknown as AdTemplateConfig}
-                        isOpen={true}
-                        onClose={() => {}}
-                      />
+                      previewComponent?.type === "vote" ? (
+                        <VoteTemplate
+                          config={previewComponent.config as unknown as VoteTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                        />
+                      ) : (
+                        <AdTemplate
+                          config={previewComponent.config as unknown as AdTemplateConfig}
+                          isOpen={true}
+                          onClose={() => {}}
+                        />
+                      )
                     ) : (
                       <div className="h-full flex items-center justify-center text-gray-400">
                         <div className="text-center p-6">

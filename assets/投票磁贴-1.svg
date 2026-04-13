@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="330px" height="192px" viewBox="0 0 330 192" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>投票磁贴-1</title>
+    <defs>
+        <path d="M0,0 L240,0 L240,160 L0,160 L0,0 Z" id="path-1"></path>
+    </defs>
+    <g id="投票磁贴-1" stroke="none" fill="none" transform="translate(47, 32)" xlink:href="#path-1">
+        <g id="编组" stroke-width="1" fill-rule="evenodd">
+            <rect id="矩形" fill="#FFFFFF" x="0" y="0" width="240" height="160" rx="3"></rect>
+            <g id="z#/关闭-Icon" transform="translate(215, 8)" fill="#000000">
+                <rect id="矩形" fill-rule="nonzero" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                <path d="M8.809375,8 L12.9109375,3.1109375 C12.9796875,3.0296875 12.921875,2.90625 12.815625,2.90625 L11.56875,2.90625 C11.4953125,2.90625 11.425,2.9390625 11.3765625,2.9953125 L7.99375,7.028125 L4.6109375,2.9953125 C4.5640625,2.9390625 4.49375,2.90625 4.41875,2.90625 L3.171875,2.90625 C3.065625,2.90625 3.0078125,3.0296875 3.0765625,3.1109375 L7.178125,8 L3.0765625,12.8890625 C3.0078125,12.9703125 3.065625,13.09375 3.171875,13.09375 L4.41875,13.09375 C4.4921875,13.09375 4.5625,13.0609375 4.6109375,13.0046875 L7.99375,8.971875 L11.3765625,13.0046875 C11.4234375,13.0609375 11.49375,13.09375 11.56875,13.09375 L12.815625,13.09375 C12.921875,13.09375 12.9796875,12.9703125 12.9109375,12.8890625 L8.809375,8 Z" id="路径" fill-opacity="0.15" fill-rule="evenodd"></path>
+            </g>
+            <text id="标题内容" font-family="PingFangSC-Medium, PingFang SC" font-size="14" font-weight="400" letter-spacing="0.254545455" fill="#082400">
+                <tspan x="22" y="29">标题内容</tspan>
+            </text>
+            <rect id="矩形-2" stroke="#3087FF" fill="#3087FF" x="22.5" y="50.5" width="196" height="23" rx="3"></rect>
+            <rect id="矩形-2" stroke="#3087FF" fill="#FFFFFF" x="165.5" y="50.5" width="53" height="23"></rect>
+            <text id="默认按钮1" font-family="PingFangSC-Medium, PingFang SC" font-size="12" font-weight="400" letter-spacing="0.218181818" fill="#FFFFFF">
+                <tspan x="87.0065455" y="67">默认按钮1</tspan>
+            </text>
+            <rect id="矩形-2" fill="#3087FF" x="22" y="81" width="197" height="24" rx="3"></rect>
+            <rect id="矩形-2" stroke="#3087FF" fill="#FFFFFF" x="59.5" y="81.5" width="159" height="23"></rect>
+            <text id="默认按钮2" font-family="PingFangSC-Medium, PingFang SC" font-size="12" font-weight="400" letter-spacing="0.218181818" fill="#082400">
+                <tspan x="86.8545455" y="98">默认按钮2</tspan>
+            </text>
+            <text id="标题内容标题内容标题内容" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" letter-spacing="0.218181818" fill="#161313" fill-opacity="0.65">
+                <tspan x="45.8" y="138">标题内容标题内容标题内</tspan>
+                <tspan x="106.890909" y="155">容</tspan>
+            </text>
+            <g id="Icon/Arrow-right" transform="translate(180, 126)" stroke="#161313" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65" stroke-width="1.5">
+                <polyline id="Path-21" transform="translate(8.5, 8) rotate(-90) translate(-8.5, -8)" points="4.5 6 8.5 10 12.5 6"></polyline>
+            </g>
+        </g>
+        <text id="75%" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" letter-spacing="0.218181818" fill="#000000" fill-opacity="0.65">
+            <tspan x="180.970727" y="66">75%</tspan>
+        </text>
+        <text id="25%" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" letter-spacing="0.218181818" fill="#000000" fill-opacity="0.65">
+            <tspan x="179.652727" y="97">25%</tspan>
+        </text>
+        <g id="@标注" stroke-width="1" fill-rule="evenodd" transform="translate(-20, -42)">
+            <g id="size-width:-编组" transform="translate(20, 0)">
+                <g id="line" transform="translate(0, 16.5)" fill="#FF5500" fill-rule="nonzero">
+                    <path id="Line" d="M240,9 L239,9 L239,5 L1,5 L1,9 L0,9 L0,0 L1,0 L1,4 L239,4 L239,0 L240,0 L240,9 Z"></path>
+                </g>
+                <g id="Number" stroke-width="1" fill-rule="evenodd" transform="translate(94.5, 10)">
+                    <rect id="Bg" fill="#FF5500" x="0" y="0" width="51" height="22" rx="2"></rect>
+                    <text id="数据" font-family="Menlo-Regular, Menlo" font-size="12" font-weight="normal" fill="#FFFFFF">
+                        <tspan x="7.43847656" y="15">120px</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="size-height:-编组" transform="translate(260, 42)">
+                <g id="line" transform="translate(16.5, 0)" fill="#FF5500" fill-rule="nonzero">
+                    <path id="Line" d="M0,160 L0,159 L4,159 L4,1 L0,1 L0,2.49800181e-16 L9,-2.49800181e-16 L9,1 L5,0.999 L5,159 L9,159 L9,160 L0,160 Z"></path>
+                </g>
+                <g id="Number" stroke-width="1" fill-rule="evenodd" transform="translate(-0.5, 69)">
+                    <rect id="Bg" fill="#FF5500" x="0" y="0" width="43" height="22" rx="2"></rect>
+                    <text id="数据" font-family="Menlo-Regular, Menlo" font-size="12" font-weight="normal" fill="#FFFFFF">
+                        <tspan x="7.05078125" y="15">80px</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="size-width:-矩形-2" transform="translate(42, 147)">
+                <g id="line" transform="translate(0, 16.5)" fill="#FF5500" fill-rule="nonzero">
+                    <path id="Line" d="M197,9 L196,9 L196,5 L1,5 L1,9 L0,9 L0,0 L1,0 L1,4 L196,4 L196,0 L197,0 L197,9 Z"></path>
+                </g>
+                <g id="Number" stroke-width="1" fill-rule="evenodd" transform="translate(73, 10)">
+                    <rect id="Bg" fill="#FF5500" x="0" y="0" width="51" height="22" rx="2"></rect>
+                    <text id="数据" font-family="Menlo-Regular, Menlo" font-size="12" font-weight="normal" fill="#FFFFFF">
+                        <tspan x="7.43847656" y="15">100px</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="size-height:-矩形-2" transform="translate(0, 123)">
+                <g id="line" transform="translate(16.5, 0)" fill="#FF5500" fill-rule="nonzero">
+                    <path id="Line" d="M0,24 L0,23 L4,23 L4,1 L0,1 L0,2.49800181e-16 L9,-2.49800181e-16 L9,1 L5,0.999 L5,23 L9,23 L9,24 L0,24 Z"></path>
+                </g>
+                <g id="Number" stroke-width="1" fill-rule="evenodd" transform="translate(-26.5, 1)">
+                    <path d="M41,0 C42.1045695,0 43,0.8954305 43,2 L43,8 L46,11 L43,14 L43,20 C43,21.1045695 42.1045695,22 41,22 L2,22 C0.8954305,22 0,21.1045695 0,20 L0,2 C0,0.8954305 0.8954305,2.22044605e-16 2,0 L41,0 Z" id="Bg" fill="#FF5500"></path>
+                    <text id="数据" font-family="Menlo-Regular, Menlo" font-size="12" font-weight="normal" fill="#FFFFFF">
+                        <tspan x="7.1015625" y="15">12px</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

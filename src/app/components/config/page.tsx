@@ -6,9 +6,70 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdTemplateConfig, AdTemplate } from "@/components/ad-template";
 import { AdTemplateConfigPanel } from "@/components/ad-template-config";
+import { VoteTemplateConfig, VoteTemplate } from "@/components/vote-template";
+import { VoteTemplateConfigPanel } from "@/components/vote-template-config";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
+
+// 默认广告组件配置
+const defaultAdConfig: AdTemplateConfig = {
+  title: "限时特惠活动",
+  subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
+  button1: {
+    text: "立即领取",
+    action: "jump",
+    landingPageMacro: "${landing_url}",
+  },
+  button2: {
+    text: "查看详情",
+    action: "show_image",
+    imageMacro: "${image_url}",
+    landingPageMacro: "${detail_url}",
+  },
+  action: "open",
+  defaultLandingPageUrl: "",
+  macroVariables: {
+    image_url: "https://picsum.photos/472/164",
+    landing_url: "https://example.com/claim",
+    detail_url: "https://example.com/detail",
+  },
+};
+
+// 默认投票组件配置
+const defaultVoteConfig: VoteTemplateConfig = {
+  title: "请选择您的偏好",
+  subtitle: "感谢您的参与，点击选项查看详情",
+  options: [
+    { id: "1", text: "选项一", percentage: 75, buttonText: "选择" },
+    { id: "2", text: "选项二", percentage: 25, buttonText: "选择" },
+  ],
+  clickResultText: "投票成功",
+  action: "jump",
+  defaultLandingPageUrl: "",
+  macroVariables: {
+    title: "投票标题",
+    subtitle: "副标题内容",
+  },
+};
+
+// 组件类型对应的默认配置和名称
+const componentConfigMap: Record<string, {
+  defaultConfig: AdTemplateConfig | VoteTemplateConfig;
+  name: string;
+  description: string;
+}> = {
+  dual_button: {
+    defaultConfig: defaultAdConfig,
+    name: "选择磁贴(双按钮)",
+    description: "配置组件内容和样式",
+  },
+  vote: {
+    defaultConfig: defaultVoteConfig,
+    name: "投票磁贴",
+    description: "配置投票选项和样式",
+  },
+};
 
 function ConfigContent() {
   const router = useRouter();
@@ -17,32 +78,18 @@ function ConfigContent() {
   const { addComponent } = useComponents();
   const { showToast } = useToast();
 
-  // 默认配置
-  const defaultConfig: AdTemplateConfig = {
-    title: "限时特惠活动",
-    subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
-    button1: {
-      text: "立即领取",
-      action: "jump",
-      landingPageMacro: "${landing_url}",
-    },
-    button2: {
-      text: "查看详情",
-      action: "show_image",
-      imageMacro: "${image_url}",
-      landingPageMacro: "${detail_url}",
-    },
-    action: "open",
-    defaultLandingPageUrl: "",
-    macroVariables: {
-      image_url: "https://picsum.photos/472/164",
-      landing_url: "https://example.com/claim",
-      detail_url: "https://example.com/detail",
-    },
+  // 根据类型获取默认配置
+  const getDefaultConfig = () => {
+    return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+  };
+
+  // 根据类型获取组件名称
+  const getComponentName = () => {
+    return componentConfigMap[type]?.name || "选择磁贴(双按钮)";
   };
 
   // 使用 useState 初始化为空配置，避免 SSR/CSR 不一致
-  const [config, setConfig] = useState<AdTemplateConfig>(defaultConfig);
+  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig>(getDefaultConfig());
 
   // 客户端挂载后从 sessionStorage 恢复配置
   React.useEffect(() => {
@@ -58,7 +105,7 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
-  const handleConfigChange = useCallback((newConfig: AdTemplateConfig) => {
+  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig) => {
     setConfig(newConfig);
     sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
@@ -70,9 +117,14 @@ function ConfigContent() {
 
   const handleSave = async () => {
     try {
+      // 获取组件名称
+      const name = 'title' in config 
+        ? (config.title || "未命名组件")
+        : "未命名组件";
+
       // 保存到全局状态（异步写入数据库）
       await addComponent({
-        name: config.title || "未命名组件",
+        name: name,
         category: "static",
         type: type,
         status: "enabled",
@@ -94,6 +146,8 @@ function ConfigContent() {
     router.push("/components/create");
   };
 
+  const isVoteComponent = type === "vote";
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -108,8 +162,8 @@ function ConfigContent() {
               <span className="text-sm">返回</span>
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900">选择磁贴(双按钮)</h1>
-              <p className="text-sm text-gray-500">配置组件内容和样式</p>
+              <h1 className="text-xl font-bold text-gray-900">{getComponentName()}</h1>
+              <p className="text-sm text-gray-500">{componentConfigMap[type]?.description || "配置组件内容和样式"}</p>
             </div>
             <Button variant="outline" onClick={handleBack}>
               取消
@@ -132,7 +186,7 @@ function ConfigContent() {
               </div>
               <span className="text-gray-500">选择样式</span>
               <span className="text-gray-400 mx-1">/</span>
-              <span className="text-blue-600 font-medium">选择磁贴(双按钮)</span>
+              <span className="text-blue-600 font-medium">{getComponentName()}</span>
             </div>
             <div className="flex-1 h-px bg-gray-200 max-w-[80px]" />
             <div className="flex items-center gap-2">
@@ -148,11 +202,18 @@ function ConfigContent() {
         <div className="flex gap-8">
           {/* Config Panel - 占据主要宽度 */}
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px]">
-            <AdTemplateConfigPanel
-              config={config}
-              onChange={handleConfigChange}
-              onSave={handleSave}
-            />
+            {isVoteComponent ? (
+              <VoteTemplateConfigPanel
+                config={config as VoteTemplateConfig}
+                onChange={handleConfigChange}
+              />
+            ) : (
+              <AdTemplateConfigPanel
+                config={config as AdTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+              />
+            )}
           </div>
 
           {/* Preview Panel - 固定定位 */}
@@ -208,11 +269,19 @@ function ConfigContent() {
 
                       {/* App content */}
                       <div className="h-[calc(100%-28px)] overflow-auto">
-                        <AdTemplate
-                          config={config}
-                          isOpen={true}
-                          previewMode={true}
-                        />
+                        {isVoteComponent ? (
+                          <VoteTemplate
+                            config={config as VoteTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        ) : (
+                          <AdTemplate
+                            config={config as AdTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -224,11 +293,11 @@ function ConfigContent() {
                 <div className="bg-white rounded-xl p-3 border border-gray-200">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h4 className="text-xs font-semibold text-gray-900">上文下按钮</h4>
-                  <p className="text-[10px] text-gray-500 mt-0.5">主标题+副标题+双按钮</p>
+                  <h4 className="text-xs font-semibold text-gray-900">{isVoteComponent ? "投票选项" : "上文下按钮"}</h4>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}</p>
                 </div>
 
                 <div className="bg-white rounded-xl p-3 border border-gray-200">
