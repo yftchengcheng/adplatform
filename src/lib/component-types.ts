@@ -32,7 +32,7 @@ export const componentStyleTemplates: ComponentStyleTemplate[] = [
   // 静态组件
   {
     id: "dual_button",
-    name: "双按钮磁贴",
+    name: "选择磁贴(双按钮)",
     category: "static",
     description: "上文下按钮结构，支持跳转落地页或显示图片",
     icon: "layout-grid",
@@ -155,7 +155,7 @@ export const ComponentTypeMap: Record<ComponentType, string> = {
   scratch_card: "刮刮卡",
   smash_egg: "砸蛋",
   popup_redpacket: "弹窗(红包)",
-  dual_button: "双按钮磁贴",
+  dual_button: "选择磁贴(双按钮)",
   vote: "投票磁贴",
   image: "图片磁贴",
   ecommerce: "电商磁贴",

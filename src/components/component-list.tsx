@@ -254,7 +254,7 @@ export function ComponentList() {
       scratch_card: "刮刮卡",
       smash_egg: "砸蛋",
       popup_redpacket: "弹窗(红包)",
-      dual_button: "双按钮磁贴",
+      dual_button: "选择磁贴(双按钮)",
       vote: "投票磁贴",
       image: "图片磁贴",
       ecommerce: "电商磁贴",
