@@ -502,9 +502,11 @@ function ButtonConfigSection({
 export function AdTemplateConfigPanel({
   config,
   onChange,
+  onSave,
 }: {
   config: AdTemplateConfig;
   onChange: (config: AdTemplateConfig) => void;
+  onSave?: () => void;
 }) {
   const [isBasicOpen, setIsBasicOpen] = useState(true);
   const [titleMode, setTitleMode] = useState<"input" | "macro">("input");
@@ -727,7 +729,10 @@ export function AdTemplateConfigPanel({
           <button className="flex-1 h-10 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">
             上一步
           </button>
-          <button className="flex-1 h-10 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors">
+          <button 
+            onClick={onSave}
+            className="flex-1 h-10 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+          >
             保存
           </button>
         </div>

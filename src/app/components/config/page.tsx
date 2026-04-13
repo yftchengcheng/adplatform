@@ -151,6 +151,7 @@ function ConfigContent() {
             <AdTemplateConfigPanel
               config={config}
               onChange={handleConfigChange}
+              onSave={handleSave}
             />
           </div>
 
