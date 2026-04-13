@@ -603,10 +603,11 @@ export function ComponentList() {
           </div>
         </div>
 
-        {/* Preview Modal */}
+        {/* Preview Modal - 手机模拟器样式 */}
         <Dialog open={!!previewComponent} onOpenChange={() => setPreviewComponent(null)}>
-          <DialogContent className="max-w-[400px] p-0 overflow-hidden">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <DialogContent className="max-w-2xl p-0 overflow-hidden">
+            {/* 头部 */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
               <div>
                 <h3 className="font-medium text-gray-900">组件预览</h3>
                 <p className="text-sm text-gray-500">{previewComponent?.name}</p>
@@ -618,21 +619,81 @@ export function ComponentList() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-4 bg-gray-100">
-              {previewComponent?.type === "dual_button" && previewComponent?.config ? (
-                <AdTemplate
-                  config={previewComponent.config as unknown as AdTemplateConfig}
-                  isOpen={true}
-                  onClose={() => {}}
-                />
-              ) : (
-                <div className="bg-white rounded-lg p-6 text-center text-gray-500">
-                  <p className="text-sm">该组件类型暂不支持预览</p>
-                  <p className="text-xs mt-2 text-gray-400">
-                    当前支持：选择磁贴(双按钮)
-                  </p>
+            
+            {/* 预览区域 - 手机模拟器 */}
+            <div className="p-8 bg-gradient-to-b from-gray-100 to-gray-200 flex justify-center">
+              <div className="relative">
+                {/* 手机边框 */}
+                <div className="w-[375px] h-[667px] bg-white rounded-[3rem] shadow-2xl overflow-hidden border-[12px] border-gray-800 relative">
+                  {/* 刘海区域 */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-800 rounded-b-2xl z-10"></div>
+                  
+                  {/* 状态栏 */}
+                  <div className="h-12 bg-white flex items-end justify-between px-6 pb-1">
+                    <span className="text-xs font-medium">9:41</span>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-2 border border-gray-400 rounded-sm">
+                        <div className="w-3 h-1 bg-gray-400 rounded-sm m-px"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* 内容区域 */}
+                  <div className="h-[calc(100%-96px)] overflow-auto">
+                    {previewComponent?.type === "dual_button" && previewComponent?.config ? (
+                      <AdTemplate
+                        config={previewComponent.config as unknown as AdTemplateConfig}
+                        isOpen={true}
+                        onClose={() => {}}
+                      />
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400">
+                        <div className="text-center p-6">
+                          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                            <Eye className="w-8 h-8" />
+                          </div>
+                          <p className="text-sm">该组件类型暂不支持预览</p>
+                          <p className="text-xs mt-2 text-gray-400">
+                            当前支持：选择磁贴(双按钮)
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Home 指示条 */}
+                  <div className="h-8 bg-white flex items-center justify-center">
+                    <div className="w-32 h-1 bg-gray-300 rounded-full"></div>
+                  </div>
                 </div>
-              )}
+                
+                {/* 底部标签 */}
+                <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-center">
+                  <p className="text-xs text-gray-500">iPhone 尺寸预览 (375×667)</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* 底部信息 */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between text-sm">
+                <div className="text-gray-500">
+                  <span>组件ID: </span>
+                  <span className="font-mono text-gray-700">{previewComponent?.id}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Badge variant={previewComponent?.status === "enabled" ? "default" : "secondary"}>
+                    {previewComponent?.status === "enabled" ? "已启用" : "已暂停"}
+                  </Badge>
+                  <Link
+                    href={`/components/config?type=${previewComponent?.type}`}
+                    className="text-blue-500 hover:text-blue-600 hover:underline"
+                    onClick={() => setPreviewComponent(null)}
+                  >
+                    编辑组件
+                  </Link>
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
