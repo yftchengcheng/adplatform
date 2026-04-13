@@ -65,6 +65,7 @@ export function AdTemplate({
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [isVisible, setIsVisible] = useState(false);
+  const [currentButtonConfig, setCurrentButtonConfig] = useState<AdButtonConfig | null>(null);
 
   // 宏替换函数
   const resolveMacro = (macro: string): string => {
@@ -91,6 +92,16 @@ export function AdTemplate({
     return undefined;
   };
 
+  // 解析落地页链接
+  const resolveLandingPageUrl = (button: AdButtonConfig): string | undefined => {
+    const url = resolveMacro(button.landingPageUrl || config.defaultLandingPageUrl || "");
+    // 如果宏替换后仍然包含 ${} 或 $，说明没有对应的变量，返回 undefined
+    if (url.includes('${') || url.startsWith('$')) {
+      return undefined;
+    }
+    return url;
+  };
+
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -104,8 +115,8 @@ export function AdTemplate({
     if (previewMode) return;
     
     if (config.button1.action === "jump") {
-      const url = resolveMacro(config.button1.landingPageUrl || config.defaultLandingPageUrl || "");
-      if (url && !url.includes('${') && !url.startsWith('$')) {
+      const url = resolveLandingPageUrl(config.button1);
+      if (url) {
         window.open(url, "_blank");
       } else {
         onButton1Click?.(config.button1);
@@ -114,6 +125,7 @@ export function AdTemplate({
       const image = resolveButtonImage(config.button1);
       if (image) {
         setCurrentImage(image);
+        setCurrentButtonConfig(config.button1);
         setShowImageModal(true);
       }
     }
@@ -124,8 +136,8 @@ export function AdTemplate({
     if (previewMode) return;
     
     if (config.button2.action === "jump") {
-      const url = resolveMacro(config.button2.landingPageUrl || config.defaultLandingPageUrl || "");
-      if (url && !url.includes('${') && !url.startsWith('$')) {
+      const url = resolveLandingPageUrl(config.button2);
+      if (url) {
         window.open(url, "_blank");
       } else {
         onButton2Click?.(config.button2);
@@ -134,10 +146,21 @@ export function AdTemplate({
       const image = resolveButtonImage(config.button2);
       if (image) {
         setCurrentImage(image);
+        setCurrentButtonConfig(config.button2);
         setShowImageModal(true);
       }
     }
     onButton2Click?.(config.button2);
+  };
+
+  // 点击图片跳转到落地页
+  const handleImageClick = () => {
+    if (previewMode || !currentButtonConfig) return;
+    const url = resolveLandingPageUrl(currentButtonConfig);
+    if (url) {
+      setShowImageModal(false);
+      window.open(url, "_blank");
+    }
   };
 
   if (!isVisible && !previewMode) return null;
@@ -233,8 +256,11 @@ export function AdTemplate({
             <img
               src={currentImage}
               alt="内容图片"
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              className="max-w-full max-h-[80vh] object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={handleImageClick}
             />
+            {/* Hint text */}
+            <p className="text-white/70 text-center text-xs mt-2">点击图片跳转落地页</p>
             <button
               onClick={() => setShowImageModal(false)}
               className="absolute -top-10 right-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
