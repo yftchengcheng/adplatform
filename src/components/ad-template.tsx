@@ -1,0 +1,222 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export interface AdButtonConfig {
+  text: string;
+  action: "jump" | "show_image";
+  landingPageUrl?: string;
+  imageUrl?: string;
+  imageMacro?: string;
+  resultText?: string;
+  buttonClickText?: string;
+}
+
+export interface AdTemplateConfig {
+  title: string;
+  subtitle: string;
+  button1: AdButtonConfig;
+  button2: AdButtonConfig;
+  action: "open" | "show_image" | "custom";
+  defaultLandingPageUrl?: string;
+}
+
+export interface AdTemplateProps {
+  config: AdTemplateConfig;
+  isOpen?: boolean;
+  onClose?: () => void;
+  onButton1Click?: (config: AdButtonConfig) => void;
+  onButton2Click?: (config: AdButtonConfig) => void;
+  previewMode?: boolean;
+}
+
+// 默认配置
+const defaultConfig: AdTemplateConfig = {
+  title: "限时特惠活动",
+  subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
+  button1: {
+    text: "立即领取",
+    action: "jump",
+    landingPageUrl: "",
+  },
+  button2: {
+    text: "查看详情",
+    action: "show_image",
+    imageUrl: "",
+    resultText: "",
+    buttonClickText: "",
+  },
+  action: "open",
+  defaultLandingPageUrl: "",
+};
+
+export function AdTemplate({
+  config = defaultConfig,
+  isOpen = true,
+  onClose,
+  onButton1Click,
+  onButton2Click,
+  previewMode = false,
+}: AdTemplateProps) {
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImage, setCurrentImage] = useState<string>("");
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleButton1Click = () => {
+    if (previewMode) return;
+    
+    if (config.button1.action === "jump") {
+      const url = config.button1.landingPageUrl || config.defaultLandingPageUrl;
+      if (url) {
+        window.open(url, "_blank");
+      } else {
+        onButton1Click?.(config.button1);
+      }
+    } else if (config.button1.action === "show_image") {
+      if (config.button1.imageUrl) {
+        setCurrentImage(config.button1.imageUrl);
+        setShowImageModal(true);
+      }
+    }
+    onButton1Click?.(config.button1);
+  };
+
+  const handleButton2Click = () => {
+    if (previewMode) return;
+    
+    if (config.button2.action === "jump") {
+      const url = config.button2.landingPageUrl || config.defaultLandingPageUrl;
+      if (url) {
+        window.open(url, "_blank");
+      } else {
+        onButton2Click?.(config.button2);
+      }
+    } else if (config.button2.action === "show_image") {
+      if (config.button2.imageUrl) {
+        setCurrentImage(config.button2.imageUrl);
+        setShowImageModal(true);
+      }
+    }
+    onButton2Click?.(config.button2);
+  };
+
+  if (!isVisible && !previewMode) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className={cn(
+          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0",
+          previewMode ? "relative" : ""
+        )}
+        onClick={!previewMode ? onClose : undefined}
+      />
+
+      {/* Modal */}
+      <div
+        className={cn(
+          "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
+          "transition-all duration-300",
+          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0",
+          previewMode ? "relative static -translate-x-0 -translate-y-0 scale-100 opacity-100" : ""
+        )}
+      >
+        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+            aria-label="关闭"
+          >
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+
+          {/* Content */}
+          <div className="px-5 pt-6 pb-4">
+            {/* Title */}
+            <h2 className="text-xl font-bold text-gray-900 pr-8 leading-tight">
+              {config.title}
+            </h2>
+
+            {/* Subtitle */}
+            <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+              {config.subtitle}
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="px-5 pb-6 space-y-3">
+            <button
+              onClick={handleButton1Click}
+              className={cn(
+                "w-full h-12 rounded-xl text-white font-medium text-base",
+                "bg-gradient-to-r from-blue-500 to-blue-600",
+                "hover:from-blue-600 hover:to-blue-700",
+                "active:scale-[0.98] transition-all duration-150",
+                "shadow-lg shadow-blue-500/25",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            >
+              {config.button1.text}
+            </button>
+
+            <button
+              onClick={handleButton2Click}
+              className={cn(
+                "w-full h-12 rounded-xl text-white font-medium text-base",
+                "bg-gradient-to-r from-blue-500 to-blue-600",
+                "hover:from-blue-600 hover:to-blue-700",
+                "active:scale-[0.98] transition-all duration-150",
+                "shadow-lg shadow-blue-500/25",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            >
+              {config.button2.text}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Image Modal (for show_image action) */}
+      {showImageModal && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div
+            className="relative max-w-full max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={currentImage}
+              alt="内容图片"
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+            />
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="absolute -top-10 right-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export { defaultConfig };

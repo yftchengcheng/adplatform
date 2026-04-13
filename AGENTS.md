@@ -54,3 +54,61 @@
 
 - 模板默认预装核心组件库 `shadcn/ui`，位于`src/components/ui/`目录下
 - Next.js 项目**必须默认**采用 shadcn/ui 组件、风格和规范，**除非用户指定用其他的组件和规范。**
+
+## 广告组件说明
+
+### 组件位置
+- 广告模板核心组件：`src/components/ad-template.tsx`
+- 广告配置面板：`src/components/ad-template-config.tsx`
+- 演示页面：`src/app/page.tsx`
+
+### 广告组件功能
+
+#### AdTemplate（广告弹窗组件）
+- **用途**：APP端广告弹窗展示
+- **结构**：上文下按钮（主标题 + 副标题 + 双按钮）
+- **主要特性**：
+  - 支持双按钮配置
+  - 按钮支持跳转落地页或显示图片
+  - 支持输入模式和宏替换
+  - 移动端优化的触摸交互
+  - 圆角设计和渐变按钮
+
+#### AdTemplateConfigPanel（配置面板）
+- **用途**：广告模板的可视化配置界面
+- **配置项**：
+  - 基础配置：动作、主标题、副标题
+  - 按钮1/2配置：文案、点击行为、落地页链接、图片上传
+  - 默认落地页链接（全局配置）
+  - 组件名称
+
+### 组件使用示例
+
+```typescript
+import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
+
+const config: AdTemplateConfig = {
+  title: "限时特惠活动",
+  subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
+  button1: {
+    text: "立即领取",
+    action: "jump",
+    landingPageUrl: "https://example.com/claim",
+  },
+  button2: {
+    text: "查看详情",
+    action: "show_image",
+    imageUrl: "https://example.com/image.jpg",
+  },
+  action: "open",
+  defaultLandingPageUrl: "https://example.com/default",
+};
+
+<AdTemplate
+  config={config}
+  isOpen={true}
+  onClose={() => setIsOpen(false)}
+  onButton1Click={(btn) => console.log("Button 1 clicked:", btn)}
+  onButton2Click={(btn) => console.log("Button 2 clicked:", btn)}
+/>
+```
