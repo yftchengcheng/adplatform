@@ -466,7 +466,7 @@ export function AdTemplateConfigPanel({
       </div>
 
       {/* Form content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 max-w-2xl mx-auto w-full">
         {/* Basic Config */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button

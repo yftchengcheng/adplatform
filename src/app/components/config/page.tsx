@@ -151,9 +151,9 @@ function ConfigContent() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Config Panel */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-280px)] min-h-[500px]">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+          {/* Config Panel - 占3列，更宽敞 */}
+          <div className="xl:col-span-3 bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px]">
             <AdTemplateConfigPanel
               config={config}
               onChange={handleConfigChange}
@@ -161,8 +161,8 @@ function ConfigContent() {
             />
           </div>
 
-          {/* Preview Panel */}
-          <div className="space-y-4">
+          {/* Preview Panel - 占2列 */}
+          <div className="xl:col-span-2 space-y-4 flex flex-col">
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200">
               <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
                 <svg
@@ -188,7 +188,7 @@ function ConfigContent() {
               </h3>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-8 flex items-center justify-center min-h-[500px] relative overflow-hidden">
+            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-8 flex items-center justify-center flex-1 relative overflow-hidden min-h-[400px]">
               {/* Background pattern */}
               <div className="absolute inset-0 opacity-[0.03]" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
