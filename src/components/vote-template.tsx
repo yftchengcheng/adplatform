@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // 配置接口
 export interface VoteOption {
@@ -83,47 +85,46 @@ function VoteOptionBar({
   return (
     <button
       onClick={onSelect}
-      className={`
-        relative w-full h-14 rounded-xl border-2 overflow-hidden transition-all duration-300
-        ${selected 
+      className={cn(
+        "relative w-full h-14 rounded-xl border-2 overflow-hidden transition-all duration-300",
+        selected 
           ? "border-blue-500 bg-blue-50" 
           : "border-blue-500 bg-white hover:bg-blue-50"
-        }
-      `}
+      )}
     >
       {/* 进度条背景 */}
       <div 
-        className={`
-          absolute inset-y-0 left-0 transition-all duration-500 ease-out
-          ${selected ? "bg-blue-500" : "bg-blue-200"}
-        `}
+        className={cn(
+          "absolute inset-y-0 left-0 transition-all duration-500 ease-out",
+          selected ? "bg-blue-500" : "bg-blue-200"
+        )}
         style={{ width: `${progressWidth}%` }}
       />
       
       {/* 内容 */}
       <div className="relative flex items-center justify-between h-full px-4">
         {/* 左侧：按钮文字 */}
-        <span className={`
-          font-medium text-sm
-          ${selected ? "text-white" : "text-blue-600"}
-        `}>
+        <span className={cn(
+          "font-medium text-sm",
+          selected ? "text-white" : "text-blue-600"
+        )}>
           {option.buttonText}
         </span>
         
         {/* 中间：选项文本 */}
-        <span className={`
-          font-medium text-sm flex-1 text-center
-          ${selected ? "text-white" : "text-gray-800"}
-        `}>
+        <span className={cn(
+          "font-medium text-sm flex-1 text-center",
+          selected ? "text-white" : "text-gray-800"
+        )}>
           {option.text}
         </span>
         
         {/* 右侧：百分比 */}
         {showResult && (
-          <span className={`
-            text-sm font-semibold
-            ${selected ? "text-white" : "text-gray-600"}
-          `}>
+          <span className={cn(
+            "text-sm font-semibold",
+            selected ? "text-white" : "text-gray-600"
+          )}>
             {option.percentage}%
           </span>
         )}
@@ -142,7 +143,6 @@ export function VoteTemplate({
 }: VoteTemplateProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResultText, setShowResultText] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
 
   // 解析宏变量 - 使用 useMemo 避免每次渲染重新计算
   const resolvedTitle = getResolvedText(
@@ -160,15 +160,6 @@ export function VoteTemplate({
   const landingPageUrl = config?.landingPageUrl || config?.defaultLandingPageUrl || defaultConfig.defaultLandingPageUrl;
   const landingPageMacro = config?.landingPageMacro;
   const macroVariables = config?.macroVariables;
-
-  // 入场动画
-  useEffect(() => {
-    if (isOpen) {
-      requestAnimationFrame(() => {
-        setIsVisible(true);
-      });
-    }
-  }, [isOpen]);
 
   // 处理选项选择
   const handleSelect = (option: VoteOption) => {
@@ -194,82 +185,100 @@ export function VoteTemplate({
   if (!isOpen) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div 
-        className={`
-          w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden
-          transition-all duration-300 ease-out
-          ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}
-        `}
+    <>
+      {/* Backdrop */}
+      <div
+        className={cn(
+          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0",
+          previewMode ? "relative" : ""
+        )}
+        onClick={!previewMode ? onClose : undefined}
+      />
+
+      {/* Modal */}
+      <div
+        className={cn(
+          "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
+          "transition-all duration-300",
+          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0",
+          previewMode ? "relative static -translate-x-0 -translate-y-0 scale-100 opacity-100" : ""
+        )}
       >
-        {/* 顶部区域 - 标题 */}
-        <div className="px-5 pt-6 pb-4">
-          <div className="flex items-start justify-between">
-            <h2 className="text-xl font-bold text-gray-900 leading-tight">
+        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+            aria-label="关闭"
+          >
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+
+          {/* Content */}
+          <div className="px-5 pt-6 pb-4">
+            {/* Title */}
+            <h2 className="text-xl font-bold text-gray-900 pr-8 leading-tight">
               {resolvedTitle}
             </h2>
-            {!previewMode && onClose && (
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+
+            {/* Subtitle */}
+            {resolvedSubtitle && (
+              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                {resolvedSubtitle}
+              </p>
+            )}
+          </div>
+
+          {/* Vote Options */}
+          <div className="px-5 pb-4 space-y-3">
+            {options.map((option) => (
+              <VoteOptionBar
+                key={option.id}
+                option={option}
+                onSelect={() => handleSelect(option)}
+                selected={selectedOption === option.id}
+                showResult={previewMode}
+              />
+            ))}
+          </div>
+
+          {/* Buttons */}
+          <div className="px-5 pb-6 space-y-3">
+            {/* Vote Result Text */}
+            {showResultText && clickResultText && (
+              <div 
+                className={cn(
+                  "text-center text-sm font-medium text-green-600 mb-3",
+                  "transition-opacity duration-300",
+                  showResultText ? "opacity-100" : "opacity-0"
+                )}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                {clickResultText}
+              </div>
+            )}
+            
+            {/* Primary Button */}
+            {selectedOption && !previewMode && (
+              <button
+                onClick={() => {
+                  const option = options.find(o => o.id === selectedOption);
+                  if (option) handleButtonClick(option);
+                }}
+                className={cn(
+                  "w-full h-12 rounded-xl text-white font-medium text-base",
+                  "bg-gradient-to-r from-blue-500 to-blue-600",
+                  "hover:from-blue-600 hover:to-blue-700",
+                  "active:scale-[0.98] transition-all duration-150",
+                  "shadow-lg shadow-blue-500/25"
+                )}
+              >
+                查看详情
               </button>
             )}
           </div>
         </div>
-
-        {/* 中间区域 - 投票选项 */}
-        <div className="px-5 pb-4 space-y-3">
-          {options.map((option) => (
-            <VoteOptionBar
-              key={option.id}
-              option={option}
-              onSelect={() => handleSelect(option)}
-              selected={selectedOption === option.id}
-              showResult={previewMode}
-            />
-          ))}
-        </div>
-
-        {/* 底部区域 - 副标题和结果提示 */}
-        <div className="px-5 pb-6">
-          {/* 投票结果文字 */}
-          {showResultText && clickResultText && (
-            <div 
-              className={`
-                text-center text-sm font-medium text-green-600 mb-3
-                transition-opacity duration-300
-                ${showResultText ? "opacity-100" : "opacity-0"}
-              `}
-            >
-              {clickResultText}
-            </div>
-          )}
-          
-          {/* 副标题 */}
-          {resolvedSubtitle && (
-            <p className="text-sm text-gray-500 leading-relaxed">
-              {resolvedSubtitle}
-            </p>
-          )}
-
-          {/* 点击按钮 */}
-          {selectedOption && !previewMode && (
-            <button
-              onClick={() => {
-                const option = options.find(o => o.id === selectedOption);
-                if (option) handleButtonClick(option);
-              }}
-              className="w-full mt-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors active:scale-[0.98]"
-            >
-              查看详情
-            </button>
-          )}
-        </div>
       </div>
-    </div>
+    </>
   );
 }
