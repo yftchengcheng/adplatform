@@ -41,36 +41,33 @@ function ConfigContent() {
     },
   };
 
-  // 从 sessionStorage 恢复配置
-  const [config, setConfig] = useState<AdTemplateConfig>(() => {
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("component_config");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          return defaultConfig;
-        }
+  // 使用 useState 初始化为空配置，避免 SSR/CSR 不一致
+  const [config, setConfig] = useState<AdTemplateConfig>(defaultConfig);
+
+  // 客户端挂载后从 sessionStorage 恢复配置
+  React.useEffect(() => {
+    const saved = sessionStorage.getItem("component_config");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setConfig(parsed);
+      } catch {
+        // ignore parse errors
       }
     }
-    return defaultConfig;
-  });
+  }, []);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // 保存配置到 sessionStorage
   const handleConfigChange = useCallback((newConfig: AdTemplateConfig) => {
     setConfig(newConfig);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("component_config", JSON.stringify(newConfig));
-    }
+    sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
 
   // 清空 sessionStorage
   const clearSavedConfig = useCallback(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("component_config");
-    }
+    sessionStorage.removeItem("component_config");
   }, []);
 
   const handleSave = async () => {
