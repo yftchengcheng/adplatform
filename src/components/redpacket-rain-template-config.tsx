@@ -209,8 +209,8 @@ export function RedpacketRainTemplateConfigPanel({
 
   // 获取落地页值
   const getLandingValue = () => {
-    if (landingMode && config.landingPageMacro) {
-      return config.landingPageMacro;
+    if (landingMode === "macro") {
+      return config.landingPageMacro || "";
     }
     return config.landingPageUrl || "";
   };
