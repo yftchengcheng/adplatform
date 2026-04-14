@@ -165,7 +165,7 @@ export function ImageTemplate({
         className={cn(
           "w-full overflow-hidden rounded-xl transition-all duration-300",
           previewMode
-            ? "flex items-center justify-center"
+            ? "flex items-center justify-center min-h-[400px]"
             : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
         )}
         onClick={!previewMode ? onClose : undefined}
@@ -173,7 +173,7 @@ export function ImageTemplate({
         <div
           className={cn(
             "relative w-full max-w-2xl mx-auto",
-            previewMode ? "" : "max-h-[80vh]"
+            previewMode ? "px-4" : "max-h-[80vh]"
           )}
           onClick={(e) => e.stopPropagation()}
         >
@@ -200,7 +200,7 @@ export function ImageTemplate({
       className={cn(
         "w-full overflow-hidden transition-all duration-300",
         previewMode
-          ? "flex items-center justify-center"
+          ? "flex items-center justify-center min-h-[400px]"
           : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
       )}
       onClick={!previewMode ? onClose : undefined}
@@ -208,7 +208,10 @@ export function ImageTemplate({
       onMouseLeave={() => !previewMode && setIsPaused(false)}
     >
       <div
-        className="relative w-full max-w-2xl mx-auto"
+        className={cn(
+          "relative w-full max-w-2xl mx-auto",
+          previewMode ? "px-4" : ""
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* 主图 */}
