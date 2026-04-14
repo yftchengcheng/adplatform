@@ -287,54 +287,45 @@ const getFixedPercentage = (index: number): number => {
 </button>
 ```
 
-### 4. 交互逻辑
+### 4. 交互逻辑（与选择磁贴一致）
 
 #### 动作类型处理
 | 动作类型 | 行为 |
 |----------|------|
-| `jump` | 投票成功后自动跳转落地页 |
-| `show_image` | 投票成功后自动显示图片预览 |
+| `jump` | 点击选项后直接跳转落地页 |
+| `show_image` | 点击选项后弹出图片预览，点击图片跳转落地页 |
 
 #### 交互流程
 1. 用户点击投票选项
-2. 显示投票成功提示（根据 `clickResultText` 配置）
-3. 500ms 后自动执行动作：
-   - `jump` → 自动打开落地页链接
-   - `show_image` → 自动显示图片预览弹窗
-4. 可点击遮罩或关闭按钮关闭图片预览
+2. 立即执行动作：
+   - `jump` → 直接打开落地页链接
+   - `show_image` → 弹出图片预览弹窗
+3. 点击图片 → 打开落地页链接
 
-#### 预览模式交互
-- 进度条和百分比始终显示
-- 投票成功提示正常显示
-- 不触发跳转或弹窗（`previewMode=true` 时跳过动作执行）
-
-#### 图片预览弹窗
+#### 图片预览弹窗（与选择磁贴一致）
 ```tsx
-// 弹窗结构
-<>
-  <div className="fixed inset-0 z-[60] bg-black/70" onClick={closeImageModal} />
-  <div className="fixed left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 max-w-lg w-[90%]">
-    <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
-      <button onClick={closeImageModal} className="...">关闭</button>
-      <Image src={currentImageUrl} alt="Preview" />
+{showImageModal && (
+  <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4" onClick={closeImageModal}>
+    <div className="relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
+      <img src={currentImage} alt="内容图片" className="max-w-full max-h-[80vh] object-contain rounded-lg cursor-pointer" onClick={handleImageClick} />
+      <p className="text-white/70 text-center text-xs mt-2">点击图片跳转落地页</p>
+      <button onClick={closeImageModal} className="absolute -top-10 right-0 w-8 h-8 ..."><X /></button>
     </div>
   </div>
-</>
+)}
 ```
 
-#### 宏变量替换
+#### 宏变量替换（与选择磁贴一致）
 ```typescript
-// 落地页URL替换
-let url = landingPageUrl;
-if (landingPageMacro && macroVariables) {
-  url = resolveMacro(landingPageMacro, macroVariables);
-}
-
-// 图片URL替换
-let imgUrl = imageUrl || "";
-if (imageMacro && macroVariables) {
-  imgUrl = resolveMacro(imageMacro, macroVariables);
-}
+const resolveMacro = (macro: string): string => {
+  if (!macro || !macroVariables) return macro;
+  let result = macro;
+  Object.entries(macroVariables).forEach(([key, value]) => {
+    result = result.replace(new RegExp(`\\$\\{${key}\\}`, 'g'), value);
+    result = result.replace(new RegExp(`\\$${key}`, 'g'), value);
+  });
+  return result;
+};
 ```
 
 ---

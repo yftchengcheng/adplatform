@@ -344,10 +344,6 @@ export function VoteTemplateConfigPanel({
     onChange({ ...config, defaultLandingPageUrl: url });
   };
 
-  const handleClickResultTextChange = (text: string) => {
-    onChange({ ...config, clickResultText: text });
-  };
-
   return (
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
@@ -447,18 +443,6 @@ export function VoteTemplateConfigPanel({
                     className="text-sm"
                   />
                 )}
-              </div>
-
-              {/* Click Result Text */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  点击结果文案
-                </label>
-                <Input
-                  value={config.clickResultText || ""}
-                  onChange={(e) => handleClickResultTextChange(e.target.value)}
-                  placeholder="投票后显示的提示文案"
-                />
               </div>
             </div>
           )}
