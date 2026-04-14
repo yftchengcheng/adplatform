@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -124,6 +124,21 @@ function ImageUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
   const [error, setError] = useState<string | null>(null);
 
+  // 同步外部 value 变化
+  useEffect(() => {
+    if (mode === "upload") {
+      setPreviewUrl(value || null);
+    }
+  }, [value, mode]);
+
+  // 切换到宏模式时清空预览
+  useEffect(() => {
+    if (mode === "macro") {
+      setPreviewUrl(null);
+      setError(null);
+    }
+  }, [mode]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -156,7 +171,10 @@ function ImageUpload({
         <label className="text-sm font-medium text-gray-700">图标设置</label>
         <div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
           <button
-            onClick={() => onModeChange("upload")}
+            onClick={() => {
+              setError(null);
+              onModeChange("upload");
+            }}
             className={cn(
               "px-2 py-0.5 text-xs font-medium rounded transition-all",
               mode === "upload" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
@@ -165,7 +183,10 @@ function ImageUpload({
             上传图片
           </button>
           <button
-            onClick={() => onModeChange("macro")}
+            onClick={() => {
+              setError(null);
+              onModeChange("macro");
+            }}
             className={cn(
               "px-2 py-0.5 text-xs font-medium rounded transition-all",
               mode === "macro" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
