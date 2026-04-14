@@ -43,6 +43,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ComponentFilters, PaginationState } from "@/lib/component-types";
 import { useComponents, AdComponentItem } from "@/contexts/component-context";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
@@ -51,6 +61,7 @@ import { VoteTemplate, VoteTemplateConfig } from "@/components/vote-template";
 export function ComponentList() {
   const { components, toggleStatus, deleteComponent } = useComponents();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; templateCount: number } | null>(null);
   const [filters, setFilters] = useState<ComponentFilters>({
     category: "all",
     type: "all",
@@ -210,12 +221,24 @@ export function ComponentList() {
 
   const handleDelete = (id: string) => {
     const component = components.find((item) => item.id === id);
-    if (component && component.templateCount > 0) {
-      alert(`组件"${component.name}"已被 ${component.templateCount} 个模板使用，无法删除`);
-      return;
+    if (component) {
+      setDeleteTarget({
+        id: component.id,
+        name: component.name,
+        templateCount: component.templateCount,
+      });
     }
-    if (confirm(`确定要删除组件"${component?.name}"吗？`)) {
-      deleteComponent(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteTarget) {
+      if (deleteTarget.templateCount > 0) {
+        // 无法删除，显示提示
+        setDeleteTarget(null);
+        return;
+      }
+      deleteComponent(deleteTarget.id);
+      setDeleteTarget(null);
     }
   };
 
@@ -699,6 +722,35 @@ export function ComponentList() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* 删除确认弹窗 */}
+        <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {deleteTarget?.templateCount && deleteTarget.templateCount > 0
+                  ? "无法删除组件"
+                  : "确认删除"}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {deleteTarget?.templateCount && deleteTarget.templateCount > 0
+                  ? `组件"${deleteTarget?.name}"已被 ${deleteTarget?.templateCount} 个模板使用，无法删除。请先解除关联后再尝试删除。`
+                  : `确定要删除组件"${deleteTarget?.name}"吗？此操作不可撤销。`}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>取消</AlertDialogCancel>
+              {!(deleteTarget?.templateCount && deleteTarget.templateCount > 0) && (
+                <AlertDialogAction
+                  onClick={handleConfirmDelete}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  删除
+                </AlertDialogAction>
+              )}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
