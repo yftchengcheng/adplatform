@@ -160,8 +160,9 @@ export function GameGiftTemplateConfigPanel({
   const [appNameMode, setAppNameMode] = useState<"input" | "macro">("input");
   const [appDescMode, setAppDescMode] = useState<"input" | "macro">("input");
   const [downloadMode, setDownloadMode] = useState<"input" | "macro">("input");
-  // Logo 模式（true = 上传模式, false = 宏模式）
-  const [logoMode, setLogoMode] = useState<boolean>(!config.logoMacro);
+  // Logo 模式（true = 宏替换模式, false = 上传模式）
+  // 初始值根据配置决定：如果有logoMacro且没有logoUrl则宏模式，否则上传模式
+  const [logoMode, setLogoMode] = useState<boolean>(!!config.logoMacro && !config.logoUrl);
 
   // Logo 错误状态
   const [logoError, setLogoError] = useState<string | null>(null);
@@ -290,8 +291,8 @@ export function GameGiftTemplateConfigPanel({
                   <div className="flex items-center gap-2 mb-2">
                     <button
                       onClick={() => {
+                        if (!logoMode) return; // 已经是上传模式
                         setLogoMode(false);
-                        handleLogoInput("", false);
                       }}
                       className={cn(
                         "px-2 py-0.5 text-xs font-medium rounded transition-all",
@@ -302,8 +303,8 @@ export function GameGiftTemplateConfigPanel({
                     </button>
                     <button
                       onClick={() => {
+                        if (logoMode) return; // 已经是宏替换模式
                         setLogoMode(true);
-                        handleLogoInput("", true);
                       }}
                       className={cn(
                         "px-2 py-0.5 text-xs font-medium rounded transition-all",
