@@ -24,6 +24,8 @@ export interface VoteTemplateConfig {
   defaultLandingPageUrl?: string;
   macroVariables?: Record<string, string>;
   onVote?: (optionId: string) => void;
+  // 动作参数：打开/关闭
+  clickAction: "open" | "close";
 }
 
 interface VoteTemplateProps {
@@ -44,6 +46,7 @@ const defaultConfig: VoteTemplateConfig = {
   ],
   action: "jump",
   defaultLandingPageUrl: "",
+  clickAction: "open",
 };
 
 // 投票选项组件

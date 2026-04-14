@@ -20,6 +20,8 @@ export interface ImageTemplateConfig {
   landingPageMacro?: string;
   macroVariables?: Record<string, string>;
   onImageClick?: (imageIndex: number) => void;
+  // 动作参数：打开/关闭
+  clickAction: "open" | "close";
 }
 
 interface ImageTemplateProps {
@@ -33,6 +35,7 @@ interface ImageTemplateProps {
 const defaultConfig: ImageTemplateConfig = {
   images: [],
   defaultLandingPageUrl: "",
+  clickAction: "open",
 };
 
 // 图片磁贴组件
