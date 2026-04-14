@@ -165,12 +165,14 @@ interface RedpacketRainTemplateConfigPanelProps {
   config: RedpacketRainConfig;
   onChange: (config: RedpacketRainConfig) => void;
   previewUrl?: string;
+  onSave?: () => void;
 }
 
 export function RedpacketRainTemplateConfigPanel({
   config,
   onChange,
   previewUrl,
+  onSave,
 }: RedpacketRainTemplateConfigPanelProps) {
   // 折叠状态
   const [basicOpen, setBasicOpen] = useState(true);
@@ -748,6 +750,18 @@ export function RedpacketRainTemplateConfigPanel({
           </p>
         </div>
       </div>
+
+      {/* 保存按钮 */}
+      {onSave && (
+        <div className="flex justify-center pt-4 border-t border-gray-200">
+          <Button
+            onClick={onSave}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium"
+          >
+            保存
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

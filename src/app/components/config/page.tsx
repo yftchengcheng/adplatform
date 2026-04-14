@@ -439,6 +439,7 @@ function ConfigContent() {
               <RedpacketRainTemplateConfigPanel
                 config={config as RedpacketRainTemplateConfig}
                 onChange={handleConfigChange}
+                onSave={handleSave}
               />
             ) : (
               <AdTemplateConfigPanel
