@@ -155,21 +155,6 @@ function VoteOptionEditor({
               maxLength={16}
             />
           </div>
-
-          {/* Vote Count */}
-          <div className="space-y-1">
-            <label className="text-xs text-gray-500">投票数</label>
-            <Input
-              type="number"
-              min="0"
-              value={option.voteCount}
-              onChange={(e) => {
-                const val = parseInt(e.target.value) || 0;
-                onChange({ ...option, voteCount: Math.max(0, val) });
-              }}
-              placeholder="请输入投票数"
-            />
-          </div>
         </div>
       )}
     </div>
@@ -537,7 +522,7 @@ export function VoteTemplateDemo() {
       { id: "option_2", text: "选项B", voteCount: 80, buttonText: "B" },
     ],
     action: "jump",
-    landingPageUrl: "https://example.com",
+    landingPageUrl: "",
     defaultLandingPageUrl: "",
   });
 
