@@ -586,10 +586,10 @@ export function AdTemplateConfigPanel({
 
           {isBasicOpen && (
             <div className="px-4 pb-4 space-y-4">
-              {/* Action */}
+              {/* 动作 */}
               <div className="space-y-2">
                 <label className="text-xs text-gray-500">
-                  动作 <span className="text-red-500">*</span>
+                  动作
                 </label>
                 <Select
                   value={config.action}
@@ -601,18 +601,8 @@ export function AdTemplateConfigPanel({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="open">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        <span>打开</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="show_image">
-                      <div className="flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4" />
-                        <span>显示图片</span>
-                      </div>
-                    </SelectItem>
+                    <SelectItem value="open">打开</SelectItem>
+                    <SelectItem value="show_image">显示图片</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
