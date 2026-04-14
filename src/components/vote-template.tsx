@@ -229,9 +229,11 @@ export function VoteTemplate({
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0",
-          previewMode ? "relative" : ""
+          previewMode
+            ? "flex items-center justify-center min-h-[400px]"
+            : "fixed inset-0 z-50 bg-black/50",
+          "transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0"
         )}
         onClick={!previewMode ? onClose : undefined}
       />
@@ -239,12 +241,11 @@ export function VoteTemplate({
       {/* Modal */}
       <div
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
-          "transition-all duration-300",
-          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0",
           previewMode
-            ? "relative static -translate-x-0 -translate-y-0 scale-100 opacity-100"
-            : ""
+            ? "w-full max-w-sm mx-4"
+            : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
+          "transition-all duration-300",
+          isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
       >
         <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">

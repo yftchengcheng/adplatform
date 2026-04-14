@@ -662,7 +662,7 @@ export function ComponentList() {
                   </div>
                   
                   {/* 内容区域 */}
-                  <div className="h-[calc(100%-96px)] overflow-auto">
+                  <div className="h-[calc(100%-96px)] overflow-auto flex items-center justify-center">
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
                       previewComponent?.type === "image" ? (

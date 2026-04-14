@@ -313,7 +313,7 @@ function ConfigContent() {
                       </div>
 
                       {/* App content */}
-                      <div className="h-[calc(100%-28px)] overflow-auto">
+                      <div className="h-[calc(100%-28px)] overflow-auto flex items-center justify-center">
                         {isImageComponent ? (
                           <ImageTemplate
                             config={config as ImageTemplateConfig}
