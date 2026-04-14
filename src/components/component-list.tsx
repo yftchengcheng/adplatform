@@ -57,6 +57,7 @@ import { ComponentFilters, PaginationState } from "@/lib/component-types";
 import { useComponents, AdComponentItem } from "@/contexts/component-context";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 import { VoteTemplate, VoteTemplateConfig } from "@/components/vote-template";
+import { ImageTemplate, ImageTemplateConfig } from "@/components/image-template";
 
 export function ComponentList() {
   const { components, toggleStatus, deleteComponent } = useComponents();
@@ -655,7 +656,13 @@ export function ComponentList() {
                   <div className="h-[calc(100%-96px)] overflow-auto">
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
-                      previewComponent?.type === "vote" ? (
+                      previewComponent?.type === "image" ? (
+                        <ImageTemplate
+                          config={previewComponent.config as unknown as ImageTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                        />
+                      ) : previewComponent?.type === "vote" ? (
                         <VoteTemplate
                           config={previewComponent.config as unknown as VoteTemplateConfig}
                           isOpen={true}

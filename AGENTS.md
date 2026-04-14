@@ -389,3 +389,122 @@ const resolveMacro = (macro: string): string => {
 | 正文 | 14px | 400 | `text-sm` |
 | 标签 | 12px | 400 | `text-xs` |
 | 字符计数 | 12px | 400 | `text-xs` |
+
+---
+
+## 十一、图片磁贴特殊规范
+
+### 1. 组件特点
+- **单图模式**：一张大图展示
+- **多图模式**：轮播图展示，最多3张图片
+- **落地页配置**：每张图片可单独配置落地页，也支持全局落地页
+
+### 2. 图片数据结构
+```typescript
+interface ImageItem {
+  id: string;
+  imageUrl?: string;          // 上传的图片URL
+  imageMacro?: string;         // 图片宏变量
+  landingPageUrl?: string;    // 落地页URL（可选，优先级高于全局）
+  landingPageMacro?: string;  // 落地页宏变量
+}
+
+interface ImageTemplateConfig {
+  images: ImageItem[];              // 图片列表（最多3张）
+  defaultLandingPageUrl?: string;  // 全局默认落地页
+  landingPageMacro?: string;       // 全局落地页宏变量
+  macroVariables?: Record<string, string>;
+}
+```
+
+### 3. 图片要求
+| 项目 | 要求 |
+|------|------|
+| 尺寸 | 640×360px |
+| 格式 | JPG/PNG/JPEG/GIF |
+| 大小 | 最大 2MB |
+
+### 4. UI组件
+
+#### 4.1 图片上传组件
+```tsx
+// 上传区域
+<label className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50/50">
+  <Plus className="w-6 h-6 text-gray-400" />
+  <span className="text-sm text-gray-500">点击上传图片</span>
+  <span className="text-xs text-gray-400">推荐 640×360px，最大 2MB</span>
+</label>
+
+// 预览区域（hover显示操作按钮）
+<div className="relative group">
+  <Image src={previewUrl} alt="Preview" fill className="object-cover" />
+  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100">
+    <button>重新上传</button>
+    <button>删除</button>
+  </div>
+</div>
+```
+
+#### 4.2 图片列表项
+```tsx
+<div className="border border-gray-200 rounded-lg bg-white p-4">
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <ImageIcon className="w-4 h-4 text-gray-400" />
+      <span className="text-sm font-medium">图片 {index + 1}</span>
+    </div>
+    {canRemove && <button className="text-red-500"><Trash2 /></button>}
+  </div>
+  {/* 图片上传 */}
+  {/* 落地页配置 */}
+</div>
+```
+
+#### 4.3 模式切换
+```tsx
+<div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
+  <button className={value === "upload" ? "bg-white shadow-sm" : "text-gray-500"}>上传图片</button>
+  <button className={value === "macro" ? "bg-white shadow-sm" : "text-gray-500"}>图片宏</button>
+</div>
+```
+
+### 5. 渲染样式
+
+#### 5.1 单图模式
+```tsx
+<div className="w-full rounded-xl overflow-hidden">
+  <img src={imageUrl} alt="图片" className="w-full h-auto aspect-video object-cover" />
+</div>
+```
+
+#### 5.2 多图轮播模式
+```tsx
+<div className="w-full rounded-xl overflow-hidden">
+  {/* 主图 */}
+  <div className="relative">
+    <img src={currentImage} alt={`图片 ${currentIndex + 1}`} className="w-full aspect-video object-cover" />
+    {/* 左右箭头 */}
+    <button className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80">
+      <ChevronLeft />
+    </button>
+    <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80">
+      <ChevronRight />
+    </button>
+  </div>
+  {/* 指示器 */}
+  <div className="flex justify-center gap-2 mt-4">
+    {images.map((_, i) => (
+      <button
+        key={i}
+        className={i === currentIndex ? "bg-white w-4" : "bg-white/50"}
+      />
+    ))}
+  </div>
+</div>
+```
+
+### 6. 交互逻辑
+1. 用户点击图片 → 跳转到落地页
+2. 轮播模式下，点击左右箭头或指示器切换图片
+3. 全局落地页优先级：图片单独配置 > 全局宏变量 > 全局默认链接
+

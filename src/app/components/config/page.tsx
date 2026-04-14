@@ -8,6 +8,8 @@ import { AdTemplateConfig, AdTemplate } from "@/components/ad-template";
 import { AdTemplateConfigPanel } from "@/components/ad-template-config";
 import { VoteTemplateConfig, VoteTemplate } from "@/components/vote-template";
 import { VoteTemplateConfigPanel } from "@/components/vote-template-config";
+import { ImageTemplateConfig, ImageTemplate } from "@/components/image-template";
+import { ImageTemplateConfigPanel } from "@/components/image-template-config";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
@@ -52,9 +54,19 @@ const defaultVoteConfig: VoteTemplateConfig = {
   },
 };
 
+// 默认图片组件配置
+const defaultImageConfig: ImageTemplateConfig = {
+  images: [],
+  defaultLandingPageUrl: "",
+  macroVariables: {
+    image_url: "https://picsum.photos/640/360",
+    landing_url: "https://example.com/landing",
+  },
+};
+
 // 组件类型对应的默认配置和名称
 const componentConfigMap: Record<string, {
-  defaultConfig: AdTemplateConfig | VoteTemplateConfig;
+  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig;
   name: string;
   description: string;
 }> = {
@@ -67,6 +79,11 @@ const componentConfigMap: Record<string, {
     defaultConfig: defaultVoteConfig,
     name: "投票磁贴",
     description: "配置投票选项和样式",
+  },
+  image: {
+    defaultConfig: defaultImageConfig,
+    name: "图片磁贴",
+    description: "配置图片内容和样式",
   },
 };
 
@@ -88,7 +105,7 @@ function ConfigContent() {
   };
 
   // 使用 useState 初始化为空配置，避免 SSR/CSR 不一致
-  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig>(getDefaultConfig());
+  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig>(getDefaultConfig());
 
   // 客户端挂载后从 sessionStorage 恢复配置
   React.useEffect(() => {
@@ -104,7 +121,7 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
-  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig) => {
+  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig) => {
     setConfig(newConfig);
     sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
@@ -146,6 +163,7 @@ function ConfigContent() {
   };
 
   const isVoteComponent = type === "vote";
+  const isImageComponent = type === "image";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -204,6 +222,12 @@ function ConfigContent() {
             {isVoteComponent ? (
               <VoteTemplateConfigPanel
                 config={config as VoteTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+              />
+            ) : isImageComponent ? (
+              <ImageTemplateConfigPanel
+                config={config as ImageTemplateConfig}
                 onChange={handleConfigChange}
                 onSave={handleSave}
               />
@@ -269,7 +293,13 @@ function ConfigContent() {
 
                       {/* App content */}
                       <div className="h-[calc(100%-28px)] overflow-auto">
-                        {isVoteComponent ? (
+                        {isImageComponent ? (
+                          <ImageTemplate
+                            config={config as ImageTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        ) : isVoteComponent ? (
                           <VoteTemplate
                             config={config as VoteTemplateConfig}
                             isOpen={true}
@@ -296,8 +326,12 @@ function ConfigContent() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h4 className="text-xs font-semibold text-gray-900">{isVoteComponent ? "投票选项" : "上文下按钮"}</h4>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}</p>
+                  <h4 className="text-xs font-semibold text-gray-900">
+                    {isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
+                  </h4>
+                  <p className="text-[10px] text-gray-500 mt-0.5">
+                    {isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
+                  </p>
                 </div>
 
                 <div className="bg-white rounded-xl p-3 border border-gray-200">
