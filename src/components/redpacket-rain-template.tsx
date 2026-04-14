@@ -390,11 +390,14 @@ export function RedpacketRainTemplate({
             <style jsx>{`
               @keyframes fallLeaf {
                 0% {
-                  top: 100px;
-                  opacity: 0.3;
+                  top: 80px;
+                  opacity: 0;
                   transform: rotate(0deg) scale(0.8);
                 }
-                10% {
+                5% {
+                  opacity: 0.5;
+                }
+                15% {
                   opacity: 1;
                   transform: rotate(5deg) scale(1);
                 }
