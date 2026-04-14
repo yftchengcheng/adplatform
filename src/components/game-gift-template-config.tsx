@@ -586,23 +586,6 @@ export function GameGiftTemplateConfigPanel({
                 onChange={(e) => updateConfig({ giftCode: e.target.value })}
               />
             </div>
-
-            {/* 组件名称 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">组件名称</label>
-                <ModeToggle value={componentNameMode ? "macro" : "input"} onChange={(v) => setComponentNameMode(v === "macro")} />
-              </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="请输入组件名称"
-                  value={getComponentNameValue()}
-                  onChange={(e) => handleComponentNameInput(e.target.value)}
-                  className="flex-1"
-                />
-                <CharCounter value={getComponentNameValue()} max={20} />
-              </div>
-            </div>
           </div>
         )}
       </div>
@@ -654,6 +637,32 @@ export function GameGiftTemplateConfigPanel({
             )}
           </div>
         )}
+      </div>
+
+      {/* Component Name Section */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <SectionHeader
+            title="组件名称"
+            isOpen={true}
+            onToggle={() => {}}
+          />
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-gray-700">组件名称</label>
+            <ModeToggle value={componentNameMode ? "macro" : "input"} onChange={(v) => setComponentNameMode(v === "macro")} />
+          </div>
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="请输入组件名称"
+              value={getComponentNameValue()}
+              onChange={(e) => handleComponentNameInput(e.target.value)}
+              className="flex-1"
+            />
+            <CharCounter value={getComponentNameValue()} max={20} />
+          </div>
+        </div>
       </div>
 
       {/* Preview & Save Buttons */}
