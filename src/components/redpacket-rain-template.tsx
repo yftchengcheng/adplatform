@@ -58,6 +58,19 @@ const defaultConfig: RedpacketRainConfig = {
   defaultLandingPageUrl: "",
 };
 
+// 飘落红包数据结构 - 模仿落叶飘落
+interface FallingRedpacket {
+  id: number;
+  startX: number;       // 起始X位置（百分比）
+  startY: number;      // 起始Y位置
+  endX: number;         // 终点X位置（水平飘动）
+  delay: number;        // 延迟开始时间
+  duration: number;     // 飘落时长
+  rotation: number;      // 初始旋转角度
+  rotationSpeed: number; // 旋转速度（度/秒）
+  size: number;          // 红包大小
+}
+
 interface RedpacketRainTemplateProps {
   config: RedpacketRainConfig;
   isOpen: boolean;
@@ -82,28 +95,64 @@ export function RedpacketRainTemplate({
   const [isClaimed, setIsClaimed] = useState(false);
   const [fallingRedpackets, setFallingRedpackets] = useState<FallingRedpacket[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number | null>(null);
+  const nextIdRef = useRef(0);
+  const containerHeightRef = useRef(500);
 
   // 红包雨配置
-  const TOTAL_REDPACKETS = 15;
-  const FALL_DURATION = 6000; // 6秒落地，更慢
-  const SPAWN_INTERVAL = 300; // 每300ms生成一个
+  const MAX_REDPACKETS = 20; // 最多同时存在20个红包
+  const SPAWN_INTERVAL = 400; // 每400ms尝试生成一个
+  const BASE_DURATION = 8000; // 基础飘落时长8秒
+  const BASE_SIZE = 36; // 基础红包大小
 
-  // 生成随机红包
-  const generateRedpacket = useCallback((id: number): FallingRedpacket => {
-    // 三条飘落线：左、中、右
-    const lanes = [15, 50, 85]; // 百分比位置
-    const lane = lanes[Math.floor(Math.random() * lanes.length)];
-    const xOffset = (Math.random() - 0.5) * 10; // ±5% 偏移
+  // 生成随机红包 - 模仿落叶飘落
+  const generateRedpacket = useCallback((): FallingRedpacket => {
+    const id = nextIdRef.current++;
+    
+    // 随机起始位置（整个屏幕宽度）
+    const startX = Math.random() * 90; // 0-90%
+    
+    // 随机终点位置（水平飘动，可以左右摆动）
+    const drift = (Math.random() - 0.5) * 40; // 左右飘动±20%
+    const endX = Math.max(5, Math.min(95, startX + drift));
+    
+    // 随机飘落时长（6-12秒）
+    const duration = BASE_DURATION + (Math.random() - 0.5) * 4000;
+    
+    // 随机初始旋转角度
+    const rotation = (Math.random() - 0.5) * 60; // ±30度
+    
+    // 随机旋转速度（飘落过程中旋转）
+    const rotationSpeed = (Math.random() - 0.5) * 120; // 每秒旋转±60度
+    
+    // 随机大小（28-44像素）
+    const size = BASE_SIZE + Math.random() * 16;
+    
+    // 随机延迟（0-1秒后开始）
+    const delay = Math.random() * 1000;
     
     return {
       id,
-      x: lane + xOffset,
-      delay: Math.random() * 3000, // 随机延迟 0-3s
-      duration: FALL_DURATION + (Math.random() - 1500), // 6s ± 1.5s
-      rotation: (Math.random() - 0.5) * 30, // 随机旋转 ±15度
+      startX,
+      startY: -50,
+      endX,
+      delay,
+      duration,
+      rotation,
+      rotationSpeed,
+      size,
     };
-  }, [FALL_DURATION]);
+  }, []);
+
+  // 添加红包到列表
+  const addRedpacket = useCallback(() => {
+    setFallingRedpackets(prev => {
+      // 如果已超过最大数量，先移除最老的
+      if (prev.length >= MAX_REDPACKETS) {
+        return [...prev.slice(1), generateRedpacket()];
+      }
+      return [...prev, generateRedpacket()];
+    });
+  }, [generateRedpacket]);
 
   // 宏替换函数
   const resolveMacro = useCallback((macro: string): string => {
@@ -209,42 +258,71 @@ export function RedpacketRainTemplate({
     return finalConfig.specialNote;
   }, [finalConfig.specialNote, finalConfig.specialNoteMacro, resolveMacro]);
 
+  // 初始化红包雨
+  useEffect(() => {
+    if (isOpen && !previewMode) {
+      setIsVisible(true);
+      setIsClaimed(false);
+      setFallingRedpackets([]);
+      nextIdRef.current = 0;
+    } else if (previewMode) {
+      setIsVisible(true);
+      setIsClaimed(false);
+      setFallingRedpackets([]);
+      nextIdRef.current = 0;
+    }
+  }, [isOpen, previewMode]);
+
+  // 开始生成红包
+  useEffect(() => {
+    if (!isVisible || isClaimed) return;
+
+    // 获取容器高度
+    if (containerRef.current) {
+      containerHeightRef.current = containerRef.current.offsetHeight;
+    }
+
+    // 初始生成几个红包
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => addRedpacket(), i * 200);
+    }
+
+    // 定时生成新红包
+    const interval = setInterval(() => {
+      if (!isClaimed) {
+        addRedpacket();
+      }
+    }, SPAWN_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [isVisible, isClaimed, addRedpacket]);
+
+  // 清理过期红包
+  useEffect(() => {
+    if (!isVisible || isClaimed) return;
+
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      setFallingRedpackets(prev => 
+        prev.filter(rp => {
+          const totalTime = rp.delay + rp.duration;
+          return totalTime > 0; // 保留所有红包，让CSS动画控制消失
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(cleanup);
+  }, [isVisible, isClaimed]);
+
   // 点击红包
   const handleRedpacketClick = useCallback(() => {
     setIsClaimed(true);
     onButtonClick?.(finalConfig);
   }, [finalConfig, onButtonClick]);
 
-  // 开始红包雨
-  const startRedpacketRain = useCallback(() => {
-    const redpackets: FallingRedpacket[] = [];
-    for (let i = 0; i < TOTAL_REDPACKETS; i++) {
-      redpackets.push(generateRedpacket(i));
-    }
-    setFallingRedpackets(redpackets);
-  }, [generateRedpacket]);
-
-  // 入场动画
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      setIsClaimed(false);
-      setFallingRedpackets([]);
-      // 延迟开始红包雨
-      const timer = setTimeout(() => {
-        startRedpacketRain();
-      }, 500);
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-      setFallingRedpackets([]);
-    }
-  }, [isOpen, startRedpacketRain]);
-
   // 点击领取按钮
   const handleClaim = useCallback(() => {
     if (previewMode) {
-      // 预览模式下不跳转
       return;
     }
     const landingPage = resolveLandingPage();
@@ -254,11 +332,11 @@ export function RedpacketRainTemplate({
     onClose();
   }, [previewMode, resolveLandingPage, onClose]);
 
-  // 预览模式下直接显示
   const shouldRender = previewMode || isVisible;
   if (!shouldRender) return null;
 
   const redpacketImage = resolveRedpacketImage();
+  const containerHeight = containerHeightRef.current;
 
   return (
     <div
@@ -298,8 +376,65 @@ export function RedpacketRainTemplate({
               </p>
             </div>
 
+            {/* Falling Redpackets - 落叶飘落效果 */}
+            <style jsx>{`
+              @keyframes fallLeaf {
+                0% {
+                  top: -50px;
+                  opacity: 1;
+                  transform: rotate(0deg);
+                }
+                25% {
+                  transform: rotate(15deg) translateX(10px);
+                }
+                50% {
+                  transform: rotate(-10deg) translateX(-8px);
+                }
+                75% {
+                  transform: rotate(8deg) translateX(6px);
+                }
+                100% {
+                  top: calc(100% - 40px);
+                  opacity: 0;
+                  transform: rotate(-5deg);
+                }
+              }
+              .falling-redpacket {
+                animation-name: fallLeaf;
+                animation-timing-function: ease-in-out;
+                animation-fill-mode: forwards;
+              }
+            `}</style>
+
+            {fallingRedpackets.map((rp) => {
+              return (
+                <div
+                  key={rp.id}
+                  className="absolute cursor-pointer hover:scale-110 transition-transform falling-redpacket"
+                  style={{
+                    left: `${rp.startX}%`,
+                    width: `${rp.size}px`,
+                    height: `${rp.size * 1.17}px`,
+                    animationDuration: `${rp.duration}ms`,
+                    animationDelay: `${rp.delay}ms`,
+                    ['--end-x' as string]: `${rp.endX}%`,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRedpacketClick();
+                  }}
+                >
+                  <img
+                    src={redpacketImage}
+                    alt="红包"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              );
+            })}
+
             {/* Hand Gesture Hint */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 animate-bounce">
               <div className="w-10 h-10">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M24 44C24 44 8 32 8 20C8 12 14 6 22 6C22 6 20 10 20 14C20 18 22 20 24 20C26 20 28 18 28 14C28 10 26 6 26 6C34 6 40 12 40 20C40 32 24 44 24 44Z" fill="white" fillOpacity="0.9"/>
@@ -307,50 +442,6 @@ export function RedpacketRainTemplate({
                 </svg>
               </div>
             </div>
-
-            {/* Falling Redpackets */}
-            {fallingRedpackets.map((rp) => (
-              <div
-                key={rp.id}
-                className="absolute top-0 cursor-pointer hover:scale-110 transition-transform"
-                style={{
-                  left: `${rp.x}%`,
-                  width: "32px",
-                  height: "37px",
-                  animation: `fallDown ${rp.duration}ms ease-in forwards`,
-                  animationDelay: `${rp.delay}ms`,
-                  transform: `rotate(${rp.rotation}deg)`,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRedpacketClick();
-                }}
-              >
-                <img
-                  src={redpacketImage}
-                  alt="红包"
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    // 默认红包样式
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              </div>
-            ))}
-
-            {/* Fall Animation Keyframes */}
-            <style jsx>{`
-              @keyframes fallDown {
-                0% {
-                  top: -50px;
-                  opacity: 1;
-                }
-                100% {
-                  top: calc(60%);
-                  opacity: 0.8;
-                }
-              }
-            `}</style>
           </div>
         ) : (
           /* Reward Claimed Scene */
@@ -368,23 +459,21 @@ export function RedpacketRainTemplate({
                   {resolveCustomRewardImage() ? (
                     <img
                       src={resolveCustomRewardImage()}
-                      alt="奖励图片"
-                      className="w-full h-auto"
+                      alt="奖励"
+                      className="w-full object-contain rounded-xl"
                     />
                   ) : (
-                    <div className="bg-gray-200 rounded-xl aspect-[690/360] flex items-center justify-center">
-                      <span className="text-gray-400">奖励图片</span>
+                    <div className="w-full h-32 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <p className="text-gray-400 text-sm">暂无奖励图片</p>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Reward Text */}
-              {resolveRewardText() && (
-                <p className="text-center text-gray-800 font-medium">
-                  {resolveRewardText()}
-                </p>
-              )}
+              <p className="text-center text-gray-800 font-medium text-base">
+                {resolveRewardText()}
+              </p>
 
               {/* Special Note */}
               <p className="text-center text-gray-400 text-xs">
@@ -404,13 +493,4 @@ export function RedpacketRainTemplate({
       </div>
     </div>
   );
-}
-
-// 飘落红包类型
-interface FallingRedpacket {
-  id: number;
-  x: number;
-  delay: number;
-  duration: number;
-  rotation: number;
 }
