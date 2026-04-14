@@ -91,21 +91,25 @@ function ConfigContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const type = (searchParams.get("type") || "dual_button") as ComponentType;
-  const { addComponent } = useComponents();
+  const componentId = searchParams.get("id");
+  const { addComponent, updateComponent, components } = useComponents();
   const { showToast } = useToast();
-
-  // 根据类型获取默认配置
-  const getDefaultConfig = () => {
-    return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
-  };
 
   // 根据类型获取组件名称
   const getComponentName = () => {
     return componentConfigMap[type]?.name || "选择磁贴(双按钮)";
   };
 
-  // 使用 useState 初始化为空配置，避免 SSR/CSR 不一致
-  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig>(getDefaultConfig());
+  // 查找要编辑的组件
+  const editingComponent = componentId ? components.find(c => c.id === componentId) : null;
+
+  // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
+  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig>(() => {
+    if (editingComponent?.config) {
+      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig;
+    }
+    return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+  });
 
   // 客户端挂载后从 sessionStorage 恢复配置
   React.useEffect(() => {
@@ -144,16 +148,23 @@ function ConfigContent() {
         name = `图片磁贴-${config.images.length}张`;
       }
 
-      // 保存到全局状态（异步写入数据库）
-      await addComponent({
-        name: name,
-        category: "static",
-        type: type,
-        status: "enabled",
-        config: config as unknown as Record<string, unknown>,
-      });
+      // 编辑模式更新现有组件，新建模式添加新组件
+      if (componentId && editingComponent) {
+        await updateComponent(componentId, {
+          name,
+          config: config as unknown as Record<string, unknown>,
+        });
+      } else {
+        await addComponent({
+          name: name,
+          category: "static",
+          type: type,
+          status: "enabled",
+          config: config as unknown as Record<string, unknown>,
+        });
+      }
       clearSavedConfig();
-      showToast("组件保存成功！", "success");
+      showToast(componentId ? "组件更新成功！" : "组件保存成功！", "success");
       // 延迟跳转，让用户看到成功提示
       setTimeout(() => {
         router.push("/");
@@ -185,8 +196,12 @@ function ConfigContent() {
               <span className="text-sm">返回</span>
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900">{getComponentName()}</h1>
-              <p className="text-sm text-gray-500">{componentConfigMap[type]?.description || "配置组件内容和样式"}</p>
+              <h1 className="text-xl font-bold text-gray-900">
+                {editingComponent ? "编辑组件" : getComponentName()}
+              </h1>
+              <p className="text-sm text-gray-500">
+                {editingComponent ? `正在编辑：${editingComponent.name}` : componentConfigMap[type]?.description || "配置组件内容和样式"}
+              </p>
             </div>
             <Button variant="outline" onClick={handleBack}>
               取消

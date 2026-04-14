@@ -59,7 +59,10 @@ import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 import { VoteTemplate, VoteTemplateConfig } from "@/components/vote-template";
 import { ImageTemplate, ImageTemplateConfig } from "@/components/image-template";
 
+import { useRouter } from "next/navigation";
+
 export function ComponentList() {
+  const router = useRouter();
   const { components, toggleStatus, deleteComponent } = useComponents();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; templateCount: number } | null>(null);
@@ -218,6 +221,12 @@ export function ComponentList() {
   // 单个操作
   const handleToggleStatus = (id: string) => {
     toggleStatus(id);
+  };
+
+  // 编辑组件
+  const handleEdit = (component: AdComponentItem) => {
+    // 跳转到配置页面，传递组件ID
+    router.push(`/components/config?type=${component.type}&id=${component.id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -533,7 +542,7 @@ export function ComponentList() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(component)}>
                             <Edit className="w-4 h-4 mr-2" />
                             编辑
                           </DropdownMenuItem>
