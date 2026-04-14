@@ -33,6 +33,8 @@ export interface RedpacketRainConfig {
   defaultLandingPageUrl?: string;
   // 宏变量
   macroVariables?: Record<string, string>;
+  // 组件名称
+  componentName?: string;
 }
 
 // 模板配置类型
@@ -56,6 +58,7 @@ const defaultConfig: RedpacketRainConfig = {
   landingPageUrl: "",
   landingPageMacro: "",
   defaultLandingPageUrl: "",
+  componentName: "点击红包，领取奖品",
 };
 
 // 飘落红包数据结构 - 模仿落叶飘落

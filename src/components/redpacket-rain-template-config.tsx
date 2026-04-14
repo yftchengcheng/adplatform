@@ -125,6 +125,8 @@ export interface RedpacketRainConfig {
   defaultLandingPageUrl?: string;
   // 宏变量
   macroVariables?: Record<string, string>;
+  // 组件名称
+  componentName?: string;
 }
 
 // 模板配置类型
@@ -156,6 +158,7 @@ export const defaultRedpacketRainConfig: RedpacketRainConfig = {
     reward_text: "恭喜发财",
     special_note: "实际奖品以APP为准！",
   },
+  componentName: "点击红包，领取奖品",
 };
 
 interface RedpacketRainTemplateConfigPanelProps {
@@ -720,16 +723,29 @@ export function RedpacketRainTemplateConfigPanel({
         </div>
       )}
 
-      {/* 组件名称卡片 */}
-      <div className="bg-gradient-to-r from-[#8B0000] to-[#4A0000] rounded-lg p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-            <span className="text-xl">🧧</span>
+      {/* 组件名称 */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <span className="text-sm font-medium text-gray-700">组件名称</span>
+        </div>
+        <div className="p-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="请输入组件名称"
+              value={config.componentName || ""}
+              onChange={(e) => {
+                onChange({ ...config, componentName: e.target.value });
+              }}
+              className="flex-1"
+            />
+            <CharCounter
+              value={config.componentName || ""}
+              max={20}
+            />
           </div>
-          <div>
-            <p className="text-white font-medium">红包雨</p>
-            <p className="text-white/70 text-xs">红包飘落互动组件</p>
-          </div>
+          <p className="text-xs text-gray-400">
+            默认值取自引导文案，修改后自动同步
+          </p>
         </div>
       </div>
     </div>
