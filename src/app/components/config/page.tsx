@@ -41,8 +41,8 @@ const defaultVoteConfig: VoteTemplateConfig = {
   title: "请选择您的偏好",
   subtitle: "感谢您的参与，点击选项查看详情",
   options: [
-    { id: "1", text: "选项一", percentage: 75, buttonText: "选择" },
-    { id: "2", text: "选项二", percentage: 25, buttonText: "选择" },
+    { id: "1", text: "选项一", voteCount: 120, buttonText: "选择" },
+    { id: "2", text: "选项二", voteCount: 80, buttonText: "选择" },
   ],
   clickResultText: "投票成功",
   action: "jump",
