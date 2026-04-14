@@ -530,7 +530,7 @@ export function RedpacketRainTemplateConfigPanel({
                       <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400">
                         <ImageIcon className="w-6 h-6 text-gray-400" />
                         <span className="text-sm text-gray-400">点击上传图片</span>
-                        <span className="text-xs text-gray-400">16:9，推荐 690×360px，最大 200KB</span>
+                        <span className="text-xs text-gray-400">16:9，推荐 690×360px，最大 300KB</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -538,9 +538,9 @@ export function RedpacketRainTemplateConfigPanel({
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
-                            // 校验文件大小 200KB
-                            if (file.size > 200 * 1024) {
-                              setRewardImageError(`奖励图片大小不能超过 200KB，当前 ${(file.size / 1024).toFixed(2)}KB`);
+                            // 校验文件大小 300KB
+                            if (file.size > 300 * 1024) {
+                              setRewardImageError(`奖励图片大小不能超过 300KB，当前 ${(file.size / 1024).toFixed(2)}KB`);
                               return;
                             }
                             // 校验宽高比 16:9
@@ -572,7 +572,7 @@ export function RedpacketRainTemplateConfigPanel({
                 {rewardImageError && (
                   <p className="text-xs text-red-500 mt-1">{rewardImageError}</p>
                 )}
-                <p className="text-xs text-gray-400">宽高比 16:9，推荐 690×360px，最大 200KB</p>
+                <p className="text-xs text-gray-400">宽高比 16:9，推荐 690×360px，最大 300KB</p>
               </div>
             )}
 
