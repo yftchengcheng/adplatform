@@ -279,12 +279,13 @@ export function RedpacketRainTemplate({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
+        {/* Close Button - 底边中间 */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4 mr-1" />
+          <span>关闭</span>
         </button>
 
         {/* Redpacket Rain Scene */}
