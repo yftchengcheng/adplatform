@@ -163,6 +163,11 @@ export function GameGiftTemplateConfigPanel({
   // Logo 模式（true = 上传模式, false = 宏模式）
   const [logoMode, setLogoMode] = useState<boolean>(!config.logoMacro);
 
+  // Logo 错误状态
+  const [logoError, setLogoError] = useState<string | null>(null);
+  // 应用图片错误状态
+  const [imageErrors, setImageErrors] = useState<Record<string, string | null>>({});
+
   // 更新配置
   const updateConfig = (updates: Partial<GameGiftTemplateConfig>) => {
     const newConfig = { ...config, ...updates, macroVariables };
@@ -327,7 +332,7 @@ export function GameGiftTemplateConfigPanel({
                           if (!file) return;
                           // 校验文件大小
                           if (file.size > 1 * 1024 * 1024) {
-                            alert(`Logo 图片大小不能超过 1MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                            setLogoError(`Logo 图片大小不能超过 1MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
                             return;
                           }
                           // 校验宽高比
@@ -335,9 +340,10 @@ export function GameGiftTemplateConfigPanel({
                           img.onload = () => {
                             const ratio = img.naturalWidth / img.naturalHeight;
                             if (Math.abs(ratio - 1) > 0.01) {
-                              alert(`Logo 图片宽高比需为 1:1，当前 ${img.naturalWidth}×${img.naturalHeight}`);
+                              setLogoError(`Logo 图片宽高比需为 1:1，当前 ${img.naturalWidth}×${img.naturalHeight}`);
                               return;
                             }
+                            setLogoError(null);
                             const reader = new FileReader();
                             reader.onload = (ev) => {
                               handleLogoInput(ev.target?.result as string, false);
@@ -345,7 +351,7 @@ export function GameGiftTemplateConfigPanel({
                             reader.readAsDataURL(file);
                           };
                           img.onerror = () => {
-                            alert("图片加载失败，请选择其他图片");
+                            setLogoError("无法读取图片文件，请选择其他图片");
                           };
                           img.src = URL.createObjectURL(file);
                         }}
@@ -353,6 +359,9 @@ export function GameGiftTemplateConfigPanel({
                     </label>
                   )}
                   <p className="text-xs text-gray-400 mt-1">宽高比 1:1，推荐 132×132px，最大 1MB</p>
+                  {logoError && (
+                    <p className="text-xs text-red-500 mt-1">{logoError}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -450,7 +459,7 @@ export function GameGiftTemplateConfigPanel({
                               if (!file) return;
                               // 校验文件大小
                               if (file.size > 1 * 1024 * 1024) {
-                                alert(`应用图片大小不能超过 1MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                                setImageErrors(prev => ({ ...prev, [index]: `应用图片大小不能超过 1MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB` }));
                                 return;
                               }
                               // 校验宽高比 16:9
@@ -459,9 +468,10 @@ export function GameGiftTemplateConfigPanel({
                                 const ratio = img.naturalWidth / img.naturalHeight;
                                 const targetRatio = 16 / 9;
                                 if (Math.abs(ratio - targetRatio) > 0.05) {
-                                  alert(`应用图片宽高比需为 16:9，当前 ${img.naturalWidth}×${img.naturalHeight}`);
+                                  setImageErrors(prev => ({ ...prev, [index]: `应用图片宽高比需为 16:9，当前 ${img.naturalWidth}×${img.naturalHeight}` }));
                                   return;
                                 }
+                                setImageErrors(prev => ({ ...prev, [index]: null }));
                                 const reader = new FileReader();
                                 reader.onload = (ev) => {
                                   updateImage(index, { imageUrl: ev.target?.result as string, imageMacro: "" });
@@ -469,7 +479,7 @@ export function GameGiftTemplateConfigPanel({
                                 reader.readAsDataURL(file);
                               };
                               img.onerror = () => {
-                                alert("图片加载失败，请选择其他图片");
+                                setImageErrors(prev => ({ ...prev, [index]: "无法读取图片文件，请选择其他图片" }));
                               };
                               img.src = URL.createObjectURL(file);
                             }}
@@ -496,6 +506,11 @@ export function GameGiftTemplateConfigPanel({
                     </button>
                   )}
                   <p className="text-xs text-gray-400">宽高比 16:9，推荐 1280×720px，最大 1MB</p>
+                  {Object.values(imageErrors).some(Boolean) && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {Object.entries(imageErrors).find(([_, error]) => error)?.[1]}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
