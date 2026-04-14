@@ -338,7 +338,7 @@ export function GameGiftTemplateConfigPanel({
                       />
                     </label>
                   )}
-                  <p className="text-xs text-gray-400 mt-1">推荐 132×132px，最大 1MB</p>
+                  <p className="text-xs text-gray-400 mt-1">宽高比 1:1，推荐 132×132px，最大 1MB</p>
                 </div>
               </div>
             </div>
