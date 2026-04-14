@@ -240,12 +240,16 @@ export function RedpacketRainTemplate({
 
   // 点击领取按钮
   const handleClaim = useCallback(() => {
+    if (previewMode) {
+      // 预览模式下不跳转
+      return;
+    }
     const landingPage = resolveLandingPage();
     if (landingPage) {
       window.open(landingPage, "_blank");
     }
     onClose();
-  }, [resolveLandingPage, onClose]);
+  }, [previewMode, resolveLandingPage, onClose]);
 
   if (!isVisible && !previewMode) return null;
 
@@ -253,30 +257,32 @@ export function RedpacketRainTemplate({
 
   return (
     <div
-      className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+      className={`${previewMode ? "relative w-full h-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       onClick={!isClaimed ? undefined : onClose}
     >
       {/* Backdrop */}
-      {!isClaimed && (
+      {!isClaimed && !previewMode && (
         <div className="absolute inset-0 bg-black/70" />
       )}
 
       {/* Modal Content */}
       <div
         className={`relative w-full h-full flex flex-col transition-all duration-500 ${
-          isVisible ? "translate-y-0" : "translate-y-full"
+          isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        {/* Close Button - hidden in preview mode */}
+        {!previewMode && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
 
         {/* Redpacket Rain Scene */}
         {!isClaimed ? (
