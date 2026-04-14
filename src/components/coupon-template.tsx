@@ -17,8 +17,6 @@ export interface CouponTemplateConfig {
   defaultLandingPageUrl?: string;
   // 宏替换变量映射
   macroVariables?: Record<string, string>;
-  // 动作参数：打开/关闭
-  clickAction: "open" | "close";
 }
 
 export interface CouponTemplateProps {
@@ -38,7 +36,6 @@ const defaultConfig: CouponTemplateConfig = {
   validFrom: "2026-01-01",
   validTo: "2026-12-31",
   landingPageUrl: "",
-  clickAction: "open",
 };
 
 export function CouponTemplate({

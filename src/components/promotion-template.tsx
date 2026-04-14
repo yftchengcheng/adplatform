@@ -23,8 +23,6 @@ export interface PromotionTemplateConfig {
   defaultLandingPageUrl?: string;
   // 宏替换变量映射
   macroVariables?: Record<string, string>;
-  // 动作参数：打开/关闭
-  clickAction: "open" | "close";
 }
 
 export interface PromotionTemplateProps {
@@ -42,7 +40,6 @@ const defaultConfig: PromotionTemplateConfig = {
   promotionPoints: [{ id: "1", text: "推广卖点1" }],
   buttonText: "行动号召",
   defaultLandingPageUrl: "",
-  clickAction: "open",
 };
 
 export function PromotionTemplate({

@@ -376,27 +376,6 @@ export function ImageTemplateConfigPanel({
               <p className="text-xs text-gray-400">
                 每张图片可单独配置落地页，未配置时使用全局落地页
               </p>
-
-              {/* 动作 - 第一项 */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  动作
-                </label>
-                <Select
-                  value={config.clickAction || "open"}
-                  onValueChange={(v) => onChange({ ...config, clickAction: v as "open" | "close" })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="open">打开</SelectItem>
-                    <SelectItem value="close">关闭</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* 全局落地页 */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-gray-500">全局落地页</label>

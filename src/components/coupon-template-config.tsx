@@ -226,25 +226,6 @@ export function CouponTemplateConfigPanel({
         </div>
         {basicOpen && (
           <div className="p-4 space-y-4">
-            {/* 动作 - 第一项 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                动作
-              </label>
-              <Select
-                value={config.clickAction || "open"}
-                onValueChange={(v) => updateConfig({ clickAction: v as "open" | "close" })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="open">打开</SelectItem>
-                  <SelectItem value="close">关闭</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* 活动名称 */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">

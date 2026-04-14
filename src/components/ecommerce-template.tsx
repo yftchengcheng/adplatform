@@ -19,8 +19,6 @@ export interface EcommerceTemplateConfig {
   defaultLandingPageUrl?: string;
   macroVariables?: Record<string, string>;
   onButtonClick?: () => void;
-  // 动作参数：打开/关闭
-  clickAction: "open" | "close";
 }
 
 interface EcommerceTemplateProps {
@@ -36,7 +34,6 @@ const defaultConfig: EcommerceTemplateConfig = {
   content: "品质保证，价格实惠，错过不再有",
   buttonText: "立即购买",
   defaultLandingPageUrl: "",
-  clickAction: "open",
 };
 
 // 电商磁贴组件
