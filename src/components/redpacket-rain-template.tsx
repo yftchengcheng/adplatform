@@ -262,7 +262,7 @@ export function RedpacketRainTemplate({
 
   return (
     <div
-      className={`${previewMode ? "relative w-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
+      className={`${previewMode ? "relative w-full h-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       onClick={!isClaimed ? undefined : onClose}
@@ -274,7 +274,7 @@ export function RedpacketRainTemplate({
 
       {/* Modal Content - 半屏浮层 */}
       <div
-        className={`relative w-full ${previewMode ? "h-1/2" : "h-full"} flex flex-col transition-all duration-500 ${
+        className={`relative w-full h-full flex flex-col transition-all duration-500 ${
           isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
         onClick={(e) => e.stopPropagation()}

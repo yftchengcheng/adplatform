@@ -470,8 +470,17 @@ function ConfigContent() {
                       </div>
 
                       {/* App content */}
-                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'items-start justify-center' : 'items-center justify-center'}`}>
-                        {isGameGiftComponent ? (
+                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'flex-col items-center' : 'items-center justify-center'}`}>
+                        {isRedpacketRainComponent ? (
+                          <div className="w-full h-1/2 mt-4">
+                            <RedpacketRainTemplate
+                              config={config as RedpacketRainTemplateConfig}
+                              isOpen={true}
+                              previewMode={true}
+                              onClose={() => {}}
+                            />
+                          </div>
+                        ) : isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}
                             isOpen={true}
@@ -506,13 +515,6 @@ function ConfigContent() {
                             config={config as VoteTemplateConfig}
                             isOpen={true}
                             previewMode={true}
-                          />
-                        ) : isRedpacketRainComponent ? (
-                          <RedpacketRainTemplate
-                            config={config as RedpacketRainTemplateConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => {}}
                           />
                         ) : (
                           <AdTemplate
