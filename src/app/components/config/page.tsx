@@ -18,6 +18,8 @@ import { PromotionTemplateConfig, PromotionTemplate } from "@/components/promoti
 import { PromotionTemplateConfigPanel } from "@/components/promotion-template-config";
 import { GameGiftTemplateConfig, GameGiftTemplate } from "@/components/game-gift-template";
 import { GameGiftTemplateConfigPanel } from "@/components/game-gift-template-config";
+import { RedpacketRainTemplateConfig, defaultRedpacketRainConfig } from "@/components/redpacket-rain-template-config";
+import { RedpacketRainTemplate } from "@/components/redpacket-rain-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
@@ -146,8 +148,10 @@ const defaultGameGiftConfig: GameGiftTemplateConfig = {
 };
 
 // 组件类型对应的默认配置和名称
+type AllConfigTypes = AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig;
+
 const componentConfigMap: Record<string, {
-  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig;
+  defaultConfig: AllConfigTypes;
   name: string;
   description: string;
 }> = {
@@ -186,6 +190,11 @@ const componentConfigMap: Record<string, {
     name: "游戏礼包码",
     description: "配置应用图片、名称、描述和下载链接",
   },
+  redpacket_rain: {
+    defaultConfig: defaultRedpacketRainConfig,
+    name: "红包雨",
+    description: "配置红包样式、引导文案和领奖场景",
+  },
 };
 
 function ConfigContent() {
@@ -209,9 +218,9 @@ function ConfigContent() {
   const editingComponent = componentId ? components.find(c => c.id === componentId) : null;
 
   // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
-  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig>(() => {
+  const [config, setConfig] = useState<AllConfigTypes>(() => {
     if (editingComponent?.config) {
-      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig;
+      return editingComponent.config as AllConfigTypes;
     }
     return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
   });
@@ -230,7 +239,7 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
-  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig) => {
+  const handleConfigChange = useCallback((newConfig: AllConfigTypes) => {
     setConfig(newConfig);
     sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
@@ -248,6 +257,9 @@ function ConfigContent() {
       if ("componentName" in config && config.componentName) {
         // 游戏礼包码等使用 componentName
         name = config.componentName;
+      } else if ("guideText" in config && config.guideText) {
+        // 红包雨使用引导文案
+        name = config.guideText;
       } else if ("title" in config && config.title) {
         // 广告磁贴和投票磁贴使用 title
         name = config.title;

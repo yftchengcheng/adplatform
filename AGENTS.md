@@ -843,3 +843,129 @@ interface GameGiftTemplateConfig {
 2. **图片轮播**：多张图片时自动轮播（每3秒切换），鼠标悬停暂停
 3. **宏变量替换**：支持图片、应用名称、描述、下载链接、礼包码的宏替换
 
+---
+
+## 十六、红包雨特殊规范
+
+### 1. 组件结构
+- **红包飘落场景**：深红色渐变背景，15个红包从顶部飘落
+- **三条飘落线**：左(15%)、中(50%)、右(85%)位置
+- **领奖场景**：点击红包后展示奖励内容
+
+### 2. 配置数据结构
+```typescript
+interface RedpacketRainConfig {
+  // 红包元素
+  redpacketImageUrl?: string;
+  redpacketImageMacro?: string;
+  // 引导文案
+  guideText: string;
+  guideTextMacro?: string;
+  // 奖励类型
+  rewardType: "cash" | "custom";
+  // 现金奖励
+  cashAmount?: string;
+  cashAmountMacro?: string;
+  // 自定义奖励图片
+  rewardImageUrl?: string;
+  rewardImageMacro?: string;
+  // 奖品文案
+  rewardText: string;
+  rewardTextMacro?: string;
+  // 特殊说明
+  specialNote: string;
+  specialNoteMacro?: string;
+  // 落地页
+  landingPageUrl?: string;
+  landingPageMacro?: string;
+  // 默认落地页
+  defaultLandingPageUrl?: string;
+  // 宏变量
+  macroVariables?: Record<string, string>;
+}
+```
+
+### 3. 字段规范
+| 字段 | 最大字符 | 说明 |
+|------|---------|------|
+| 引导文案 | 20字符 | 10个汉字（不含标点） |
+| 现金金额 | 无限制 | 支持宏替换 |
+| 奖品文案 | 30字符 | 15个汉字（不含标点） |
+| 特殊说明 | 20字符 | 10个汉字（不含标点） |
+| 红包图片 | 30KB | 推荐 115×133px，宽高比 115:133 |
+| 奖励图片 | 100KB | 推荐 690×360px，宽高比 690:360 |
+
+### 4. 渲染样式
+
+#### 红包飘落场景
+```tsx
+<div className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#8B0000] to-[#4A0000]">
+  {/* 引导文案 */}
+  <div className="absolute top-1/4 left-0 right-0 text-center z-10">
+    <p className="text-white text-lg font-medium drop-shadow-lg animate-pulse">
+      {guideText}
+    </p>
+  </div>
+
+  {/* 飘落红包（三条线） */}
+  {fallingRedpackets.map((rp) => (
+    <div
+      key={rp.id}
+      className="absolute top-0 cursor-pointer hover:scale-110 transition-transform"
+      style={{
+        left: `${rp.x}%`, // 15%, 50%, 85%
+        animation: `fallDown ${rp.duration}ms ease-in forwards`,
+        animationDelay: `${rp.delay}ms`,
+      }}
+    >
+      <img src={redpacketImage} alt="红包" />
+    </div>
+  ))}
+</div>
+```
+
+#### 领奖场景
+```tsx
+<div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC]">
+  {/* 现金奖励 */}
+  {rewardType === "cash" && (
+    <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-6">
+      <p className="text-white/80 text-sm">恭喜获得</p>
+      <p className="text-white text-4xl font-bold">¥{cashAmount}</p>
+    </div>
+  )}
+
+  {/* 自定义奖励图片 */}
+  {rewardType === "custom" && (
+    <img src={rewardImageUrl} alt="奖励图片" className="rounded-xl" />
+  )}
+
+  {/* 奖品文案 */}
+  <p className="text-center text-gray-800 font-medium">{rewardText}</p>
+
+  {/* 特殊说明 */}
+  <p className="text-center text-gray-400 text-xs">{specialNote}</p>
+
+  {/* 领取按钮 */}
+  <button className="w-full py-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white rounded-xl">
+    立即领取
+  </button>
+</div>
+```
+
+### 5. 动画配置
+| 参数 | 值 | 说明 |
+|------|------|------|
+| 红包数量 | 15个 | TOTAL_REDPACKETS |
+| 飘落时长 | 3秒 ± 1秒 | FALL_DURATION |
+| 生成间隔 | 200ms | SPAWN_INTERVAL |
+| 延迟开始 | 500ms | 入场后延迟 |
+| 飘落线 | 15%, 50%, 85% | 三条垂直线 |
+| 旋转角度 | ±15度 | 随机旋转 |
+
+### 6. 交互逻辑
+1. **入场动画**：遮罩层淡入，红包雨延迟500ms开始
+2. **飘落动画**：15个红包从顶部随机位置飘落，点击任意红包触发领取
+3. **领取场景**：点击红包后切换到领奖场景
+4. **点击领取**：跳转到落地页链接
+5. **宏变量替换**：支持引导文案、金额、图片、文案、落地页的宏替换

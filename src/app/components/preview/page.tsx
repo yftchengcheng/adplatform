@@ -7,11 +7,12 @@ import { ArrowLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
+import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
 
-type ComponentType = "dual_button" | "vote" | "image" | "ecommerce" | "coupon" | "promotion_card" | "game_gift";
+type ComponentType = "dual_button" | "vote" | "image" | "ecommerce" | "coupon" | "promotion_card" | "game_gift" | "redpacket_rain";
 
 interface ComponentConfig {
-  defaultConfig: AdTemplateConfig | GameGiftTemplateConfig;
+  defaultConfig: AdTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig;
   name: string;
   description: string;
 }
@@ -117,11 +118,33 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
     name: "游戏礼包码",
     description: "配置应用图片、名称、描述和下载链接",
   },
+  redpacket_rain: {
+    defaultConfig: {
+      guideText: "点击红包，领取奖品",
+      guideTextMacro: "",
+      rewardType: "cash",
+      cashAmount: "88.88",
+      cashAmountMacro: "",
+      rewardImageUrl: "",
+      rewardImageMacro: "",
+      rewardText: "恭喜发财",
+      rewardTextMacro: "",
+      specialNote: "实际奖品以APP为准！",
+      specialNoteMacro: "",
+      redpacketImageUrl: "",
+      redpacketImageMacro: "",
+      landingPageUrl: "",
+      landingPageMacro: "",
+      defaultLandingPageUrl: "",
+    },
+    name: "红包雨",
+    description: "红包飘落互动，点击领取奖品",
+  },
 };
 
 function PreviewContent() {
   const searchParams = useSearchParams();
-  const [config, setConfig] = useState<AdTemplateConfig | GameGiftTemplateConfig | null>(null);
+  const [config, setConfig] = useState<AdTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig | null>(null);
   const [componentType, setComponentType] = useState<ComponentType>("dual_button");
   const [showAd, setShowAd] = useState(false);
 
@@ -137,10 +160,10 @@ function PreviewContent() {
       } catch (e) {
         console.error("配置解析失败", e);
         // 使用默认配置
-        setConfig(defaultConfigs[type].defaultConfig);
+        setConfig(defaultConfigs[type].defaultConfig as AdTemplateConfig);
       }
     } else {
-      setConfig(defaultConfigs[type].defaultConfig);
+      setConfig(defaultConfigs[type].defaultConfig as AdTemplateConfig);
     }
   }, [searchParams]);
 
@@ -151,6 +174,18 @@ function PreviewContent() {
       return (
         <GameGiftTemplate
           config={gameConfig}
+          isOpen={showAd}
+          onClose={() => setShowAd(false)}
+          previewMode={false}
+        />
+      );
+    }
+
+    if (componentType === "redpacket_rain") {
+      const redpacketConfig = config as RedpacketRainTemplateConfig;
+      return (
+        <RedpacketRainTemplate
+          config={redpacketConfig}
           isOpen={showAd}
           onClose={() => setShowAd(false)}
           previewMode={false}
