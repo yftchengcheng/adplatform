@@ -197,12 +197,23 @@ export function VoteTemplate({
       // 解析图片URL
       let imgUrl = imageUrl || "";
       if (imageMacro) {
-        // 优先使用 imageMacro（直接替换宏变量）
-        imgUrl = resolveMacro(imageMacro, macroVariables);
+        // imageMacro 有值，尝试解析宏变量
+        if (macroVariables) {
+          imgUrl = resolveMacro(imageMacro, macroVariables);
+        } else {
+          // 没有宏变量配置，直接使用 imageMacro 作为 URL
+          imgUrl = imageMacro;
+        }
+      }
+
+      // 如果 action 是 show_image 但没有配置图片，使用默认占位图
+      if (action === "show_image" && !imgUrl) {
+        imgUrl = "https://picsum.photos/300/150";
       }
 
       if (action === "show_image") {
         // 显示图片模式
+        console.log("[VoteTemplate] show_image:", { imgUrl, action });
         setCurrentImageUrl(imgUrl);
         setShowImageModal(true);
       } else {
