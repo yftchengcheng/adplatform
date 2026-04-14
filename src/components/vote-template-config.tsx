@@ -64,26 +64,40 @@ function ImageUpload({
       return;
     }
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      setPreviewUrl(dataUrl);
-    };
-    reader.readAsDataURL(file);
+    // Validate image dimensions
+    const img = document.createElement("img");
+    img.onload = () => {
+      URL.revokeObjectURL(img.src);
+      if (img.width > width || img.height > height) {
+        setError(`图片尺寸不能超过 ${width}×${height}px，当前 ${img.width}×${img.height}px`);
+        return;
+      }
 
-    // Simulate upload (in production, replace with actual upload API)
-    setIsUploading(true);
-    try {
-      // Simulate upload delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setIsUploading(false);
-      // Use data URL for demo, in production call actual upload API
-      onChange(reader.result as string);
-    } catch {
-      setIsUploading(false);
-      setError("图片上传失败，请重试");
-    }
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setPreviewUrl(dataUrl);
+      };
+      reader.readAsDataURL(file);
+
+      // Simulate upload (in production, replace with actual upload API)
+      setIsUploading(true);
+      try {
+        // Simulate upload delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setIsUploading(false);
+        // Use data URL for demo, in production call actual upload API
+        onChange(reader.result as string);
+      } catch {
+        setIsUploading(false);
+        setError("图片上传失败，请重试");
+      }
+    };
+    img.onerror = () => {
+      setError("无法读取图片文件，请选择其他图片");
+    };
+    img.src = URL.createObjectURL(file);
   };
 
   const handleRemove = () => {
