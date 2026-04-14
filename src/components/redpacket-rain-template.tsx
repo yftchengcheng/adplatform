@@ -371,7 +371,7 @@ export function RedpacketRainTemplate({
           <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#8B0000] to-[#4A0000]">
             {/* Guide Text */}
             <div className="absolute top-8 left-0 right-0 text-center z-10">
-              <p className="text-white text-lg font-medium drop-shadow-lg animate-pulse">
+              <p className="text-white text-lg font-medium drop-shadow-lg">
                 {resolveGuideText()}
               </p>
             </div>
