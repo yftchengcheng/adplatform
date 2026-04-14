@@ -135,7 +135,7 @@ export function CouponTemplate({
     onButtonClick?.(finalConfig);
   };
 
-  if (!isVisible && !previewMode) return null;
+  if (!isVisible && previewMode === false) return null;
 
   return (
     <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
@@ -178,34 +178,31 @@ export function CouponTemplate({
 
           {/* Main Content - Red Background */}
           <div className="flex mx-3 mb-3 rounded-lg overflow-hidden">
-            {/* Left Side - Discount Amount */}
-            <div className="w-[80px] bg-gradient-to-br from-[#F87D79] to-[#E85D5A] flex flex-col items-center justify-center py-4 px-2">
-              <span className="text-white text-2xl font-semibold leading-none">
+            {/* Left Side - Discount Amount (1/3) */}
+            <div className="w-[100px] bg-gradient-to-br from-[#F87D79] to-[#E85D5A] flex flex-col items-center justify-center py-4 px-2">
+              <span className="text-white text-3xl font-semibold leading-none">
                 {resolveMacro(finalConfig.discountInfo) || "优惠"}
               </span>
             </div>
 
-            {/* Right Side - Info */}
-            <div className="flex-1 bg-gradient-to-br from-[#F87D79] to-[#E85D5A] px-3 py-3 flex flex-col justify-between">
-              {/* Top: Button and Condition */}
-              <div className="flex items-start justify-between">
-                {/* Button Text */}
-                <div className="flex-1">
-                  <span className="text-white text-sm font-semibold whitespace-nowrap">
-                    {resolveButtonText()}
-                  </span>
-                </div>
+            {/* Right Side - Info (2/3) */}
+            <div className="flex-1 bg-gradient-to-br from-[#F87D79] to-[#E85D5A] px-4 py-3 flex flex-col justify-between">
+              {/* Top: Button Text */}
+              <div>
+                <span className="text-white text-base font-semibold whitespace-nowrap">
+                  {resolveButtonText()}
+                </span>
               </div>
 
               {/* Middle: Discount Condition */}
-              <div className="mt-1">
-                <span className="text-white/90 text-sm font-medium line-clamp-1">
+              <div>
+                <span className="text-white/90 text-sm line-clamp-1">
                   {resolveMacro(finalConfig.discountCondition) || "优惠条件"}
                 </span>
               </div>
 
               {/* Bottom: Valid Date */}
-              <div className="mt-1">
+              <div>
                 <span className="text-white/80 text-xs whitespace-nowrap">
                   {formatValidDate()}
                 </span>

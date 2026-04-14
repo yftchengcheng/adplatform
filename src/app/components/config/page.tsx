@@ -151,9 +151,9 @@ function ConfigContent() {
   const editingComponent = componentId ? components.find(c => c.id === componentId) : null;
 
   // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
-  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig>(() => {
+  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig>(() => {
     if (editingComponent?.config) {
-      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig;
+      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig;
     }
     return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
   });
@@ -172,7 +172,7 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
-  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig) => {
+  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig) => {
     setConfig(newConfig);
     sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
@@ -292,6 +292,7 @@ function ConfigContent() {
             {isCouponComponent ? (
               <CouponTemplateConfigPanel
                 initialConfig={config as CouponTemplateConfig}
+                onChange={handleConfigChange}
                 onSave={handleSave}
                 macroVariables={(config as CouponTemplateConfig).macroVariables}
               />

@@ -120,6 +120,7 @@ const BUTTON_TEXT_OPTIONS = [
 
 interface CouponTemplateConfigPanelProps {
   initialConfig?: Partial<CouponTemplateConfig>;
+  onChange?: (config: CouponTemplateConfig) => void;
   onSave?: (config: CouponTemplateConfig) => void;
   onPreview?: (config: CouponTemplateConfig) => void;
   macroVariables?: Record<string, string>;
@@ -127,6 +128,7 @@ interface CouponTemplateConfigPanelProps {
 
 export function CouponTemplateConfigPanel({
   initialConfig,
+  onChange,
   onSave,
   onPreview,
   macroVariables = {},
@@ -165,6 +167,7 @@ export function CouponTemplateConfigPanel({
   const updateConfig = (updates: Partial<CouponTemplateConfig>) => {
     const newConfig = { ...config, ...updates, macroVariables };
     setConfig(newConfig);
+    onChange?.(newConfig);
   };
 
   // 处理落地页输入
