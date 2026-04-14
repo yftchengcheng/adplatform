@@ -697,4 +697,69 @@ const BUTTON_TEXT_OPTIONS = [
 2. **默认动作**：打开落地页链接
 3. **宏变量替换**：支持标题、优惠信息、优惠条件、按钮文案、落地页的宏替换
 
+---
+
+## 十四、推广卡片特殊规范
+
+### 1. 组件结构
+- **左图右文布局**：左侧图标，右侧标题+推广卖点+行动号召按钮
+- **推广卖点**：支持多条轮播展示（最多10条）
+
+### 2. 配置数据结构
+```typescript
+interface PromotionPoint {
+  id: string;
+  text: string;           // 卖点文本（最多18字符）
+  textMacro?: string;    // 卖点宏变量
+}
+
+interface PromotionTemplateConfig {
+  iconUrl?: string;               // 图标URL
+  iconMacro?: string;             // 图标宏变量
+  title: string;                  // 标题（最多14字符）
+  titleMacro?: string;            // 标题宏变量
+  promotionPoints: PromotionPoint[];  // 推广卖点（最多10条）
+  buttonText: string;             // 行动号召（最多12字符）
+  buttonTextMacro?: string;       // 行动号召宏变量
+  landingPageUrl?: string;        // 落地页URL
+  landingPageMacro?: string;      // 落地页宏变量
+  defaultLandingPageUrl?: string;
+  macroVariables?: Record<string, string>;
+}
+```
+
+### 3. 字段规范
+| 字段 | 最大字符 | 说明 |
+|------|---------|------|
+| 图标 | 1MB | 推荐 108×108px，支持 JPG、PNG、JPEG |
+| 标题 | 14字符 | 7个汉字（不含标点） |
+| 推广卖点(单条) | 18字符 | 9个汉字（不含标点） |
+| 行动号召 | 12字符 | 6个汉字（不含标点） |
+
+### 4. 渲染样式
+```tsx
+<div className="flex items-center p-2 gap-2">
+  {/* 左侧图标 */}
+  <div className="w-10 h-10 rounded bg-gray-100">
+    <img src={iconUrl} alt="图标" className="w-full h-full object-cover" />
+  </div>
+
+  {/* 右侧内容 */}
+  <div className="flex-1">
+    <p className="text-xs text-gray-500">{title}</p>
+    <p className="text-[10px] text-gray-600">{currentPoint}</p>
+  </div>
+
+  {/* 按钮 */}
+  <button className="h-5 px-2 bg-[#3087FF] text-white text-[10px] rounded">
+    {buttonText}
+  </button>
+</div>
+```
+
+### 5. 交互逻辑
+1. **点击行动号召按钮**：跳转到落地页
+2. **推广卖点轮播**：多条卖点时自动轮播（每3秒切换），鼠标悬停暂停
+3. **手动切换**：点击左右箭头或指示器切换卖点
+4. **宏变量替换**：支持图标、标题、卖点、按钮文案、落地页的宏替换
 

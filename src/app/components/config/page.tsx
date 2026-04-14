@@ -14,6 +14,8 @@ import { EcommerceTemplateConfig, EcommerceTemplate } from "@/components/ecommer
 import { EcommerceTemplateConfigPanel } from "@/components/ecommerce-template-config";
 import { CouponTemplateConfig, CouponTemplate } from "@/components/coupon-template";
 import { CouponTemplateConfigPanel } from "@/components/coupon-template-config";
+import { PromotionTemplateConfig, PromotionTemplate } from "@/components/promotion-template";
+import { PromotionTemplateConfigPanel } from "@/components/promotion-template-config";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
@@ -101,9 +103,29 @@ const defaultCouponConfig: CouponTemplateConfig = {
   },
 };
 
+// 默认推广卡片组件配置
+const defaultPromotionConfig: PromotionTemplateConfig = {
+  iconUrl: "",
+  title: "卡片标题",
+  promotionPoints: [
+    { id: "1", text: "推广卖点1" },
+    { id: "2", text: "推广卖点2" },
+  ],
+  buttonText: "行动号召",
+  defaultLandingPageUrl: "",
+  macroVariables: {
+    icon_url: "https://picsum.photos/108/108",
+    title: "商品名称",
+    point_1: "卖点一",
+    point_2: "卖点二",
+    button_text: "了解更多",
+    landing_url: "https://example.com/promotion",
+  },
+};
+
 // 组件类型对应的默认配置和名称
 const componentConfigMap: Record<string, {
-  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig;
+  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig;
   name: string;
   description: string;
 }> = {
@@ -132,6 +154,11 @@ const componentConfigMap: Record<string, {
     name: "优惠券磁贴",
     description: "配置优惠券信息和领取按钮",
   },
+  promotion_card: {
+    defaultConfig: defaultPromotionConfig,
+    name: "推广卡片",
+    description: "配置图标、标题、推广卖点和行动号召",
+  },
 };
 
 function ConfigContent() {
@@ -151,9 +178,9 @@ function ConfigContent() {
   const editingComponent = componentId ? components.find(c => c.id === componentId) : null;
 
   // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
-  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig>(() => {
+  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig>(() => {
     if (editingComponent?.config) {
-      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig;
+      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig;
     }
     return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
   });
@@ -172,7 +199,7 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
-  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig) => {
+  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig) => {
     setConfig(newConfig);
     sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
@@ -230,6 +257,7 @@ function ConfigContent() {
   const isImageComponent = type === "image";
   const isEcommerceComponent = type === "ecommerce";
   const isCouponComponent = type === "coupon";
+  const isPromotionComponent = type === "promotion_card";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -289,7 +317,14 @@ function ConfigContent() {
         <div className="flex gap-8">
           {/* Config Panel - 占据主要宽度 */}
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px]">
-            {isCouponComponent ? (
+            {isPromotionComponent ? (
+              <PromotionTemplateConfigPanel
+                initialConfig={config as PromotionTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+                macroVariables={(config as PromotionTemplateConfig).macroVariables}
+              />
+            ) : isCouponComponent ? (
               <CouponTemplateConfigPanel
                 initialConfig={config as CouponTemplateConfig}
                 onChange={handleConfigChange}
@@ -376,7 +411,13 @@ function ConfigContent() {
 
                       {/* App content */}
                       <div className="h-[calc(100%-28px)] overflow-auto flex items-center justify-center">
-                        {isCouponComponent ? (
+                        {isPromotionComponent ? (
+                          <PromotionTemplate
+                            config={config as PromotionTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        ) : isCouponComponent ? (
                           <CouponTemplate
                             config={config as CouponTemplateConfig}
                             isOpen={true}
@@ -422,10 +463,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
+                    {isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
+                    {isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 
