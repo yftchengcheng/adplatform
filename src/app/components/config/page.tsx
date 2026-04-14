@@ -16,6 +16,8 @@ import { CouponTemplateConfig, CouponTemplate } from "@/components/coupon-templa
 import { CouponTemplateConfigPanel } from "@/components/coupon-template-config";
 import { PromotionTemplateConfig, PromotionTemplate } from "@/components/promotion-template";
 import { PromotionTemplateConfigPanel } from "@/components/promotion-template-config";
+import { GameGiftTemplateConfig, GameGiftTemplate } from "@/components/game-gift-template";
+import { GameGiftTemplateConfigPanel } from "@/components/game-gift-template-config";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
@@ -123,9 +125,29 @@ const defaultPromotionConfig: PromotionTemplateConfig = {
   },
 };
 
+// 默认游戏礼包码组件配置
+const defaultGameGiftConfig: GameGiftTemplateConfig = {
+  images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
+  logoUrl: "",
+  appName: "游戏名称",
+  appDescription: "游戏描述内容",
+  appPackageName: "com.example.game",
+  downloadUrl: "",
+  giftCode: "",
+  defaultLandingPageUrl: "",
+  macroVariables: {
+    app_image: "https://picsum.photos/640/360",
+    app_logo: "https://picsum.photos/132/132",
+    app_name: "游戏名称",
+    app_desc: "游戏描述内容",
+    package_name: "com.example.game",
+    download_url: "https://example.com/download",
+  },
+};
+
 // 组件类型对应的默认配置和名称
 const componentConfigMap: Record<string, {
-  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig;
+  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig;
   name: string;
   description: string;
 }> = {
@@ -159,6 +181,11 @@ const componentConfigMap: Record<string, {
     name: "推广卡片",
     description: "配置图标、标题、推广卖点和行动号召",
   },
+  game_gift: {
+    defaultConfig: defaultGameGiftConfig,
+    name: "游戏礼包码",
+    description: "配置应用图片、名称、描述和下载链接",
+  },
 };
 
 function ConfigContent() {
@@ -178,9 +205,9 @@ function ConfigContent() {
   const editingComponent = componentId ? components.find(c => c.id === componentId) : null;
 
   // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
-  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig>(() => {
+  const [config, setConfig] = useState<AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig>(() => {
     if (editingComponent?.config) {
-      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig;
+      return editingComponent.config as AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig;
     }
     return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
   });
@@ -199,7 +226,7 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
-  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig) => {
+  const handleConfigChange = useCallback((newConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig) => {
     setConfig(newConfig);
     sessionStorage.setItem("component_config", JSON.stringify(newConfig));
   }, []);
@@ -258,6 +285,7 @@ function ConfigContent() {
   const isEcommerceComponent = type === "ecommerce";
   const isCouponComponent = type === "coupon";
   const isPromotionComponent = type === "promotion_card";
+  const isGameGiftComponent = type === "game_gift";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -317,7 +345,14 @@ function ConfigContent() {
         <div className="flex gap-8">
           {/* Config Panel - 占据主要宽度 */}
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px]">
-            {isPromotionComponent ? (
+            {isGameGiftComponent ? (
+              <GameGiftTemplateConfigPanel
+                initialConfig={config as GameGiftTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+                macroVariables={(config as GameGiftTemplateConfig).macroVariables}
+              />
+            ) : isPromotionComponent ? (
               <PromotionTemplateConfigPanel
                 initialConfig={config as PromotionTemplateConfig}
                 onChange={handleConfigChange}
@@ -411,7 +446,13 @@ function ConfigContent() {
 
                       {/* App content */}
                       <div className="h-[calc(100%-28px)] overflow-auto flex items-center justify-center">
-                        {isPromotionComponent ? (
+                        {isGameGiftComponent ? (
+                          <GameGiftTemplate
+                            config={config as GameGiftTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        ) : isPromotionComponent ? (
                           <PromotionTemplate
                             config={config as PromotionTemplateConfig}
                             isOpen={true}
@@ -463,10 +504,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
+                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
+                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 

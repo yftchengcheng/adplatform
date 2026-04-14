@@ -61,6 +61,7 @@ import { ImageTemplate, ImageTemplateConfig } from "@/components/image-template"
 import { EcommerceTemplate, EcommerceTemplateConfig } from "@/components/ecommerce-template";
 import { CouponTemplate, CouponTemplateConfig } from "@/components/coupon-template";
 import { PromotionTemplate, PromotionTemplateConfig } from "@/components/promotion-template";
+import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
 
 import { useRouter } from "next/navigation";
 
@@ -695,6 +696,12 @@ export function ComponentList() {
                       ) : previewComponent?.type === "vote" ? (
                         <VoteTemplate
                           config={previewComponent.config as unknown as VoteTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                        />
+                      ) : previewComponent?.type === "game_gift" ? (
+                        <GameGiftTemplate
+                          config={previewComponent.config as unknown as GameGiftTemplateConfig}
                           isOpen={true}
                           previewMode={true}
                         />

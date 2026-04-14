@@ -763,3 +763,83 @@ interface PromotionTemplateConfig {
 3. **手动切换**：点击左右箭头或指示器切换卖点
 4. **宏变量替换**：支持图标、标题、卖点、按钮文案、落地页的宏替换
 
+---
+
+## 十五、游戏礼包码特殊规范
+
+### 1. 组件结构
+- **左图右文布局**：左侧应用图片（可轮播），右侧应用名称+描述+包名+礼包码
+- **底部下载按钮**：蓝色按钮「立即下载」
+- **应用图片**：最多2张，支持轮播
+
+### 2. 配置数据结构
+```typescript
+interface GameGiftTemplateConfig {
+  // 应用图片（最多2张）
+  images: {
+    id: string;
+    imageUrl?: string;
+    imageMacro?: string;
+  }[];
+  // 应用logo
+  logoUrl?: string;
+  logoMacro?: string;
+  // 应用名称
+  appName: string;
+  appNameMacro?: string;
+  // 应用描述
+  appDescription: string;
+  appDescriptionMacro?: string;
+  // 应用包名
+  appPackageName?: string;
+  appPackageMacro?: string;
+  // 下载链接
+  downloadUrl?: string;
+  downloadMacro?: string;
+  // 礼包码
+  giftCode?: string;
+  giftCodeMacro?: string;
+  defaultLandingPageUrl?: string;
+  macroVariables?: Record<string, string>;
+}
+```
+
+### 3. 字段规范
+| 字段 | 最大字符 | 说明 |
+|------|---------|------|
+| 应用图片 | 1MB | 推荐 1280×720px，支持 JPG、PNG、JPEG |
+| 应用logo | 1MB | 推荐 132×132px，支持 JPG、PNG、JPEG |
+| 应用名称 | 18字符 | 9个汉字（不含标点） |
+| 应用描述 | 30字符 | 15个汉字（不含标点） |
+| 应用包名 | 无限制 | 如 com.example.game |
+| 礼包码 | 无限制 | 礼包码文本 |
+| 下载链接 | 无限制 | 支持宏替换 |
+
+### 4. 渲染样式
+```tsx
+<div className="flex p-3 gap-3">
+  {/* 左侧：应用图片 */}
+  <div className="w-[67px] h-[67px] rounded bg-gray-100">
+    <img src={imageSrc} alt="应用图片" className="w-full h-full object-cover" />
+  </div>
+
+  {/* 右侧：信息 */}
+  <div className="flex-1">
+    <p className="text-sm font-medium">{appName}</p>
+    <p className="text-xs text-gray-500">{appDescription}</p>
+    <p className="text-[10px] text-gray-400">{appPackageName}</p>
+    <p className="text-[10px] text-blue-500">码: {giftCode}</p>
+  </div>
+</div>
+
+{/* 底部：下载按钮 */}
+<button className="w-full h-7 bg-[#3087FF] text-white text-xs rounded">
+  立即下载
+</button>
+```
+
+### 5. 交互逻辑
+1. **点击下载按钮**：跳转到下载链接
+2. **图片轮播**：多张图片时自动轮播（每3秒切换），鼠标悬停暂停
+3. **宏变量替换**：支持图片、应用名称、描述、下载链接、礼包码的宏替换
+
