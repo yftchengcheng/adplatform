@@ -325,15 +325,29 @@ export function GameGiftTemplateConfigPanel({
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
+                          // 校验文件大小
                           if (file.size > 1 * 1024 * 1024) {
-                            alert("图片大小不能超过 1MB");
+                            alert("Logo 图片大小不能超过 1MB");
                             return;
                           }
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            handleLogoInput(ev.target?.result as string, false);
+                          // 校验宽高比
+                          const img = new Image();
+                          img.onload = () => {
+                            const ratio = img.naturalWidth / img.naturalHeight;
+                            if (Math.abs(ratio - 1) > 0.01) {
+                              alert("Logo 图片宽高比需为 1:1，当前: " + img.naturalWidth + "×" + img.naturalHeight);
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              handleLogoInput(ev.target?.result as string, false);
+                            };
+                            reader.readAsDataURL(file);
                           };
-                          reader.readAsDataURL(file);
+                          img.onerror = () => {
+                            alert("图片加载失败，请选择其他图片");
+                          };
+                          img.src = URL.createObjectURL(file);
                         }}
                       />
                     </label>
@@ -434,15 +448,30 @@ export function GameGiftTemplateConfigPanel({
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
+                              // 校验文件大小
                               if (file.size > 1 * 1024 * 1024) {
-                                alert("图片大小不能超过 1MB");
+                                alert("应用图片大小不能超过 1MB");
                                 return;
                               }
-                              const reader = new FileReader();
-                              reader.onload = (ev) => {
-                                updateImage(index, { imageUrl: ev.target?.result as string, imageMacro: "" });
+                              // 校验宽高比 16:9
+                              const img = new Image();
+                              img.onload = () => {
+                                const ratio = img.naturalWidth / img.naturalHeight;
+                                const targetRatio = 16 / 9;
+                                if (Math.abs(ratio - targetRatio) > 0.05) {
+                                  alert("应用图片宽高比需为 16:9，当前: " + img.naturalWidth + "×" + img.naturalHeight);
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = (ev) => {
+                                  updateImage(index, { imageUrl: ev.target?.result as string, imageMacro: "" });
+                                };
+                                reader.readAsDataURL(file);
                               };
-                              reader.readAsDataURL(file);
+                              img.onerror = () => {
+                                alert("图片加载失败，请选择其他图片");
+                              };
+                              img.src = URL.createObjectURL(file);
                             }}
                           />
                         </label>
