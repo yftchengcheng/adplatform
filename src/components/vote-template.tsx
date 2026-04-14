@@ -196,7 +196,8 @@ export function VoteTemplate({
 
       // 解析图片URL
       let imgUrl = imageUrl || "";
-      if (imageMacro && macroVariables) {
+      if (imageMacro) {
+        // 优先使用 imageMacro（直接替换宏变量）
         imgUrl = resolveMacro(imageMacro, macroVariables);
       }
 
@@ -313,13 +314,31 @@ export function VoteTemplate({
               >
                 <X className="w-4 h-4 text-gray-500" />
               </button>
-              <Image
-                src={currentImageUrl}
-                alt="Preview"
-                width={300}
-                height={150}
-                className="w-full h-auto"
-              />
+              <div className="relative cursor-pointer group">
+                <Image
+                  src={currentImageUrl}
+                  alt="Preview"
+                  width={300}
+                  height={150}
+                  className="w-full h-auto"
+                  onClick={() => {
+                    // 点击图片跳转到落地页
+                    let url = landingPageUrl;
+                    if (landingPageMacro && macroVariables) {
+                      url = resolveMacro(landingPageMacro, macroVariables);
+                    }
+                    if (url) {
+                      window.open(url, "_blank");
+                    }
+                  }}
+                />
+                {/* 点击提示 */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 px-3 py-1.5 rounded-full text-xs font-medium text-gray-700">
+                    点击图片跳转落地页
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </>
