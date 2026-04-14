@@ -85,6 +85,18 @@ export function GameGiftTemplate({
     return result;
   };
 
+  // 解析组件名称
+  const resolveComponentName = (): string => {
+    if (finalConfig.componentNameMacro) {
+      const resolved = resolveMacro(finalConfig.componentNameMacro);
+      if (resolved.includes('${') || resolved.startsWith('$')) {
+        return finalConfig.componentName || "游戏礼包码";
+      }
+      return resolved;
+    }
+    return finalConfig.componentName || "游戏礼包码";
+  };
+
   // 解析应用名称
   const resolveAppName = (): string => {
     if (finalConfig.appNameMacro) {
@@ -200,45 +212,53 @@ export function GameGiftTemplate({
           )}
 
           {/* Content */}
-          <div className="flex p-3 gap-3">
-            {/* Left: Logo */}
-            <div className="flex-shrink-0 w-[67px] h-[67px] rounded bg-gray-100 overflow-hidden">
-              {logoSrc ? (
-                <img
-                  src={logoSrc}
-                  alt="应用Logo"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                  Logo
+          <div className="p-3 space-y-2">
+            {/* Component Name */}
+            <p className="text-xs text-gray-500">
+              {resolveComponentName()}
+            </p>
+
+            {/* Left & Right Row */}
+            <div className="flex gap-3">
+              {/* Left: Logo */}
+              <div className="flex-shrink-0 w-[67px] h-[67px] rounded bg-gray-100 overflow-hidden">
+                {logoSrc ? (
+                  <img
+                    src={logoSrc}
+                    alt="应用Logo"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                    Logo
+                  </div>
+                )}
+              </div>
+
+              {/* Right: Info */}
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
+                {/* App Name */}
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {resolveAppName()}
+                </p>
+
+                {/* App Description */}
+                <p className="text-xs text-gray-500 line-clamp-2">
+                  {resolveAppDescription()}
+                </p>
+
+                {/* Package Name & Gift Code */}
+                <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                  {finalConfig.appPackageName && (
+                    <span className="truncate">{finalConfig.appPackageName}</span>
+                  )}
+                  {finalConfig.giftCode && (
+                    <span className="text-blue-500 truncate">码: {finalConfig.giftCode}</span>
+                  )}
                 </div>
-              )}
-            </div>
-
-            {/* Right: Info */}
-            <div className="flex-1 min-w-0 flex flex-col justify-between">
-              {/* App Name */}
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {resolveAppName()}
-              </p>
-
-              {/* App Description */}
-              <p className="text-xs text-gray-500 line-clamp-2">
-                {resolveAppDescription()}
-              </p>
-
-              {/* Package Name & Gift Code */}
-              <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                {finalConfig.appPackageName && (
-                  <span className="truncate">{finalConfig.appPackageName}</span>
-                )}
-                {finalConfig.giftCode && (
-                  <span className="text-blue-500 truncate">码: {finalConfig.giftCode}</span>
-                )}
               </div>
             </div>
           </div>
