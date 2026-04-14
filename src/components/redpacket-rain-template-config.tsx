@@ -319,13 +319,11 @@ export function RedpacketRainTemplateConfigPanel({
                             setRedpacketError(`红包图片大小不能超过 30KB，当前 ${(file.size / 1024).toFixed(2)}KB`);
                             return;
                           }
-                          // 校验宽高比 115:133
+                          // 校验精确尺寸 115×133px
                           const img = new window.Image();
                           img.onload = () => {
-                            const ratio = img.naturalWidth / img.naturalHeight;
-                            const targetRatio = 115 / 133;
-                            if (Math.abs(ratio - targetRatio) > 0.05) {
-                              setRedpacketError(`红包图片宽高比需为 115:133，当前 ${img.naturalWidth}×${img.naturalHeight}`);
+                            if (img.naturalWidth !== 115 || img.naturalHeight !== 133) {
+                              setRedpacketError(`红包图片尺寸需为 115×133px，当前 ${img.naturalWidth}×${img.naturalHeight}px`);
                               return;
                             }
                             setRedpacketError(null);
@@ -348,7 +346,7 @@ export function RedpacketRainTemplateConfigPanel({
               {redpacketError && (
                 <p className="text-xs text-red-500 mt-1">{redpacketError}</p>
               )}
-              <p className="text-xs text-gray-400">宽高比 115:133，推荐 115×133px，最大 30KB</p>
+              <p className="text-xs text-gray-400">尺寸 115×133px，最大 30KB</p>
             </div>
 
             {/* 引导文案 */}
