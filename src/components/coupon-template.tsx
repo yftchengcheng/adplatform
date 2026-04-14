@@ -98,19 +98,29 @@ export function CouponTemplate({
     return finalConfig.buttonText;
   };
 
-  // 格式化有效期
+  // 格式化有效期 - 转换为友好格式
   const formatValidDate = (): string => {
     const { validFrom, validTo } = finalConfig;
     if (!validFrom && !validTo) {
       return "";
     }
+
+    // 转换日期格式 2026-01-01 -> 2026年1月1日
+    const formatDate = (dateStr: string): string => {
+      if (!dateStr) return "";
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return dateStr;
+      const [year, month, day] = parts;
+      return `${year}年${parseInt(month)}月${parseInt(day)}日`;
+    };
+
     if (validFrom && validTo) {
-      return `有效期: ${validFrom} 至 ${validTo}`;
+      return `${formatDate(validFrom)}-${formatDate(validTo)}`;
     }
     if (validFrom) {
-      return `有效期: ${validFrom} 起`;
+      return `${formatDate(validFrom)}起`;
     }
-    return `有效期: 至 ${validTo}`;
+    return `至${formatDate(validTo)}`;
   };
 
   useEffect(() => {
