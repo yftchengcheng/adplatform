@@ -206,14 +206,14 @@ export function CouponTemplate({
 
               {/* Middle: Discount Condition */}
               <div>
-                <span className="text-white/90 text-sm line-clamp-1">
+                <span className="text-white/90 text-xs line-clamp-1">
                   {resolveMacro(finalConfig.discountCondition) || "优惠条件"}
                 </span>
               </div>
 
               {/* Bottom: Valid Date */}
               <div>
-                <span className="text-white/80 text-xs whitespace-nowrap">
+                <span className="text-white/80 text-[10px] whitespace-nowrap truncate">
                   {formatValidDate()}
                 </span>
               </div>
