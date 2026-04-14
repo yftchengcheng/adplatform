@@ -1,164 +1,367 @@
-# 项目上下文
+# 组件设计规范记忆库
 
-### 版本技术栈
+## 一、UI 组件库
 
-- **Framework**: Next.js 16 (App Router)
-- **Core**: React 19
-- **Language**: TypeScript 5
-- **UI 组件**: shadcn/ui (基于 Radix UI)
-- **Styling**: Tailwind CSS 4
+### 1. ModeToggle（模式切换组件）
 
-## 目录结构
+**用途**：在"输入模式"和"宏模式"之间切换
 
-```
-├── public/                 # 静态资源
-├── scripts/                # 构建与启动脚本
-│   ├── build.sh            # 构建脚本
-│   ├── dev.sh              # 开发环境启动脚本
-│   ├── prepare.sh          # 预处理脚本
-│   └── start.sh            # 生产环境启动脚本
-├── src/
-│   ├── app/                # 页面路由与布局
-│   ├── components/ui/      # Shadcn UI 组件库
-│   ├── hooks/              # 自定义 Hooks
-│   ├── lib/                # 工具库
-│   │   └── utils.ts        # 通用工具函数 (cn)
-│   └── server.ts           # 自定义服务端入口
-├── next.config.ts          # Next.js 配置
-├── package.json            # 项目依赖管理
-└── tsconfig.json           # TypeScript 配置
+**设计样式**：
+```tsx
+<div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
+  <button className="px-3 py-1 text-xs font-medium rounded-md transition-all">
+    {/* 选中：bg-white shadow-sm text-gray-900 */}
+    {/* 未选中：text-gray-500 hover:text-gray-700 */}
+  </button>
+</div>
 ```
 
-- 项目文件（如 app 目录、pages 目录、components 等）默认初始化到 `src/` 目录下。
+**校验规则**：
+- 无特殊校验
+- 切换时清空另一模式的值
 
-## 包管理规范
+---
 
-**仅允许使用 pnpm** 作为包管理器，**严禁使用 npm 或 yarn**。
-**常用命令**：
-- 安装依赖：`pnpm add <package>`
-- 安装开发依赖：`pnpm add -D <package>`
-- 安装所有依赖：`pnpm install`
-- 移除依赖：`pnpm remove <package>`
+### 2. CharCounter（字符计数器）
 
-## 开发规范
+**用途**：显示当前字符数/最大字符数
 
-### Hydration 问题防范
+**设计样式**：
+```tsx
+<span className="text-xs {isOverLimit ? 'text-red-500' : 'text-gray-400'}">
+  {current}/{max}
+</span>
+```
 
-1. 严禁在 JSX 渲染逻辑中直接使用 typeof window、Date.now()、Math.random() 等动态数据。**必须使用 'use client' 并配合 useEffect + useState 确保动态内容仅在客户端挂载后渲染**；同时严禁非法 HTML 嵌套（如 <p> 嵌套 <div>）。
-2. **禁止使用 head 标签**，优先使用 metadata，详见文档：https://nextjs.org/docs/app/api-reference/functions/generate-metadata
-   1. 三方 CSS、字体等资源可在 `globals.css` 中顶部通过 `@import` 引入或使用 next/font
-   2. preload, preconnect, dns-prefetch 通过 ReactDOM 的 preload、preconnect、dns-prefetch 方法引入
-   3. json-ld 可阅读 https://nextjs.org/docs/app/guides/json-ld
+**校验规则**：
+- 超出限制时显示红色 `text-red-500`
+- 通常搭配 Input 的 `maxLength` 属性使用
 
-## UI 设计与组件规范 (UI & Styling Standards)
+---
 
-- 模板默认预装核心组件库 `shadcn/ui`，位于`src/components/ui/`目录下
-- Next.js 项目**必须默认**采用 shadcn/ui 组件、风格和规范，**除非用户指定用其他的组件和规范。**
+### 3. ImageUpload（图片上传组件）
 
-## 广告组件说明
+**用途**：图片上传、预览、删除
 
-### 组件位置
-- 广告模板核心组件：`src/components/ad-template.tsx`
-- 广告配置面板：`src/components/ad-template-config.tsx`
-- 组件列表页面：`src/components/component-list.tsx`
-- 组件选择页面：`src/app/components/create/page.tsx`
-- 配置页面：`src/app/components/config/page.tsx`
-- 组件预览页面：`src/app/components/preview/page.tsx`
-- 组件上下文：`src/contexts/component-context.tsx`
-- 演示页面：`src/app/page.tsx`
-- 类型定义：`src/lib/component-types.ts`
+**设计样式**：
+```tsx
+// 容器
+<div className="border-2 border-dashed border-gray-200 rounded-lg overflow-hidden">
+  // 上传区域
+  <label className="flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-gray-50">
+    <Plus className="w-10 h-10 rounded-full bg-gray-100" />
+    <span className="text-sm text-gray-500">点击上传图片</span>
+    <span className="text-xs text-gray-400">推荐 300×150px，最大 2MB</span>
+  </label>
+  // 预览区域（hover显示操作按钮）
+  <div className="relative group">
+    <Image />
+    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100">
+      <button>重新上传</button>
+      <button>删除</button>
+    </div>
+  </div>
+</div>
+```
 
-### 组件列表功能
-- **用途**：管理和展示广告组件列表
-- **功能特性**：
-  - 表格展示：ID、组件预览、组件名称、组件分类、组件类型、关联模板数量、组件状态、编辑人、编辑时间、操作
-  - 筛选功能：组件分类（静态类、动效类）、组件类型、组件状态
-  - 搜索：支持按组件名称和ID搜索
-  - 排序：支持按状态和时间排序
-  - 批量操作：批量开启、批量暂停
-  - 分页：智能分页组件
-  - 操作菜单：编辑、开启/暂停、预览、删除
+**校验规则**：
+| 校验项 | 规则 | 错误提示 |
+|--------|------|---------|
+| 文件类型 | `file.type.startsWith("image/")` | "请上传图片文件（支持 JPG、PNG、GIF、WebP 等格式）" |
+| 文件大小 | `file.size <= maxSize * 1024 * 1024` | "图片大小不能超过 {maxSize}MB，当前文件 {实际大小}MB" |
+| 删除确认 | 无确认弹窗，直接删除 | - |
 
-### 组件选择页面
-- **路由**：`/components/create`
-- **用途**：选择组件样式模板
-- **功能特性**：
-  - 静态组件：选择磁贴(双按钮)、投票磁贴、图片磁贴、电商磁贴、优惠券磁贴、推广卡片、游戏礼包码
-  - 动效组件：红包雨、翻卡、翻红包、翻宝箱、宝箱雨、刮刮卡、砸蛋、弹窗(红包)
-  - 分类筛选：全部/静态组件/动效组件
-  - 组件卡片展示：图标、名称、描述、选择按钮
-  - 步骤指示器：选择样式 → 填写内容
-  - 点击卡片跳转到配置页面
+**状态管理**：
+- `previewUrl`: string - 当前预览图片
+- `isUploading`: boolean - 上传中状态
+- `error`: string - 错误信息
 
-### 完整创建链路
-1. **组件列表** `/` → 点击"创建"
-2. **选择样式** `/components/create` → 点击"选择磁贴(双按钮)"
-3. **配置页面** `/components/config?type=dual_button` → 填写内容 → 点击"预览"或"保存"
-4. **预览页面** `/components/preview?config=xxx` → 查看效果 → 点击"返回"或"列表"
-5. **返回列表** → 新增记录显示在列表顶部
+---
 
-### 数据管理
-- **状态管理**：`src/contexts/component-context.tsx`
-- **存储方式**：
-  - 组件列表：localStorage 持久化
-  - 配置页面：sessionStorage（预览返回后数据不丢失）
-- **数据字段**：id、name、category、type、templateCount、status、editor、updateTime、config
+### 4. SectionCollapse（可折叠区块）
 
-### 广告组件功能
+**用途**：配置面板中的可折叠分组
 
-#### AdTemplate（广告弹窗组件）
-- **用途**：APP端广告弹窗展示
-- **结构**：上文下按钮（主标题 + 副标题 + 双按钮）
-- **主要特性**：
-  - 支持双按钮配置
-  - 按钮支持跳转落地页或显示图片
-  - 支持输入模式和宏替换
-  - 移动端优化的触摸交互
-  - 圆角设计和渐变按钮
-- **宏替换功能**：
-  - 支持 `${变量名}` 格式的宏替换
-  - 通过 `macroVariables` 字段传入变量映射
-  - 支持按钮落地页链接、图片宏的动态替换
+**设计样式**：
+```tsx
+<div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+  <button className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-gray-50">
+    <span className="text-sm font-medium text-gray-700">标题</span>
+    <ChevronDown/ChevronRight className="w-4 h-4 text-gray-400" />
+  </button>
+  {isOpen && <div className="px-4 pb-4">内容</div>}
+</div>
+```
 
-#### AdTemplateConfigPanel（配置面板）
-- **用途**：广告模板的可视化配置界面
-- **配置项**：
-  - 基础配置：动作、主标题、副标题
-  - 按钮1/2配置：文案、点击行为、落地页链接、图片上传
-  - 默认落地页链接（全局配置）
-  - 组件名称
+---
 
-### 组件使用示例
+### 5. VoteOptionEditor（投票选项编辑器）
 
+**用途**：编辑单个投票选项
+
+**设计样式**：
+```tsx
+<div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+  <div className="flex items-center justify-between px-3 py-2 bg-gray-50">
+    <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
+    <span className="text-sm font-medium">选项 {index}</span>
+    <div className="flex gap-2">
+      <ChevronDown/ChevronRight />
+      <Trash2 className="text-red-500" />
+    </div>
+  </div>
+  {isOpen && <div className="p-3 space-y-3">
+    {/* 选项文本 */}
+    {/* 按钮文本 */}
+    {/* 投票数（已移除） */}
+  </div>}
+</div>
+```
+
+---
+
+### 6. StepIndicator（步骤指示器）
+
+**用途**：显示当前步骤
+
+**设计样式**：
+```tsx
+<div className="flex items-center gap-2 text-xs">
+  <div className="flex items-center gap-1">
+    <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center">1</span>
+    <span className="text-gray-600">选择样式</span>
+    <ChevronRight className="w-3 h-3 text-gray-400" />
+  </div>
+  <div className="flex items-center gap-1">
+    <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center">2</span>
+    <span className="text-blue-600 font-medium">填写内容</span>
+  </div>
+</div>
+```
+
+---
+
+## 二、表单输入规范
+
+### 1. 文本输入框 (Input)
+
+| 场景 | 最大长度 | 提示文字 |
+|------|---------|---------|
+| 主标题 | 24字符 | "请输入主标题" |
+| 副标题 | 60字符 | "请输入副标题" |
+| 按钮文本 | 16字符 | "请输入按钮文本" |
+| 选项文本 | 20字符 | "请输入选项文本" |
+| 组件名称 | 20字符 | "请输入组件名称" |
+| 落地页链接 | 无限制 | "请输入落地页链接" |
+| 宏变量 | 无限制 | "如 ${variable_name}" |
+
+### 2. 下拉选择 (Select)
+
+| 场景 | 选项 |
+|------|------|
+| 点击后动作 | 跳转落地页 / 显示图片 |
+| 图片设置 | 上传图片 / 图片宏 |
+| 输入模式/宏模式 | 输入模式 / 宏模式 |
+
+### 3. 数字输入
+
+| 场景 | 范围 | 说明 |
+|------|------|------|
+| 投票占比 | 0-100% | 已废弃，改用投票数自动计算 |
+| 投票数 | >= 0 | 后台实时统计 |
+
+---
+
+## 三、按钮样式规范
+
+### 1. 主按钮
+```tsx
+<button className="h-10 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600">
+  保存
+</button>
+```
+
+### 2. 次按钮
+```tsx
+<button className="h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50">
+  取消
+</button>
+```
+
+### 3. 危险按钮
+```tsx
+<button className="px-3 py-1.5 bg-white rounded-lg text-xs font-medium text-red-500 hover:bg-red-50">
+  删除
+</button>
+```
+
+### 4. 添加按钮
+```tsx
+<button className="w-full h-10 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500">
+  <Plus className="w-4 h-4" />
+  <span className="text-sm font-medium">添加投票选项</span>
+</button>
+```
+
+---
+
+## 四、弹窗组件规范
+
+### 1. 模态弹窗结构
+```tsx
+<>
+  {/* Backdrop */}
+  <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
+
+  {/* Modal */}
+  <div className="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2">
+    <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+      {/* Close Button */}
+      <button className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200">
+        <X className="w-4 h-4 text-gray-500" />
+      </button>
+      {/* Content */}
+      <div className="px-5 pt-6 pb-4">
+        {children}
+      </div>
+    </div>
+  </div>
+</>
+```
+
+---
+
+## 五、配置面板布局规范
+
+### 1. 整体结构
+```
+┌─────────────────────────────────────┐
+│ Header: 图标 + 标题                  │
+├─────────────────────────────────────┤
+│ Step Indicator: 步骤1 / 步骤2        │
+├─────────────────────────────────────┤
+│                                     │
+│  Form Content (可滚动)               │
+│  ┌─────────────────────────────┐   │
+│  │ Section: 基础配置            │   │
+│  └─────────────────────────────┘   │
+│  ┌─────────────────────────────┐   │
+│  │ Section: 投票选项配置        │   │
+│  └─────────────────────────────┘   │
+│  ┌─────────────────────────────┐   │
+│  │ Section: 落地页配置          │   │
+│  └─────────────────────────────┘   │
+│                                     │
+├─────────────────────────────────────┤
+│ Footer: 取消 | 上一步 | 保存         │
+└─────────────────────────────────────┘
+```
+
+### 2. Section 样式
+```tsx
+<div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+  <button className="...">标题 + ChevronDown</button>
+  {isOpen && <div className="px-4 pb-4 space-y-4">
+    {/* 表单项 */}
+  </div>}
+</div>
+```
+
+---
+
+## 六、投票磁贴特殊规范
+
+### 1. 选项数据结构
 ```typescript
-import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
-
-const config: AdTemplateConfig = {
-  title: "限时特惠活动",
-  subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
-  button1: {
-    text: "立即领取",
-    action: "jump",
-    landingPageUrl: "https://example.com/claim",
-  },
-  button2: {
-    text: "查看详情",
-    action: "show_image",
-    imageMacro: "${image_url}", // 图片宏模式
-  },
-  action: "open",
-  defaultLandingPageUrl: "https://example.com/default",
-  // 宏变量映射
-  macroVariables: {
-    image_url: "https://example.com/promotion.jpg",
-  },
-};
-
-<AdTemplate
-  config={config}
-  isOpen={true}
-  onClose={() => setIsOpen(false)}
-  onButton1Click={(btn) => console.log("Button 1 clicked:", btn)}
-  onButton2Click={(btn) => console.log("Button 2 clicked:", btn)}
-/>
+interface VoteOption {
+  id: string;
+  text: string;           // 选项文本（最多20字符）
+  voteCount: number;       // 投票数（后台统计，不在前端输入）
+  buttonText: string;      // 按钮文本（最多16字符）
+}
 ```
+
+### 2. 百分比计算
+```typescript
+const totalVotes = options.reduce((sum, opt) => sum + opt.voteCount, 0);
+const getPercentage = (voteCount: number): number => {
+  if (totalVotes === 0) return 0;
+  return Math.round((voteCount / totalVotes) * 100);
+};
+```
+
+### 3. 投票选项条样式
+```tsx
+<div className="relative w-full h-14 rounded-xl border-2 overflow-hidden">
+  {/* 进度条 */}
+  <div className="absolute inset-y-0 left-0 bg-blue-200" style={{ width: `${percentage}%` }} />
+  {/* 内容 */}
+  <div className="relative flex items-center justify-between h-full px-4">
+    <span>{buttonText}</span>
+    <span>{text}</span>
+    <span>{voteCount}票 {percentage}%</span>
+  </div>
+</div>
+```
+
+---
+
+## 七、校验错误显示规范
+
+### 1. 错误提示样式
+```tsx
+<div className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">
+  {errorMessage}
+</div>
+```
+
+### 2. 错误边框
+```tsx
+<div className={cn(
+  "border-2 border-dashed rounded-lg",
+  hasError ? "border-red-300" : "border-gray-200"
+)}>
+  {/* 内容 */}
+</div>
+```
+
+---
+
+## 八、颜色使用规范
+
+| 用途 | 颜色 | Tailwind |
+|------|------|----------|
+| 主色 | 蓝色 | `blue-500` / `blue-600` |
+| 危险 | 红色 | `red-500` |
+| 警告 | 橙色 | `orange-500` |
+| 成功 | 绿色 | `green-500` |
+| 文字-主要 | 灰色-900 | `text-gray-900` |
+| 文字-次要 | 灰色-500 | `text-gray-500` |
+| 文字-提示 | 灰色-400 | `text-gray-400` |
+| 背景-卡片 | 白色 | `bg-white` |
+| 背景-页面 | 灰色-50 | `bg-gray-50` |
+| 边框 | 灰色-200 | `border-gray-200` |
+
+---
+
+## 九、间距规范
+
+| 场景 | 间距 | Tailwind |
+|------|------|----------|
+| 卡片内边距 | 16px | `p-4` |
+| 表单项间距 | 16px | `space-y-4` |
+| 按钮间距 | 12px | `gap-3` |
+| 标签与输入框 | 8px | `space-y-2` |
+| 标题与内容 | 12px | `mt-3` |
+
+---
+
+## 十、字体规范
+
+| 用途 | 大小 | 权重 | Tailwind |
+|------|------|------|----------|
+| 页面标题 | 20px | 600 | `text-xl font-semibold` |
+| 分组标题 | 14px | 500 | `text-sm font-medium` |
+| 正文 | 14px | 400 | `text-sm` |
+| 标签 | 12px | 400 | `text-xs` |
+| 字符计数 | 12px | 400 | `text-xs` |

@@ -25,7 +25,7 @@ import {
 } from "./vote-template";
 import { cn } from "@/lib/utils";
 
-// Image Upload Component
+// Image Upload Component with validation
 function ImageUpload({
   value,
   onChange,
@@ -43,39 +43,53 @@ function ImageUpload({
 }) {
   const [previewUrl, setPreviewUrl] = useState<string>(value || "");
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Clear previous error
+    setError("");
+
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("请上传图片文件");
+      setError("请上传图片文件（支持 JPG、PNG、GIF、WebP 等格式）");
       return;
     }
 
     // Validate file size
     if (file.size > maxSize * 1024 * 1024) {
-      alert(`图片大小不能超过 ${maxSize}MB`);
+      setError(`图片大小不能超过 ${maxSize}MB，当前文件 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
       return;
     }
 
     // Create preview
     const reader = new FileReader();
     reader.onload = (event) => {
-      setPreviewUrl(event.target?.result as string);
+      const dataUrl = event.target?.result as string;
+      setPreviewUrl(dataUrl);
     };
     reader.readAsDataURL(file);
 
     // Simulate upload (in production, replace with actual upload API)
     setIsUploading(true);
-    setTimeout(() => {
-      // Use data URL for demo
+    try {
+      // Simulate upload delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
       setIsUploading(false);
-      // In production, call actual upload API
-      const dataUrl = reader.result as string;
-      onChange(dataUrl);
-    }, 1000);
+      // Use data URL for demo, in production call actual upload API
+      onChange(reader.result as string);
+    } catch {
+      setIsUploading(false);
+      setError("图片上传失败，请重试");
+    }
+  };
+
+  const handleRemove = () => {
+    setPreviewUrl("");
+    setError("");
+    onChange("");
   };
 
   return (
@@ -83,7 +97,18 @@ function ImageUpload({
       {label && (
         <label className="text-xs text-gray-500">{label}</label>
       )}
-      <div className="border-2 border-dashed border-gray-200 rounded-lg overflow-hidden">
+      
+      {/* Error message */}
+      {error && (
+        <div className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">
+          {error}
+        </div>
+      )}
+      
+      <div className={cn(
+        "border-2 border-dashed rounded-lg overflow-hidden",
+        error ? "border-red-300 bg-red-50" : "border-gray-200"
+      )}>
         {previewUrl ? (
           <div className="relative group">
             <Image
@@ -93,8 +118,8 @@ function ImageUpload({
               height={150}
               className="w-full h-auto max-h-[150px] object-contain"
             />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <label className="cursor-pointer px-4 py-2 bg-white rounded-lg text-sm font-medium hover:bg-gray-100">
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <label className="cursor-pointer px-3 py-1.5 bg-white rounded-lg text-xs font-medium hover:bg-gray-100">
                 重新上传
                 <input
                   type="file"
@@ -103,12 +128,26 @@ function ImageUpload({
                   className="hidden"
                 />
               </label>
+              <button
+                onClick={handleRemove}
+                className="px-3 py-1.5 bg-white rounded-lg text-xs font-medium hover:bg-gray-100 text-red-500"
+              >
+                删除
+              </button>
+            </div>
+            <div className="absolute bottom-1 left-1 right-1 text-center">
+              <span className="text-xs text-white bg-black/50 px-2 py-0.5 rounded">
+                {width}×{height}px | 最大 {maxSize}MB
+              </span>
             </div>
           </div>
         ) : (
           <label className="flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-gray-50 transition-colors">
             {isUploading ? (
-              <div className="text-sm text-gray-500">上传中...</div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-gray-500">上传中...</span>
+              </div>
             ) : (
               <>
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
