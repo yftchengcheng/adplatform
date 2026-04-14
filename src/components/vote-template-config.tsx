@@ -286,6 +286,7 @@ export function VoteTemplateConfigPanel({
   const [titleMode, setTitleMode] = useState<"input" | "macro">("input");
   const [subtitleMode, setSubtitleMode] = useState<"input" | "macro">("input");
   const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">("input");
+  const [imageInputMode, setImageInputMode] = useState<"upload" | "macro">("upload");
 
   const handleTitleChange = (title: string) => {
     onChange({ ...config, title });
@@ -562,9 +563,11 @@ export function VoteTemplateConfigPanel({
                       图片设置
                     </label>
                     <Select
-                      value={config.imageMacro ? "macro" : "upload"}
+                      value={imageInputMode}
                       onValueChange={(v) => {
-                        if (v === "upload") {
+                        const mode = v as "upload" | "macro";
+                        setImageInputMode(mode);
+                        if (mode === "upload") {
                           handleImageChange("");
                         } else {
                           handleImageMacroChange("");
@@ -580,7 +583,7 @@ export function VoteTemplateConfigPanel({
                       </SelectContent>
                     </Select>
                   </div>
-                  {config.imageMacro ? (
+                  {imageInputMode === "macro" ? (
                     <Input
                       value={config.imageMacro || ""}
                       onChange={(e) => handleImageMacroChange(e.target.value)}
