@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Settings2,
   ChevronRight,
@@ -23,6 +24,114 @@ import {
   VoteTemplate,
 } from "./vote-template";
 import { cn } from "@/lib/utils";
+
+// Image Upload Component
+function ImageUpload({
+  value,
+  onChange,
+  label,
+  width = 300,
+  height = 150,
+  maxSize = 1,
+}: {
+  value?: string;
+  onChange: (url: string) => void;
+  label?: string;
+  width?: number;
+  height?: number;
+  maxSize?: number;
+}) {
+  const [previewUrl, setPreviewUrl] = useState<string>(value || "");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("请上传图片文件");
+      return;
+    }
+
+    // Validate file size
+    if (file.size > maxSize * 1024 * 1024) {
+      alert(`图片大小不能超过 ${maxSize}MB`);
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setPreviewUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Simulate upload (in production, replace with actual upload API)
+    setIsUploading(true);
+    setTimeout(() => {
+      // Use data URL for demo
+      setIsUploading(false);
+      // In production, call actual upload API
+      const dataUrl = reader.result as string;
+      onChange(dataUrl);
+    }, 1000);
+  };
+
+  return (
+    <div className="space-y-2">
+      {label && (
+        <label className="text-xs text-gray-500">{label}</label>
+      )}
+      <div className="border-2 border-dashed border-gray-200 rounded-lg overflow-hidden">
+        {previewUrl ? (
+          <div className="relative group">
+            <Image
+              src={previewUrl}
+              alt="Preview"
+              width={300}
+              height={150}
+              className="w-full h-auto max-h-[150px] object-contain"
+            />
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <label className="cursor-pointer px-4 py-2 bg-white rounded-lg text-sm font-medium hover:bg-gray-100">
+                重新上传
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+        ) : (
+          <label className="flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-gray-50 transition-colors">
+            {isUploading ? (
+              <div className="text-sm text-gray-500">上传中...</div>
+            ) : (
+              <>
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+                  <Plus className="w-5 h-5 text-gray-400" />
+                </div>
+                <span className="text-sm text-gray-500">点击上传图片</span>
+                <span className="text-xs text-gray-400 mt-1">
+                  推荐 {width}×{height}px，最大 {maxSize}MB
+                </span>
+              </>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // Tab switch component
 function ModeToggle({
@@ -176,6 +285,7 @@ export function VoteTemplateConfigPanel({
   const [isLandingOpen, setIsLandingOpen] = useState(true);
   const [titleMode, setTitleMode] = useState<"input" | "macro">("input");
   const [subtitleMode, setSubtitleMode] = useState<"input" | "macro">("input");
+  const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">("input");
 
   const handleTitleChange = (title: string) => {
     onChange({ ...config, title });
@@ -216,7 +326,20 @@ export function VoteTemplateConfigPanel({
   };
 
   const handleActionChange = (action: "jump" | "show_image") => {
-    onChange({ ...config, action });
+    // Reset image settings when switching actions
+    if (action === "jump") {
+      onChange({ ...config, action, imageUrl: undefined, imageMacro: undefined });
+    } else {
+      onChange({ ...config, action });
+    }
+  };
+
+  const handleImageChange = (url: string) => {
+    onChange({ ...config, imageUrl: url, imageMacro: undefined });
+  };
+
+  const handleImageMacroChange = (macro: string) => {
+    onChange({ ...config, imageMacro: macro, imageUrl: undefined });
   };
 
   const handleDefaultLandingPageChange = (url: string) => {
@@ -431,45 +554,105 @@ export function VoteTemplateConfigPanel({
                 </Select>
               </div>
 
-              {/* Landing Page URL */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  落地页链接
-                </label>
-                <Input
-                  value={config.landingPageUrl || config.defaultLandingPageUrl || ""}
-                  onChange={(e) => handleLandingPageChange(e.target.value)}
-                  placeholder={
-                    config.defaultLandingPageUrl
-                      ? `不配置默认使用: ${config.defaultLandingPageUrl}`
-                      : "请输入落地页链接"
-                  }
-                />
-              </div>
+              {/* Landing Page URL - Only show when action is "jump" */}
+              {config.action === "jump" && (
+                <>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs text-gray-500">
+                        落地页链接
+                      </label>
+                      <ModeToggle 
+                        value={landingPageMode} 
+                        onChange={(v) => {
+                          setLandingPageMode(v);
+                          if (v === "macro") {
+                            handleLandingPageChange("");
+                          } else {
+                            handleLandingPageMacroChange("");
+                          }
+                        }} 
+                      />
+                    </div>
+                    {landingPageMode === "input" ? (
+                      <Input
+                        value={config.landingPageUrl || ""}
+                        onChange={(e) => handleLandingPageChange(e.target.value)}
+                        placeholder={
+                          config.defaultLandingPageUrl
+                            ? `不配置默认使用: ${config.defaultLandingPageUrl}`
+                            : "请输入落地页链接"
+                        }
+                      />
+                    ) : (
+                      <Input
+                        value={config.landingPageMacro || ""}
+                        onChange={(e) => handleLandingPageMacroChange(e.target.value)}
+                        placeholder="如 ${landing_page_url}"
+                      />
+                    )}
+                  </div>
 
-              {/* Landing Page Macro */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  落地页宏变量
-                </label>
-                <Input
-                  value={config.landingPageMacro || ""}
-                  onChange={(e) => handleLandingPageMacroChange(e.target.value)}
-                  placeholder="如 ${landing_page_url}"
-                />
-              </div>
+                  {/* Default Landing Page */}
+                  <div className="space-y-2">
+                    <label className="text-xs text-gray-500">
+                      默认落地页链接（全局）
+                    </label>
+                    <Input
+                      value={config.defaultLandingPageUrl || ""}
+                      onChange={(e) => handleDefaultLandingPageChange(e.target.value)}
+                      placeholder="当选项未配置落地页时使用此链接"
+                    />
+                  </div>
+                </>
+              )}
 
-              {/* Default Landing Page */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  默认落地页链接（全局）
-                </label>
-                <Input
-                  value={config.defaultLandingPageUrl || ""}
-                  onChange={(e) => handleDefaultLandingPageChange(e.target.value)}
-                  placeholder="当选项未配置落地页时使用此链接"
-                />
-              </div>
+              {/* Image Upload - Only show when action is "show_image" */}
+              {config.action === "show_image" && (
+                <>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs text-gray-500">
+                        图片设置
+                      </label>
+                      <Select
+                        value={config.imageMacro ? "macro" : "upload"}
+                        onValueChange={(v) => {
+                          if (v === "upload") {
+                            handleImageChange("");
+                          } else {
+                            handleImageMacroChange("");
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="upload">上传图片</SelectItem>
+                          <SelectItem value="macro">图片宏</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {config.imageMacro ? (
+                      <Input
+                        value={config.imageMacro || ""}
+                        onChange={(e) => handleImageMacroChange(e.target.value)}
+                        placeholder="如 ${image_url}"
+                      />
+                    ) : (
+                      <ImageUpload
+                        value={config.imageUrl || ""}
+                        onChange={handleImageChange}
+                        label="上传图片"
+                        width={300}
+                        height={150}
+                        maxSize={2}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

@@ -22,6 +22,8 @@ export interface VoteTemplateConfig {
   action: "jump" | "show_image";
   landingPageUrl?: string;
   landingPageMacro?: string;
+  imageUrl?: string;
+  imageMacro?: string;
   defaultLandingPageUrl?: string;
   macroVariables?: Record<string, string>;
   onVote?: (optionId: string) => void;
