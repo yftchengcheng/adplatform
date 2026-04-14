@@ -554,105 +554,99 @@ export function VoteTemplateConfigPanel({
                 </Select>
               </div>
 
-              {/* Landing Page URL - Only show when action is "jump" */}
-              {config.action === "jump" && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs text-gray-500">
-                        落地页链接
-                      </label>
-                      <ModeToggle 
-                        value={landingPageMode} 
-                        onChange={(v) => {
-                          setLandingPageMode(v);
-                          if (v === "macro") {
-                            handleLandingPageChange("");
-                          } else {
-                            handleLandingPageMacroChange("");
-                          }
-                        }} 
-                      />
-                    </div>
-                    {landingPageMode === "input" ? (
-                      <Input
-                        value={config.landingPageUrl || ""}
-                        onChange={(e) => handleLandingPageChange(e.target.value)}
-                        placeholder={
-                          config.defaultLandingPageUrl
-                            ? `不配置默认使用: ${config.defaultLandingPageUrl}`
-                            : "请输入落地页链接"
-                        }
-                      />
-                    ) : (
-                      <Input
-                        value={config.landingPageMacro || ""}
-                        onChange={(e) => handleLandingPageMacroChange(e.target.value)}
-                        placeholder="如 ${landing_page_url}"
-                      />
-                    )}
-                  </div>
-
-                  {/* Default Landing Page */}
-                  <div className="space-y-2">
-                    <label className="text-xs text-gray-500">
-                      默认落地页链接（全局）
-                    </label>
-                    <Input
-                      value={config.defaultLandingPageUrl || ""}
-                      onChange={(e) => handleDefaultLandingPageChange(e.target.value)}
-                      placeholder="当选项未配置落地页时使用此链接"
-                    />
-                  </div>
-                </>
-              )}
-
               {/* Image Upload - Only show when action is "show_image" */}
               {config.action === "show_image" && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs text-gray-500">
-                        图片设置
-                      </label>
-                      <Select
-                        value={config.imageMacro ? "macro" : "upload"}
-                        onValueChange={(v) => {
-                          if (v === "upload") {
-                            handleImageChange("");
-                          } else {
-                            handleImageMacroChange("");
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="upload">上传图片</SelectItem>
-                          <SelectItem value="macro">图片宏</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {config.imageMacro ? (
-                      <Input
-                        value={config.imageMacro || ""}
-                        onChange={(e) => handleImageMacroChange(e.target.value)}
-                        placeholder="如 ${image_url}"
-                      />
-                    ) : (
-                      <ImageUpload
-                        value={config.imageUrl || ""}
-                        onChange={handleImageChange}
-                        label="上传图片"
-                        width={300}
-                        height={150}
-                        maxSize={2}
-                      />
-                    )}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-500">
+                      图片设置
+                    </label>
+                    <Select
+                      value={config.imageMacro ? "macro" : "upload"}
+                      onValueChange={(v) => {
+                        if (v === "upload") {
+                          handleImageChange("");
+                        } else {
+                          handleImageMacroChange("");
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="upload">上传图片</SelectItem>
+                        <SelectItem value="macro">图片宏</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </>
+                  {config.imageMacro ? (
+                    <Input
+                      value={config.imageMacro || ""}
+                      onChange={(e) => handleImageMacroChange(e.target.value)}
+                      placeholder="如 ${image_url}"
+                    />
+                  ) : (
+                    <ImageUpload
+                      value={config.imageUrl || ""}
+                      onChange={handleImageChange}
+                      label="上传图片"
+                      width={300}
+                      height={150}
+                      maxSize={2}
+                    />
+                  )}
+                </div>
               )}
+
+              {/* Landing Page URL - Show for both actions */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs text-gray-500">
+                    落地页链接
+                  </label>
+                  <ModeToggle 
+                    value={landingPageMode} 
+                    onChange={(v) => {
+                      setLandingPageMode(v);
+                      if (v === "macro") {
+                        handleLandingPageChange("");
+                      } else {
+                        handleLandingPageMacroChange("");
+                      }
+                    }} 
+                  />
+                </div>
+                {landingPageMode === "input" ? (
+                  <Input
+                    value={config.landingPageUrl || ""}
+                    onChange={(e) => handleLandingPageChange(e.target.value)}
+                    placeholder={
+                      config.defaultLandingPageUrl
+                        ? `不配置默认使用: ${config.defaultLandingPageUrl}`
+                        : "请输入落地页链接"
+                    }
+                  />
+                ) : (
+                  <Input
+                    value={config.landingPageMacro || ""}
+                    onChange={(e) => handleLandingPageMacroChange(e.target.value)}
+                    placeholder="如 ${landing_page_url}"
+                  />
+                )}
+              </div>
+
+              {/* Default Landing Page */}
+              <div className="space-y-2">
+                <label className="text-xs text-gray-500">
+                  默认落地页链接（全局）
+                </label>
+                <Input
+                  value={config.defaultLandingPageUrl || ""}
+                  onChange={(e) => handleDefaultLandingPageChange(e.target.value)}
+                  placeholder="当选项未配置落地页时使用此链接"
+                />
+              </div>
             </div>
           )}
         </div>
