@@ -66,7 +66,7 @@ function ImageUpload({
 
     // Validate image dimensions
     const img = document.createElement("img");
-    img.onload = () => {
+    img.onload = async () => {
       URL.revokeObjectURL(img.src);
       if (img.width > width || img.height > height) {
         setError(`图片尺寸不能超过 ${width}×${height}px，当前 ${img.width}×${img.height}px`);
@@ -85,7 +85,7 @@ function ImageUpload({
       setIsUploading(true);
       try {
         // Simulate upload delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
         setIsUploading(false);
         // Use data URL for demo, in production call actual upload API
         onChange(reader.result as string);
