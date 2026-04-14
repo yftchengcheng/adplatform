@@ -186,37 +186,32 @@ export function AdTemplate({
   if (!isVisible && !previewMode) return null;
 
   return (
-    <>
+    <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
       {/* Backdrop */}
       <div
         className={cn(
           previewMode
-            ? "flex items-center justify-center min-h-[400px]"
+            ? "flex items-center justify-center w-full max-w-[280px]"
             : "fixed inset-0 z-50 bg-black/50",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
         onClick={!previewMode ? onClose : undefined}
-      />
-
-      {/* Modal */}
-      <div
-        className={cn(
-          previewMode
-            ? "w-full max-w-sm mx-4"
-            : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
-          "transition-all duration-300",
-          isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
-        )}
       >
-        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Modal */}
+        <div
+          className={cn(
+            previewMode
+              ? "w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+              : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl overflow-hidden",
+            "transition-all duration-300",
+            isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
+          )}
+        >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className={cn(
-              "w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10",
-              previewMode ? "absolute top-3 right-3" : "absolute top-3 right-3"
-            )}
+            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
             aria-label="关闭"
           >
             <X className="w-4 h-4 text-gray-500" />
@@ -296,7 +291,7 @@ export function AdTemplate({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
