@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface GameGiftTemplateConfig {
@@ -70,11 +70,6 @@ export function GameGiftTemplate({
 
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  // 有效的图片列表
-  const validImages = finalConfig.images.filter(img => img.imageUrl || img.imageMacro);
 
   // 宏替换函数
   const resolveMacro = (macro: string): string => {
@@ -85,21 +80,6 @@ export function GameGiftTemplate({
       result = result.replace(new RegExp(`\\$${key}`, 'g'), value);
     });
     return result;
-  };
-
-  // 解析图片
-  const resolveImage = (img: { imageUrl?: string; imageMacro?: string }): string | undefined => {
-    if (img.imageMacro) {
-      const resolved = resolveMacro(img.imageMacro);
-      if (resolved.includes('${') || resolved.startsWith('$')) {
-        return undefined;
-      }
-      return resolved;
-    }
-    if (img.imageUrl) {
-      return resolveMacro(img.imageUrl);
-    }
-    return undefined;
   };
 
   // 解析应用名称
@@ -144,17 +124,6 @@ export function GameGiftTemplate({
     return undefined;
   };
 
-  // 自动轮播
-  useEffect(() => {
-    if (validImages.length <= 1 || isPaused || !previewMode) return;
-    
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [validImages.length, isPaused, previewMode]);
-
   // 入场动画
   useEffect(() => {
     if (isOpen) {
@@ -178,20 +147,22 @@ export function GameGiftTemplate({
     onButtonClick?.(finalConfig);
   };
 
-  const handlePrevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + validImages.length) % validImages.length);
-  };
-
-  const handleNextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
-  };
-
   if (!isVisible && previewMode === false) return null;
 
-  const currentImage = validImages[currentImageIndex];
-  const imageSrc = currentImage ? resolveImage(currentImage) : undefined;
+  // 解析 Logo 图片
+  const logoSrc = (() => {
+    if (finalConfig.logoMacro) {
+      const resolved = resolveMacro(finalConfig.logoMacro);
+      if (resolved.includes('${') || resolved.startsWith('$')) {
+        return undefined;
+      }
+      return resolved;
+    }
+    if (finalConfig.logoUrl) {
+      return resolveMacro(finalConfig.logoUrl);
+    }
+    return undefined;
+  })();
 
   return (
     <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
@@ -227,16 +198,12 @@ export function GameGiftTemplate({
 
           {/* Content */}
           <div className="flex p-3 gap-3">
-            {/* Left: Image with carousel */}
-            <div 
-              className="flex-shrink-0 relative w-[67px] h-[67px] rounded bg-gray-100 overflow-hidden"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              {imageSrc ? (
+            {/* Left: Logo */}
+            <div className="flex-shrink-0 w-[67px] h-[67px] rounded bg-gray-100 overflow-hidden">
+              {logoSrc ? (
                 <img
-                  src={imageSrc}
-                  alt="应用图片"
+                  src={logoSrc}
+                  alt="应用Logo"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
@@ -244,26 +211,8 @@ export function GameGiftTemplate({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                  图片
+                  Logo
                 </div>
-              )}
-
-              {/* Carousel Controls */}
-              {validImages.length > 1 && (
-                <>
-                  <button
-                    onClick={handlePrevImage}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-6 flex items-center justify-center bg-black/30 text-white hover:bg-black/50"
-                  >
-                    <ChevronLeft className="w-3 h-3" />
-                  </button>
-                  <button
-                    onClick={handleNextImage}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-6 flex items-center justify-center bg-black/30 text-white hover:bg-black/50"
-                  >
-                    <ChevronRight className="w-3 h-3" />
-                  </button>
-                </>
               )}
             </div>
 
