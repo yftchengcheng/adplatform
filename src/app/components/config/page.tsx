@@ -239,9 +239,40 @@ function ConfigContent() {
   }, []);
 
   // 保存配置到 sessionStorage
+  // 深拷贝函数，处理可能的循环引用
+  const deepClone = (obj: unknown): unknown => {
+    if (obj === null || typeof obj !== "object") return obj;
+    if (obj instanceof Date) return new Date(obj);
+    if (Array.isArray(obj)) return obj.map(deepClone);
+    
+    const seen = new WeakMap();
+    const clone = (value: unknown): unknown => {
+      if (value === null || typeof value !== "object") return value;
+      if (seen.has(value)) return seen.get(value);
+      
+      if (value instanceof HTMLElement) return undefined; // 跳过 DOM 元素
+      if (typeof File !== "undefined" && value instanceof File) return undefined;
+      
+      const cloneValue: Record<string, unknown> = {};
+      seen.set(value, cloneValue);
+      
+      for (const key of Object.keys(value as Record<string, unknown>)) {
+        cloneValue[key] = clone((value as Record<string, unknown>)[key]);
+      }
+      return cloneValue;
+    };
+    
+    return clone(obj);
+  };
+
   const handleConfigChange = useCallback((newConfig: AllConfigTypes) => {
     setConfig(newConfig);
-    sessionStorage.setItem("component_config", JSON.stringify(newConfig));
+    try {
+      const cleanConfig = deepClone(newConfig);
+      sessionStorage.setItem("component_config", JSON.stringify(cleanConfig));
+    } catch (e) {
+      console.error("配置序列化失败:", e);
+    }
   }, []);
 
   // 清空 sessionStorage

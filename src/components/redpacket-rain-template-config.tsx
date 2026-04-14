@@ -732,9 +732,10 @@ export function RedpacketRainTemplateConfigPanel({
           <div className="flex items-center gap-2">
             <Input
               placeholder="请输入组件名称"
-              value={config.componentName || ""}
+              value={typeof config.componentName === "string" ? config.componentName : ""}
               onChange={(e) => {
-                onChange({ ...config, componentName: e.target.value });
+                const value = typeof e.target.value === "string" ? e.target.value : "";
+                onChange({ ...config, componentName: value });
               }}
               className="flex-1"
             />
