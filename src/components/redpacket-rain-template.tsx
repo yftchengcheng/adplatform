@@ -442,72 +442,81 @@ export function RedpacketRainTemplate({
           </div>
         ) : (
           /* Reward Claimed Scene - 参考样式优化 */
-          <div className="flex-1 flex flex-col bg-[#FFF0F5]">
-            {/* 顶部深粉色横幅 */}
-            <div className="w-full bg-gradient-to-r from-[#FF69B4] to-[#FF1493] py-4 px-4">
-              <h2 className="text-white text-xl font-bold text-center">
-                恭喜获奖
-              </h2>
+          <div className="flex flex-col h-full">
+            {/* 顶部红色横幅区域 */}
+            <div className="relative bg-[#F54A47] mx-[5px] mt-[6px] rounded-t-md overflow-hidden" style={{ height: 'calc(100% - 12px)' }}>
+              {/* 装饰图标 - 左上角 */}
+              <div className="absolute top-1 left-1 opacity-40">
+                <svg width="35" height="35" viewBox="0 0 35 35">
+                  <path d="M31.5,9.7 C31,8.6 30.4,7.7 29.6,6.9 C28.8,6.1 27.8,5.4 26.7,5 C25.6,4.5 24.4,4.3 23.2,4.3 C21.5,4.3 19.9,4.7 18.5,5.6 C18.1,5.8 17.8,6 17.5,6.3 C17.2,6 16.9,5.8 16.5,5.6 C15.1,4.7 13.5,4.3 11.8,4.3 C10.6,4.3 9.4,4.5 8.3,5 C7.2,5.4 6.2,6.1 5.4,6.9 C4.6,7.7 4,8.6 3.5,9.7 C3,10.8 2.7,12 2.7,13.2 C2.7,14.3 3,15.5 3.4,16.7 C3.8,17.7 4.4,18.8 5.1,19.8 C6.2,21.5 7.7,23.2 9.7,25 C12.8,27.9 16,29.9 16.1,30 L17,30.5 C17.3,30.8 17.7,30.8 18.1,30.5 L19,30 C19.1,29.9 22.2,27.9 25.3,25 C27.3,23.2 28.8,21.5 29.9,19.8 C30.6,18.8 31.2,17.7 31.6,16.7 C32,15.5 32.3,14.3 32.3,13.2 C32.3,12 32,10.8 31.5,9.7 Z" fill="#F65E63"/>
+                </svg>
+              </div>
+
+              {/* 装饰图标 - 右上角 */}
+              <div className="absolute top-2 right-1 opacity-40">
+                <svg width="35" height="35" viewBox="0 0 35 35">
+                  <path d="M31.5,9.7 C31,8.6 30.4,7.7 29.6,6.9 C28.8,6.1 27.8,5.4 26.7,5 C25.6,4.5 24.4,4.3 23.2,4.3 C21.5,4.3 19.9,4.7 18.5,5.6 C18.1,5.8 17.8,6 17.5,6.3 C17.2,6 16.9,5.8 16.5,5.6 C15.1,4.7 13.5,4.3 11.8,4.3 C10.6,4.3 9.4,4.5 8.3,5 C7.2,5.4 6.2,6.1 5.4,6.9 C4.6,7.7 4,8.6 3.5,9.7 C3,10.8 2.7,12 2.7,13.2 C2.7,14.3 3,15.5 3.4,16.7 C3.8,17.7 4.4,18.8 5.1,19.8 C6.2,21.5 7.7,23.2 9.7,25 C12.8,27.9 16,29.9 16.1,30 L17,30.5 C17.3,30.8 17.7,30.8 18.1,30.5 L19,30 C19.1,29.9 22.2,27.9 25.3,25 C27.3,23.2 28.8,21.5 29.9,19.8 C30.6,18.8 31.2,17.7 31.6,16.7 C32,15.5 32.3,14.3 32.3,13.2 C32.3,12 32,10.8 31.5,9.7 Z" fill="#F65E63"/>
+                </svg>
+              </div>
+
+              {/* 标题 */}
+              <div className="relative flex items-center justify-center h-full px-2">
+                <h2 className="text-white text-lg font-medium text-center">
+                  恭喜获奖
+                </h2>
+              </div>
             </div>
 
-            {/* 提示文字 */}
-            <p className="text-center text-gray-500 text-xs py-3 px-4">
-              奖励提示信息
-            </p>
+            {/* 内容区域 */}
+            <div className="flex-1 bg-[#FEF6EA] mx-[11px] rounded-b-md overflow-hidden flex flex-col">
+              {/* 提示文字 */}
+              <p className="text-gray-500 text-xs text-center py-2 px-4">
+                奖励提示信息
+              </p>
 
-            {/* 奖励信息卡片 */}
-            <div className="mx-3 flex-1 flex flex-col items-center justify-center px-2 pb-4">
-              <div className="w-full max-w-[280px] bg-[#FFF5E6] rounded-2xl p-4 shadow-md flex items-start gap-3">
-                {/* 左侧金元宝图标 */}
-                <div className="w-12 h-12 flex-shrink-0">
-                  <img
-                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23FFD700'/%3E%3Cstop offset='100%25' style='stop-color:%23DAA520'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cellipse cx='32' cy='48' rx='20' ry='8' fill='%23B8860B'/%3E%3Cpath d='M12 32 Q12 20 32 20 Q52 20 52 32 Q52 44 32 44 Q12 44 12 32 Z' fill='url(%23gold)' stroke='%23B8860B' stroke-width='1'/%3E%3Ctext x='32' y='36' text-anchor='middle' font-size='16' font-weight='bold' fill='%23B8860B'%3E元%3C/text%3E%3C/svg%3E"
-                    alt="元宝"
-                    className="w-full h-full"
-                  />
-                </div>
-
-                {/* 右侧文字信息 */}
-                <div className="flex-1 min-w-0">
-                  {/* 奖励信息 */}
-                  {finalConfig.rewardType === "cash" ? (
-                    <p className="text-[#FF6B00] text-lg font-bold">
-                      ¥{resolveCashAmount()}
-                    </p>
-                  ) : resolveCustomRewardImage() ? (
-                    <img
-                      src={resolveCustomRewardImage()}
-                      alt="奖励"
-                      className="w-full max-h-24 object-contain rounded-lg"
-                    />
-                  ) : (
-                    <p className="text-[#FF6B00] text-lg font-bold">
-                      {resolveRewardText()}
-                    </p>
-                  )}
-                  {/* 特殊说明 */}
-                  <p className="text-gray-500 text-xs mt-1 leading-relaxed">
-                    {resolveSpecialNote()}
-                  </p>
+              {/* 奖励信息卡片 */}
+              <div className="px-3 flex-1 flex items-center justify-center">
+                <div className="w-full bg-gradient-to-r from-[#FBAAAD] to-[#F53767] rounded-md p-3 flex items-center">
+                  {/* 奖励内容 */}
+                  <div className="flex-1 min-w-0">
+                    {finalConfig.rewardType === "cash" ? (
+                      <p className="text-white text-lg font-bold">
+                        ¥{resolveCashAmount()}
+                      </p>
+                    ) : resolveCustomRewardImage() ? (
+                      <img
+                        src={resolveCustomRewardImage()}
+                        alt="奖励"
+                        className="max-h-12 object-contain"
+                      />
+                    ) : (
+                      <p className="text-white text-lg font-bold">
+                        {resolveRewardText()}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* 奖品文案 */}
-              {finalConfig.rewardType === "cash" && (
-                <p className="text-gray-800 font-medium text-base mt-4 text-center">
+              {/* 奖品文案和特殊说明 */}
+              <div className="px-4 pb-2 text-center">
+                <p className="text-gray-800 font-medium text-sm">
                   {resolveRewardText()}
                 </p>
-              )}
-            </div>
+                <p className="text-gray-400 text-xs mt-1">
+                  {resolveSpecialNote()}
+                </p>
+              </div>
 
-            {/* 底部领取按钮 */}
-            <div className="px-3 pb-4">
-              <button
-                onClick={handleClaim}
-                className="w-full py-3 bg-gradient-to-r from-[#DC143C] to-[#FF4444] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow text-base"
-              >
-                立即领取
-              </button>
+              {/* 底部按钮区域 */}
+              <div className="bg-[#F54A48]/70 px-2 py-3">
+                <button
+                  onClick={handleClaim}
+                  className="w-full py-2.5 bg-white text-[#E02020] font-medium rounded-md shadow-sm hover:shadow-md transition-shadow text-sm"
+                >
+                  立即下载领取
+                </button>
+              </div>
             </div>
           </div>
         )}
