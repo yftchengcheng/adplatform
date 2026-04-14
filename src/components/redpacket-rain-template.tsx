@@ -103,8 +103,8 @@ export function RedpacketRainTemplate({
 
   // 红包雨配置
   const MAX_REDPACKETS = 8; // 最多同时存在8个红包，更有美感
-  const SPAWN_INTERVAL = 800; // 每800ms生成一个，慢一些
-  const BASE_DURATION = 8000; // 基础飘落时长8秒
+  const SPAWN_INTERVAL = 667; // 每667ms生成一个，速度增加0.2倍
+  const BASE_DURATION = 6667; // 基础飘落时长6.7秒，速度增加0.2倍
   const BASE_SIZE = 36; // 基础红包大小
 
   // 生成随机红包 - 模仿落叶飘落
