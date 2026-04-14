@@ -373,10 +373,17 @@ export function RedpacketRainTemplate({
         {!isClaimed ? (
           <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#8B0000] to-[#4A0000]">
             {/* Guide Text */}
-            <div className="absolute top-8 left-0 right-0 text-center z-10">
-              <p className="text-white text-lg font-medium drop-shadow-lg animate-pulse">
-                {resolveGuideText()}
-              </p>
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 px-6 py-2">
+              <div className="relative">
+                {/* 光晕效果 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 via-yellow-100/40 to-yellow-300/30 blur-sm rounded-full" />
+                {/* 背景 */}
+                <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
+                  <p className="text-white text-sm font-semibold text-center drop-shadow-lg animate-pulse">
+                    {resolveGuideText()}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Falling Redpackets - 落叶飘落效果，从文字下方开始 */}
