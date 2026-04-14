@@ -350,9 +350,9 @@ export function RedpacketRainTemplate({
         <div className="absolute inset-0 bg-black/70" />
       )}
 
-      {/* Modal Content - 半屏浮层 */}
+      {/* Modal Content - 半屏浮层，宽度小于屏幕，下移100px */}
       <div
-        className={`relative w-full h-full flex flex-col transition-all duration-500 ${
+        className={`relative mx-4 mt-[100px] h-[calc(100%-100px)] flex flex-col transition-all duration-500 ${
           isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -360,7 +360,7 @@ export function RedpacketRainTemplate({
         {/* Close Button - 底边中间 */}
         <button
           onClick={onClose}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm"
+          className="absolute -top-[70px] left-1/2 -translate-x-1/2 z-10 px-4 py-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm"
         >
           <X className="w-4 h-4 mr-1" />
           <span>关闭</span>
