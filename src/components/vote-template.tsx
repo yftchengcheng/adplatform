@@ -177,13 +177,14 @@ export function VoteTemplate({
 
   // 处理选项选择并投票
   const handleSelect = (option: VoteOption) => {
-    if (previewMode) return;
-    
     // 记录已选择的选项
     setSelectedOption(option.id);
     
     // 显示投票成功提示
     setShowResultText(true);
+    
+    // 预览模式下不执行实际动作
+    if (previewMode) return;
     
     // 延迟执行动作，让用户看到投票成功
     setTimeout(() => {
