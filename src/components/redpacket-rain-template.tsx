@@ -169,18 +169,18 @@ export function RedpacketRainTemplate({
 
   // 解析自定义奖励图片
   const resolveCustomRewardImage = useCallback((): string => {
-    if (finalConfig.customRewardImageMacro) {
-      const resolved = resolveMacro(finalConfig.customRewardImageMacro);
+    if (finalConfig.rewardImageMacro) {
+      const resolved = resolveMacro(finalConfig.rewardImageMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
         return "";
       }
       return resolved;
     }
-    if (finalConfig.customRewardImageUrl) {
-      return resolveMacro(finalConfig.customRewardImageUrl);
+    if (finalConfig.rewardImageUrl) {
+      return resolveMacro(finalConfig.rewardImageUrl);
     }
     return "";
-  }, [finalConfig.customRewardImageMacro, finalConfig.customRewardImageUrl, resolveMacro]);
+  }, [finalConfig.rewardImageMacro, finalConfig.rewardImageUrl, resolveMacro]);
 
   // 解析奖品文案
   const resolveRewardText = useCallback((): string => {
