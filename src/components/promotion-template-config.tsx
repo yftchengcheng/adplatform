@@ -219,7 +219,7 @@ function ImageUpload({
                 </div>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center py-6 cursor-pointer hover:bg-gray-50">
+              <label htmlFor="icon-upload" className="flex flex-col items-center justify-center py-6 cursor-pointer hover:bg-gray-50">
                 <Plus className="w-6 h-6 text-gray-400" />
                 <span className="text-sm text-gray-500">点击上传图片</span>
                 <span className="text-xs text-gray-400">推荐 108×108px，最大 1MB</span>
