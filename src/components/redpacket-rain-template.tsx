@@ -340,9 +340,10 @@ export function RedpacketRainTemplate({
 
   return (
     <div
-      className={`${previewMode ? "relative w-full h-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
+      className={`${previewMode ? "relative w-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
+      style={previewMode ? { aspectRatio: "5 / 6", maxWidth: "260px" } : undefined}
       onClick={!isClaimed ? undefined : onClose}
     >
       {/* Backdrop */}
@@ -352,10 +353,9 @@ export function RedpacketRainTemplate({
 
       {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.2倍 */}
       <div
-        className={`relative mx-auto h-[calc(100vh-100px)] max-w-full flex flex-col transition-all duration-500 ${
+        className={`relative w-full h-full max-w-full flex flex-col transition-all duration-500 ${
           isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
-        style={{ aspectRatio: "5 / 6" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button - 底边中间，仅图标 */}

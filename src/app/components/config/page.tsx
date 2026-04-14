@@ -470,9 +470,9 @@ function ConfigContent() {
                       </div>
 
                       {/* App content */}
-                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'flex-col items-center pt-8' : 'items-center justify-center'}`}>
+                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'flex-col items-center justify-start pt-4' : 'items-center justify-center'}`}>
                         {isRedpacketRainComponent ? (
-                          <div className="w-3/4 max-w-[300px]">
+                          <div className="w-full max-w-[280px]">
                             <RedpacketRainTemplate
                               config={config as RedpacketRainTemplateConfig}
                               isOpen={true}
