@@ -164,6 +164,9 @@ export function GameGiftTemplateConfigPanel({
   // 初始值根据配置决定：如果有logoMacro且没有logoUrl则宏模式，否则上传模式
   const [logoMode, setLogoMode] = useState<boolean>(!!config.logoMacro && !config.logoUrl);
 
+  // 组件名称模式（true = 宏替换模式, false = 输入模式）
+  const [componentNameMode, setComponentNameMode] = useState<boolean>(!!config.componentNameMacro && !config.componentName);
+
   // Logo 错误状态
   const [logoError, setLogoError] = useState<string | null>(null);
   // 应用图片错误状态
@@ -220,6 +223,20 @@ export function GameGiftTemplateConfigPanel({
     } else {
       updateConfig({ appName: value, appNameMacro: "" });
     }
+  };
+
+  // 处理组件名称输入
+  const handleComponentNameInput = (value: string) => {
+    if (componentNameMode) {
+      updateConfig({ componentNameMacro: value, componentName: value });
+    } else {
+      updateConfig({ componentName: value, componentNameMacro: "" });
+    }
+  };
+
+  // 获取组件名称值
+  const getComponentNameValue = () => {
+    return componentNameMode ? (config.componentNameMacro || "") : (config.componentName || "");
   };
 
   // 处理应用描述输入
@@ -568,6 +585,23 @@ export function GameGiftTemplateConfigPanel({
                 value={config.giftCode || ""}
                 onChange={(e) => updateConfig({ giftCode: e.target.value })}
               />
+            </div>
+
+            {/* 组件名称 */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">组件名称</label>
+                <ModeToggle value={componentNameMode ? "macro" : "input"} onChange={(v) => setComponentNameMode(v === "macro")} />
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="请输入组件名称"
+                  value={getComponentNameValue()}
+                  onChange={(e) => handleComponentNameInput(e.target.value)}
+                  className="flex-1"
+                />
+                <CharCounter value={getComponentNameValue()} max={20} />
+              </div>
             </div>
           </div>
         )}

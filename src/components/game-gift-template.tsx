@@ -5,6 +5,9 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface GameGiftTemplateConfig {
+  // 组件名称
+  componentName?: string;
+  componentNameMacro?: string;
   // 应用图片（最多2张，支持轮播）
   images: {
     id: string;

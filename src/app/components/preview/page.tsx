@@ -104,6 +104,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
   },
   game_gift: {
     defaultConfig: {
+      componentName: "游戏礼包码",
       images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
       logoUrl: "",
       appName: "游戏名称",
