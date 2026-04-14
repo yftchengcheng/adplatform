@@ -18,7 +18,7 @@ import { PromotionTemplateConfig, PromotionTemplate } from "@/components/promoti
 import { PromotionTemplateConfigPanel } from "@/components/promotion-template-config";
 import { GameGiftTemplateConfig, GameGiftTemplate } from "@/components/game-gift-template";
 import { GameGiftTemplateConfigPanel } from "@/components/game-gift-template-config";
-import { RedpacketRainTemplateConfig, defaultRedpacketRainConfig } from "@/components/redpacket-rain-template-config";
+import { RedpacketRainTemplateConfig, defaultRedpacketRainConfig, RedpacketRainTemplateConfigPanel } from "@/components/redpacket-rain-template-config";
 import { RedpacketRainTemplate } from "@/components/redpacket-rain-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
