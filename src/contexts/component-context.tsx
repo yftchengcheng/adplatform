@@ -98,6 +98,14 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
 
   // 加载数据
   const loadComponents = useCallback(async () => {
+    // 需要过滤的旧测试ID
+    const legacyIds = ["A100001", "A100002", "A100003"];
+
+    // 过滤掉旧测试数据
+    const filterLegacyData = (items: AdComponentItem[]): AdComponentItem[] => {
+      return items.filter(item => !legacyIds.includes(item.id));
+    };
+
     // 去重辅助函数
     const deduplicate = (items: AdComponentItem[]): AdComponentItem[] => {
       const seen = new Set<string>();
@@ -115,14 +123,20 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          setComponents(deduplicate(parsed));
+          // 过滤旧数据并去重
+          const filtered = filterLegacyData(parsed);
+          const deduplicated = deduplicate(filtered);
+          setComponents(deduplicated);
+          localStorage.setItem("ad_components", JSON.stringify(deduplicated));
         } catch {
-          const deduplicated = deduplicate(initialComponents);
+          const filtered = filterLegacyData(initialComponents);
+          const deduplicated = deduplicate(filtered);
           setComponents(deduplicated);
           localStorage.setItem("ad_components", JSON.stringify(deduplicated));
         }
       } else {
-        const deduplicated = deduplicate(initialComponents);
+        const filtered = filterLegacyData(initialComponents);
+        const deduplicated = deduplicate(filtered);
         setComponents(deduplicated);
         localStorage.setItem("ad_components", JSON.stringify(deduplicated));
       }
@@ -150,9 +164,11 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
           seen.add(item.id);
           return true;
         });
-        setComponents(deduplicated);
+        // 过滤旧测试数据
+        const filtered = filterLegacyData(deduplicated);
+        setComponents(filtered);
         // 同步到 localStorage 缓存
-        localStorage.setItem("ad_components", JSON.stringify(deduplicated));
+        localStorage.setItem("ad_components", JSON.stringify(filtered));
       } else {
         // 数据库为空，加载初始数据（去重）
         const seen = new Set<string>();
@@ -161,31 +177,36 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
           seen.add(item.id);
           return true;
         });
-        setComponents(deduplicated);
-        localStorage.setItem("ad_components", JSON.stringify(deduplicated));
+        // 过滤旧测试数据
+        const filtered = filterLegacyData(deduplicated);
+        setComponents(filtered);
+        localStorage.setItem("ad_components", JSON.stringify(filtered));
         // 初始化数据库数据
-        for (const item of deduplicated) {
+        for (const item of filtered) {
           await client.from("ad_components").insert(toDbFormat(item));
         }
       }
       setError(null);
     } catch (err) {
       console.error("数据库加载失败，降级到 localStorage:", err);
-      // 降级到 localStorage（去重）
+      // 降级到 localStorage（去重 + 过滤旧数据）
       const stored = localStorage.getItem("ad_components");
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
+          const filtered = filterLegacyData(parsed);
           const seen = new Set<string>();
-          const deduplicated = parsed.filter((item: AdComponentItem) => {
+          const deduplicated = filtered.filter((item: AdComponentItem) => {
             if (seen.has(item.id)) return false;
             seen.add(item.id);
             return true;
           });
           setComponents(deduplicated);
+          localStorage.setItem("ad_components", JSON.stringify(deduplicated));
         } catch {
+          const filtered = filterLegacyData(initialComponents);
           const seen = new Set<string>();
-          const deduplicated = initialComponents.filter(item => {
+          const deduplicated = filtered.filter(item => {
             if (seen.has(item.id)) return false;
             seen.add(item.id);
             return true;
@@ -193,8 +214,9 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
           setComponents(deduplicated);
         }
       } else {
+        const filtered = filterLegacyData(initialComponents);
         const seen = new Set<string>();
-        const deduplicated = initialComponents.filter(item => {
+        const deduplicated = filtered.filter(item => {
           if (seen.has(item.id)) return false;
           seen.add(item.id);
           return true;
