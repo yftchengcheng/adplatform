@@ -31,64 +31,7 @@ export interface AdComponentItem {
 }
 
 // 初始模拟数据（数据库连接失败时降级使用）
-const initialComponents: AdComponentItem[] = [
-  {
-    id: "A100001",
-    name: "限时特惠活动",
-    category: "static",
-    type: "dual_button",
-    templateCount: 10,
-    status: "enabled",
-    editor: "admin@adtalos.com",
-    updateTime: "2026-04-13 10:30:00",
-    config: {
-      title: "限时特惠活动",
-      subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
-      button1: {
-        text: "立即领取",
-        action: "jump",
-        landingPageUrl: "https://example.com/claim",
-      },
-      button2: {
-        text: "查看详情",
-        action: "show_image",
-        imageUrl: "https://picsum.photos/472/164",
-      },
-      action: "open",
-      defaultLandingPageUrl: "https://example.com/default",
-    },
-  },
-  {
-    id: "A100002",
-    name: "新用户红包雨",
-    category: "animation",
-    type: "redpacket_rain",
-    templateCount: 5,
-    status: "enabled",
-    editor: "admin@adtalos.com",
-    updateTime: "2026-04-12 15:20:00",
-    config: {
-      title: "新用户红包雨",
-      subtitle: "恭喜获得新人红包，点击领取",
-      action: "open",
-    },
-  },
-  {
-    id: "A100003",
-    name: "会员专享优惠券",
-    category: "static",
-    type: "coupon",
-    templateCount: 16,
-    status: "enabled",
-    editor: "yufutang@adtalos.com",
-    updateTime: "2026-04-11 09:45:00",
-    config: {
-      title: "会员专享优惠券",
-      subtitle: "您有一张专属优惠券待领取",
-      action: "open",
-    },
-  },
-];
+const initialComponents: AdComponentItem[] = [];
 
 // 数据库记录转前端格式
 function toFrontendFormat(item: DbAdComponent): AdComponentItem {
