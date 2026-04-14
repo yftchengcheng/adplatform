@@ -350,9 +350,9 @@ export function RedpacketRainTemplate({
         <div className="absolute inset-0 bg-black/70" />
       )}
 
-      {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.5倍 */}
+      {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.2倍 */}
       <div
-        className={`relative mx-auto h-[calc(100vh-100px)] aspect-[1/1.5] max-w-full flex flex-col transition-all duration-500 ${
+        className={`relative mx-auto h-[calc(100vh-100px)] aspect-[1/1.2] max-w-full flex flex-col transition-all duration-500 ${
           isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
         onClick={(e) => e.stopPropagation()}
