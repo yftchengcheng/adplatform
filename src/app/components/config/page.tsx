@@ -470,7 +470,7 @@ function ConfigContent() {
                       </div>
 
                       {/* App content */}
-                      <div className="h-[calc(100%-28px)] overflow-auto flex items-center justify-center">
+                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'items-start justify-center' : 'items-center justify-center'}`}>
                         {isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}

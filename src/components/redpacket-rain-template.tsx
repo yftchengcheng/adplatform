@@ -254,7 +254,9 @@ export function RedpacketRainTemplate({
     onClose();
   }, [previewMode, resolveLandingPage, onClose]);
 
-  if (!isVisible && !previewMode) return null;
+  // 预览模式下直接显示
+  const shouldRender = previewMode || isVisible;
+  if (!shouldRender) return null;
 
   const redpacketImage = resolveRedpacketImage();
 
