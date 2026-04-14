@@ -6,23 +6,168 @@ import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
+import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
+
+type ComponentType = "dual_button" | "vote" | "image" | "ecommerce" | "coupon" | "promotion_card" | "game_gift";
+
+interface ComponentConfig {
+  defaultConfig: AdTemplateConfig | GameGiftTemplateConfig;
+  name: string;
+  description: string;
+}
+
+// 默认配置
+const defaultConfigs: Record<ComponentType, ComponentConfig> = {
+  dual_button: {
+    defaultConfig: {
+      title: "限时特惠活动",
+      subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
+      button1: {
+        text: "立即领取",
+        action: "jump",
+        landingPageUrl: "",
+      },
+      button2: {
+        text: "查看详情",
+        action: "show_image",
+        imageUrl: "",
+        resultText: "",
+        buttonClickText: "",
+      },
+      action: "open",
+      defaultLandingPageUrl: "",
+    },
+    name: "双按钮",
+    description: "配置主副标题和两个按钮的跳转链接",
+  },
+  vote: {
+    defaultConfig: {
+      title: "限时特惠活动",
+      subtitle: "新用户首单立减50元",
+      options: [
+        { id: "1", buttonText: "选项A", jumpUrl: "" },
+        { id: "2", buttonText: "选项B", jumpUrl: "" },
+      ],
+      defaultLandingPageUrl: "",
+    },
+    name: "投票",
+    description: "配置标题、副标题和投票选项",
+  },
+  image: {
+    defaultConfig: {
+      images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
+      defaultLandingPageUrl: "",
+    },
+    name: "图片",
+    description: "配置图片内容",
+  },
+  ecommerce: {
+    defaultConfig: {
+      title: "商品名称",
+      content: "商品描述内容",
+      buttonText: "立即购买",
+      imageUrl: "",
+      landingPageUrl: "",
+      defaultLandingPageUrl: "",
+    },
+    name: "电商",
+    description: "配置商品图片、标题和购买按钮",
+  },
+  coupon: {
+    defaultConfig: {
+      title: "限时优惠活动",
+      discountInfo: "30元",
+      discountCondition: "满100立减！",
+      buttonText: "立即领取",
+      validFrom: "2024-01-01",
+      validTo: "2024-12-31",
+      landingPageUrl: "",
+      defaultLandingPageUrl: "",
+    },
+    name: "优惠券",
+    description: "配置优惠券信息",
+  },
+  promotion_card: {
+    defaultConfig: {
+      iconUrl: "",
+      title: "官方推广",
+      promotionPoints: [
+        { id: "1", text: "官方正版授权" },
+        { id: "2", text: "安全无毒无插件" },
+      ],
+      buttonText: "立即下载",
+      landingPageUrl: "",
+      defaultLandingPageUrl: "",
+    },
+    name: "推广卡片",
+    description: "配置图标、标题、推广卖点和行动号召",
+  },
+  game_gift: {
+    defaultConfig: {
+      images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
+      logoUrl: "",
+      appName: "游戏名称",
+      appDescription: "游戏描述内容",
+      appPackageName: "com.example.game",
+      downloadUrl: "",
+      giftCode: "ABCD123456",
+      defaultLandingPageUrl: "",
+    },
+    name: "游戏礼包码",
+    description: "配置应用图片、名称、描述和下载链接",
+  },
+};
 
 function PreviewContent() {
   const searchParams = useSearchParams();
-  const [config, setConfig] = useState<AdTemplateConfig | null>(null);
+  const [config, setConfig] = useState<AdTemplateConfig | GameGiftTemplateConfig | null>(null);
+  const [componentType, setComponentType] = useState<ComponentType>("dual_button");
   const [showAd, setShowAd] = useState(false);
 
   useEffect(() => {
     const configParam = searchParams.get("config");
+    const type = (searchParams.get("type") || "dual_button") as ComponentType;
+    setComponentType(type);
+
     if (configParam) {
       try {
         const decoded = decodeURIComponent(atob(configParam));
         setConfig(JSON.parse(decoded));
       } catch (e) {
         console.error("配置解析失败", e);
+        // 使用默认配置
+        setConfig(defaultConfigs[type].defaultConfig);
       }
+    } else {
+      setConfig(defaultConfigs[type].defaultConfig);
     }
   }, [searchParams]);
+
+  // 根据组件类型渲染对应的模板
+  const renderTemplate = () => {
+    if (componentType === "game_gift") {
+      const gameConfig = config as GameGiftTemplateConfig;
+      return (
+        <GameGiftTemplate
+          config={gameConfig}
+          isOpen={showAd}
+          onClose={() => setShowAd(false)}
+          previewMode={false}
+        />
+      );
+    }
+
+    // 其他组件类型使用 AdTemplate
+    const adConfig = config as AdTemplateConfig;
+    return (
+      <AdTemplate
+        config={adConfig}
+        isOpen={showAd}
+        onClose={() => setShowAd(false)}
+        previewMode={false}
+      />
+    );
+  };
 
   if (!config) {
     return (
@@ -85,24 +230,22 @@ function PreviewContent() {
                     <h2 className="text-lg font-semibold text-gray-800 mb-2">
                       组件效果预览
                     </h2>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {defaultConfigs[componentType]?.name || "组件"}
+                    </p>
                     <p className="text-sm text-gray-500 mb-6">
-                      点击下方按钮预览广告弹窗
+                      点击下方按钮预览{defaultConfigs[componentType]?.name}弹窗
                     </p>
                     <Button
                       onClick={() => setShowAd(true)}
                       className="bg-blue-500 hover:bg-blue-600"
                     >
-                      预览广告弹窗
+                      预览{defaultConfigs[componentType]?.name}弹窗
                     </Button>
                   </div>
                 </div>
               ) : (
-                <AdTemplate
-                  config={config}
-                  isOpen={showAd}
-                  onClose={() => setShowAd(false)}
-                  previewMode={false}
-                />
+                renderTemplate()
               )}
             </div>
 
@@ -119,7 +262,7 @@ function PreviewContent() {
         <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4">
           <h3 className="text-sm font-medium text-gray-700 mb-2">预览说明</h3>
           <ul className="text-xs text-gray-500 space-y-1">
-            <li>点击「预览广告弹窗」按钮查看组件效果</li>
+            <li>点击「预览{defaultConfigs[componentType]?.name}弹窗」按钮查看组件效果</li>
             <li>点击弹窗中的按钮可跳转链接或显示图片</li>
             <li>点击弹窗外部可关闭弹窗</li>
           </ul>
