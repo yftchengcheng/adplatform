@@ -350,8 +350,8 @@ export function RedpacketRainTemplate({
       onClick={!isClaimed ? undefined : onClose}
     >
       {/* Backdrop */}
-      {!isClaimed && !previewMode && (
-        <div className="absolute inset-0 bg-black/30" />
+      {!isClaimed && (
+        <div className={`absolute inset-0 ${previewMode ? "bg-black/30 rounded-xl" : "bg-black/30"}`} />
       )}
 
       {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.2倍 */}
@@ -371,7 +371,7 @@ export function RedpacketRainTemplate({
 
         {/* Redpacket Rain Scene */}
         {!isClaimed ? (
-          <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#8B0000] to-[#4A0000]">
+          <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, rgba(139, 0, 0, 0.3), rgba(74, 0, 0, 0.3))" }}>
             {/* Guide Text */}
             <div className="absolute top-6 left-0 right-0 z-10">
               <div className="relative flex justify-center">
