@@ -196,8 +196,12 @@ function ConfigContent() {
   const { addComponent, updateComponent, components } = useComponents();
   const { showToast } = useToast();
 
-  // 根据类型获取组件名称
+  // 根据类型获取组件名称（优先从配置读取，否则使用静态名称）
   const getComponentName = () => {
+    // 如果配置中有 componentName，优先使用
+    if ((config as { componentName?: string }).componentName) {
+      return (config as { componentName: string }).componentName;
+    }
     return componentConfigMap[type]?.name || "选择磁贴(双按钮)";
   };
 
@@ -240,8 +244,11 @@ function ConfigContent() {
     try {
       // 获取组件名称（根据不同类型获取）
       let name = "未命名组件";
-      
-      if ("title" in config && config.title) {
+
+      if ("componentName" in config && config.componentName) {
+        // 游戏礼包码等使用 componentName
+        name = config.componentName;
+      } else if ("title" in config && config.title) {
         // 广告磁贴和投票磁贴使用 title
         name = config.title;
       } else if ("images" in config && Array.isArray(config.images) && config.images.length > 0) {
