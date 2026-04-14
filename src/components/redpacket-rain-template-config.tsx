@@ -538,9 +538,9 @@ export function RedpacketRainTemplateConfigPanel({
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
-                            // 校验文件大小 100KB
-                            if (file.size > 100 * 1024) {
-                              setRewardImageError(`奖励图片大小不能超过 100KB，当前 ${(file.size / 1024).toFixed(2)}KB`);
+                            // 校验文件大小 200KB
+                            if (file.size > 200 * 1024) {
+                              setRewardImageError(`奖励图片大小不能超过 200KB，当前 ${(file.size / 1024).toFixed(2)}KB`);
                               return;
                             }
                             // 校验宽高比 16:9
@@ -572,7 +572,7 @@ export function RedpacketRainTemplateConfigPanel({
                 {rewardImageError && (
                   <p className="text-xs text-red-500 mt-1">{rewardImageError}</p>
                 )}
-                <p className="text-xs text-gray-400">宽高比 16:9，推荐 690×360px，最大 100KB</p>
+                <p className="text-xs text-gray-400">宽高比 16:9，推荐 690×360px，最大 200KB</p>
               </div>
             )}
 
