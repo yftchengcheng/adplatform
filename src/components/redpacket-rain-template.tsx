@@ -376,13 +376,17 @@ export function RedpacketRainTemplate({
               </p>
             </div>
 
-            {/* Falling Redpackets - 落叶飘落效果 */}
+            {/* Falling Redpackets - 落叶飘落效果，从文字下方开始 */}
             <style jsx>{`
               @keyframes fallLeaf {
                 0% {
-                  top: -50px;
+                  top: 70px;
+                  opacity: 0.3;
+                  transform: rotate(0deg) scale(0.8);
+                }
+                10% {
                   opacity: 1;
-                  transform: rotate(0deg);
+                  transform: rotate(5deg) scale(1);
                 }
                 25% {
                   transform: rotate(15deg) translateX(10px);
@@ -394,7 +398,7 @@ export function RedpacketRainTemplate({
                   transform: rotate(8deg) translateX(6px);
                 }
                 100% {
-                  top: calc(100% - 40px);
+                  top: calc(100% - 60px);
                   opacity: 0;
                   transform: rotate(-5deg);
                 }
