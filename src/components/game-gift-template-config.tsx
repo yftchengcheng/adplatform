@@ -327,7 +327,7 @@ export function GameGiftTemplateConfigPanel({
                           if (!file) return;
                           // 校验文件大小
                           if (file.size > 1 * 1024 * 1024) {
-                            alert("Logo 图片大小不能超过 1MB");
+                            alert(`Logo 图片大小不能超过 1MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
                             return;
                           }
                           // 校验宽高比
@@ -335,7 +335,7 @@ export function GameGiftTemplateConfigPanel({
                           img.onload = () => {
                             const ratio = img.naturalWidth / img.naturalHeight;
                             if (Math.abs(ratio - 1) > 0.01) {
-                              alert("Logo 图片宽高比需为 1:1，当前: " + img.naturalWidth + "×" + img.naturalHeight);
+                              alert(`Logo 图片宽高比需为 1:1，当前 ${img.naturalWidth}×${img.naturalHeight}`);
                               return;
                             }
                             const reader = new FileReader();
@@ -450,7 +450,7 @@ export function GameGiftTemplateConfigPanel({
                               if (!file) return;
                               // 校验文件大小
                               if (file.size > 1 * 1024 * 1024) {
-                                alert("应用图片大小不能超过 1MB");
+                                alert(`应用图片大小不能超过 1MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
                                 return;
                               }
                               // 校验宽高比 16:9
@@ -459,7 +459,7 @@ export function GameGiftTemplateConfigPanel({
                                 const ratio = img.naturalWidth / img.naturalHeight;
                                 const targetRatio = 16 / 9;
                                 if (Math.abs(ratio - targetRatio) > 0.05) {
-                                  alert("应用图片宽高比需为 16:9，当前: " + img.naturalWidth + "×" + img.naturalHeight);
+                                  alert(`应用图片宽高比需为 16:9，当前 ${img.naturalWidth}×${img.naturalHeight}`);
                                   return;
                                 }
                                 const reader = new FileReader();
