@@ -75,14 +75,12 @@ function getResolvedText(
 function VoteOptionBar({
   option,
   percentage,
-  voteCount,
   onSelect,
   selected,
   showResult,
 }: {
   option: VoteOption;
   percentage: number;
-  voteCount: number;
   onSelect: () => void;
   selected: boolean;
   showResult: boolean;
@@ -118,23 +116,14 @@ function VoteOptionBar({
           {option.buttonText}
         </span>
         
-        {/* 中间：选项文本 */}
-        <span className={cn(
-          "font-medium text-sm flex-1 text-center",
-          selected ? "text-white" : "text-gray-800"
-        )}>
-          {option.text}
-        </span>
-        
-        {/* 右侧：投票数和百分比 */}
+        {/* 右侧：百分比 */}
         {showResult ? (
-          <div className={cn(
-            "flex items-center gap-2 text-sm",
+          <span className={cn(
+            "font-semibold text-sm",
             selected ? "text-white" : "text-gray-600"
           )}>
-            <span className="font-medium">{voteCount}票</span>
-            <span className="font-semibold">{percentage}%</span>
-          </div>
+            {percentage}%
+          </span>
         ) : (
           <span className={cn(
             "text-sm",
@@ -181,13 +170,9 @@ export function VoteTemplate({
   const imageUrl = config?.imageUrl;
   const imageMacro = config?.imageMacro;
 
-  // 计算总投票数
-  const totalVotes = options.reduce((sum, opt) => sum + opt.voteCount, 0);
-
-  // 计算每个选项的百分比
-  const getPercentage = (voteCount: number): number => {
-    if (totalVotes === 0) return 0;
-    return Math.round((voteCount / totalVotes) * 100);
+  // 获取选项的固定百分比（选项1为75%，选项2为25%）
+  const getFixedPercentage = (index: number): number => {
+    return index === 0 ? 75 : 25;
   };
 
   // 处理选项选择并投票
@@ -284,23 +269,16 @@ export function VoteTemplate({
 
           {/* Vote Options */}
           <div className="px-5 pb-4 space-y-3">
-            {options.map((option) => (
+            {options.map((option, index) => (
               <VoteOptionBar
                 key={option.id}
                 option={option}
-                percentage={getPercentage(option.voteCount)}
-                voteCount={option.voteCount}
+                percentage={getFixedPercentage(index)}
                 onSelect={() => handleSelect(option)}
                 selected={selectedOption === option.id}
                 showResult={previewMode || showResultText}
               />
             ))}
-            {/* 总投票数 */}
-            {totalVotes > 0 && (
-              <p className="text-center text-xs text-gray-400 pt-1">
-                总计 {totalVotes} 票
-              </p>
-            )}
           </div>
 
           {/* Buttons */}

@@ -101,20 +101,16 @@
 
 **设计样式**：
 ```tsx
-<div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
-  <div className="flex items-center justify-between px-3 py-2 bg-gray-50">
-    <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
-    <span className="text-sm font-medium">选项 {index}</span>
-    <div className="flex gap-2">
-      <ChevronDown/ChevronRight />
-      <Trash2 className="text-red-500" />
+<div className="border border-gray-200 rounded-lg bg-white p-4">
+  <div className="flex items-center justify-between mb-3">
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-gray-700">选项 {index}</span>
+      <span className="text-xs text-gray-400 px-2 py-0.5 bg-gray-100 rounded">
+        {fixedPercentage}%
+      </span>
     </div>
   </div>
-  {isOpen && <div className="p-3 space-y-3">
-    {/* 选项文本 */}
-    {/* 按钮文本 */}
-    {/* 投票数（已移除） */}
-  </div>}
+  {/* 按钮文本 */}
 </div>
 ```
 
@@ -167,8 +163,7 @@
 
 | 场景 | 范围 | 说明 |
 |------|------|------|
-| 投票占比 | 0-100% | 已废弃，改用投票数自动计算 |
-| 投票数 | >= 0 | 后台实时统计 |
+| 投票数 | >= 0 | 后台实时统计，不在前端输入 |
 
 ---
 
@@ -192,14 +187,6 @@
 ```tsx
 <button className="px-3 py-1.5 bg-white rounded-lg text-xs font-medium text-red-500 hover:bg-red-50">
   删除
-</button>
-```
-
-### 4. 添加按钮
-```tsx
-<button className="w-full h-10 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500">
-  <Plus className="w-4 h-4" />
-  <span className="text-sm font-medium">添加投票选项</span>
 </button>
 ```
 
@@ -275,33 +262,29 @@
 ```typescript
 interface VoteOption {
   id: string;
-  text: string;           // 选项文本（最多20字符）
-  voteCount: number;       // 投票数（后台统计，不在前端输入）
   buttonText: string;      // 按钮文本（最多16字符）
 }
 ```
 
-### 2. 百分比计算
+### 2. 固定百分比
 ```typescript
-const totalVotes = options.reduce((sum, opt) => sum + opt.voteCount, 0);
-const getPercentage = (voteCount: number): number => {
-  if (totalVotes === 0) return 0;
-  return Math.round((voteCount / totalVotes) * 100);
+// 固定百分比（选项1为75%，选项2为25%）
+const getFixedPercentage = (index: number): number => {
+  return index === 0 ? 75 : 25;
 };
 ```
 
 ### 3. 投票选项条样式
 ```tsx
-<div className="relative w-full h-14 rounded-xl border-2 overflow-hidden">
+<button className="relative w-full h-14 rounded-xl border-2 overflow-hidden">
   {/* 进度条 */}
   <div className="absolute inset-y-0 left-0 bg-blue-200" style={{ width: `${percentage}%` }} />
   {/* 内容 */}
   <div className="relative flex items-center justify-between h-full px-4">
     <span>{buttonText}</span>
-    <span>{text}</span>
-    <span>{voteCount}票 {percentage}%</span>
+    <span>{percentage}%</span>
   </div>
-</div>
+</button>
 ```
 
 ### 4. 交互逻辑

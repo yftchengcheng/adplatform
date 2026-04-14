@@ -7,8 +7,6 @@ import {
   ChevronRight,
   ChevronDown,
   Plus,
-  Trash2,
-  GripVertical,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -243,82 +241,44 @@ function CharCounter({
   );
 }
 
-// Vote option editor
+// Vote option editor (简化版 - 只有两个固定选项)
 function VoteOptionEditor({
   option,
+  index,
   onChange,
-  onRemove,
-  canRemove,
 }: {
   option: VoteOption;
+  index: number;
   onChange: (option: VoteOption) => void;
-  onRemove: () => void;
-  canRemove: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const fixedPercentage = index === 0 ? 75 : 25;
 
   return (
-    <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-2 bg-gray-50">
+    <div className="border border-gray-200 rounded-lg bg-white p-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
           <span className="text-sm font-medium text-gray-700">
-            选项 {option.id.replace("option_", "")}
+            选项 {index + 1}
+          </span>
+          <span className="text-xs text-gray-400 px-2 py-0.5 bg-gray-100 rounded">
+            {fixedPercentage}%
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
-          >
-            {isOpen ? (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            ) : (
-              <ChevronRight className="w-4 h-4 text-gray-500" />
-            )}
-          </button>
-          {canRemove && (
-            <button
-              onClick={onRemove}
-              className="p-1 hover:bg-red-100 rounded transition-colors text-red-500"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
-        </div>
       </div>
-
-      {isOpen && (
-        <div className="p-3 space-y-3">
-          {/* Option Text */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-500">选项文本</label>
-              <CharCounter current={option.text.length} max={20} />
-            </div>
-            <Input
-              value={option.text}
-              onChange={(e) => onChange({ ...option, text: e.target.value })}
-              placeholder="请输入选项文本"
-              maxLength={20}
-            />
-          </div>
-
-          {/* Button Text */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-500">按钮文本</label>
-              <CharCounter current={option.buttonText.length} max={16} />
-            </div>
-            <Input
-              value={option.buttonText}
-              onChange={(e) => onChange({ ...option, buttonText: e.target.value })}
-              placeholder="请输入按钮文本"
-              maxLength={16}
-            />
-          </div>
+      
+      {/* Button Text */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <label className="text-xs text-gray-500">按钮文本</label>
+          <CharCounter current={option.buttonText.length} max={16} />
         </div>
-      )}
+        <Input
+          value={option.buttonText}
+          onChange={(e) => onChange({ ...option, buttonText: e.target.value })}
+          placeholder="请输入按钮文本"
+          maxLength={16}
+        />
+      </div>
     </div>
   );
 }
@@ -352,22 +312,6 @@ export function VoteTemplateConfigPanel({
   const handleOptionChange = (index: number, option: VoteOption) => {
     const newOptions = [...(config.options || [])];
     newOptions[index] = option;
-    onChange({ ...config, options: newOptions });
-  };
-
-  const handleAddOption = () => {
-    const newOption: VoteOption = {
-      id: `option_${Date.now()}`,
-      text: "",
-      voteCount: 0,
-      buttonText: "",
-    };
-    onChange({ ...config, options: [...(config.options || []), newOption] });
-  };
-
-  const handleRemoveOption = (index: number) => {
-    const newOptions = [...(config.options || [])];
-    newOptions.splice(index, 1);
     onChange({ ...config, options: newOptions });
   };
 
@@ -538,27 +482,21 @@ export function VoteTemplateConfigPanel({
 
           {isOptionsOpen && (
             <div className="px-4 pb-4 space-y-3">
-              {/* Options List */}
+              {/* Fixed two options with percentages */}
               <div className="space-y-3">
-                {(config.options || []).map((option, index) => (
+                {(config.options || []).slice(0, 2).map((option, index) => (
                   <VoteOptionEditor
                     key={option.id}
                     option={option}
+                    index={index}
                     onChange={(opt) => handleOptionChange(index, opt)}
-                    onRemove={() => handleRemoveOption(index)}
-                    canRemove={(config.options?.length || 0) > 1}
                   />
                 ))}
               </div>
-
-              {/* Add Button */}
-              <button
-                onClick={handleAddOption}
-                className="w-full h-10 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">添加投票选项</span>
-              </button>
+              {/* Fixed percentage note */}
+              <p className="text-xs text-gray-400 text-center">
+                投票统计：选项1占75%，选项2占25%
+              </p>
             </div>
           )}
         </div>
