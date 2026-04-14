@@ -289,15 +289,21 @@ export function RedpacketRainTemplateConfigPanel({
                       />
                       <button
                         onClick={() => updateConfig({ redpacketImageUrl: "", redpacketImageMacro: "" })}
-                        className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center"
+                        className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70"
                       >
                         <Trash2 className="w-3 h-3 text-white" />
                       </button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400">
-                      <Plus className="w-5 h-5 text-gray-400" />
-                      <span className="text-xs text-gray-400">上传</span>
+                    <label className="relative flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400">
+                      <img
+                        src={defaultRedpacketRainConfig.redpacketImageUrl}
+                        alt="默认红包"
+                        className="w-full h-full object-cover opacity-30"
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
+                        <Plus className="w-4 h-4 text-gray-400" />
+                      </div>
                       <input
                         type="file"
                         accept="image/*"
