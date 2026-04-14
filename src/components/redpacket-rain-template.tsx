@@ -127,8 +127,8 @@ export function RedpacketRainTemplate({
     // 随机大小（32-48像素），稍微大一些更美观
     const size = BASE_SIZE + Math.random() * 16;
     
-    // 随机延迟（0-1.5秒后开始）
-    const delay = Math.random() * 1500;
+    // 随机延迟（1-3秒后开始），避免同时出现在顶部
+    const delay = 1000 + Math.random() * 2000;
     
     return {
       id,
@@ -282,9 +282,9 @@ export function RedpacketRainTemplate({
       containerHeightRef.current = containerRef.current.offsetHeight;
     }
 
-    // 初始生成几个红包
+    // 初始生成几个红包，延迟更大避免同时出现在顶部
     for (let i = 0; i < 4; i++) {
-      setTimeout(() => addRedpacket(), i * 400);
+      setTimeout(() => addRedpacket(), 1000 + i * 600);
     }
 
     // 定时生成新红包
