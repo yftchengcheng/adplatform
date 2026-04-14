@@ -260,7 +260,7 @@ export function RedpacketRainTemplate({
 
   return (
     <div
-      className={`${previewMode ? "relative w-full h-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
+      className={`${previewMode ? "relative w-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       onClick={!isClaimed ? undefined : onClose}
@@ -270,36 +270,34 @@ export function RedpacketRainTemplate({
         <div className="absolute inset-0 bg-black/70" />
       )}
 
-      {/* Modal Content */}
+      {/* Modal Content - 半屏浮层 */}
       <div
-        className={`relative w-full h-full flex flex-col transition-all duration-500 ${
+        className={`relative w-full ${previewMode ? "h-1/2" : "h-full"} flex flex-col transition-all duration-500 ${
           isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button - hidden in preview mode */}
-        {!previewMode && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
         {/* Redpacket Rain Scene */}
         {!isClaimed ? (
           <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#8B0000] to-[#4A0000]">
             {/* Guide Text */}
-            <div className="absolute top-1/4 left-0 right-0 text-center z-10">
+            <div className="absolute top-8 left-0 right-0 text-center z-10">
               <p className="text-white text-lg font-medium drop-shadow-lg animate-pulse">
                 {resolveGuideText()}
               </p>
             </div>
 
             {/* Hand Gesture Hint */}
-            <div className="absolute bottom-1/3 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-              <div className="w-12 h-12">
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+              <div className="w-10 h-10">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M24 44C24 44 8 32 8 20C8 12 14 6 22 6C22 6 20 10 20 14C20 18 22 20 24 20C26 20 28 18 28 14C28 10 26 6 26 6C34 6 40 12 40 20C40 32 24 44 24 44Z" fill="white" fillOpacity="0.9"/>
                   <path d="M20 14V6M24 14V4M28 14V6" stroke="white" strokeOpacity="0.6" strokeWidth="2" strokeLinecap="round"/>
@@ -314,8 +312,8 @@ export function RedpacketRainTemplate({
                 className="absolute top-0 cursor-pointer hover:scale-110 transition-transform"
                 style={{
                   left: `${rp.x}%`,
-                  width: "40px",
-                  height: "46px",
+                  width: "32px",
+                  height: "37px",
                   animation: `fallDown ${rp.duration}ms ease-in forwards`,
                   animationDelay: `${rp.delay}ms`,
                   transform: `rotate(${rp.rotation}deg)`,
@@ -345,7 +343,7 @@ export function RedpacketRainTemplate({
                   opacity: 1;
                 }
                 100% {
-                  top: calc(100% - 100px);
+                  top: calc(60%);
                   opacity: 0.8;
                 }
               }
@@ -358,9 +356,9 @@ export function RedpacketRainTemplate({
             <div className="w-full max-w-[345px] space-y-4">
               {/* Reward Image or Cash */}
               {finalConfig.rewardType === "cash" ? (
-                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-6 text-center">
-                  <p className="text-white/80 text-sm mb-1">恭喜获得</p>
-                  <p className="text-white text-4xl font-bold">¥{resolveCashAmount()}</p>
+                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-4 text-center">
+                  <p className="text-white/80 text-xs mb-1">恭喜获得</p>
+                  <p className="text-white text-3xl font-bold">¥{resolveCashAmount()}</p>
                 </div>
               ) : (
                 <div className="rounded-xl overflow-hidden">
@@ -393,7 +391,7 @@ export function RedpacketRainTemplate({
               {/* Claim Button */}
               <button
                 onClick={handleClaim}
-                className="w-full py-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+                className="w-full py-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-shadow text-sm"
               >
                 立即领取
               </button>
