@@ -249,14 +249,16 @@ export function VoteTemplate({
         )}
       >
         <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
-            aria-label="关闭"
-          >
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
+          {/* Close Button - 仅在非预览模式下显示 */}
+          {!previewMode && (
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              aria-label="关闭"
+            >
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          )}
 
           {/* Content */}
           <div className="px-5 pt-6 pb-4">
