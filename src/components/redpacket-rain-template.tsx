@@ -447,20 +447,20 @@ export function RedpacketRainTemplate({
             <div className="w-full max-w-[345px] space-y-4">
               {/* Reward Image or Cash */}
               {finalConfig.rewardType === "cash" ? (
-                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-4 text-center">
+                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-4 text-center shadow-lg">
                   <p className="text-white/80 text-xs mb-1">恭喜获得</p>
                   <p className="text-white text-3xl font-bold">¥{resolveCashAmount()}</p>
                 </div>
               ) : (
-                <div className="rounded-xl overflow-hidden">
+                <div className="rounded-2xl overflow-hidden shadow-lg">
                   {resolveCustomRewardImage() ? (
                     <img
                       src={resolveCustomRewardImage()}
                       alt="奖励"
-                      className="w-full object-contain rounded-xl"
+                      className="w-full object-contain"
                     />
                   ) : (
-                    <div className="w-full h-32 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <div className="w-full h-32 bg-gray-100 rounded-2xl flex items-center justify-center">
                       <p className="text-gray-400 text-sm">暂无奖励图片</p>
                     </div>
                   )}
@@ -480,7 +480,7 @@ export function RedpacketRainTemplate({
               {/* Claim Button */}
               <button
                 onClick={handleClaim}
-                className="w-full py-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-shadow text-sm"
+                className="w-full py-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-shadow text-sm"
               >
                 立即领取
               </button>
