@@ -466,7 +466,7 @@ export function GameGiftTemplateConfigPanel({
                       添加图片
                     </button>
                   )}
-                  <p className="text-xs text-gray-400">推荐 1280×720px，最大 1MB</p>
+                  <p className="text-xs text-gray-400">宽高比 16:9，推荐 1280×720px，最大 1MB</p>
                 </div>
               )}
             </div>
