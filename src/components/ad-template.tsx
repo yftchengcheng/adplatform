@@ -191,7 +191,7 @@ export function AdTemplate({
       <div
         className={cn(
           previewMode
-            ? "flex items-center justify-center w-full max-w-[280px]"
+            ? "flex items-center justify-center w-full max-w-sm"
             : "fixed inset-0 z-50 bg-black/50",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
@@ -202,7 +202,7 @@ export function AdTemplate({
         <div
           className={cn(
             previewMode
-              ? "w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+              ? "w-full mx-4 bg-white rounded-2xl shadow-xl overflow-hidden"
               : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl overflow-hidden",
             "transition-all duration-300",
             isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
