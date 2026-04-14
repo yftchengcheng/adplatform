@@ -380,7 +380,7 @@ export function RedpacketRainTemplate({
             <style jsx>{`
               @keyframes fallLeaf {
                 0% {
-                  top: 70px;
+                  top: 80px;
                   opacity: 0.3;
                   transform: rotate(0deg) scale(0.8);
                 }
