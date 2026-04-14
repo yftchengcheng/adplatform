@@ -351,7 +351,7 @@ export function RedpacketRainTemplate({
     >
       {/* Backdrop */}
       {!isClaimed && !previewMode && (
-        <div className="absolute inset-0 bg-black/70" />
+        <div className="absolute inset-0 bg-black/30" />
       )}
 
       {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.2倍 */}
