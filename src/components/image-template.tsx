@@ -164,7 +164,9 @@ export function ImageTemplate({
       <div
         className={cn(
           "w-full overflow-hidden rounded-xl transition-all duration-300",
-          previewMode ? "" : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          previewMode
+            ? "flex items-center justify-center"
+            : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
         )}
         onClick={!previewMode ? onClose : undefined}
       >
@@ -197,11 +199,13 @@ export function ImageTemplate({
     <div
       className={cn(
         "w-full overflow-hidden transition-all duration-300",
-        previewMode ? "" : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+        previewMode
+          ? "flex items-center justify-center"
+          : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
       )}
       onClick={!previewMode ? onClose : undefined}
       onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseLeave={() => !previewMode && setIsPaused(false)}
     >
       <div
         className="relative w-full max-w-2xl mx-auto"
