@@ -442,9 +442,9 @@ export function RedpacketRainTemplate({
           </div>
         ) : (
           /* Reward Claimed Scene - 参考样式优化 */
-          <div className="flex flex-col h-full bg-[#F54A47]">
-            {/* 顶部红色区域 - 约40%高度 */}
-            <div className="relative flex items-center justify-center py-4 px-2">
+          <div className="relative w-full h-full flex flex-col bg-[#F54A47]">
+            {/* 顶部红色区域 */}
+            <div className="relative flex items-center justify-center py-5 px-4">
               {/* 装饰图标 - 左上角 */}
               <div className="absolute top-2 left-4 opacity-40">
                 <svg width="28" height="28" viewBox="0 0 35 35">
@@ -466,38 +466,35 @@ export function RedpacketRainTemplate({
             </div>
 
             {/* 底部白色内容区域 */}
-            <div className="flex-1 bg-[#FEF6EA] rounded-t-2xl flex flex-col overflow-hidden">
+            <div className="flex-1 bg-[#FEF6EA] rounded-t-2xl flex flex-col">
               {/* 提示文字 */}
-              <p className="text-gray-500 text-xs text-center pt-3 pb-2 px-4">
+              <p className="text-gray-500 text-xs text-center pt-4 pb-3 px-4">
                 奖励提示信息
               </p>
 
               {/* 奖励信息卡片 */}
-              <div className="px-4 flex justify-center">
-                <div className="w-full max-w-[260px] bg-gradient-to-r from-[#FBAAAD] to-[#F53767] rounded-lg p-4 flex items-center">
-                  {/* 奖励内容 */}
-                  <div className="flex-1 min-w-0">
-                    {finalConfig.rewardType === "cash" ? (
-                      <p className="text-white text-xl font-bold">
-                        ¥{resolveCashAmount()}
-                      </p>
-                    ) : resolveCustomRewardImage() ? (
-                      <img
-                        src={resolveCustomRewardImage()}
-                        alt="奖励"
-                        className="max-h-16 object-contain"
-                      />
-                    ) : (
-                      <p className="text-white text-xl font-bold">
-                        {resolveRewardText()}
-                      </p>
-                    )}
-                  </div>
+              <div className="px-4">
+                <div className="w-full bg-gradient-to-r from-[#FBAAAD] to-[#F53767] rounded-lg p-4 flex items-center">
+                  {finalConfig.rewardType === "cash" ? (
+                    <p className="text-white text-xl font-bold">
+                      ¥{resolveCashAmount()}
+                    </p>
+                  ) : resolveCustomRewardImage() ? (
+                    <img
+                      src={resolveCustomRewardImage()}
+                      alt="奖励"
+                      className="max-h-16 object-contain"
+                    />
+                  ) : (
+                    <p className="text-white text-xl font-bold">
+                      {resolveRewardText()}
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* 奖品文案和特殊说明 */}
-              <div className="px-4 pt-3 pb-2 text-center">
+              <div className="px-4 pt-4 text-center">
                 <p className="text-gray-800 font-medium text-sm">
                   {resolveRewardText()}
                 </p>
@@ -506,11 +503,11 @@ export function RedpacketRainTemplate({
                 </p>
               </div>
 
-              {/* 底部按钮区域 */}
+              {/* 底部按钮 */}
               <div className="mt-auto bg-[#F54A48]/70 px-4 py-4">
                 <button
                   onClick={handleClaim}
-                  className="w-full py-2.5 bg-white text-[#E02020] font-medium rounded-lg shadow-sm hover:shadow-md transition-shadow text-sm"
+                  className="w-full py-2.5 bg-white text-[#E02020] font-medium rounded-lg shadow-sm text-sm"
                 >
                   立即下载领取
                 </button>
