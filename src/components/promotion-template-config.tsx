@@ -155,14 +155,27 @@ function ImageUpload({
       return;
     }
 
-    setError(null);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const url = e.target?.result as string;
-      setPreviewUrl(url);
-      onChange(url);
+    // 校验图片尺寸（1:1比例，推荐 108×108px）
+    const img = new window.Image();
+    img.onload = () => {
+      // 校验宽高比例是否为1:1
+      if (img.width !== img.height) {
+        setError(`图片比例必须为1:1，当前为 ${img.width}×${img.height}px`);
+        return;
+      }
+      setError(null);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const url = ev.target?.result as string;
+        setPreviewUrl(url);
+        onChange(url);
+      };
+      reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
+    img.onerror = () => {
+      setError("图片加载失败，请重新上传");
+    };
+    img.src = URL.createObjectURL(file);
   };
 
   return (
