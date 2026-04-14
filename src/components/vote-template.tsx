@@ -190,40 +190,42 @@ export function VoteTemplate({
     return Math.round((voteCount / totalVotes) * 100);
   };
 
-  // 处理选项选择
+  // 处理选项选择并投票
   const handleSelect = (option: VoteOption) => {
     if (previewMode) return;
+    
+    // 记录已选择的选项
     setSelectedOption(option.id);
+    
+    // 显示投票成功提示
+    setShowResultText(true);
+    
+    // 延迟执行动作，让用户看到投票成功
     setTimeout(() => {
-      setShowResultText(true);
-    }, 300);
-  };
-
-  // 处理按钮点击
-  const handleButtonClick = (option: VoteOption) => {
-    // 解析落地页URL
-    let url = landingPageUrl;
-    if (landingPageMacro && macroVariables) {
-      url = resolveMacro(landingPageMacro, macroVariables);
-    }
-
-    // 解析图片URL
-    let imgUrl = imageUrl || "";
-    if (imageMacro && macroVariables) {
-      imgUrl = resolveMacro(imageMacro, macroVariables);
-    }
-
-    if (action === "show_image") {
-      // 显示图片模式
-      setCurrentImageUrl(imgUrl);
-      setShowImageModal(true);
-    } else {
-      // 跳转落地页模式
-      if (url) {
-        window.open(url, "_blank");
+      // 解析落地页URL
+      let url = landingPageUrl;
+      if (landingPageMacro && macroVariables) {
+        url = resolveMacro(landingPageMacro, macroVariables);
       }
-    }
-    onButtonClick?.(option);
+
+      // 解析图片URL
+      let imgUrl = imageUrl || "";
+      if (imageMacro && macroVariables) {
+        imgUrl = resolveMacro(imageMacro, macroVariables);
+      }
+
+      if (action === "show_image") {
+        // 显示图片模式
+        setCurrentImageUrl(imgUrl);
+        setShowImageModal(true);
+      } else {
+        // 跳转落地页模式
+        if (url) {
+          window.open(url, "_blank");
+        }
+      }
+      onButtonClick?.(option);
+    }, 500);
   };
 
   // 关闭图片预览
@@ -302,40 +304,14 @@ export function VoteTemplate({
           </div>
 
           {/* Buttons */}
-          <div className="px-5 pb-6 space-y-3">
-            {/* Vote Result Text */}
+          <div className="px-5 pb-6">
+            {/* Vote Result Text - 选择后显示 */}
             {showResultText && clickResultText && (
-              <div 
-                className={cn(
-                  "text-center text-sm font-medium text-green-600 mb-3",
-                  "transition-opacity duration-300",
-                  showResultText ? "opacity-100" : "opacity-0"
-                )}
-              >
-                {clickResultText}
+              <div className="text-center py-2">
+                <span className="text-sm font-medium text-green-600">
+                  {clickResultText}
+                </span>
               </div>
-            )}
-            
-            {/* Primary Button - 预览模式下也显示，或已选择了选项 */}
-            {(selectedOption || previewMode) && (
-              <button
-                onClick={() => {
-                  // 预览模式下使用第一个选项，或使用已选选项
-                  const option = previewMode 
-                    ? options[0] 
-                    : options.find(o => o.id === selectedOption);
-                  if (option) handleButtonClick(option);
-                }}
-                className={cn(
-                  "w-full h-12 rounded-xl text-white font-medium text-base",
-                  "bg-gradient-to-r from-blue-500 to-blue-600",
-                  "hover:from-blue-600 hover:to-blue-700",
-                  "active:scale-[0.98] transition-all duration-150",
-                  "shadow-lg shadow-blue-500/25"
-                )}
-              >
-                {action === "show_image" ? "查看图片" : "查看详情"}
-              </button>
             )}
           </div>
         </div>
