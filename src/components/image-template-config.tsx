@@ -28,15 +28,9 @@ import { cn } from "@/lib/utils";
 function ImageUpload({
   value,
   onChange,
-  width = 640,
-  height = 360,
-  maxSize = 2,
 }: {
   value?: string;
   onChange: (url: string) => void;
-  width?: number;
-  height?: number;
-  maxSize?: number;
 }) {
   const [previewUrl, setPreviewUrl] = useState<string>(value || "");
   const [isUploading, setIsUploading] = useState(false);
@@ -48,24 +42,27 @@ function ImageUpload({
 
     setError("");
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("请上传图片文件（支持 JPG、PNG、GIF 等格式）");
+    // 允许的文件类型
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+    // Validate file type (只允许 jpg、png、jpeg)
+    if (!allowedTypes.includes(file.type)) {
+      setError("仅支持 JPG、PNG、JPEG 格式");
       return;
     }
 
-    // Validate file size
-    if (file.size > maxSize * 1024 * 1024) {
-      setError(`图片大小不能超过 ${maxSize}MB，当前文件 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+    // Validate file size (小于2M)
+    if (file.size > 2 * 1024 * 1024) {
+      setError(`图片大小不能超过 2MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
       return;
     }
 
-    // Validate image dimensions
+    // Validate image dimensions (必须为 640×360)
     const img = document.createElement("img");
     img.onload = () => {
       URL.revokeObjectURL(img.src);
-      if (img.width > width || img.height > height) {
-        setError(`图片尺寸不能超过 ${width}×${height}px，当前 ${img.width}×${img.height}px`);
+      if (img.width !== 640 || img.height !== 360) {
+        setError(`图片尺寸必须为 640×360px，当前 ${img.width}×${img.height}px`);
         return;
       }
 
@@ -144,7 +141,7 @@ function ImageUpload({
         </div>
         <span className="text-sm text-gray-500">点击上传图片</span>
         <span className="text-xs text-gray-400 mt-1">
-          推荐 {width}×{height}px，最大 {maxSize}MB
+          尺寸 640×360px，JPG/PNG/JPEG，最大 2MB
         </span>
         <input
           type="file"
@@ -269,9 +266,6 @@ function ImageItemEditor({
           <ImageUpload
             value={image.imageUrl || ""}
             onChange={(url) => onChange({ ...image, imageUrl: url, imageMacro: undefined })}
-            width={640}
-            height={360}
-            maxSize={2}
           />
         )}
       </div>

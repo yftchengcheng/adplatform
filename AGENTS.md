@@ -420,9 +420,9 @@ interface ImageTemplateConfig {
 ### 3. 图片要求
 | 项目 | 要求 |
 |------|------|
-| 尺寸 | 640×360px |
-| 格式 | JPG/PNG/JPEG/GIF |
-| 大小 | 最大 2MB |
+| 尺寸 | 640×360px（精确匹配） |
+| 格式 | JPG、PNG、JPEG |
+| 大小 | 小于 2MB |
 
 ### 4. UI组件
 
