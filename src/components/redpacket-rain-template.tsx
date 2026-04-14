@@ -340,7 +340,7 @@ export function RedpacketRainTemplate({
 
   return (
     <div
-      className={`${previewMode ? "relative w-full" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
+      className={`${previewMode ? "relative mx-auto" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       style={previewMode ? { aspectRatio: "5 / 6", maxWidth: "260px" } : undefined}
