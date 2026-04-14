@@ -350,20 +350,19 @@ export function RedpacketRainTemplate({
         <div className="absolute inset-0 bg-black/70" />
       )}
 
-      {/* Modal Content - 半屏浮层，宽度小于屏幕，下移100px */}
+      {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.5倍 */}
       <div
-        className={`relative mx-4 mt-[100px] h-[calc(100%-100px)] flex flex-col transition-all duration-500 ${
+        className={`relative mx-auto h-[calc(100vh-100px)] aspect-[1/1.5] max-w-full flex flex-col transition-all duration-500 ${
           isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button - 底边中间 */}
+        {/* Close Button - 底边中间，仅图标 */}
         <button
           onClick={onClose}
-          className="absolute -top-[70px] left-1/2 -translate-x-1/2 z-10 px-4 py-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm"
+          className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
         >
-          <X className="w-4 h-4 mr-1" />
-          <span>关闭</span>
+          <X className="w-4 h-4" />
         </button>
 
         {/* Redpacket Rain Scene */}
