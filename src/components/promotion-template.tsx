@@ -150,7 +150,7 @@ export function PromotionTemplate({
     
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % validPoints.length);
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [hasMultiplePoints, isPaused, previewMode, validPoints.length]);
