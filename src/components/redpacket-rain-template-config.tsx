@@ -143,7 +143,7 @@ export const defaultRedpacketRainConfig: RedpacketRainConfig = {
   rewardTextMacro: "",
   specialNote: "实际奖品以APP为准！",
   specialNoteMacro: "",
-  redpacketImageUrl: "",
+  redpacketImageUrl: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E5%85%83%E7%B4%A02_%E5%89%AF%E6%9C%AC.png&nonce=e7fab6ca-83d2-448d-890a-25e1ed9b5876&project_id=7628071345674895423&sign=519ae46c48a91edf52823aefc5f8dd3e00a6c52faa6bcc80e87b981165b40600",
   redpacketImageMacro: "",
   landingPageUrl: "",
   landingPageMacro: "",
