@@ -529,6 +529,7 @@ export function RedpacketRainTemplateConfigPanel({
                       <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400">
                         <ImageIcon className="w-6 h-6 text-gray-400" />
                         <span className="text-sm text-gray-400">点击上传图片</span>
+                        <span className="text-xs text-gray-400">16:9，推荐 690×360px，最大 100KB</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -541,13 +542,13 @@ export function RedpacketRainTemplateConfigPanel({
                               setRewardImageError(`奖励图片大小不能超过 100KB，当前 ${(file.size / 1024).toFixed(2)}KB`);
                               return;
                             }
-                            // 校验宽高比 690:360
+                            // 校验宽高比 16:9
                             const img = new window.Image();
                             img.onload = () => {
                               const ratio = img.naturalWidth / img.naturalHeight;
-                              const targetRatio = 690 / 360;
+                              const targetRatio = 16 / 9;
                               if (Math.abs(ratio - targetRatio) > 0.1) {
-                                setRewardImageError(`奖励图片宽高比需为 690:360，当前 ${img.naturalWidth}×${img.naturalHeight}`);
+                                setRewardImageError(`奖励图片宽高比需为 16:9，当前 ${img.naturalWidth}×${img.naturalHeight}`);
                                 return;
                               }
                               setRewardImageError(null);
@@ -570,7 +571,7 @@ export function RedpacketRainTemplateConfigPanel({
                 {rewardImageError && (
                   <p className="text-xs text-red-500 mt-1">{rewardImageError}</p>
                 )}
-                <p className="text-xs text-gray-400">宽高比 690:360，推荐 690×360px，最大 100KB</p>
+                <p className="text-xs text-gray-400">宽高比 16:9，推荐 690×360px，最大 100KB</p>
               </div>
             )}
 
