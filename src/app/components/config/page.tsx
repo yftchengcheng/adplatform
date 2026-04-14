@@ -238,6 +238,9 @@ function ConfigContent() {
     }
   }, []);
 
+  // 预览重置计数器（用于动态组件如红包雨的重置）
+  const [previewResetKey, setPreviewResetKey] = React.useState(0);
+
   // 保存配置到 sessionStorage
   // 深拷贝函数，处理可能的循环引用
   const deepClone = (obj: unknown): unknown => {
@@ -506,11 +509,19 @@ function ConfigContent() {
                         {isRedpacketRainComponent ? (
                           <div className="w-full px-4">
                             <RedpacketRainTemplate
+                              key={`redpacket-${previewResetKey}`}
                               config={config as RedpacketRainTemplateConfig}
                               isOpen={true}
                               previewMode={true}
                               onClose={() => {}}
                             />
+                            {/* 重新预览按钮 */}
+                            <button
+                              onClick={() => setPreviewResetKey(k => k + 1)}
+                              className="mt-2 w-full py-1.5 px-3 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+                            >
+                              重新预览
+                            </button>
                           </div>
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
