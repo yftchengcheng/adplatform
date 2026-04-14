@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export interface VoteOption {
   id: string;
   text: string;
-  percentage: number;
+  voteCount: number;
   buttonText: string;
 }
 
@@ -40,8 +40,8 @@ const defaultConfig: VoteTemplateConfig = {
   title: "请选择您的偏好",
   subtitle: "感谢您的参与，点击选项查看详情",
   options: [
-    { id: "1", text: "选项一", percentage: 75, buttonText: "选择" },
-    { id: "2", text: "选项二", percentage: 25, buttonText: "选择" },
+    { id: "1", text: "选项一", voteCount: 120, buttonText: "选择" },
+    { id: "2", text: "选项二", voteCount: 80, buttonText: "选择" },
   ],
   clickResultText: "投票成功",
   action: "jump",
@@ -71,16 +71,20 @@ function getResolvedText(
 // 投票选项组件
 function VoteOptionBar({
   option,
+  percentage,
+  voteCount,
   onSelect,
   selected,
   showResult,
 }: {
   option: VoteOption;
+  percentage: number;
+  voteCount: number;
   onSelect: () => void;
   selected: boolean;
   showResult: boolean;
 }) {
-  const progressWidth = Math.max(10, Math.min(100, option.percentage));
+  const progressWidth = Math.max(5, Math.min(100, percentage));
   
   return (
     <button
@@ -119,13 +123,21 @@ function VoteOptionBar({
           {option.text}
         </span>
         
-        {/* 右侧：百分比 */}
-        {showResult && (
-          <span className={cn(
-            "text-sm font-semibold",
+        {/* 右侧：投票数和百分比 */}
+        {showResult ? (
+          <div className={cn(
+            "flex items-center gap-2 text-sm",
             selected ? "text-white" : "text-gray-600"
           )}>
-            {option.percentage}%
+            <span className="font-medium">{voteCount}票</span>
+            <span className="font-semibold">{percentage}%</span>
+          </div>
+        ) : (
+          <span className={cn(
+            "text-sm",
+            selected ? "text-white" : "text-gray-400"
+          )}>
+            点击选择
           </span>
         )}
       </div>
@@ -160,6 +172,15 @@ export function VoteTemplate({
   const landingPageUrl = config?.landingPageUrl || config?.defaultLandingPageUrl || defaultConfig.defaultLandingPageUrl;
   const landingPageMacro = config?.landingPageMacro;
   const macroVariables = config?.macroVariables;
+
+  // 计算总投票数
+  const totalVotes = options.reduce((sum, opt) => sum + opt.voteCount, 0);
+
+  // 计算每个选项的百分比
+  const getPercentage = (voteCount: number): number => {
+    if (totalVotes === 0) return 0;
+    return Math.round((voteCount / totalVotes) * 100);
+  };
 
   // 处理选项选择
   const handleSelect = (option: VoteOption) => {
@@ -236,11 +257,19 @@ export function VoteTemplate({
               <VoteOptionBar
                 key={option.id}
                 option={option}
+                percentage={getPercentage(option.voteCount)}
+                voteCount={option.voteCount}
                 onSelect={() => handleSelect(option)}
                 selected={selectedOption === option.id}
-                showResult={previewMode}
+                showResult={previewMode || showResultText}
               />
             ))}
+            {/* 总投票数 */}
+            {totalVotes > 0 && (
+              <p className="text-center text-xs text-gray-400 pt-1">
+                总计 {totalVotes} 票
+              </p>
+            )}
           </div>
 
           {/* Buttons */}

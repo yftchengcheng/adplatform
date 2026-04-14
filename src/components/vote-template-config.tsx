@@ -156,19 +156,18 @@ function VoteOptionEditor({
             />
           </div>
 
-          {/* Percentage */}
+          {/* Vote Count */}
           <div className="space-y-1">
-            <label className="text-xs text-gray-500">投票占比 (%)</label>
+            <label className="text-xs text-gray-500">投票数</label>
             <Input
               type="number"
               min="0"
-              max="100"
-              value={option.percentage}
+              value={option.voteCount}
               onChange={(e) => {
                 const val = parseInt(e.target.value) || 0;
-                onChange({ ...option, percentage: Math.min(100, Math.max(0, val)) });
+                onChange({ ...option, voteCount: Math.max(0, val) });
               }}
-              placeholder="0-100"
+              placeholder="请输入投票数"
             />
           </div>
         </div>
@@ -211,7 +210,7 @@ export function VoteTemplateConfigPanel({
     const newOption: VoteOption = {
       id: `option_${Date.now()}`,
       text: "",
-      percentage: 0,
+      voteCount: 0,
       buttonText: "",
     };
     onChange({ ...config, options: [...(config.options || []), newOption] });
@@ -534,8 +533,8 @@ export function VoteTemplateDemo() {
     subtitle: "感谢您的参与，点击选择您喜欢的选项",
     clickResultText: "投票成功，感谢您的参与！",
     options: [
-      { id: "option_1", text: "选项A", percentage: 60, buttonText: "A" },
-      { id: "option_2", text: "选项B", percentage: 40, buttonText: "B" },
+      { id: "option_1", text: "选项A", voteCount: 120, buttonText: "A" },
+      { id: "option_2", text: "选项B", voteCount: 80, buttonText: "B" },
     ],
     action: "jump",
     landingPageUrl: "https://example.com",
