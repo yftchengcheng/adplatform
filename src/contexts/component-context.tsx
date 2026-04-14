@@ -237,6 +237,22 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("ad_components", JSON.stringify(data));
   }, []);
 
+  // 生成顺序ID
+  const generateSequentialId = useCallback((existingComponents: AdComponentItem[]): string => {
+    // 提取所有数字ID并排序
+    const ids = existingComponents
+      .map(c => {
+        const match = c.id.match(/^A(\d+)$/);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter(n => n > 0)
+      .sort((a, b) => b - a);
+
+    // 下一个ID = 最大ID + 1，最小为 1000000000
+    const nextNum = ids.length > 0 ? ids[0] + 1 : 1000000000;
+    return `A${nextNum}`;
+  }, []);
+
   // 添加组件
   const addComponent = useCallback(async (
     component: Omit<AdComponentItem, "id" | "updateTime" | "templateCount" | "editor">
@@ -244,10 +260,8 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
     
-    // 生成新ID - 使用时间戳确保唯一性
-    const timestamp = Date.now();
-    const randomSuffix = Math.floor(Math.random() * 1000);
-    const newId = `A${timestamp}${randomSuffix}`.slice(-12);
+    // 生成顺序ID
+    const newId = generateSequentialId(components);
     
     const newComponent: AdComponentItem = {
       ...component,
@@ -279,7 +293,7 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage, isSupabaseAvailable]);
+  }, [saveToStorage, isSupabaseAvailable, generateSequentialId, components]);
 
   // 更新组件
   const updateComponent = useCallback(async (id: string, updates: Partial<AdComponentItem>) => {
