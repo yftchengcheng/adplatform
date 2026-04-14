@@ -99,8 +99,8 @@ export function RedpacketRainTemplate({
   const containerHeightRef = useRef(500);
 
   // 红包雨配置
-  const MAX_REDPACKETS = 20; // 最多同时存在20个红包
-  const SPAWN_INTERVAL = 400; // 每400ms尝试生成一个
+  const MAX_REDPACKETS = 8; // 最多同时存在8个红包，更有美感
+  const SPAWN_INTERVAL = 800; // 每800ms生成一个，慢一些
   const BASE_DURATION = 8000; // 基础飘落时长8秒
   const BASE_SIZE = 36; // 基础红包大小
 
@@ -109,26 +109,26 @@ export function RedpacketRainTemplate({
     const id = nextIdRef.current++;
     
     // 随机起始位置（整个屏幕宽度）
-    const startX = Math.random() * 90; // 0-90%
+    const startX = Math.random() * 85; // 0-85%
     
     // 随机终点位置（水平飘动，可以左右摆动）
-    const drift = (Math.random() - 0.5) * 40; // 左右飘动±20%
+    const drift = (Math.random() - 0.5) * 25; // 左右飘动±12.5%
     const endX = Math.max(5, Math.min(95, startX + drift));
     
-    // 随机飘落时长（6-12秒）
-    const duration = BASE_DURATION + (Math.random() - 0.5) * 4000;
+    // 随机飘落时长（8-14秒），更慢更优雅
+    const duration = BASE_DURATION + (Math.random() - 0.5) * 6000;
     
     // 随机初始旋转角度
-    const rotation = (Math.random() - 0.5) * 60; // ±30度
+    const rotation = (Math.random() - 0.5) * 45; // ±22.5度
     
-    // 随机旋转速度（飘落过程中旋转）
-    const rotationSpeed = (Math.random() - 0.5) * 120; // 每秒旋转±60度
+    // 随机旋转速度（飘落过程中旋转），更慢
+    const rotationSpeed = (Math.random() - 0.5) * 80; // 每秒旋转±40度
     
-    // 随机大小（28-44像素）
+    // 随机大小（32-48像素），稍微大一些更美观
     const size = BASE_SIZE + Math.random() * 16;
     
-    // 随机延迟（0-1秒后开始）
-    const delay = Math.random() * 1000;
+    // 随机延迟（0-1.5秒后开始）
+    const delay = Math.random() * 1500;
     
     return {
       id,
@@ -283,8 +283,8 @@ export function RedpacketRainTemplate({
     }
 
     // 初始生成几个红包
-    for (let i = 0; i < 8; i++) {
-      setTimeout(() => addRedpacket(), i * 200);
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => addRedpacket(), i * 400);
     }
 
     // 定时生成新红包
