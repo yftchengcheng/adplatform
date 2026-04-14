@@ -50,8 +50,20 @@ export function ImageTemplate({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const images = finalConfig.images || [];
+
+  // 自动轮播效果
+  useEffect(() => {
+    if (images.length < 2 || isPaused || previewMode) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }, 3000); // 每3秒切换一次
+
+    return () => clearInterval(interval);
+  }, [images.length, isPaused, previewMode]);
 
   // 宏替换函数
   const resolveMacro = (macro: string): string => {
@@ -185,6 +197,8 @@ export function ImageTemplate({
         previewMode ? "" : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
       )}
       onClick={!previewMode ? onClose : undefined}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       <div
         className="relative w-full max-w-2xl mx-auto"
@@ -205,17 +219,24 @@ export function ImageTemplate({
             <>
               <button
                 onClick={handlePrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
               >
                 <ChevronLeft className="w-5 h-5 text-gray-700" />
               </button>
               <button
                 onClick={handleNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
               >
                 <ChevronRight className="w-5 h-5 text-gray-700" />
               </button>
             </>
+          )}
+
+          {/* 自动轮播指示器 */}
+          {!previewMode && images.length > 1 && (
+            <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/50 rounded text-xs text-white">
+              {currentIndex + 1}/{images.length}
+            </div>
           )}
         </div>
 
@@ -230,20 +251,15 @@ export function ImageTemplate({
                   setCurrentIndex(index);
                 }}
                 className={cn(
-                  "w-2 h-2 rounded-full transition-all",
+                  "h-1.5 rounded-full transition-all duration-300",
                   index === currentIndex
-                    ? "bg-white w-4"
-                    : "bg-white/50 hover:bg-white/70"
+                    ? "bg-white w-6"
+                    : "bg-white/50 hover:bg-white/70 w-1.5"
                 )}
               />
             ))}
           </div>
         )}
-
-        {/* 计数 */}
-        <p className="text-white/70 text-center text-xs mt-2">
-          {currentIndex + 1} / {images.length}
-        </p>
       </div>
     </div>
   );
