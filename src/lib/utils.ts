@@ -10,7 +10,8 @@ export function cn(...inputs: ClassValue[]) {
  * @param str 输入字符串
  * @returns 字符宽度
  */
-export function getStringWidth(str: string): number {
+export function getStringWidth(str: string | undefined | null): number {
+  if (!str) return 0;
   let width = 0;
   for (const char of str) {
     // 判断是否是中文字符（包括中文标点）
@@ -29,7 +30,8 @@ export function getStringWidth(str: string): number {
  * @param maxWidth 最大宽度
  * @returns 截断后的字符串
  */
-export function truncateByWidth(str: string, maxWidth: number): string {
+export function truncateByWidth(str: string | undefined | null, maxWidth: number): string {
+  if (!str) return '';
   let result = '';
   let width = 0;
   for (const char of str) {
@@ -47,6 +49,6 @@ export function truncateByWidth(str: string, maxWidth: number): string {
  * @param maxWidth 最大宽度
  * @returns 是否超过
  */
-export function isOverWidth(str: string, maxWidth: number): boolean {
+export function isOverWidth(str: string | undefined | null, maxWidth: number): boolean {
   return getStringWidth(str) > maxWidth;
 }
