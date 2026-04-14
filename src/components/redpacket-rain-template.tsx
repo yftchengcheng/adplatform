@@ -442,55 +442,53 @@ export function RedpacketRainTemplate({
           </div>
         ) : (
           /* Reward Claimed Scene - 参考样式优化 */
-          <div className="flex flex-col h-full">
-            {/* 顶部红色横幅区域 */}
-            <div className="relative bg-[#F54A47] mx-[5px] mt-[6px] rounded-t-md overflow-hidden" style={{ height: 'calc(100% - 12px)' }}>
+          <div className="flex flex-col h-full bg-[#F54A47]">
+            {/* 顶部红色区域 - 约40%高度 */}
+            <div className="relative flex items-center justify-center py-4 px-2">
               {/* 装饰图标 - 左上角 */}
-              <div className="absolute top-1 left-1 opacity-40">
-                <svg width="35" height="35" viewBox="0 0 35 35">
+              <div className="absolute top-2 left-4 opacity-40">
+                <svg width="28" height="28" viewBox="0 0 35 35">
                   <path d="M31.5,9.7 C31,8.6 30.4,7.7 29.6,6.9 C28.8,6.1 27.8,5.4 26.7,5 C25.6,4.5 24.4,4.3 23.2,4.3 C21.5,4.3 19.9,4.7 18.5,5.6 C18.1,5.8 17.8,6 17.5,6.3 C17.2,6 16.9,5.8 16.5,5.6 C15.1,4.7 13.5,4.3 11.8,4.3 C10.6,4.3 9.4,4.5 8.3,5 C7.2,5.4 6.2,6.1 5.4,6.9 C4.6,7.7 4,8.6 3.5,9.7 C3,10.8 2.7,12 2.7,13.2 C2.7,14.3 3,15.5 3.4,16.7 C3.8,17.7 4.4,18.8 5.1,19.8 C6.2,21.5 7.7,23.2 9.7,25 C12.8,27.9 16,29.9 16.1,30 L17,30.5 C17.3,30.8 17.7,30.8 18.1,30.5 L19,30 C19.1,29.9 22.2,27.9 25.3,25 C27.3,23.2 28.8,21.5 29.9,19.8 C30.6,18.8 31.2,17.7 31.6,16.7 C32,15.5 32.3,14.3 32.3,13.2 C32.3,12 32,10.8 31.5,9.7 Z" fill="#F65E63"/>
                 </svg>
               </div>
 
               {/* 装饰图标 - 右上角 */}
-              <div className="absolute top-2 right-1 opacity-40">
-                <svg width="35" height="35" viewBox="0 0 35 35">
+              <div className="absolute top-3 right-4 opacity-40">
+                <svg width="28" height="28" viewBox="0 0 35 35">
                   <path d="M31.5,9.7 C31,8.6 30.4,7.7 29.6,6.9 C28.8,6.1 27.8,5.4 26.7,5 C25.6,4.5 24.4,4.3 23.2,4.3 C21.5,4.3 19.9,4.7 18.5,5.6 C18.1,5.8 17.8,6 17.5,6.3 C17.2,6 16.9,5.8 16.5,5.6 C15.1,4.7 13.5,4.3 11.8,4.3 C10.6,4.3 9.4,4.5 8.3,5 C7.2,5.4 6.2,6.1 5.4,6.9 C4.6,7.7 4,8.6 3.5,9.7 C3,10.8 2.7,12 2.7,13.2 C2.7,14.3 3,15.5 3.4,16.7 C3.8,17.7 4.4,18.8 5.1,19.8 C6.2,21.5 7.7,23.2 9.7,25 C12.8,27.9 16,29.9 16.1,30 L17,30.5 C17.3,30.8 17.7,30.8 18.1,30.5 L19,30 C19.1,29.9 22.2,27.9 25.3,25 C27.3,23.2 28.8,21.5 29.9,19.8 C30.6,18.8 31.2,17.7 31.6,16.7 C32,15.5 32.3,14.3 32.3,13.2 C32.3,12 32,10.8 31.5,9.7 Z" fill="#F65E63"/>
                 </svg>
               </div>
 
               {/* 标题 */}
-              <div className="relative flex items-center justify-center h-full px-2">
-                <h2 className="text-white text-lg font-medium text-center">
-                  恭喜获奖
-                </h2>
-              </div>
+              <h2 className="text-white text-xl font-medium text-center">
+                恭喜获奖
+              </h2>
             </div>
 
-            {/* 内容区域 */}
-            <div className="flex-1 bg-[#FEF6EA] mx-[11px] rounded-b-md overflow-hidden flex flex-col">
+            {/* 底部白色内容区域 */}
+            <div className="flex-1 bg-[#FEF6EA] rounded-t-2xl flex flex-col overflow-hidden">
               {/* 提示文字 */}
-              <p className="text-gray-500 text-xs text-center py-2 px-4">
+              <p className="text-gray-500 text-xs text-center pt-3 pb-2 px-4">
                 奖励提示信息
               </p>
 
               {/* 奖励信息卡片 */}
-              <div className="px-3 flex-1 flex items-center justify-center">
-                <div className="w-full bg-gradient-to-r from-[#FBAAAD] to-[#F53767] rounded-md p-3 flex items-center">
+              <div className="px-4 flex justify-center">
+                <div className="w-full max-w-[260px] bg-gradient-to-r from-[#FBAAAD] to-[#F53767] rounded-lg p-4 flex items-center">
                   {/* 奖励内容 */}
                   <div className="flex-1 min-w-0">
                     {finalConfig.rewardType === "cash" ? (
-                      <p className="text-white text-lg font-bold">
+                      <p className="text-white text-xl font-bold">
                         ¥{resolveCashAmount()}
                       </p>
                     ) : resolveCustomRewardImage() ? (
                       <img
                         src={resolveCustomRewardImage()}
                         alt="奖励"
-                        className="max-h-12 object-contain"
+                        className="max-h-16 object-contain"
                       />
                     ) : (
-                      <p className="text-white text-lg font-bold">
+                      <p className="text-white text-xl font-bold">
                         {resolveRewardText()}
                       </p>
                     )}
@@ -499,7 +497,7 @@ export function RedpacketRainTemplate({
               </div>
 
               {/* 奖品文案和特殊说明 */}
-              <div className="px-4 pb-2 text-center">
+              <div className="px-4 pt-3 pb-2 text-center">
                 <p className="text-gray-800 font-medium text-sm">
                   {resolveRewardText()}
                 </p>
@@ -509,10 +507,10 @@ export function RedpacketRainTemplate({
               </div>
 
               {/* 底部按钮区域 */}
-              <div className="bg-[#F54A48]/70 px-2 py-3">
+              <div className="mt-auto bg-[#F54A48]/70 px-4 py-4">
                 <button
                   onClick={handleClaim}
-                  className="w-full py-2.5 bg-white text-[#E02020] font-medium rounded-md shadow-sm hover:shadow-md transition-shadow text-sm"
+                  className="w-full py-2.5 bg-white text-[#E02020] font-medium rounded-lg shadow-sm hover:shadow-md transition-shadow text-sm"
                 >
                   立即下载领取
                 </button>
