@@ -205,21 +205,21 @@ export function EcommerceTemplate({
             </div>
 
             {/* 右侧文字内容 */}
-            <div className="flex-1 min-w-0 flex flex-col justify-between h-[87px]">
+            <div className="flex-1 min-w-0 flex flex-col justify-between h-[87px] overflow-hidden">
               {/* 标题 */}
-              <h3 className="text-sm font-semibold text-gray-900 leading-tight line-clamp-2">
+              <h3 className="text-base font-semibold text-gray-900 leading-tight line-clamp-1 truncate">
                 {resolveTitle()}
               </h3>
 
               {/* 文案内容 */}
-              <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+              <p className="text-sm text-gray-500 leading-snug line-clamp-2 flex-1 overflow-hidden">
                 {resolveContent()}
               </p>
 
               {/* 按钮 */}
               <button
                 onClick={handleButtonClick}
-                className="self-start px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors"
+                className="self-start px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
               >
                 {resolveButtonText()}
               </button>
