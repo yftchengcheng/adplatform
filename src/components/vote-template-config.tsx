@@ -397,6 +397,25 @@ export function VoteTemplateConfigPanel({
 
           {isBasicOpen && (
             <div className="px-4 pb-4 space-y-4">
+              {/* 动作 */}
+              <div className="space-y-2">
+                <label className="text-xs text-gray-500">
+                  动作
+                </label>
+                <Select
+                  value={config.clickAction || "open"}
+                  onValueChange={(v) => handleConfigChange({ clickAction: v as "open" | "close" })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="open">打开</SelectItem>
+                    <SelectItem value="close">关闭</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Title */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -457,25 +476,6 @@ export function VoteTemplateConfigPanel({
                     className="text-sm"
                   />
                 )}
-              </div>
-
-              {/* 动作 */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  动作
-                </label>
-                <Select
-                  value={config.clickAction || "open"}
-                  onValueChange={(v) => handleConfigChange({ clickAction: v as "open" | "close" })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="open">打开</SelectItem>
-                    <SelectItem value="close">关闭</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           )}
