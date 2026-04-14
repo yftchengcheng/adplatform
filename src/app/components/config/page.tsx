@@ -133,10 +133,16 @@ function ConfigContent() {
 
   const handleSave = async () => {
     try {
-      // 获取组件名称
-      const name = 'title' in config 
-        ? (config.title || "未命名组件")
-        : "未命名组件";
+      // 获取组件名称（根据不同类型获取）
+      let name = "未命名组件";
+      
+      if ("title" in config && config.title) {
+        // 广告磁贴和投票磁贴使用 title
+        name = config.title;
+      } else if ("images" in config && Array.isArray(config.images) && config.images.length > 0) {
+        // 图片磁贴使用第一张图片作为名称标识
+        name = `图片磁贴-${config.images.length}张`;
+      }
 
       // 保存到全局状态（异步写入数据库）
       await addComponent({

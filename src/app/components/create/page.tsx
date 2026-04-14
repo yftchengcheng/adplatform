@@ -73,6 +73,8 @@ export default function ComponentCreatePage() {
       router.push("/components/config?type=dual_button");
     } else if (template.id === "vote") {
       router.push("/components/config?type=vote");
+    } else if (template.id === "image") {
+      router.push("/components/config?type=image");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);
