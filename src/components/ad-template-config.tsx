@@ -23,7 +23,7 @@ import {
   AdButtonConfig,
   AdTemplate,
 } from "@/components/ad-template";
-import { cn } from "@/lib/utils";
+import { cn, getStringWidth } from "@/lib/utils";
 
 // Tab switch component
 function ModeToggle({
@@ -63,13 +63,14 @@ function ModeToggle({
 
 // Character counter
 function CharCounter({
-  current,
+  value,
   max,
 }: {
-  current: number;
+  value: string;
   max: number;
 }) {
-  const isOverLimit = current > max;
+  const width = getStringWidth(value);
+  const isOverLimit = width > max;
   return (
     <span
       className={cn(
@@ -77,7 +78,7 @@ function CharCounter({
         isOverLimit ? "text-red-500" : "text-gray-400"
       )}
     >
-      {current}/{max}
+      {width}/{max}字符
     </span>
   );
 }
@@ -322,7 +323,7 @@ function ButtonConfigSection({
               <label className="text-xs text-gray-500">
                 按钮{index}文案 <span className="text-red-500">*</span>
               </label>
-              <CharCounter current={config.text.length} max={24} />
+              <CharCounter value={config.text} max={24} />
             </div>
             <div className="flex gap-2">
               <Input
@@ -622,7 +623,7 @@ export function AdTemplateConfigPanel({
                   <label className="text-xs text-gray-500">
                     主标题 <span className="text-red-500">*</span>
                   </label>
-                  <CharCounter current={config.title.length} max={24} />
+                  <CharCounter value={config.title} max={24} />
                 </div>
                 <div className="flex gap-2">
                   <Input
@@ -648,7 +649,7 @@ export function AdTemplateConfigPanel({
                   <label className="text-xs text-gray-500">
                     副标题 <span className="text-red-500">*</span>
                   </label>
-                  <CharCounter current={config.subtitle.length} max={60} />
+                  <CharCounter value={config.subtitle} max={60} />
                 </div>
                 <div className="flex gap-2">
                   <Input

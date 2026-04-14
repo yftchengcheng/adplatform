@@ -139,7 +139,38 @@
 
 ## 二、表单输入规范
 
-### 1. 文本输入框 (Input)
+### 1. 字符计数规则（重要）
+
+**字符计算规则**：
+- **中文**：每个汉字占 2 个字符
+- **英文/数字/符号**：每个占 1 个字符
+
+**实现函数**：
+```typescript
+// 计算字符串的显示宽度
+export function getStringWidth(str: string): number {
+  let width = 0;
+  for (const char of str) {
+    // 判断是否是中文字符
+    if (/[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(char)) {
+      width += 2;
+    } else {
+      width += 1;
+    }
+  }
+  return width;
+}
+```
+
+**超出限制提示**：
+```tsx
+<p className="text-xs text-gray-400 text-right">
+  {getStringWidth(value)}/{max}字符
+  {isOverWidth(value, max) && <span className="text-red-500 ml-1">（超出限制）</span>}
+</p>
+```
+
+### 2. 文本输入框 (Input)
 
 | 场景 | 最大长度 | 提示文字 |
 |------|---------|---------|

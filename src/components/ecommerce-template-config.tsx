@@ -18,7 +18,7 @@ import {
 import {
   EcommerceTemplateConfig,
 } from "./ecommerce-template";
-import { cn } from "@/lib/utils";
+import { cn, getStringWidth, isOverWidth } from "@/lib/utils";
 
 // 按钮文案选项
 const BUTTON_TEXT_OPTIONS = [
@@ -337,7 +337,8 @@ export function EcommerceTemplateConfigPanel({
                   maxLength={20}
                 />
                 <p className="text-xs text-gray-400 text-right">
-                  {getTitleValue().length}/20字符
+                  {getStringWidth(getTitleValue())}/20字符
+                  {isOverWidth(getTitleValue(), 20) && <span className="text-red-500 ml-1">（超出限制）</span>}
                 </p>
               </div>
 
@@ -357,7 +358,8 @@ export function EcommerceTemplateConfigPanel({
                   maxLength={30}
                 />
                 <p className="text-xs text-gray-400 text-right">
-                  {getContentValue().length}/30字符
+                  {getStringWidth(getContentValue())}/30字符
+                  {isOverWidth(getContentValue(), 30) && <span className="text-red-500 ml-1">（超出限制）</span>}
                 </p>
               </div>
 

@@ -21,7 +21,7 @@ import {
   VoteOption,
   VoteTemplate,
 } from "./vote-template";
-import { cn } from "@/lib/utils";
+import { cn, getStringWidth, isOverWidth } from "@/lib/utils";
 
 // Image Upload Component with validation
 function ImageUpload({
@@ -270,7 +270,7 @@ function VoteOptionEditor({
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <label className="text-xs text-gray-500">按钮文本</label>
-          <CharCounter current={option.buttonText.length} max={16} />
+          <CharCounter value={option.buttonText} max={16} />
         </div>
         <Input
           value={option.buttonText}
@@ -411,6 +411,10 @@ export function VoteTemplateConfigPanel({
                   />
                   <ModeToggle value={titleMode} onChange={setTitleMode} />
                 </div>
+                <p className="text-xs text-gray-400 text-right">
+                  {getStringWidth(config.title || "")}/24字符
+                  {isOverWidth(config.title || "", 24) && <span className="text-red-500 ml-1">（超出限制）</span>}
+                </p>
                 {titleMode === "macro" && (
                   <Input
                     placeholder="宏替换变量，如 ${title}"
@@ -425,7 +429,9 @@ export function VoteTemplateConfigPanel({
                   <label className="text-xs text-gray-500">
                     副标题
                   </label>
-                  <CharCounter current={config.subtitle?.length || 0} max={60} />
+                  <span className="text-xs text-gray-400">
+                    {getStringWidth(config.subtitle || "")}/60字符
+                  </span>
                 </div>
                 <div className="flex gap-2">
                   <Input
@@ -437,6 +443,10 @@ export function VoteTemplateConfigPanel({
                   />
                   <ModeToggle value={subtitleMode} onChange={setSubtitleMode} />
                 </div>
+                <p className="text-xs text-gray-400 text-right">
+                  {getStringWidth(config.subtitle || "")}/60字符
+                  {isOverWidth(config.subtitle || "", 60) && <span className="text-red-500 ml-1">（超出限制）</span>}
+                </p>
                 {subtitleMode === "macro" && (
                   <Input
                     placeholder="宏替换变量，如 ${subtitle}"
