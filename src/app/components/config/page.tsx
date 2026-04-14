@@ -205,6 +205,7 @@ function ConfigContent() {
               <VoteTemplateConfigPanel
                 config={config as VoteTemplateConfig}
                 onChange={handleConfigChange}
+                onSave={handleSave}
               />
             ) : (
               <AdTemplateConfigPanel
