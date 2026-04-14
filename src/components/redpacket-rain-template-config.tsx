@@ -219,8 +219,9 @@ export function RedpacketRainTemplateConfigPanel({
   };
 
   // 处理落地页输入
-  const handleLandingInput = (value: string) => {
-    if (landingMode) {
+  const handleLandingInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (landingMode === "macro") {
       updateConfig({ landingPageMacro: value, landingPageUrl: "" });
     } else {
       updateConfig({ landingPageUrl: value, landingPageMacro: "" });
