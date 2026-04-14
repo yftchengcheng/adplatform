@@ -105,169 +105,7 @@ function SectionHeader({
   );
 }
 
-// Image Upload Component
-function ImageUpload({
-  value,
-  onChange,
-  macroValue,
-  macroOnChange,
-  mode,
-  onModeChange,
-  recommendedSize,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  macroValue: string;
-  macroOnChange: (v: string) => void;
-  mode: "upload" | "macro";
-  onModeChange: (v: "upload" | "macro") => void;
-  recommendedSize?: string;
-}) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
-  const [error, setError] = useState<string | null>(null);
-
-  // 同步外部 value 变化
-  useEffect(() => {
-    if (mode === "upload") {
-      setPreviewUrl(value || null);
-    }
-  }, [value, mode]);
-
-  // 切换到宏模式时清空预览
-  useEffect(() => {
-    if (mode === "macro") {
-      setPreviewUrl(null);
-      setError(null);
-    }
-  }, [mode]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // 校验文件类型
-    if (!file.type.startsWith("image/")) {
-      setError("请上传图片文件（支持 JPG、PNG、GIF、WebP 等格式）");
-      return;
-    }
-
-    // 校验文件大小（1MB）
-    if (file.size > 1 * 1024 * 1024) {
-      setError("图片大小不能超过 1MB，当前文件 " + (file.size / 1024 / 1024).toFixed(2) + "MB");
-      return;
-    }
-
-    setError(null);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const url = ev.target?.result as string;
-      setPreviewUrl(url);
-      onChange(url);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700">图片设置</label>
-        <div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
-          <button
-            onClick={() => {
-              setError(null);
-              onModeChange("upload");
-            }}
-            className={cn(
-              "px-2 py-0.5 text-xs font-medium rounded transition-all",
-              mode === "upload" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
-            )}
-          >
-            上传图片
-          </button>
-          <button
-            onClick={() => {
-              setError(null);
-              onModeChange("macro");
-            }}
-            className={cn(
-              "px-2 py-0.5 text-xs font-medium rounded transition-all",
-              mode === "macro" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
-            )}
-          >
-            图片宏
-          </button>
-        </div>
-      </div>
-
-      {mode === "macro" ? (
-        <Input
-          placeholder="如 ${app_image}"
-          value={macroValue || ""}
-          onChange={(e) => macroOnChange(e.target.value)}
-        />
-      ) : (
-        <>
-          <div
-            className={cn(
-              "border-2 border-dashed rounded-lg overflow-hidden",
-              error ? "border-red-300" : "border-gray-200"
-            )}
-          >
-            {previewUrl ? (
-              <div className="relative group">
-                <img
-                  src={previewUrl}
-                  alt="图片预览"
-                  className="w-full h-auto object-contain max-h-32 mx-auto"
-                />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2">
-                  <label className="px-2 py-1 bg-white rounded text-xs cursor-pointer">
-                    重新上传
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                  </label>
-                  <button
-                    onClick={() => {
-                      setPreviewUrl(null);
-                      onChange("");
-                    }}
-                    className="px-2 py-1 bg-white rounded text-xs text-red-500"
-                  >
-                    删除
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <label htmlFor="image-upload" className="flex flex-col items-center justify-center py-6 cursor-pointer hover:bg-gray-50">
-                <Plus className="w-6 h-6 text-gray-400" />
-                <span className="text-sm text-gray-500">点击上传图片</span>
-                {recommendedSize && (
-                  <span className="text-xs text-gray-400">{recommendedSize}，最大 1MB</span>
-                )}
-              </label>
-            )}
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-            id="image-upload"
-          />
-          {error && (
-            <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">
-              {error}
-            </p>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
+// Image Upload Component - Integrated into Basic Config
 
 interface GameGiftTemplateConfigPanelProps {
   initialConfig?: Partial<GameGiftTemplateConfig>;
@@ -314,7 +152,6 @@ export function GameGiftTemplateConfigPanel({
   }));
 
   // 折叠状态
-  const [imageOpen, setImageOpen] = useState(true);
   const [basicOpen, setBasicOpen] = useState(true);
   const [downloadOpen, setDownloadOpen] = useState(true);
 
@@ -414,62 +251,6 @@ export function GameGiftTemplateConfigPanel({
 
   return (
     <div className="space-y-4">
-      {/* App Images Section */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <SectionHeader
-            title="应用图片（最多2张）"
-            isOpen={imageOpen}
-            onToggle={() => setImageOpen(!imageOpen)}
-            required
-          />
-        </div>
-        {imageOpen && (
-          <div className="p-4 space-y-4">
-            {config.images.map((img, index) => (
-              <div key={img.id} className="border border-gray-200 rounded-lg bg-white p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-700">图片 {index + 1}</span>
-                  </div>
-                  {config.images.length > 1 && (
-                    <button
-                      onClick={() => deleteImage(img.id)}
-                      className="text-red-500 hover:bg-red-50 p-1 rounded"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                <ImageUpload
-                  value={img.imageUrl || ""}
-                  onChange={(v) => updateImage(index, { imageUrl: v, imageMacro: "" })}
-                  macroValue={img.imageMacro || ""}
-                  macroOnChange={(v) => updateImage(index, { imageMacro: v, imageUrl: "" })}
-                  mode={imageMode}
-                  onModeChange={setImageMode}
-                  recommendedSize="推荐 1280×720px"
-                />
-              </div>
-            ))}
-            
-            {config.images.length < 2 && (
-              <button
-                onClick={addImage}
-                className="w-full py-2 border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                添加图片
-              </button>
-            )}
-            <p className="text-xs text-gray-400">
-              支持 JPG、PNG、JPEG 格式，大小不超过 1MB
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* Basic Config Section */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
@@ -482,7 +263,133 @@ export function GameGiftTemplateConfigPanel({
         </div>
         {basicOpen && (
           <div className="p-4 space-y-4">
-            {/* 应用Logo */}
+            {/* 应用图片 */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  应用图片（最多2张）
+                </label>
+                <div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
+                  <button
+                    onClick={() => setImageMode("upload")}
+                    className={cn(
+                      "px-2 py-0.5 text-xs font-medium rounded transition-all",
+                      imageMode === "upload" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
+                    )}
+                  >
+                    上传图片
+                  </button>
+                  <button
+                    onClick={() => setImageMode("macro")}
+                    className={cn(
+                      "px-2 py-0.5 text-xs font-medium rounded transition-all",
+                      imageMode === "macro" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
+                    )}
+                  >
+                    图片宏
+                  </button>
+                </div>
+              </div>
+
+              {imageMode === "macro" ? (
+                <div className="space-y-2">
+                  {config.images.map((img, index) => (
+                    <div key={img.id} className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 w-12">图片{index + 1}</span>
+                      <Input
+                        placeholder="如 ${app_image}"
+                        value={img.imageMacro || ""}
+                        onChange={(e) => updateImage(index, { imageMacro: e.target.value, imageUrl: "" })}
+                        className="flex-1"
+                      />
+                      {config.images.length > 1 && (
+                        <button
+                          onClick={() => deleteImage(img.id)}
+                          className="text-red-500 hover:bg-red-50 p-1 rounded"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {config.images.length < 2 && (
+                    <button
+                      onClick={addImage}
+                      className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      添加图片
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {config.images.map((img, index) => (
+                    <div key={img.id} className="flex items-center gap-3">
+                      <div className="w-16 h-16 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        {img.imageUrl ? (
+                          <img
+                            src={img.imageUrl}
+                            alt={`图片${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <ImageIcon className="w-6 h-6 text-gray-300" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <label className="flex items-center justify-center px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500">
+                          <Plus className="w-4 h-4 mr-1" />
+                          选择文件
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              if (file.size > 1 * 1024 * 1024) {
+                                alert("图片大小不能超过 1MB");
+                                return;
+                              }
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                updateImage(index, { imageUrl: ev.target?.result as string, imageMacro: "" });
+                              };
+                              reader.readAsDataURL(file);
+                            }}
+                          />
+                        </label>
+                      </div>
+                      {config.images.length > 1 && (
+                        <button
+                          onClick={() => deleteImage(img.id)}
+                          className="text-red-500 hover:bg-red-50 p-1 rounded"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {config.images.length < 2 && (
+                    <button
+                      onClick={addImage}
+                      className="w-full py-2 border border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      添加图片
+                    </button>
+                  )}
+                  <p className="text-xs text-gray-400">推荐 1280×720px，最大 1MB</p>
+                </div>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-100" />
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">应用Logo</label>
               <div className="flex items-center gap-4">
