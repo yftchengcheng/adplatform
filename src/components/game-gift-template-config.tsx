@@ -113,6 +113,7 @@ function ImageUpload({
   macroOnChange,
   mode,
   onModeChange,
+  recommendedSize,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -120,7 +121,6 @@ function ImageUpload({
   macroOnChange: (v: string) => void;
   mode: "upload" | "macro";
   onModeChange: (v: "upload" | "macro") => void;
-  aspectRatio?: string;
   recommendedSize?: string;
 }) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
