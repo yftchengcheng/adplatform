@@ -86,8 +86,8 @@ export function RedpacketRainTemplate({
 
   // 红包雨配置
   const TOTAL_REDPACKETS = 15;
-  const FALL_DURATION = 3000; // 3秒落地
-  const SPAWN_INTERVAL = 200; // 每200ms生成一个
+  const FALL_DURATION = 6000; // 6秒落地，更慢
+  const SPAWN_INTERVAL = 300; // 每300ms生成一个
 
   // 生成随机红包
   const generateRedpacket = useCallback((id: number): FallingRedpacket => {
@@ -99,11 +99,11 @@ export function RedpacketRainTemplate({
     return {
       id,
       x: lane + xOffset,
-      delay: Math.random() * 2000, // 随机延迟 0-2s
-      duration: FALL_DURATION + (Math.random() - 1000), // 3s ± 1s
+      delay: Math.random() * 3000, // 随机延迟 0-3s
+      duration: FALL_DURATION + (Math.random() - 1500), // 6s ± 1.5s
       rotation: (Math.random() - 0.5) * 30, // 随机旋转 ±15度
     };
-  }, []);
+  }, [FALL_DURATION]);
 
   // 宏替换函数
   const resolveMacro = useCallback((macro: string): string => {
