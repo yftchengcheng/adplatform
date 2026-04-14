@@ -279,31 +279,43 @@ function ButtonConfigSection({
   index,
 }: {
   title: string;
-  config: AdButtonConfig;
+  config: AdButtonConfig | undefined;
   onChange: (config: AdButtonConfig) => void;
   defaultLandingPageUrl?: string;
   index: 1 | 2;
 }) {
+  // Use default values if config is undefined
+  const safeConfig = config || {
+    text: "",
+    action: "jump" as const,
+    landingPageUrl: "",
+    landingPageMacro: "",
+    imageUrl: "",
+    imageMacro: "",
+    resultText: "",
+    buttonClickText: "",
+  };
+  
   const [isOpen, setIsOpen] = useState(true);
   const [textMode, setTextMode] = useState<"input" | "macro">("input");
   const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">(
-    config.landingPageMacro ? "macro" : "input"
+    safeConfig.landingPageMacro ? "macro" : "input"
   );
 
   const handleTextChange = (text: string) => {
-    onChange({ ...config, text });
+    onChange({ ...safeConfig, text });
   };
 
   const handleActionChange = (action: "jump" | "show_image") => {
-    onChange({ ...config, action });
+    onChange({ ...safeConfig, action });
   };
 
   const handleImageChange = (imageUrl: string) => {
-    onChange({ ...config, imageUrl });
+    onChange({ ...safeConfig, imageUrl });
   };
 
   const handleImageMacroChange = (imageMacro: string) => {
-    onChange({ ...config, imageMacro });
+    onChange({ ...safeConfig, imageMacro });
   };
 
   return (
@@ -323,11 +335,11 @@ function ButtonConfigSection({
               <label className="text-xs text-gray-500">
                 按钮{index}文案 <span className="text-red-500">*</span>
               </label>
-              <CharCounter value={config.text} max={24} />
+              <CharCounter value={safeConfig.text} max={24} />
             </div>
             <div className="flex gap-2">
               <Input
-                value={config.text}
+                value={safeConfig.text}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder="请输入按钮文案"
                 maxLength={24}
@@ -349,7 +361,7 @@ function ButtonConfigSection({
               点击按钮{index}后显示
             </label>
             <Select
-              value={config.action}
+              value={safeConfig.action}
               onValueChange={(v) => handleActionChange(v as "jump" | "show_image")}
             >
               <SelectTrigger>
@@ -373,7 +385,7 @@ function ButtonConfigSection({
           </div>
 
           {/* Action Config */}
-          {config.action === "jump" && (
+          {safeConfig.action === "jump" && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs text-gray-500">落地页链接</label>
@@ -384,8 +396,8 @@ function ButtonConfigSection({
               </div>
               {landingPageMode === "input" ? (
                 <Input
-                  value={config.landingPageUrl || ""}
-                  onChange={(e) => onChange({ ...config, landingPageUrl: e.target.value, landingPageMacro: undefined })}
+                  value={safeConfig.landingPageUrl || ""}
+                  onChange={(e) => onChange({ ...safeConfig, landingPageUrl: e.target.value, landingPageMacro: undefined })}
                   placeholder={
                     defaultLandingPageUrl
                       ? `不配置默认使用: ${defaultLandingPageUrl}`
@@ -394,12 +406,12 @@ function ButtonConfigSection({
                 />
               ) : (
                 <Input
-                  value={config.landingPageMacro || ""}
-                  onChange={(e) => onChange({ ...config, landingPageMacro: e.target.value, landingPageUrl: undefined })}
+                  value={safeConfig.landingPageMacro || ""}
+                  onChange={(e) => onChange({ ...safeConfig, landingPageMacro: e.target.value, landingPageUrl: undefined })}
                   placeholder="请输入落地页宏变量，如 ${landing_page_url}"
                 />
               )}
-              {!config.landingPageUrl && !config.landingPageMacro && defaultLandingPageUrl && (
+              {!safeConfig.landingPageUrl && !safeConfig.landingPageMacro && defaultLandingPageUrl && (
                 <p className="text-xs text-gray-400">
                   当前将使用广告素材链接: {defaultLandingPageUrl}
                 </p>
@@ -407,14 +419,14 @@ function ButtonConfigSection({
             </div>
           )}
 
-          {config.action === "show_image" && (
+          {safeConfig.action === "show_image" && (
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs text-gray-500">结果文案</label>
                 <Input
-                  value={config.resultText || ""}
+                  value={safeConfig.resultText || ""}
                   onChange={(e) =>
-                    onChange({ ...config, resultText: e.target.value })
+                    onChange({ ...safeConfig, resultText: e.target.value })
                   }
                   placeholder="请输入结果文案"
                 />
@@ -425,13 +437,13 @@ function ButtonConfigSection({
                   图片模式
                 </label>
                 <Select
-                  value={config.imageMacro ? "macro" : "custom"}
+                  value={safeConfig.imageMacro ? "macro" : "custom"}
                   onValueChange={(v) => {
                     if (v === "custom") {
-                      onChange({ ...config, imageMacro: undefined, imageUrl: "" });
+                      onChange({ ...safeConfig, imageMacro: undefined, imageUrl: "" });
                     } else if (v === "macro") {
                       onChange({ 
-                        ...config, 
+                        ...safeConfig, 
                         imageMacro: "${image_url}",
                         imageUrl: "" 
                       });
@@ -449,25 +461,25 @@ function ButtonConfigSection({
               </div>
 
               <div className="space-y-2">
-                {config.imageMacro ? (
+                {safeConfig.imageMacro ? (
                   <div className="space-y-2">
                     <label className="text-xs text-gray-500">图片宏变量</label>
                     <Input
-                      value={config.imageMacro}
+                      value={safeConfig.imageMacro}
                       onChange={(e) => handleImageMacroChange(e.target.value)}
                       placeholder="请输入图片宏变量，如 ${image_url}"
                     />
                   </div>
                 ) : (
                   <ImageUpload
-                    value={config.imageUrl || ""}
+                    value={safeConfig.imageUrl || ""}
                     onChange={handleImageChange}
                     label="上传图片 (472x164, <1MB)"
                   />
                 )}
               </div>
 
-              {(config.imageUrl || config.imageMacro) && (
+              {(safeConfig.imageUrl || safeConfig.imageMacro) && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs text-gray-500">落地页链接</label>
@@ -478,14 +490,14 @@ function ButtonConfigSection({
                   </div>
                   {landingPageMode === "input" ? (
                     <Input
-                      value={config.landingPageUrl || ""}
-                      onChange={(e) => onChange({ ...config, landingPageUrl: e.target.value, landingPageMacro: undefined })}
+                      value={safeConfig.landingPageUrl || ""}
+                      onChange={(e) => onChange({ ...safeConfig, landingPageUrl: e.target.value, landingPageMacro: undefined })}
                       placeholder="点击图片后跳转的链接"
                     />
                   ) : (
                     <Input
-                      value={config.landingPageMacro || ""}
-                      onChange={(e) => onChange({ ...config, landingPageMacro: e.target.value, landingPageUrl: undefined })}
+                      value={safeConfig.landingPageMacro || ""}
+                      onChange={(e) => onChange({ ...safeConfig, landingPageMacro: e.target.value, landingPageUrl: undefined })}
                       placeholder="请输入落地页宏变量，如 ${landing_page_url}"
                     />
                   )}
