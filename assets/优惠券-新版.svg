@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="240px" height="120px" viewBox="0 0 240 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>优惠券-新版</title>
+    <g id="模版组件管理" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组">
+            <rect id="矩形" fill="#FFFFFF" x="0" y="0" width="240" height="120" rx="3"></rect>
+            <text id="满减大酬宾" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" letter-spacing="0.218181818" fill="#000000" fill-opacity="0.65">
+                <tspan x="17.4545455" y="20">满减大酬宾</tspan>
+            </text>
+            <rect id="矩形" fill="#F87D79" x="16" y="30" width="65" height="65" rx="5"></rect>
+            <rect id="矩形" fill="#F87D79" x="81" y="30" width="130" height="65" rx="5"></rect>
+            <text id="30元" font-family="PingFangSC-Semibold, PingFang SC" font-size="26" font-weight="500" letter-spacing="0.185714286" fill="#FFFFFF">
+                <tspan x="21" y="71">30元</tspan>
+            </text>
+            <text id="满100立减！" font-family="PingFangSC-Semibold, PingFang SC" font-size="14" font-weight="500" letter-spacing="0.1" fill="#FFFFFF">
+                <tspan x="108" y="75">满100立减！</tspan>
+            </text>
+            <text id="有效期:2026年2月1日止" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal" letter-spacing="0.0714285714" fill="#FFFFFF">
+                <tspan x="92" y="91">有效期:2026年2月1日止</tspan>
+            </text>
+            <text id="立即领取" font-family="PingFangSC-Semibold, PingFang SC" font-size="14" font-weight="500" letter-spacing="0.1" fill="#FFFFFF">
+                <tspan x="112" y="55">立即领取</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

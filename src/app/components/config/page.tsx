@@ -12,6 +12,8 @@ import { ImageTemplateConfig, ImageTemplate } from "@/components/image-template"
 import { ImageTemplateConfigPanel } from "@/components/image-template-config";
 import { EcommerceTemplateConfig, EcommerceTemplate } from "@/components/ecommerce-template";
 import { EcommerceTemplateConfigPanel } from "@/components/ecommerce-template-config";
+import { CouponTemplateConfig, CouponTemplate } from "@/components/coupon-template";
+import { CouponTemplateConfigPanel } from "@/components/coupon-template-config";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
@@ -81,9 +83,27 @@ const defaultEcommerceConfig: EcommerceTemplateConfig = {
   },
 };
 
+// 默认优惠券组件配置
+const defaultCouponConfig: CouponTemplateConfig = {
+  title: "满减大酬宾",
+  discountInfo: "30元",
+  discountCondition: "满100立减！",
+  buttonText: "立即领取",
+  validFrom: "2026-01-01",
+  validTo: "2026-12-31",
+  landingPageUrl: "",
+  macroVariables: {
+    title: "活动名称",
+    discount_info: "30元",
+    discount_condition: "满100立减",
+    button_text: "立即领取",
+    landing_url: "https://example.com/coupon",
+  },
+};
+
 // 组件类型对应的默认配置和名称
 const componentConfigMap: Record<string, {
-  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig;
+  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig;
   name: string;
   description: string;
 }> = {
@@ -106,6 +126,11 @@ const componentConfigMap: Record<string, {
     defaultConfig: defaultEcommerceConfig,
     name: "电商磁贴",
     description: "配置商品图片和购买按钮",
+  },
+  coupon: {
+    defaultConfig: defaultCouponConfig,
+    name: "优惠券磁贴",
+    description: "配置优惠券信息和领取按钮",
   },
 };
 
@@ -204,6 +229,7 @@ function ConfigContent() {
   const isVoteComponent = type === "vote";
   const isImageComponent = type === "image";
   const isEcommerceComponent = type === "ecommerce";
+  const isCouponComponent = type === "coupon";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -263,7 +289,13 @@ function ConfigContent() {
         <div className="flex gap-8">
           {/* Config Panel - 占据主要宽度 */}
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px]">
-            {isEcommerceComponent ? (
+            {isCouponComponent ? (
+              <CouponTemplateConfigPanel
+                initialConfig={config as CouponTemplateConfig}
+                onSave={handleSave}
+                macroVariables={(config as CouponTemplateConfig).macroVariables}
+              />
+            ) : isEcommerceComponent ? (
               <EcommerceTemplateConfigPanel
                 config={config as EcommerceTemplateConfig}
                 onChange={handleConfigChange}
@@ -343,7 +375,13 @@ function ConfigContent() {
 
                       {/* App content */}
                       <div className="h-[calc(100%-28px)] overflow-auto flex items-center justify-center">
-                        {isEcommerceComponent ? (
+                        {isCouponComponent ? (
+                          <CouponTemplate
+                            config={config as CouponTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        ) : isEcommerceComponent ? (
                           <EcommerceTemplate
                             config={config as EcommerceTemplateConfig}
                             isOpen={true}
@@ -383,10 +421,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
+                    {isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
+                    {isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 

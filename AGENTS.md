@@ -609,3 +609,92 @@ const BUTTON_TEXT_OPTIONS = [
 ];
 ```
 
+---
+
+## 十三、优惠券磁贴特殊规范
+
+### 1. 组件结构
+- **上下结构**：顶部活动名称 + 主体红色区域
+- **主体布局**：左侧优惠信息 + 右侧按钮文案、优惠条件、有效期
+
+### 2. 配置数据结构
+```typescript
+interface CouponTemplateConfig {
+  title: string;              // 活动名称（最多14字符）
+  discountInfo: string;       // 优惠信息（建议不超过6字符）
+  discountCondition: string;   // 优惠条件（最多16字符）
+  buttonText: string;         // 按钮文案
+  buttonTextMacro?: string;    // 按钮文案宏变量
+  validFrom?: string;         // 有效期开始
+  validTo?: string;           // 有效期结束
+  landingPageUrl?: string;    // 落地页URL
+  landingPageMacro?: string;  // 落地页宏变量
+  defaultLandingPageUrl?: string;
+  macroVariables?: Record<string, string>;
+}
+```
+
+### 3. 字段规范
+| 字段 | 最大字符 | 说明 |
+|------|---------|------|
+| 活动名称 | 14字符 | 7个汉字（不含标点） |
+| 优惠信息 | 6字符 | 3个汉字，建议格式：30元、8折 |
+| 优惠条件 | 16字符 | 8个汉字，如：满100立减！ |
+| 有效期 | 日期格式 | 开始日期和结束日期 |
+| 按钮文案 | 固定选项 | 见下方按钮文案选项 |
+
+### 4. 按钮文案选项
+```typescript
+const BUTTON_TEXT_OPTIONS = [
+  { value: "立即领取", label: "立即领取" },
+  { value: "立即使用", label: "立即使用" },
+  { value: "马上抢", label: "马上抢" },
+  { value: "去领取", label: "去领取" },
+  { value: "点击领取", label: "点击领取" },
+];
+```
+
+### 5. 渲染样式
+```tsx
+<div className="w-full max-w-[300px] bg-white rounded-lg overflow-hidden">
+  {/* 活动名称 */}
+  <div className="px-4 pt-3 pb-1">
+    <p className="text-xs text-gray-500">
+      {title}
+    </p>
+  </div>
+
+  {/* 主体红色区域 */}
+  <div className="flex mx-3 mb-3 rounded-lg overflow-hidden">
+    {/* 左侧：优惠信息 */}
+    <div className="w-[80px] bg-gradient-to-br from-[#F87D79] to-[#E85D5A] flex flex-col items-center justify-center py-4 px-2">
+      <span className="text-white text-2xl font-semibold">
+        {discountInfo}
+      </span>
+    </div>
+
+    {/* 右侧：信息 */}
+    <div className="flex-1 bg-gradient-to-br from-[#F87D79] to-[#E85D5A] px-3 py-3 flex flex-col justify-between">
+      {/* 按钮文案 */}
+      <span className="text-white text-sm font-semibold">
+        {buttonText}
+      </span>
+      {/* 优惠条件 */}
+      <span className="text-white/90 text-sm">
+        {discountCondition}
+      </span>
+      {/* 有效期 */}
+      <span className="text-white/80 text-xs">
+        有效期: {validFrom} 至 {validTo}
+      </span>
+    </div>
+  </div>
+</div>
+```
+
+### 6. 交互逻辑
+1. **点击优惠券**：跳转到落地页
+2. **默认动作**：打开落地页链接
+3. **宏变量替换**：支持标题、优惠信息、优惠条件、按钮文案、落地页的宏替换
+
+

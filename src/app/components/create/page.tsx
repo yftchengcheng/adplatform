@@ -77,6 +77,8 @@ export default function ComponentCreatePage() {
       router.push("/components/config?type=image");
     } else if (template.id === "ecommerce") {
       router.push("/components/config?type=ecommerce");
+    } else if (template.id === "coupon") {
+      router.push("/components/config?type=coupon");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);
