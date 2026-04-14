@@ -10,6 +10,8 @@ import { VoteTemplateConfig, VoteTemplate } from "@/components/vote-template";
 import { VoteTemplateConfigPanel } from "@/components/vote-template-config";
 import { ImageTemplateConfig, ImageTemplate } from "@/components/image-template";
 import { ImageTemplateConfigPanel } from "@/components/image-template-config";
+import { EcommerceTemplateConfig, EcommerceTemplate } from "@/components/ecommerce-template";
+import { EcommerceTemplateConfigPanel } from "@/components/ecommerce-template-config";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType } from "@/lib/component-types";
@@ -64,9 +66,24 @@ const defaultImageConfig: ImageTemplateConfig = {
   },
 };
 
+// 默认电商组件配置
+const defaultEcommerceConfig: EcommerceTemplateConfig = {
+  title: "精选好物限时特惠",
+  content: "品质保证，价格实惠，错过不再有",
+  buttonText: "立即购买",
+  defaultLandingPageUrl: "",
+  macroVariables: {
+    title: "商品标题",
+    content: "商品描述内容",
+    button_text: "立即购买",
+    image_url: "https://picsum.photos/174/174",
+    landing_url: "https://example.com/product",
+  },
+};
+
 // 组件类型对应的默认配置和名称
 const componentConfigMap: Record<string, {
-  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig;
+  defaultConfig: AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig;
   name: string;
   description: string;
 }> = {
@@ -84,6 +101,11 @@ const componentConfigMap: Record<string, {
     defaultConfig: defaultImageConfig,
     name: "图片磁贴",
     description: "配置图片内容和样式",
+  },
+  ecommerce: {
+    defaultConfig: defaultEcommerceConfig,
+    name: "电商磁贴",
+    description: "配置商品图片和购买按钮",
   },
 };
 
@@ -181,6 +203,7 @@ function ConfigContent() {
 
   const isVoteComponent = type === "vote";
   const isImageComponent = type === "image";
+  const isEcommerceComponent = type === "ecommerce";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -240,7 +263,13 @@ function ConfigContent() {
         <div className="flex gap-8">
           {/* Config Panel - 占据主要宽度 */}
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden min-h-[600px]">
-            {isVoteComponent ? (
+            {isEcommerceComponent ? (
+              <EcommerceTemplateConfigPanel
+                config={config as EcommerceTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+              />
+            ) : isVoteComponent ? (
               <VoteTemplateConfigPanel
                 config={config as VoteTemplateConfig}
                 onChange={handleConfigChange}
@@ -314,7 +343,13 @@ function ConfigContent() {
 
                       {/* App content */}
                       <div className="h-[calc(100%-28px)] overflow-auto flex items-center justify-center">
-                        {isImageComponent ? (
+                        {isEcommerceComponent ? (
+                          <EcommerceTemplate
+                            config={config as EcommerceTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                          />
+                        ) : isImageComponent ? (
                           <ImageTemplate
                             config={config as ImageTemplateConfig}
                             isOpen={true}
@@ -348,10 +383,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
+                    {isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
+                    {isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 

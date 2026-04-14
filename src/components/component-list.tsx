@@ -58,6 +58,7 @@ import { useComponents, AdComponentItem } from "@/contexts/component-context";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 import { VoteTemplate, VoteTemplateConfig } from "@/components/vote-template";
 import { ImageTemplate, ImageTemplateConfig } from "@/components/image-template";
+import { EcommerceTemplate, EcommerceTemplateConfig } from "@/components/ecommerce-template";
 
 import { useRouter } from "next/navigation";
 
@@ -665,7 +666,13 @@ export function ComponentList() {
                   <div className="h-[calc(100%-96px)] overflow-auto flex items-center justify-center">
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
-                      previewComponent?.type === "image" ? (
+                      previewComponent?.type === "ecommerce" ? (
+                        <EcommerceTemplate
+                          config={previewComponent.config as unknown as EcommerceTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                        />
+                      ) : previewComponent?.type === "image" ? (
                         <ImageTemplate
                           config={previewComponent.config as unknown as ImageTemplateConfig}
                           isOpen={true}

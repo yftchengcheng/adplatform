@@ -510,3 +510,71 @@ interface ImageTemplateConfig {
 4. 点击左右箭头或指示器手动切换图片
 5. 全局落地页优先级：图片单独配置 > 全局宏变量 > 全局默认链接
 
+---
+
+## 十二、电商磁贴特殊规范
+
+### 1. 组件结构
+- **左图右文布局**：左侧商品图片，右侧文字内容和按钮
+- **落地页配置**：支持手动输入、宏替换，默认使用广告（素材）链接
+
+### 2. 配置数据结构
+```typescript
+interface EcommerceTemplateConfig {
+  title: string;              // 标题（最多20字符）
+  titleMacro?: string;         // 标题宏变量
+  content: string;            // 文案内容（最多30字符）
+  contentMacro?: string;       // 内容宏变量
+  buttonText: string;         // 按钮文案
+  buttonTextMacro?: string;    // 按钮文案宏变量
+  imageUrl?: string;           // 图片URL
+  imageMacro?: string;        // 图片宏变量
+  landingPageUrl?: string;    // 落地页URL
+  landingPageMacro?: string;  // 落地页宏变量
+  defaultLandingPageUrl?: string;
+  macroVariables?: Record<string, string>;
+}
+```
+
+### 3. 字段规范
+| 字段 | 最大字符 | 说明 |
+|------|---------|------|
+| 标题 | 20字符 | 10个汉字（不含标点） |
+| 文案内容 | 30字符 | 15个汉字（不含标点） |
+| 按钮文案 | - | 固定选项：立即下单、立即购买、立即下载 |
+
+### 4. 图片要求
+| 项目 | 要求 |
+|------|------|
+| 尺寸 | 174×174px（精确匹配） |
+| 格式 | JPG、PNG、JPEG |
+| 大小 | 小于 1MB |
+
+### 5. 渲染样式
+```tsx
+<div className="flex items-center p-4 gap-4">
+  {/* 左侧图片 */}
+  <div className="flex-shrink-0 w-[87px] h-[87px] rounded-lg overflow-hidden">
+    <img src={imageUrl} alt="商品图片" className="w-full h-full object-cover" />
+  </div>
+
+  {/* 右侧内容 */}
+  <div className="flex-1 flex flex-col justify-between h-[87px]">
+    <h3 className="text-sm font-semibold line-clamp-2">{title}</h3>
+    <p className="text-xs text-gray-500 line-clamp-2">{content}</p>
+    <button className="self-start px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg">
+      {buttonText}
+    </button>
+  </div>
+</div>
+```
+
+### 6. 按钮文案选项
+```typescript
+const BUTTON_TEXT_OPTIONS = [
+  { value: "立即下单", label: "立即下单" },
+  { value: "立即购买", label: "立即购买" },
+  { value: "立即下载", label: "立即下载" },
+];
+```
+
