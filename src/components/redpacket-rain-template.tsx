@@ -436,16 +436,6 @@ export function RedpacketRainTemplate({
                 </div>
               );
             })}
-
-            {/* Hand Gesture Hint */}
-            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-              <div className="w-10 h-10">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 44C24 44 8 32 8 20C8 12 14 6 22 6C22 6 20 10 20 14C20 18 22 20 24 20C26 20 28 18 28 14C28 10 26 6 26 6C34 6 40 12 40 20C40 32 24 44 24 44Z" fill="white" fillOpacity="0.9"/>
-                  <path d="M20 14V6M24 14V4M28 14V6" stroke="white" strokeOpacity="0.6" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-            </div>
           </div>
         ) : (
           /* Reward Claimed Scene */
