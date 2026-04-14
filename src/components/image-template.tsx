@@ -56,7 +56,10 @@ export function ImageTemplate({
 
   // 自动轮播效果
   useEffect(() => {
-    if (images.length < 2 || isPaused || previewMode) return;
+    if (images.length < 2) return;
+
+    // 预览模式下始终启用轮播，非预览模式下根据 isPaused 状态控制
+    if (!previewMode && isPaused) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
