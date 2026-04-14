@@ -304,6 +304,48 @@ const getPercentage = (voteCount: number): number => {
 </div>
 ```
 
+### 4. 交互逻辑
+
+#### 动作类型处理
+| 动作类型 | 按钮文字 | 点击行为 |
+|----------|----------|----------|
+| `jump` | "查看详情" | 打开落地页链接 |
+| `show_image` | "查看图片" | 显示图片预览弹窗 |
+
+#### 预览模式交互
+- 进度条和百分比始终显示
+- 点击"查看详情"或"查看图片"按钮触发动作
+- 预览模式下也显示操作按钮
+
+#### 图片预览弹窗
+```tsx
+// 弹窗结构
+<>
+  <div className="fixed inset-0 z-[60] bg-black/70" onClick={closeImageModal} />
+  <div className="fixed left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 max-w-lg w-[90%]">
+    <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <button onClick={closeImageModal} className="...">关闭</button>
+      <Image src={currentImageUrl} alt="Preview" />
+    </div>
+  </div>
+</>
+```
+
+#### 宏变量替换
+```typescript
+// 落地页URL替换
+let url = landingPageUrl;
+if (landingPageMacro && macroVariables) {
+  url = resolveMacro(landingPageMacro, macroVariables);
+}
+
+// 图片URL替换
+let imgUrl = imageUrl || "";
+if (imageMacro && macroVariables) {
+  imgUrl = resolveMacro(imageMacro, macroVariables);
+}
+```
+
 ---
 
 ## 七、校验错误显示规范

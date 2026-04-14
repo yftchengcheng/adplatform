@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -157,6 +158,8 @@ export function VoteTemplate({
 }: VoteTemplateProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResultText, setShowResultText] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
 
   // 解析宏变量 - 使用 useMemo 避免每次渲染重新计算
   const resolvedTitle = getResolvedText(
@@ -174,6 +177,9 @@ export function VoteTemplate({
   const landingPageUrl = config?.landingPageUrl || config?.defaultLandingPageUrl || defaultConfig.defaultLandingPageUrl;
   const landingPageMacro = config?.landingPageMacro;
   const macroVariables = config?.macroVariables;
+  const action = config?.action || "jump";
+  const imageUrl = config?.imageUrl;
+  const imageMacro = config?.imageMacro;
 
   // 计算总投票数
   const totalVotes = options.reduce((sum, opt) => sum + opt.voteCount, 0);
@@ -195,14 +201,35 @@ export function VoteTemplate({
 
   // 处理按钮点击
   const handleButtonClick = (option: VoteOption) => {
+    // 解析落地页URL
     let url = landingPageUrl;
     if (landingPageMacro && macroVariables) {
       url = resolveMacro(landingPageMacro, macroVariables);
     }
-    if (url && !previewMode) {
-      window.open(url, "_blank");
+
+    // 解析图片URL
+    let imgUrl = imageUrl || "";
+    if (imageMacro && macroVariables) {
+      imgUrl = resolveMacro(imageMacro, macroVariables);
+    }
+
+    if (action === "show_image") {
+      // 显示图片模式
+      setCurrentImageUrl(imgUrl);
+      setShowImageModal(true);
+    } else {
+      // 跳转落地页模式
+      if (url) {
+        window.open(url, "_blank");
+      }
     }
     onButtonClick?.(option);
+  };
+
+  // 关闭图片预览
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setCurrentImageUrl("");
   };
 
   if (!isOpen) return null;
@@ -289,11 +316,14 @@ export function VoteTemplate({
               </div>
             )}
             
-            {/* Primary Button */}
-            {selectedOption && !previewMode && (
+            {/* Primary Button - 预览模式下也显示，或已选择了选项 */}
+            {(selectedOption || previewMode) && (
               <button
                 onClick={() => {
-                  const option = options.find(o => o.id === selectedOption);
+                  // 预览模式下使用第一个选项，或使用已选选项
+                  const option = previewMode 
+                    ? options[0] 
+                    : options.find(o => o.id === selectedOption);
                   if (option) handleButtonClick(option);
                 }}
                 className={cn(
@@ -304,12 +334,41 @@ export function VoteTemplate({
                   "shadow-lg shadow-blue-500/25"
                 )}
               >
-                查看详情
+                {action === "show_image" ? "查看图片" : "查看详情"}
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Image Preview Modal */}
+      {showImageModal && currentImageUrl && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-[60] bg-black/70"
+            onClick={closeImageModal}
+          />
+          {/* Modal */}
+          <div className="fixed left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 max-w-lg w-[90%]">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <button
+                onClick={closeImageModal}
+                className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+              <Image
+                src={currentImageUrl}
+                alt="Preview"
+                width={300}
+                height={150}
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
