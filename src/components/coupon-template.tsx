@@ -179,14 +179,14 @@ export function CouponTemplate({
           {/* Main Content - Red Background */}
           <div className="flex mx-3 mb-3 rounded-lg overflow-hidden">
             {/* Left Side - Discount Amount (1/3) */}
-            <div className="w-[100px] bg-gradient-to-br from-[#F87D79] to-[#E85D5A] flex flex-col items-center justify-center py-4 px-2">
+            <div className="w-[33.33%] bg-gradient-to-br from-[#F87D79] to-[#E85D5A] flex flex-col items-center justify-center py-4 px-2">
               <span className="text-white text-3xl font-semibold leading-none">
                 {resolveMacro(finalConfig.discountInfo) || "优惠"}
               </span>
             </div>
 
             {/* Right Side - Info (2/3) */}
-            <div className="flex-1 bg-gradient-to-br from-[#F87D79] to-[#E85D5A] px-4 py-3 flex flex-col justify-between">
+            <div className="w-[66.67%] bg-gradient-to-br from-[#F87D79] to-[#E85D5A] px-4 py-3 flex flex-col justify-between">
               {/* Top: Button Text */}
               <div>
                 <span className="text-white text-base font-semibold whitespace-nowrap">
