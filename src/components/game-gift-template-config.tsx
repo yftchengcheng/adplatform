@@ -263,6 +263,89 @@ export function GameGiftTemplateConfigPanel({
         </div>
         {basicOpen && (
           <div className="p-4 space-y-4">
+            {/* 应用Logo */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">应用Logo</label>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                  {config.logoUrl || config.logoMacro ? (
+                    <img
+                      src={logoMode ? config.logoMacro : config.logoUrl}
+                      alt="Logo预览"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-xs">Logo</span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <button
+                      onClick={() => {
+                        setLogoMode(false);
+                        handleLogoInput("", false);
+                      }}
+                      className={cn(
+                        "px-2 py-0.5 text-xs font-medium rounded transition-all",
+                        !logoMode ? "bg-white shadow-sm text-gray-900 border border-gray-200" : "text-gray-500"
+                      )}
+                    >
+                      上传
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLogoMode(true);
+                        handleLogoInput("", true);
+                      }}
+                      className={cn(
+                        "px-2 py-0.5 text-xs font-medium rounded transition-all",
+                        logoMode ? "bg-white shadow-sm text-gray-900 border border-gray-200" : "text-gray-500"
+                      )}
+                    >
+                      宏替换
+                    </button>
+                  </div>
+                  {logoMode ? (
+                    <Input
+                      placeholder="如 ${app_logo}"
+                      value={config.logoMacro || ""}
+                      onChange={(e) => handleLogoInput(e.target.value, true)}
+                    />
+                  ) : (
+                    <label className="flex items-center justify-center px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500">
+                      <Plus className="w-4 h-4 mr-1" />
+                      选择文件
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 1 * 1024 * 1024) {
+                            alert("图片大小不能超过 1MB");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            handleLogoInput(ev.target?.result as string, false);
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </label>
+                  )}
+                  <p className="text-xs text-gray-400 mt-1">推荐 132×132px，最大 1MB</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-100" />
+
             {/* 应用图片 */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -386,87 +469,6 @@ export function GameGiftTemplateConfigPanel({
                   <p className="text-xs text-gray-400">推荐 1280×720px，最大 1MB</p>
                 </div>
               )}
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-gray-100" />
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">应用Logo</label>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
-                  {config.logoUrl || config.logoMacro ? (
-                    <img
-                      src={logoMode ? config.logoMacro : config.logoUrl}
-                      alt="Logo预览"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-xs">Logo</span>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <button
-                      onClick={() => {
-                        setLogoMode(false);
-                        handleLogoInput("", false);
-                      }}
-                      className={cn(
-                        "px-2 py-0.5 text-xs font-medium rounded transition-all",
-                        !logoMode ? "bg-white shadow-sm text-gray-900 border border-gray-200" : "text-gray-500"
-                      )}
-                    >
-                      上传
-                    </button>
-                    <button
-                      onClick={() => {
-                        setLogoMode(true);
-                        handleLogoInput("", true);
-                      }}
-                      className={cn(
-                        "px-2 py-0.5 text-xs font-medium rounded transition-all",
-                        logoMode ? "bg-white shadow-sm text-gray-900 border border-gray-200" : "text-gray-500"
-                      )}
-                    >
-                      宏替换
-                    </button>
-                  </div>
-                  {logoMode ? (
-                    <Input
-                      placeholder="如 ${app_logo}"
-                      value={config.logoMacro || ""}
-                      onChange={(e) => handleLogoInput(e.target.value, true)}
-                    />
-                  ) : (
-                    <label className="flex items-center justify-center px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500">
-                      <Plus className="w-4 h-4 mr-1" />
-                      选择文件
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          if (file.size > 1 * 1024 * 1024) {
-                            alert("图片大小不能超过 1MB");
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            handleLogoInput(ev.target?.result as string, false);
-                          };
-                          reader.readAsDataURL(file);
-                        }}
-                      />
-                    </label>
-                  )}
-                  <p className="text-xs text-gray-400 mt-1">推荐 132×132px，最大 1MB</p>
-                </div>
-              </div>
             </div>
 
             {/* 应用名称 */}
