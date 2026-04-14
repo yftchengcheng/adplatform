@@ -719,6 +719,19 @@ export function RedpacketRainTemplateConfigPanel({
           </Button>
         </div>
       )}
+
+      {/* 组件名称卡片 */}
+      <div className="bg-gradient-to-r from-[#8B0000] to-[#4A0000] rounded-lg p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <span className="text-xl">🧧</span>
+          </div>
+          <div>
+            <p className="text-white font-medium">红包雨</p>
+            <p className="text-white/70 text-xs">红包飘落互动组件</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
