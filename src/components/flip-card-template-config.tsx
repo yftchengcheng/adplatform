@@ -261,7 +261,7 @@ export const defaultFlipCardConfig: FlipCardConfig = {
   rewardTextMacro: "",
   specialNote: "实际奖品以APP为准！",
   specialNoteMacro: "",
-  cardImageUrl: "/card-item.png",
+  cardImageUrl: "/card-default.png",
   cardImageMacro: "",
   landingPageUrl: "",
   landingPageMacro: "",
