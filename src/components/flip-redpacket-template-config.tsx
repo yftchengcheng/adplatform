@@ -698,7 +698,7 @@ export function FlipRedpacketTemplateConfigPanel({
           <div className="p-4 space-y-4 border-t border-gray-200">
             <div className="space-y-2">
               <Input
-                value={config.componentName || ""}
+                value={config.componentName || "点击红包领取奖品"}
                 onChange={(e) => updateConfig({ componentName: e.target.value })}
                 placeholder="输入组件名称"
               />
