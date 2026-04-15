@@ -251,8 +251,8 @@ export function FlipRedpacketTemplate({
                       <img
                         src="/flip-redpacket-gesture.png"
                         alt="手势"
-                        className="w-10 h-auto absolute -top-2 left-1/2 -translate-x-1/2 animate-bounce z-10"
-                        style={{ animationDuration: '0.8s' }}
+                        className="w-10 h-auto absolute left-1/2 -translate-x-1/2 animate-bounce z-10"
+                        style={{ top: '15px', animationDuration: '0.8s' }}
                         draggable={false}
                       />
                     )}
