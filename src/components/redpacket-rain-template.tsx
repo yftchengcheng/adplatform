@@ -351,11 +351,12 @@ export function RedpacketRainTemplate({
     <div
       className={cn(
         previewMode
-          ? "w-full bg-gradient-to-b from-[#8B0000] to-[#4A0000] rounded-xl overflow-hidden"
+          ? "relative"
           : "fixed inset-0 z-50",
         "transition-opacity duration-300",
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       )}
+      style={previewMode ? { aspectRatio: "5 / 6", maxWidth: "260px" } : undefined}
       onClick={!isClaimed ? undefined : (!previewMode ? onClose : undefined)}
     >
       {/* Backdrop */}
