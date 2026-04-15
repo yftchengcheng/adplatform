@@ -463,12 +463,12 @@ export function TreasureBoxTemplateConfigPanel({
                   <ImageUpload
                     value={config.rewardImageUrl || ""}
                     onChange={(url) => updateConfig({ rewardImageUrl: url })}
-                    aspectRatio="690:360"
-                    maxSize={0.1}
+                    aspectRatio="16:9"
+                    maxSize={0.3}
                     placeholder="点击上传奖励图片"
                   />
                   <p className="text-xs text-gray-400">
-                    尺寸：690×360px，JPG/PNG/JPEG，最大 100KB
+                    宽高比 16:9，JPG/PNG/JPEG，最大 300KB
                   </p>
                 </>
               ) : (
