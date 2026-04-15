@@ -594,7 +594,7 @@ export function FlipRedpacketTemplateConfigPanel({
                     placeholder={'如 ${reward_image}'}
                   />
                   <p className="text-xs text-gray-400">
-                    图片宏变量，如 ${reward_image}
+                    {'图片宏变量，如 ${reward_image}'}
                   </p>
                 </>
               )}
