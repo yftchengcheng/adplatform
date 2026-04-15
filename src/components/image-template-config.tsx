@@ -28,9 +28,13 @@ import { cn } from "@/lib/utils";
 function ImageUpload({
   value,
   onChange,
+  aspectRatio,
+  maxSize = 1,
 }: {
   value?: string;
   onChange: (url: string) => void;
+  aspectRatio?: string;
+  maxSize?: number;
 }) {
   const [previewUrl, setPreviewUrl] = useState<string>(value || "");
   const [isUploading, setIsUploading] = useState(false);
@@ -43,27 +47,36 @@ function ImageUpload({
     setError("");
 
     // 允许的文件类型
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/gif"];
 
-    // Validate file type (只允许 jpg、png、jpeg)
+    // Validate file type
     if (!allowedTypes.includes(file.type)) {
-      setError("仅支持 JPG、PNG、JPEG 格式");
+      setError("仅支持 JPG、PNG、JPEG、WebP、GIF 格式");
       return;
     }
 
-    // Validate file size (小于2M)
-    if (file.size > 2 * 1024 * 1024) {
-      setError(`图片大小不能超过 2MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+    // Validate file size
+    if (file.size > maxSize * 1024 * 1024) {
+      setError(`图片大小不能超过 ${maxSize}MB，当前 ${(file.size / 1024 / 1024).toFixed(2)}MB`);
       return;
     }
 
-    // Validate image dimensions (必须为 640×360)
+    // Validate image dimensions or aspect ratio
     const img = document.createElement("img");
     img.onload = () => {
       URL.revokeObjectURL(img.src);
-      if (img.width !== 640 || img.height !== 360) {
-        setError(`图片尺寸必须为 640×360px，当前 ${img.width}×${img.height}px`);
-        return;
+      
+      if (aspectRatio) {
+        // 宽高比校验
+        const [targetW, targetH] = aspectRatio.split(":").map(Number);
+        const targetRatio = targetW / targetH;
+        const actualRatio = img.width / img.height;
+        const ratioDiff = Math.abs(actualRatio - targetRatio);
+        const tolerance = 0.1; // 允许10%误差
+        if (ratioDiff > targetRatio * tolerance) {
+          setError(`图片宽高比需为 ${aspectRatio}，当前 ${img.width}×${img.height}`);
+          return;
+        }
       }
 
       // Create preview
@@ -98,7 +111,7 @@ function ImageUpload({
     return (
       <div className="relative group">
         <div className="border-2 border-dashed border-gray-200 rounded-lg overflow-hidden">
-          <div className="relative aspect-video bg-gray-100">
+          <div className={`relative ${aspectRatio ? "bg-transparent" : "aspect-video bg-gray-100"}`} style={aspectRatio ? { aspectRatio } : undefined}>
             <Image
               src={previewUrl || value || ""}
               alt="Preview"
@@ -141,7 +154,7 @@ function ImageUpload({
         </div>
         <span className="text-sm text-gray-500">点击上传图片</span>
         <span className="text-xs text-gray-400 mt-1">
-          尺寸 640×360px，JPG/PNG/JPEG，最大 2MB
+          {aspectRatio ? `宽高比: ${aspectRatio}` : "尺寸 640×360px"}，JPG/PNG/JPEG，最大 {maxSize}MB
         </span>
         <input
           type="file"
@@ -313,27 +326,28 @@ export function ImageTemplateConfigPanel({
   const [isBasicOpen, setIsBasicOpen] = useState(true);
   const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">("input");
 
-  const images = config.images || [];
+  // 确保 images 是数组
+  const safeImages: ImageItem[] = Array.isArray(config.images) ? config.images : [];
 
   // 添加图片
   const handleAddImage = () => {
-    if (images.length >= 3) return;
+    if (safeImages.length >= 3) return;
     const newImage: ImageItem = {
       id: `img_${Date.now()}`,
     };
-    onChange({ ...config, images: [...images, newImage] });
+    onChange({ ...config, images: [...safeImages, newImage] });
   };
 
   // 更新图片
   const handleUpdateImage = (index: number, image: ImageItem) => {
-    const newImages = [...images];
+    const newImages = [...safeImages];
     newImages[index] = image;
     onChange({ ...config, images: newImages });
   };
 
   // 删除图片
   const handleRemoveImage = (index: number) => {
-    const newImages = images.filter((_, i) => i !== index);
+    const newImages = safeImages.filter((_, i) => i !== index);
     onChange({ ...config, images: newImages });
   };
 
@@ -409,14 +423,14 @@ export function ImageTemplateConfigPanel({
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3">
             <span className="text-sm font-medium text-gray-700">
-              图片列表 ({images.length}/3)
+              图片列表 ({safeImages.length}/3)
             </span>
             <button
               onClick={handleAddImage}
-              disabled={images.length >= 3}
+              disabled={safeImages.length >= 3}
               className={cn(
                 "flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                images.length >= 3
+                safeImages.length >= 3
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-blue-500 text-white hover:bg-blue-600"
               )}
@@ -427,19 +441,19 @@ export function ImageTemplateConfigPanel({
           </div>
 
           <div className="px-4 pb-4 space-y-4">
-            {images.length === 0 ? (
+            {safeImages.length === 0 ? (
               <div className="text-center py-8 text-gray-400 text-sm">
                 暂无图片，请点击上方按钮添加
               </div>
             ) : (
-              images.map((image, index) => (
+              safeImages.map((image, index) => (
                 <ImageItemEditor
                   key={image.id || index}
                   image={image}
                   index={index}
                   onChange={(img) => handleUpdateImage(index, img)}
                   onRemove={() => handleRemoveImage(index)}
-                  canRemove={images.length > 1}
+                  canRemove={safeImages.length > 1}
                 />
               ))
             )}
