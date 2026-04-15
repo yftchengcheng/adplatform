@@ -65,9 +65,9 @@ import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
 import { FlipRedpacketTemplate } from "@/components/flip-redpacket-template";
 import { FlipRedpacketTemplateConfig } from "@/components/flip-redpacket-template-config";
-import { TreasureBoxTemplate } from "@/components/treasurebox-template";
+import TreasureBoxTemplate from "@/components/treasurebox-template";
 import { TreasureBoxConfig } from "@/components/treasurebox-template-config";
-import { FlipCardTemplate } from "@/components/flip-card-template";
+import FlipCardTemplate from "@/components/flip-card-template";
 import { FlipCardConfig } from "@/components/flip-card-template-config";
 
 import { useRouter } from "next/navigation";
