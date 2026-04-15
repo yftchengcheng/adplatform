@@ -308,9 +308,10 @@ function ImageUpload({
 
         // Create preview
         const reader = new FileReader();
+        let uploadedUrl = "";
         reader.onload = (event) => {
-          const dataUrl = event.target?.result as string;
-          setPreviewUrl(dataUrl);
+          uploadedUrl = event.target?.result as string;
+          setPreviewUrl(uploadedUrl);
         };
         reader.readAsDataURL(file);
 
@@ -318,7 +319,7 @@ function ImageUpload({
         setIsUploading(true);
         setTimeout(() => {
           setIsUploading(false);
-          onChange(dataUrl);
+          onChange(uploadedUrl);
         }, 500);
       };
       img.onerror = () => {
