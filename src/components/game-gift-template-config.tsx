@@ -145,8 +145,21 @@ export function GameGiftTemplateConfigPanel({
       giftCodeMacro: "",
     },
     ...initialConfig,
-    images: initialConfig?.images?.length 
-      ? initialConfig.images 
+    // 确保空值和null都转为空字符串
+    appPackageMacro: initialConfig?.appPackageMacro || "",
+    appPackageName: initialConfig?.appPackageName || "",
+    giftCodeMacro: initialConfig?.giftCodeMacro || "",
+    giftCode: initialConfig?.giftCode || "",
+    appNameMacro: initialConfig?.appNameMacro || "",
+    appName: initialConfig?.appName || "",
+    appDescriptionMacro: initialConfig?.appDescriptionMacro || "",
+    appDescription: initialConfig?.appDescription || "",
+    logoMacro: initialConfig?.logoMacro || "",
+    logoUrl: initialConfig?.logoUrl || "",
+    downloadMacro: initialConfig?.downloadMacro || "",
+    downloadUrl: initialConfig?.downloadUrl || "",
+    images: initialConfig?.images?.length
+      ? initialConfig.images
       : [...defaultImages],
     macroVariables,
   }));
@@ -157,29 +170,30 @@ export function GameGiftTemplateConfigPanel({
 
   // 模式状态
   // 初始值根据配置决定：如果有对应的Macro则宏模式，否则输入模式
+  // 确保正确处理 null、空字符串、undefined
   const [imageMode, setImageMode] = useState<"upload" | "macro">(
-    config.images[0]?.imageMacro ? "macro" : "upload"
+    initialConfig?.images?.[0]?.imageMacro ? "macro" : "upload"
   );
   const [appNameMode, setAppNameMode] = useState<"input" | "macro">(
-    config.appNameMacro ? "macro" : "input"
+    (initialConfig?.appNameMacro || "") ? "macro" : "input"
   );
   const [appDescMode, setAppDescMode] = useState<"input" | "macro">(
-    config.appDescriptionMacro ? "macro" : "input"
+    (initialConfig?.appDescriptionMacro || "") ? "macro" : "input"
   );
   const [downloadMode, setDownloadMode] = useState<"input" | "macro">(
-    config.downloadMacro ? "macro" : "input"
+    (initialConfig?.downloadMacro || "") ? "macro" : "input"
   );
   // 应用包名模式：根据是否有 appPackageMacro 判断
   const [appPackageMode, setAppPackageMode] = useState<"input" | "macro">(
-    config.appPackageMacro ? "macro" : "input"
+    (initialConfig?.appPackageMacro || "") ? "macro" : "input"
   );
   // 礼包码模式：根据是否有 giftCodeMacro 判断
   const [giftCodeMode, setGiftCodeMode] = useState<"input" | "macro">(
-    config.giftCodeMacro ? "macro" : "input"
+    (initialConfig?.giftCodeMacro || "") ? "macro" : "input"
   );
   // Logo 模式（true = 宏替换模式, false = 上传模式）
   // 初始值根据配置决定：如果有logoMacro且没有logoUrl则宏模式，否则上传模式
-  const [logoMode, setLogoMode] = useState<boolean>(!!config.logoMacro && !config.logoUrl);
+  const [logoMode, setLogoMode] = useState<boolean>(!!(initialConfig?.logoMacro || "") && !(initialConfig?.logoUrl || ""));
 
   // 组件名称模式（true = 宏替换模式, false = 输入模式）
   const [componentNameMode, setComponentNameMode] = useState<boolean>(!!config.componentNameMacro && !config.componentName);
@@ -313,11 +327,11 @@ export function GameGiftTemplateConfigPanel({
   };
 
   // 获取各输入值
-  const getAppNameValue = () => appNameMode === "macro" ? (config.appNameMacro || config.appName || "") : (config.appName || "");
-  const getAppDescValue = () => appDescMode === "macro" ? (config.appDescriptionMacro || config.appDescription || "") : (config.appDescription || "");
+  const getAppNameValue = () => appNameMode === "macro" ? (config.appNameMacro || "") : (config.appName || "");
+  const getAppDescValue = () => appDescMode === "macro" ? (config.appDescriptionMacro || "") : (config.appDescription || "");
   const getDownloadValue = () => downloadMode === "macro" ? (config.downloadMacro || "") : (config.downloadUrl || "");
-  const getAppPackageValue = () => appPackageMode === "macro" ? (config.appPackageMacro || config.appPackageName || "") : (config.appPackageName || "");
-  const getGiftCodeValue = () => giftCodeMode === "macro" ? (config.giftCodeMacro || config.giftCode || "") : (config.giftCode || "");
+  const getAppPackageValue = () => appPackageMode === "macro" ? (config.appPackageMacro || "") : (config.appPackageName || "");
+  const getGiftCodeValue = () => giftCodeMode === "macro" ? (config.giftCodeMacro || "") : (config.giftCode || "");
 
   return (
     <div className="space-y-4">
