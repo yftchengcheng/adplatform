@@ -517,7 +517,7 @@ export function FlipRedpacketTemplateConfigPanel({
                   updateConfig({ guideText: e.target.value });
                 }
               }}
-              placeholder="如 ${guide_text}"
+              placeholder={'如 ${guide_text}'}
             />
             <div className="flex justify-end">
               <CharCounter
@@ -601,7 +601,7 @@ export function FlipRedpacketTemplateConfigPanel({
                   <Input
                     value={getRewardImageValue()}
                     onChange={(e) => updateConfig({ rewardImageMacro: e.target.value })}
-                    placeholder="如 ${reward_image}"
+                    placeholder={'如 ${reward_image}'}
                   />
                   <p className="text-xs text-gray-400">
                     图片宏变量，如 ${reward_image}
@@ -670,7 +670,7 @@ export function FlipRedpacketTemplateConfigPanel({
                     updateConfig({ landingPageUrl: e.target.value });
                   }
                 }}
-                placeholder={landingPageMode === "macro" ? "如 ${landing_url}" : "输入落地页链接"}
+                placeholder={landingPageMode === "macro" ? '如 ${landing_url}' : "输入落地页链接"}
               />
             </div>
 
