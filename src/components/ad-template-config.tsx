@@ -279,7 +279,7 @@ function ImageUpload({
         <Upload className="w-8 h-8 text-gray-400 mb-2" />
         <span className="text-sm text-gray-500">{label || "点击上传图片"}</span>
         <span className="text-xs text-gray-400 mt-1">
-          尺寸: {width}×{height}px, 大小&lt;{maxSize}MB
+          {aspectRatio ? `宽高比: ${aspectRatio}` : `尺寸: ${width}×${height}px`}, 大小&lt;{maxSize}MB
         </span>
         <input
           type="file"
