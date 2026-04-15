@@ -969,3 +969,101 @@ interface RedpacketRainConfig {
 3. **领取场景**：点击红包后切换到领奖场景
 4. **点击领取**：跳转到落地页链接
 5. **宏变量替换**：支持引导文案、金额、图片、文案、落地页的宏替换
+
+---
+
+## 十七、组件注册规范（重要）
+
+### 1. 必须同步更新的文件
+
+当新增或修改组件时，必须同时更新以下文件，**缺一不可**：
+
+| 文件 | 作用 |
+|------|------|
+| `src/components/xxx-template.tsx` | 组件渲染逻辑 |
+| `src/components/xxx-template-config.tsx` | 配置面板 |
+| `src/app/components/config/page.tsx` | 配置页面（导入+渲染+预览） |
+| `src/components/component-list.tsx` | 组件列表预览 |
+
+### 2. page.tsx 必须包含的内容
+
+```tsx
+// 1. 导入组件（与 config 页面分开）
+import { FlipCardConfig, defaultFlipCardConfig, FlipCardTemplateConfigPanel } from "@/components/flip-card-template-config";
+import { FlipCardTemplate } from "@/components/flip-card-template";
+
+// 2. 组件注册
+{ id: "flip_card", name: "翻卡", ... }
+
+// 3. ConfigPanel 渲染
+<FlipCardTemplateConfigPanel
+  config={config as FlipCardConfig}
+  onChange={handleConfigChange}
+  onSave={handleSave}  // 必须传递 onSave
+  macroVariables={(config as FlipCardConfig).macroVariables}
+/>
+
+// 4. 预览渲染（使用绝对定位在模拟器底部）
+) : isFlipCardComponent ? (
+  <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
+    <FlipCardTemplate
+      config={config as FlipCardConfig}
+      isOpen={true}
+      previewMode={true}
+      onClose={() => {}}
+    />
+  </div>
+```
+
+### 3. component-list.tsx 必须包含的内容
+
+```tsx
+// 1. 导入组件
+import { FlipCardTemplate, FlipCardConfig } from "@/components/flip-card-template";
+
+// 2. 预览分支（放在 flip_redpacket 之后）
+} : previewComponent?.type === "flip_card" ? (
+  <div className="w-full px-2">
+    <FlipCardTemplate
+      config={previewComponent.config as unknown as FlipCardConfig}
+      isOpen={true}
+      previewMode={true}
+      onClose={() => {}}
+    />
+  </div>
+```
+
+### 4. 配置面板 Props 接口
+
+```tsx
+export interface FlipCardTemplateConfigPanelProps {
+  config: FlipCardConfig;
+  onChange: (config: FlipCardConfig) => void;
+  onSave?: () => void;  // 可选，但建议添加
+  macroVariables?: Record<string, string>;
+  onMacroVariablesChange?: (vars: Record<string, string>) => void;
+}
+```
+
+### 5. 配置面板底部保存按钮
+
+```tsx
+// 在 return 的最后、</div> 之前添加
+{onSave && (
+  <div className="flex justify-center pt-4 mt-4 border-t border-gray-200">
+    <Button
+      onClick={onSave}
+      className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium"
+    >
+      保存
+    </Button>
+  </div>
+)}
+```
+
+### 6. 避免预览错乱的 Checklist
+
+- [ ] component-list.tsx 中已导入组件
+- [ ] component-list.tsx 中有对应的 previewComponent?.type === "xxx" 分支
+- [ ] page.tsx 中 ConfigPanel 组件已传递 onSave 属性
+- [ ] 全屏组件（红包雨、翻红包、翻宝箱、翻卡）在预览区域使用 `absolute bottom-0` 定位

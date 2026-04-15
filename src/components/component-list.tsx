@@ -64,6 +64,8 @@ import { PromotionTemplate, PromotionTemplateConfig } from "@/components/promoti
 import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
 import { FlipRedpacketTemplate, FlipRedpacketTemplateConfig } from "@/components/flip-redpacket-template";
+import { TreasureBoxTemplate, TreasureBoxConfig } from "@/components/treasurebox-template";
+import { FlipCardTemplate, FlipCardConfig } from "@/components/flip-card-template";
 
 import { useRouter } from "next/navigation";
 
@@ -737,6 +739,24 @@ export function ComponentList() {
                         <div className="w-full px-2">
                           <FlipRedpacketTemplate
                             config={previewComponent.config as unknown as FlipRedpacketTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
+                        </div>
+                      ) : previewComponent?.type === "treasure_box" ? (
+                        <div className="w-full px-2">
+                          <TreasureBoxTemplate
+                            config={previewComponent.config as unknown as TreasureBoxConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
+                        </div>
+                      ) : previewComponent?.type === "flip_card" ? (
+                        <div className="w-full px-2">
+                          <FlipCardTemplate
+                            config={previewComponent.config as unknown as FlipCardConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => {}}
