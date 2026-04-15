@@ -326,15 +326,6 @@ export function FlipRedpacketTemplate({
               >
                 立即领取
               </button>
-
-              {/* 翻出效果图片 */}
-              <div className="mt-4">
-                <img
-                  src="/flip-redpacket-reveal.png"
-                  alt="翻出"
-                  className="w-16 h-auto"
-                />
-              </div>
             </div>
           )}
         </div>
