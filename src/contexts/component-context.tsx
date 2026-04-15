@@ -174,8 +174,8 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   const addComponent = useCallback(async (
     component: Omit<AdComponentItem, "id" | "updateTime" | "templateCount" | "editor">
   ) => {
-    const now = new Date();
-    const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+    // 使用 ISO 格式时间，确保排序一致
+    const timeStr = new Date().toISOString();
     
     // 生成顺序ID
     const newId = generateSequentialId(components);
@@ -212,8 +212,8 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
 
   // 更新组件
   const updateComponent = useCallback(async (id: string, updates: Partial<AdComponentItem>) => {
-    const now = new Date();
-    const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+    // 使用 ISO 格式时间，确保排序一致
+    const timeStr = new Date().toISOString();
     
     // 准备更新数据
     const dbUpdates: Partial<DbAdComponent> = {};
