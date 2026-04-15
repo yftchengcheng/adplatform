@@ -488,6 +488,7 @@ function ConfigContent() {
                 config={config as FlipRedpacketTemplateConfig}
                 onChange={handleConfigChange}
                 onSave={handleSave}
+                onCancel={handleCancel}
                 macroVariables={(config as FlipRedpacketTemplateConfig).macroVariables}
               />
             ) : isTreasureBoxComponent ? (

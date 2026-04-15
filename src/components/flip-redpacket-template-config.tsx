@@ -165,6 +165,8 @@ export const defaultFlipRedpacketConfig: FlipRedpacketConfig = {
 export interface FlipRedpacketTemplateConfigPanelProps {
   config: FlipRedpacketTemplateConfig;
   onChange: (config: FlipRedpacketTemplateConfig) => void;
+  onSave?: () => void;
+  onCancel?: () => void;
   macroVariables?: Record<string, string>;
   onMacroVariablesChange?: (vars: Record<string, string>) => void;
 }
@@ -414,6 +416,8 @@ function ImageUpload({
 export function FlipRedpacketTemplateConfigPanel({
   config,
   onChange,
+  onSave,
+  onCancel,
   macroVariables = {},
   onMacroVariablesChange,
 }: FlipRedpacketTemplateConfigPanelProps) {
@@ -461,6 +465,7 @@ export function FlipRedpacketTemplateConfigPanel({
   // 落地页展开状态
   const [landingOpen, setLandingOpen] = useState(true);
   const [basicOpen, setBasicOpen] = useState(true);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -707,6 +712,63 @@ export function FlipRedpacketTemplateConfigPanel({
           </div>
         )}
       </div>
+
+      {/* 底部按钮 */}
+      {(onSave || onCancel) && (
+        <div className="flex gap-3 pt-4 mt-4 border-t border-gray-200">
+          {onCancel && (
+            <button
+              onClick={() => setShowCancelConfirm(true)}
+              className="flex-1 h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              取消
+            </button>
+          )}
+          {onSave && (
+            <button
+              onClick={onSave}
+              className="flex-1 h-10 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+            >
+              保存
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 取消确认弹窗 */}
+      {showCancelConfirm && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/50"
+            onClick={() => setShowCancelConfirm(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <div className="px-5 pt-6 pb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">确认取消</h3>
+                <p className="text-sm text-gray-500 mb-6">确定要取消编辑吗？未保存的更改将会丢失。</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="flex-1 h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    继续编辑
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCancelConfirm(false);
+                      onCancel?.();
+                    }}
+                    className="flex-1 h-10 px-4 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+                  >
+                    确认取消
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
