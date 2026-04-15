@@ -374,6 +374,12 @@ function ButtonConfigSection({
                     <span>跳转落地页</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="show_image">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    <span>显示图片</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

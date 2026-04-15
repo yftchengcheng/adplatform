@@ -531,9 +531,61 @@ export function VoteTemplateConfigPanel({
                         <span>跳转落地页</span>
                       </div>
                     </SelectItem>
+                    <SelectItem value="show_image">
+                      <div className="flex items-center gap-2">
+                        <span>显示图片</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Image Upload - Only show when action is "show_image" */}
+              {config.action === "show_image" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-500">
+                      图片设置
+                    </label>
+                    <Select
+                      value={imageInputMode}
+                      onValueChange={(v) => {
+                        const mode = v as "upload" | "macro";
+                        setImageInputMode(mode);
+                        if (mode === "upload") {
+                          handleImageChange("");
+                        } else {
+                          handleImageMacroChange("");
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="upload">上传图片</SelectItem>
+                        <SelectItem value="macro">图片宏</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {imageInputMode === "macro" ? (
+                    <Input
+                      value={config.imageMacro || ""}
+                      onChange={(e) => handleImageMacroChange(e.target.value)}
+                      placeholder="如 ${image_url}"
+                    />
+                  ) : (
+                    <ImageUpload
+                      value={config.imageUrl || ""}
+                      onChange={handleImageChange}
+                      label="上传图片"
+                      width={300}
+                      height={150}
+                      maxSize={2}
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Landing Page URL - Show for both actions */}
               <div className="space-y-2">
