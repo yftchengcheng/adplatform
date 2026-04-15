@@ -240,23 +240,26 @@ function ConfigContent() {
 
   // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
   const [config, setConfig] = useState<AllConfigTypes>(() => {
+    // 优先使用编辑组件的配置
     if (editingComponent?.config) {
       return editingComponent.config as AllConfigTypes;
     }
-    return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
-  });
-
-  // 客户端挂载后从 sessionStorage 恢复配置
-  React.useEffect(() => {
+    // 其次使用sessionStorage中的配置
     const saved = sessionStorage.getItem("component_config");
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        setConfig(parsed);
+        return JSON.parse(saved);
       } catch {
         // ignore parse errors
       }
     }
+    // 最后使用默认配置
+    return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+  });
+
+  // 客户端挂载后不再从 sessionStorage 恢复配置（已在初始化时处理）
+  React.useEffect(() => {
+    // 移除旧的sessionStorage读取逻辑，避免重复覆盖
   }, []);
 
   // 预览重置计数器（用于动态组件如红包雨的重置）
