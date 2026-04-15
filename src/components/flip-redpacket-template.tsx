@@ -233,7 +233,7 @@ export function FlipRedpacketTemplate({
                 </div>
               </div>
 
-              {/* 三个红包并排 */}
+              {/* 三个红包并排 - 手势内嵌到红包上方 */}
               <div className="flex items-center justify-center gap-4 mb-4">
                 {[0, 1, 2].map((index) => (
                   <div
@@ -246,6 +246,16 @@ export function FlipRedpacketTemplate({
                     )}
                     onClick={handleRedpacketClick}
                   >
+                    {/* 手势提示 */}
+                    {gestureIndex === index && (
+                      <img
+                        src="/flip-redpacket-gesture.png"
+                        alt="手势"
+                        className="w-10 h-auto absolute -top-2 left-1/2 -translate-x-1/2 animate-bounce z-10"
+                        style={{ animationDuration: '0.8s' }}
+                        draggable={false}
+                      />
+                    )}
                     {/* 红包图片 */}
                     <img
                       src={resolveRedpacketImage()}
@@ -253,23 +263,6 @@ export function FlipRedpacketTemplate({
                       className="w-[100px] h-auto object-contain"
                       draggable={false}
                     />
-                  </div>
-                ))}
-              </div>
-
-              {/* 手势提示 - 顺序闪现 */}
-              <div className="flex items-center justify-center gap-4 mb-4">
-                {[0, 1, 2].map((index) => (
-                  <div key={index} className="w-[100px] h-[80px] flex items-start justify-center relative">
-                    {gestureIndex === index && (
-                      <img
-                        src="/flip-redpacket-gesture.png"
-                        alt="手势"
-                        className="w-10 h-auto absolute top-0 animate-bounce"
-                        style={{ animationDuration: '0.8s' }}
-                        draggable={false}
-                      />
-                    )}
                   </div>
                 ))}
               </div>
