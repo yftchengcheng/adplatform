@@ -61,7 +61,7 @@ export function FlipRedpacketTemplate({
     landingPageMacro: "",
     defaultLandingPageUrl: "",
     macroVariables: {},
-    componentName: "",
+    componentName: "点击红包领取奖品",
   };
 
   const finalConfig = { ...defaultConfig, ...config };

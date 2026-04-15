@@ -158,7 +158,7 @@ export const defaultFlipRedpacketConfig: FlipRedpacketConfig = {
     reward_text: "恭喜发财",
     special_note: "实际奖品以APP为准！",
   },
-  componentName: "",
+  componentName: "点击红包领取奖品",
 };
 
 // Props
@@ -695,16 +695,6 @@ export function FlipRedpacketTemplateConfigPanel({
             </div>
           </div>
         )}
-      </div>
-
-      {/* 宏变量配置 */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <MacroVariableEditor
-            variables={macroVariables}
-            onChange={onMacroVariablesChange || (() => {})}
-          />
-        </div>
       </div>
     </div>
   );
