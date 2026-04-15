@@ -22,7 +22,7 @@ import { RedpacketRainTemplateConfig, defaultRedpacketRainConfig, RedpacketRainT
 import { RedpacketRainTemplate } from "@/components/redpacket-rain-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
-import { ComponentType } from "@/lib/component-types";
+import { ComponentType, componentStyleTemplates } from "@/lib/component-types";
 
 // 默认广告组件配置
 const defaultAdConfig: AdTemplateConfig = {
@@ -302,6 +302,12 @@ function ConfigContent() {
         name = `图片磁贴-${config.images.length}张`;
       }
 
+      // 根据组件类型获取分类
+      const getCategoryForType = (componentType: string): "static" | "animation" => {
+        const template = componentStyleTemplates.find(t => t.id === componentType);
+        return (template?.category as "static" | "animation") || "static";
+      };
+
       // 编辑模式更新现有组件，新建模式添加新组件
       if (componentId && editingComponent) {
         await updateComponent(componentId, {
@@ -311,7 +317,7 @@ function ConfigContent() {
       } else {
         await addComponent({
           name: name,
-          category: "static",
+          category: getCategoryForType(type),
           type: type,
           status: "enabled",
           config: config as unknown as Record<string, unknown>,
