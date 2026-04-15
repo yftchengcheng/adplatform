@@ -160,6 +160,8 @@ export function GameGiftTemplateConfigPanel({
   const [appNameMode, setAppNameMode] = useState<"input" | "macro">("input");
   const [appDescMode, setAppDescMode] = useState<"input" | "macro">("input");
   const [downloadMode, setDownloadMode] = useState<"input" | "macro">("input");
+  const [appPackageMode, setAppPackageMode] = useState<"input" | "macro">("input");
+  const [giftCodeMode, setGiftCodeMode] = useState<"input" | "macro">("input");
   // Logo 模式（true = 宏替换模式, false = 上传模式）
   // 初始值根据配置决定：如果有logoMacro且没有logoUrl则宏模式，否则上传模式
   const [logoMode, setLogoMode] = useState<boolean>(!!config.logoMacro && !config.logoUrl);
@@ -257,6 +259,24 @@ export function GameGiftTemplateConfigPanel({
     }
   };
 
+  // 处理应用包名输入
+  const handleAppPackageInput = (value: string) => {
+    if (appPackageMode === "macro") {
+      updateConfig({ appPackageMacro: value, appPackageName: value });
+    } else {
+      updateConfig({ appPackageName: value, appPackageMacro: "" });
+    }
+  };
+
+  // 处理礼包码输入
+  const handleGiftCodeInput = (value: string) => {
+    if (giftCodeMode === "macro") {
+      updateConfig({ giftCodeMacro: value, giftCode: value });
+    } else {
+      updateConfig({ giftCode: value, giftCodeMacro: "" });
+    }
+  };
+
   // 预览
   const handlePreview = () => {
     onPreview?.(config);
@@ -271,6 +291,8 @@ export function GameGiftTemplateConfigPanel({
   const getAppNameValue = () => appNameMode === "macro" ? (config.appNameMacro || config.appName || "") : (config.appName || "");
   const getAppDescValue = () => appDescMode === "macro" ? (config.appDescriptionMacro || config.appDescription || "") : (config.appDescription || "");
   const getDownloadValue = () => downloadMode === "macro" ? (config.downloadMacro || "") : (config.downloadUrl || "");
+  const getAppPackageValue = () => appPackageMode === "macro" ? (config.appPackageMacro || config.appPackageName || "") : (config.appPackageName || "");
+  const getGiftCodeValue = () => giftCodeMode === "macro" ? (config.giftCodeMacro || config.giftCode || "") : (config.giftCode || "");
 
   return (
     <div className="space-y-4">
@@ -569,22 +591,44 @@ export function GameGiftTemplateConfigPanel({
 
             {/* 应用包名 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">应用包名</label>
-              <Input
-                placeholder="如 com.example.game"
-                value={config.appPackageName || ""}
-                onChange={(e) => updateConfig({ appPackageName: e.target.value })}
-              />
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">应用包名</label>
+                <ModeToggle value={appPackageMode} onChange={setAppPackageMode} />
+              </div>
+              {appPackageMode === "macro" ? (
+                <Input
+                  placeholder="如 ${package_name}"
+                  value={getAppPackageValue()}
+                  onChange={(e) => handleAppPackageInput(e.target.value)}
+                />
+              ) : (
+                <Input
+                  placeholder="如 com.example.game"
+                  value={getAppPackageValue()}
+                  onChange={(e) => handleAppPackageInput(e.target.value)}
+                />
+              )}
             </div>
 
             {/* 礼包码 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">礼包码</label>
-              <Input
-                placeholder="请输入礼包码"
-                value={config.giftCode || ""}
-                onChange={(e) => updateConfig({ giftCode: e.target.value })}
-              />
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">礼包码</label>
+                <ModeToggle value={giftCodeMode} onChange={setGiftCodeMode} />
+              </div>
+              {giftCodeMode === "macro" ? (
+                <Input
+                  placeholder="如 ${gift_code}"
+                  value={getGiftCodeValue()}
+                  onChange={(e) => handleGiftCodeInput(e.target.value)}
+                />
+              ) : (
+                <Input
+                  placeholder="请输入礼包码"
+                  value={getGiftCodeValue()}
+                  onChange={(e) => handleGiftCodeInput(e.target.value)}
+                />
+              )}
             </div>
           </div>
         )}

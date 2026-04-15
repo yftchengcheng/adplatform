@@ -121,6 +121,30 @@ export function GameGiftTemplate({
     return finalConfig.appDescription;
   };
 
+  // 解析应用包名
+  const resolveAppPackageName = (): string => {
+    if (finalConfig.appPackageMacro) {
+      const resolved = resolveMacro(finalConfig.appPackageMacro);
+      if (resolved.includes('${') || resolved.startsWith('$')) {
+        return finalConfig.appPackageName || "";
+      }
+      return resolved;
+    }
+    return finalConfig.appPackageName || "";
+  };
+
+  // 解析礼包码
+  const resolveGiftCode = (): string => {
+    if (finalConfig.giftCodeMacro) {
+      const resolved = resolveMacro(finalConfig.giftCodeMacro);
+      if (resolved.includes('${') || resolved.startsWith('$')) {
+        return finalConfig.giftCode || "";
+      }
+      return resolved;
+    }
+    return finalConfig.giftCode || "";
+  };
+
   // 解析下载链接
   const resolveDownloadUrl = (): string | undefined => {
     if (finalConfig.downloadMacro) {
@@ -252,11 +276,11 @@ export function GameGiftTemplate({
 
                 {/* Package Name & Gift Code */}
                 <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                  {finalConfig.appPackageName && (
-                    <span className="truncate">{finalConfig.appPackageName}</span>
+                  {resolveAppPackageName() && (
+                    <span className="truncate">{resolveAppPackageName()}</span>
                   )}
-                  {finalConfig.giftCode && (
-                    <span className="text-blue-500 truncate">码: {finalConfig.giftCode}</span>
+                  {resolveGiftCode() && (
+                    <span className="text-blue-500 truncate">码: {resolveGiftCode()}</span>
                   )}
                 </div>
               </div>
