@@ -251,7 +251,7 @@ export function FlipCardTemplate({
                       src={resolveCardImage()}
                       alt={`卡牌${index + 1}`}
                       className={cn(
-                        "w-[100px] h-auto object-contain transition-transform duration-300",
+                        "w-[100px] aspect-[3/4] object-cover rounded-lg shadow-md",
                         flipHoverIndex === index && "animate-gesture-flip",
                         isFlipping && "animate-flip"
                       )}
