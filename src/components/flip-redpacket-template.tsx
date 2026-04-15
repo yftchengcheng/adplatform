@@ -208,7 +208,7 @@ export function FlipRedpacketTemplate({
           isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}
         style={{
-          background: "linear-gradient(to bottom, rgba(139, 0, 0, 0.3), rgba(74, 0, 0, 0.3))",
+          background: "rgba(255, 255, 255, 0.6)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
