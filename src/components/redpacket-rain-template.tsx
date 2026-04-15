@@ -349,15 +349,21 @@ export function RedpacketRainTemplate({
 
   return (
     <div
-      className={`${previewMode ? "relative mx-auto" : "fixed inset-0 z-50"} transition-opacity duration-300 ${
+      className={cn(
+        previewMode
+          ? "w-full bg-gradient-to-b from-[#8B0000] to-[#4A0000] rounded-xl overflow-hidden"
+          : "fixed inset-0 z-50",
+        "transition-opacity duration-300",
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
-      style={previewMode ? { aspectRatio: "5 / 6", maxWidth: "260px" } : undefined}
-      onClick={!isClaimed ? undefined : onClose}
+      )}
+      onClick={!isClaimed ? undefined : (!previewMode ? onClose : undefined)}
     >
       {/* Backdrop */}
       {!isClaimed && (
-        <div className={`absolute inset-0 ${previewMode ? "bg-black/30 rounded-xl" : "bg-black/30"}`} />
+        <div className={cn(
+          "absolute inset-0",
+          previewMode ? "bg-gradient-to-b from-[#8B0000] to-[#4A0000] rounded-xl" : "bg-gradient-to-b from-[#8B0000] to-[#4A0000]"
+        )} />
       )}
 
       {/* Modal Content - 直接显示，取消入场动画 */}

@@ -1067,3 +1067,48 @@ export interface FlipCardTemplateConfigPanelProps {
 - [ ] component-list.tsx 中有对应的 previewComponent?.type === "xxx" 分支
 - [ ] page.tsx 中 ConfigPanel 组件已传递 onSave 属性
 - [ ] 全屏组件（红包雨、翻红包、翻宝箱、翻卡）在预览区域使用 `absolute bottom-0` 定位
+
+---
+
+## 十八、全屏组件预览模式规范
+
+### 1. 常见问题
+- 使用 `aspectRatio` 时未设置宽度导致组件无法渲染
+- 预览模式下背景色不正确（透明导致不可见）
+- 预览模式下的点击事件未正确处理
+
+### 2. 正确示例（FlipRedpacketTemplate）
+
+```tsx
+return (
+  <div
+    className={cn(
+      previewMode
+        ? "w-full flex items-center justify-center"  // 预览模式用 w-full
+        : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+    )}
+    onClick={() => !previewMode && onClose?.()}
+  >
+    {/* Modal Content */}
+    <div
+      className={cn(
+        previewMode
+          ? "relative w-full rounded-2xl overflow-hidden"
+          : "relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden",
+        // ...
+      )}
+    >
+      {/* 内容 */}
+    </div>
+  </div>
+);
+```
+
+### 3. 关键要点
+
+| 要点 | 说明 |
+|------|------|
+| 外层容器 | previewMode 用 `w-full`，非预览用 `fixed inset-0` |
+| 背景色 | 预览模式需设置背景色（如 `bg-gradient-to-b from-[#8B0000] to-[#4A0000]`） |
+| 点击事件 | 预览模式跳过关闭逻辑 |
+| 动画入场 | previewMode 直接显示，跳过入场动画 |
