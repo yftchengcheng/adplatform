@@ -60,12 +60,14 @@ function ImageUpload({
       return;
     }
 
-    // Validate image dimensions (必须为 174×174)
+    // Validate image aspect ratio (必须为 1:1)
     const img = document.createElement("img");
     img.onload = () => {
       URL.revokeObjectURL(img.src);
-      if (img.width !== 174 || img.height !== 174) {
-        setError(`图片尺寸必须为 174×174px，当前 ${img.width}×${img.height}px`);
+      const ratio = img.width / img.height;
+      // 允许误差 ±0.1 的比例误差
+      if (Math.abs(ratio - 1) > 0.1) {
+        setError(`图片宽高比必须为 1:1，当前 ${img.width}×${img.height}`);
         return;
       }
 
@@ -143,9 +145,9 @@ function ImageUpload({
           <Plus className="w-4 h-4 text-gray-400" />
         </div>
         <span className="text-xs text-gray-400 text-center leading-tight">
-          174×174
+          1:1 比例
           <br />
-          JPG/PNG
+          最大 1MB
         </span>
         <input
           type="file"
