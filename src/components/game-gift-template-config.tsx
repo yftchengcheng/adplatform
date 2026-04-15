@@ -156,12 +156,27 @@ export function GameGiftTemplateConfigPanel({
   const [downloadOpen, setDownloadOpen] = useState(true);
 
   // 模式状态
-  const [imageMode, setImageMode] = useState<"upload" | "macro">("upload");
-  const [appNameMode, setAppNameMode] = useState<"input" | "macro">("input");
-  const [appDescMode, setAppDescMode] = useState<"input" | "macro">("input");
-  const [downloadMode, setDownloadMode] = useState<"input" | "macro">("input");
-  const [appPackageMode, setAppPackageMode] = useState<"input" | "macro">("input");
-  const [giftCodeMode, setGiftCodeMode] = useState<"input" | "macro">("input");
+  // 初始值根据配置决定：如果有对应的Macro则宏模式，否则输入模式
+  const [imageMode, setImageMode] = useState<"upload" | "macro">(
+    config.images[0]?.imageMacro ? "macro" : "upload"
+  );
+  const [appNameMode, setAppNameMode] = useState<"input" | "macro">(
+    config.appNameMacro ? "macro" : "input"
+  );
+  const [appDescMode, setAppDescMode] = useState<"input" | "macro">(
+    config.appDescriptionMacro ? "macro" : "input"
+  );
+  const [downloadMode, setDownloadMode] = useState<"input" | "macro">(
+    config.downloadMacro ? "macro" : "input"
+  );
+  // 应用包名模式：根据是否有 appPackageMacro 判断
+  const [appPackageMode, setAppPackageMode] = useState<"input" | "macro">(
+    config.appPackageMacro ? "macro" : "input"
+  );
+  // 礼包码模式：根据是否有 giftCodeMacro 判断
+  const [giftCodeMode, setGiftCodeMode] = useState<"input" | "macro">(
+    config.giftCodeMacro ? "macro" : "input"
+  );
   // Logo 模式（true = 宏替换模式, false = 上传模式）
   // 初始值根据配置决定：如果有logoMacro且没有logoUrl则宏模式，否则上传模式
   const [logoMode, setLogoMode] = useState<boolean>(!!config.logoMacro && !config.logoUrl);
