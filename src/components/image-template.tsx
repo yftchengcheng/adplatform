@@ -63,7 +63,7 @@ export function ImageTemplate({
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    }, 3000); // 每3秒切换一次
+    }, 2000); // 每2秒切换一次
 
     return () => clearInterval(interval);
   }, [images.length, isPaused, previewMode]);
