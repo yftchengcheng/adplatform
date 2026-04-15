@@ -393,7 +393,8 @@ export function RedpacketRainTemplate({
                   <img
                     src="/gesture-hand.png"
                     alt="手势提示"
-                    className="w-12 h-auto shadow-none"
+                    className="w-12 h-auto"
+                    style={{ filter: 'drop-shadow(0 0 0 transparent)' }}
                   />
                 </div>
               </div>
