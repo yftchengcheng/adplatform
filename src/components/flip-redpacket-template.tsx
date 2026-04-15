@@ -40,6 +40,7 @@ export function FlipRedpacketTemplate({
   const [isFlipping, setIsFlipping] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [gestureIndex, setGestureIndex] = useState(0);
+  const [flipHoverIndex, setFlipHoverIndex] = useState(-1);
 
   // 使用默认配置填充空值
   const defaultConfig: FlipRedpacketTemplateConfig = {
@@ -153,11 +154,13 @@ export function FlipRedpacketTemplate({
     if (!isVisible || showReward) return;
     
     const interval = setInterval(() => {
-      setGestureIndex((prev) => (prev + 1) % 3);
+      const nextIndex = (gestureIndex + 1) % 3;
+      setGestureIndex(nextIndex);
+      setFlipHoverIndex(nextIndex);
     }, 1500);
     
     return () => clearInterval(interval);
-  }, [isVisible, showReward]);
+  }, [isVisible, showReward, gestureIndex]);
 
   // 点击红包
   const handleRedpacketClick = useCallback(() => {
@@ -241,8 +244,7 @@ export function FlipRedpacketTemplate({
                     className={cn(
                       "relative cursor-pointer select-none",
                       "transform transition-transform duration-300",
-                      "hover:scale-105 active:scale-95",
-                      isFlipping && "animate-flip"
+                      "hover:scale-105 active:scale-95"
                     )}
                     onClick={handleRedpacketClick}
                   >
@@ -256,11 +258,15 @@ export function FlipRedpacketTemplate({
                         draggable={false}
                       />
                     )}
-                    {/* 红包图片 */}
+                    {/* 红包图片 - 手势指向时翻转 */}
                     <img
                       src={resolveRedpacketImage()}
                       alt={`红包${index + 1}`}
-                      className="w-[100px] h-auto object-contain"
+                      className={cn(
+                        "w-[100px] h-auto object-contain transition-transform duration-300",
+                        flipHoverIndex === index && "animate-gesture-flip",
+                        isFlipping && "animate-flip"
+                      )}
                       draggable={false}
                     />
                   </div>
@@ -363,8 +369,21 @@ export function FlipRedpacketTemplate({
           animation: flip 0.6s ease-in-out;
         }
         
+        .animate-gesture-flip {
+          animation: gestureFlip 0.3s ease-in-out;
+        }
+        
         .animate-fadeIn {
           animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes gestureFlip {
+          0%, 100% {
+            transform: scaleX(1) rotateY(0deg);
+          }
+          50% {
+            transform: scaleX(0) rotateY(90deg);
+          }
         }
       `}</style>
     </div>
