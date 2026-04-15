@@ -378,7 +378,7 @@ export function RedpacketRainTemplate({
           <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, rgba(139, 0, 0, 0.3), rgba(74, 0, 0, 0.3))" }}>
             {/* Guide Text */}
             <div className="absolute top-6 left-0 right-0 z-10">
-              <div className="relative flex justify-center">
+              <div className="relative flex flex-col items-center">
                 {/* 光晕效果 */}
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 via-yellow-100/40 to-yellow-300/30 blur-sm rounded-full" />
                 {/* 背景 */}
@@ -387,11 +387,28 @@ export function RedpacketRainTemplate({
                     {resolveGuideText()}
                   </p>
                 </div>
+
+                {/* 手势提示 - 提示用户点击红包 */}
+                <div className="relative mt-4 gesture-hint animate-bounce" style={{ animationDuration: '1.2s', animationIterationCount: 'infinite' }}>
+                  <img
+                    src="/gesture-hand.png"
+                    alt="手势提示"
+                    className="w-12 h-auto"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Falling Redpackets - 落叶飘落效果，从文字下方开始 */}
             <style jsx>{`
+              @keyframes gestureBounce {
+                0%, 100% {
+                  transform: translateY(0) scale(1);
+                }
+                50% {
+                  transform: translateY(8px) scale(0.95);
+                }
+              }
               @keyframes fallLeaf {
                 0% {
                   top: 80px;
