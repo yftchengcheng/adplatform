@@ -332,14 +332,13 @@ export function RedpacketRainTemplate({
 
   // 点击领取按钮
   const handleClaim = useCallback(() => {
-    if (previewMode) {
-      return;
-    }
     const landingPage = resolveLandingPage();
     if (landingPage) {
       window.open(landingPage, "_blank");
+    } else if (!previewMode) {
+      // 非预览模式下且没有落地页时才关闭
+      onClose();
     }
-    onClose();
   }, [previewMode, resolveLandingPage, onClose]);
 
   const shouldRender = previewMode || isVisible;
