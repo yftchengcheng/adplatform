@@ -63,9 +63,11 @@ import { CouponTemplate, CouponTemplateConfig } from "@/components/coupon-templa
 import { PromotionTemplate, PromotionTemplateConfig } from "@/components/promotion-template";
 import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
-import { FlipRedpacketTemplate, FlipRedpacketTemplateConfig } from "@/components/flip-redpacket-template";
-import { TreasureBoxTemplate, TreasureBoxConfig } from "@/components/treasurebox-template";
-import { FlipCardTemplate, FlipCardConfig } from "@/components/flip-card-template";
+import { FlipRedpacketTemplate } from "@/components/flip-redpacket-template";
+import { TreasureBoxTemplate } from "@/components/treasurebox-template";
+import { TreasureBoxConfig } from "@/components/treasurebox-template-config";
+import { FlipCardTemplate } from "@/components/flip-card-template";
+import { FlipCardConfig } from "@/components/flip-card-template-config";
 
 import { useRouter } from "next/navigation";
 
