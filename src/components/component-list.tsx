@@ -63,6 +63,7 @@ import { CouponTemplate, CouponTemplateConfig } from "@/components/coupon-templa
 import { PromotionTemplate, PromotionTemplateConfig } from "@/components/promotion-template";
 import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
+import { FlipRedpacketTemplate, FlipRedpacketTemplateConfig } from "@/components/flip-redpacket-template";
 
 import { useRouter } from "next/navigation";
 
@@ -727,6 +728,15 @@ export function ComponentList() {
                         <div className="w-full px-2">
                           <RedpacketRainTemplate
                             config={previewComponent.config as unknown as RedpacketRainTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
+                        </div>
+                      ) : previewComponent?.type === "flip_redpacket" ? (
+                        <div className="w-full px-2">
+                          <FlipRedpacketTemplate
+                            config={previewComponent.config as unknown as FlipRedpacketTemplateConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => {}}

@@ -20,6 +20,8 @@ import { GameGiftTemplateConfig, GameGiftTemplate } from "@/components/game-gift
 import { GameGiftTemplateConfigPanel } from "@/components/game-gift-template-config";
 import { RedpacketRainTemplateConfig, defaultRedpacketRainConfig, RedpacketRainTemplateConfigPanel } from "@/components/redpacket-rain-template-config";
 import { RedpacketRainTemplate } from "@/components/redpacket-rain-template";
+import { FlipRedpacketTemplateConfig, defaultFlipRedpacketConfig, FlipRedpacketTemplateConfigPanel } from "@/components/flip-redpacket-template-config";
+import { FlipRedpacketTemplate } from "@/components/flip-redpacket-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType, componentStyleTemplates } from "@/lib/component-types";
@@ -195,6 +197,11 @@ const componentConfigMap: Record<string, {
     name: "红包雨",
     description: "配置红包样式、引导文案和领奖场景",
   },
+  flip_redpacket: {
+    defaultConfig: defaultFlipRedpacketConfig,
+    name: "翻红包",
+    description: "点击红包翻出惊喜，领取奖励",
+  },
 };
 
 function ConfigContent() {
@@ -346,6 +353,7 @@ function ConfigContent() {
   const isPromotionComponent = type === "promotion_card";
   const isGameGiftComponent = type === "game_gift";
   const isRedpacketRainComponent = type === "redpacket_rain";
+  const isFlipRedpacketComponent = type === "flip_redpacket";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -450,6 +458,13 @@ function ConfigContent() {
                 onChange={handleConfigChange}
                 onSave={handleSave}
               />
+            ) : isFlipRedpacketComponent ? (
+              <FlipRedpacketTemplateConfigPanel
+                config={config as FlipRedpacketTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+                macroVariables={(config as FlipRedpacketTemplateConfig).macroVariables}
+              />
             ) : (
               <AdTemplateConfigPanel
                 config={config as AdTemplateConfig}
@@ -532,6 +547,16 @@ function ConfigContent() {
                               onClose={() => {}}
                             />
                           </div>
+                        ) : isFlipRedpacketComponent ? (
+                          <div className="w-full px-4">
+                            <FlipRedpacketTemplate
+                              key={`flip-${previewResetKey}`}
+                              config={config as FlipRedpacketTemplateConfig}
+                              isOpen={true}
+                              previewMode={true}
+                              onClose={() => {}}
+                            />
+                          </div>
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}
@@ -590,10 +615,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : isRedpacketRainComponent ? "红包雨" : "上文下按钮"}
+                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : isRedpacketRainComponent ? "红包雨" : isFlipRedpacketComponent ? "翻红包" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : isRedpacketRainComponent ? "红包飘落+领奖场景" : "主标题+副标题+双按钮"}
+                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : isRedpacketRainComponent ? "红包飘落+领奖场景" : isFlipRedpacketComponent ? "点击红包+翻出惊喜" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 
