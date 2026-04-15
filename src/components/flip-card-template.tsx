@@ -250,11 +250,15 @@ export function FlipCardTemplate({
                     <img
                       src={resolveCardImage()}
                       alt={`卡牌${index + 1}`}
-                      className={cn(
-                        "w-[100px] h-auto object-contain transition-transform duration-300",
-                        flipHoverIndex === index && !isFlipping && "animate-flip-hover",
-                        isFlipping && "animate-flip"
-                      )}
+                      className="w-[100px] h-auto object-contain"
+                      style={{
+                        transform: flipHoverIndex === index && !isFlipping 
+                          ? "perspective(500px) rotateY(20deg)" 
+                          : isFlipping 
+                            ? "perspective(500px) rotateY(90deg)" 
+                            : "perspective(500px) rotateY(0deg)",
+                        transition: isFlipping ? "transform 0.6s ease-in-out" : "transform 0.3s ease-out",
+                      }}
                       draggable={false}
                     />
                   </div>
