@@ -187,8 +187,8 @@ export function FlipRedpacketTemplate({
       <div
         className={cn(
           previewMode
-            ? "relative w-full bg-gradient-to-b from-[#8B0000] to-[#4A0000] rounded-2xl overflow-hidden"
-            : "relative w-full max-w-sm bg-gradient-to-b from-[#8B0000] to-[#4A0000] rounded-2xl shadow-2xl overflow-hidden",
+            ? "relative w-full bg-gradient-to-b from-[#8B0000]/70 to-[#4A0000]/70 rounded-2xl overflow-hidden"
+            : "relative w-full max-w-sm bg-gradient-to-b from-[#8B0000]/70 to-[#4A0000]/70 rounded-2xl shadow-2xl overflow-hidden",
           "transition-all duration-500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}
