@@ -307,6 +307,23 @@ export function ComponentList() {
     return typeMap[type] || type;
   };
 
+  // 格式化时间显示
+  const formatTime = (timeStr: string): string => {
+    if (!timeStr) return "-";
+    try {
+      const date = new Date(timeStr);
+      if (isNaN(date.getTime())) return timeStr;
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    } catch {
+      return timeStr;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -537,7 +554,7 @@ export function ComponentList() {
                       {component.editor}
                     </TableCell>
                     <TableCell className="text-gray-500 text-sm">
-                      {component.updateTime}
+                      {formatTime(component.updateTime)}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
