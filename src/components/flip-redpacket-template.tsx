@@ -214,7 +214,7 @@ export function FlipRedpacketTemplate({
                 <img
                   src="/flip-redpacket-header.png"
                   alt="翻红包"
-                  className="w-[160px] h-auto object-contain inline-block"
+                  className="w-[50px] h-auto object-contain inline-block"
                   draggable={false}
                 />
               </div>
