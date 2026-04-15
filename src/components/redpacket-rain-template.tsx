@@ -200,15 +200,22 @@ export function RedpacketRainTemplate({
 
   // 解析落地页
   const resolveLandingPage = useCallback((): string => {
+    // 优先使用配置的落地页宏变量
     if (finalConfig.landingPageMacro) {
       const resolved = resolveMacro(finalConfig.landingPageMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
-        return "";
+        // 宏变量未解析，使用默认落地页
+        return finalConfig.defaultLandingPageUrl || "";
       }
       return resolved;
     }
-    return finalConfig.landingPageUrl || "";
-  }, [finalConfig.landingPageMacro, finalConfig.landingPageUrl, resolveMacro]);
+    // 其次使用配置的落地页
+    if (finalConfig.landingPageUrl) {
+      return resolveMacro(finalConfig.landingPageUrl);
+    }
+    // 最后使用默认落地页
+    return finalConfig.defaultLandingPageUrl || "";
+  }, [finalConfig.landingPageMacro, finalConfig.landingPageUrl, finalConfig.defaultLandingPageUrl, resolveMacro]);
 
   // 解析现金金额
   const resolveCashAmount = useCallback((): string => {
