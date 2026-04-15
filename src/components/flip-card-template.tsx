@@ -181,7 +181,7 @@ export function FlipCardTemplate({
     <div
       className={cn(
         previewMode
-          ? "fixed bottom-0 left-0 right-0"
+          ? "w-full rounded-t-2xl overflow-hidden"
           : "fixed inset-0 z-50 bg-black/80 flex items-end justify-center"
       )}
       onClick={() => !previewMode && onClose?.()}
@@ -190,7 +190,7 @@ export function FlipCardTemplate({
       <div
         className={cn(
           previewMode
-            ? "relative w-full rounded-t-2xl overflow-hidden"
+            ? "relative w-full"
             : "relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden mb-4",
           "transition-all duration-500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"

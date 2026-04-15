@@ -598,7 +598,7 @@ function ConfigContent() {
                             />
                           </div>
                         ) : isFlipCardComponent ? (
-                          <div className="w-full px-4">
+                          <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
                             <FlipCardTemplate
                               key={`card-${previewResetKey}`}
                               config={config as FlipCardConfig}
