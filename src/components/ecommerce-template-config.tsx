@@ -419,7 +419,7 @@ export function EcommerceTemplateConfigPanel({
           {isImageOpen && (
             <div className="px-4 pb-4 space-y-4">
               <p className="text-xs text-gray-400">
-                图片要求：174×174px，JPG/PNG/JPEG，最大 1MB
+                图片要求：宽高比 1:1，JPG/PNG/JPEG，最大 1MB
               </p>
               
               {/* 图片上传/宏选择 */}
