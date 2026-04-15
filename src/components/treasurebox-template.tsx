@@ -144,13 +144,12 @@ export function TreasureBoxTemplate({
     if (!isVisible || showReward) return;
     
     const interval = setInterval(() => {
-      const nextIndex = (gestureIndex + 1) % 3; // 三个宝箱
-      setGestureIndex(nextIndex);
-      setFlipHoverIndex(nextIndex);
+      setGestureIndex((prev) => (prev + 1) % 3);
+      setFlipHoverIndex((prev) => (prev + 1) % 3);
     }, 1500);
     
     return () => clearInterval(interval);
-  }, [isVisible, showReward, gestureIndex]);
+  }, [isVisible, showReward]);
 
   // 点击宝箱
   const handleTreasureboxClick = useCallback(() => {
@@ -245,13 +244,13 @@ export function TreasureBoxTemplate({
                         draggable={false}
                       />
                     )}
-                    {/* 宝箱图片 - 手势指向时翻转 */}
+                    {/* 宝箱图片 - 手势指向时抖动 */}
                     <img
                       src={resolveTreasureboxImage()}
                       alt={`宝箱${index + 1}`}
                       className={cn(
                         "w-[100px] h-auto object-contain transition-transform duration-300",
-                        flipHoverIndex === index && "animate-gesture-flip",
+                        flipHoverIndex === index && !isFlipping && "animate-shake",
                         isFlipping && "animate-flip"
                       )}
                       draggable={false}
@@ -343,25 +342,28 @@ export function TreasureBoxTemplate({
           }
         }
         
+        @keyframes shake {
+          0%, 100% {
+            transform: translateX(0) rotate(0deg);
+          }
+          10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-3px) rotate(-5deg);
+          }
+          20%, 40%, 60%, 80% {
+            transform: translateX(3px) rotate(5deg);
+          }
+        }
+        
         .animate-flip {
           animation: flip 0.6s ease-in-out;
         }
         
-        .animate-gesture-flip {
-          animation: gestureFlip 0.3s ease-in-out;
+        .animate-shake {
+          animation: shake 0.5s ease-in-out infinite;
         }
         
         .animate-fadeIn {
           animation: fadeIn 0.4s ease-out;
-        }
-        
-        @keyframes gestureFlip {
-          0%, 100% {
-            transform: scaleX(1) rotateY(0deg);
-          }
-          50% {
-            transform: scaleX(0) rotateY(90deg);
-          }
         }
       `}</style>
     </div>
