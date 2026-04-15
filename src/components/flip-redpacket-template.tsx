@@ -212,16 +212,6 @@ export function FlipRedpacketTemplate({
           {!showReward ? (
             /* 红包场景 - 三个红包并排 */
             <>
-              {/* 头部图片 */}
-              <div className="mb-4 text-center">
-                <img
-                  src="/flip-redpacket-header.png"
-                  alt="翻红包"
-                  className="w-[50px] h-auto object-contain inline-block"
-                  draggable={false}
-                />
-              </div>
-
               {/* 引导文案 */}
               <div className="mb-6 text-center">
                 <div className="bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
