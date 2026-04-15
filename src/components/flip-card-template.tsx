@@ -246,13 +246,13 @@ export function FlipCardTemplate({
                         draggable={false}
                       />
                     )}
-                    {/* 卡牌图片 - 手势指向时抖动 */}
+                    {/* 卡牌图片 - 手势指向时翻面 */}
                     <img
                       src={resolveCardImage()}
                       alt={`卡牌${index + 1}`}
                       className={cn(
                         "w-[100px] h-auto object-contain transition-transform duration-300",
-                        flipHoverIndex === index && !isFlipping && "animate-shake",
+                        flipHoverIndex === index && !isFlipping && "animate-flip-hover",
                         isFlipping && "animate-flip"
                       )}
                       draggable={false}
@@ -333,6 +333,15 @@ export function FlipCardTemplate({
           }
         }
         
+        @keyframes flipHover {
+          0% {
+            transform: rotateY(0deg);
+          }
+          100% {
+            transform: rotateY(20deg);
+          }
+        }
+        
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -344,24 +353,12 @@ export function FlipCardTemplate({
           }
         }
         
-        @keyframes shake {
-          0%, 100% {
-            transform: translateX(0) rotate(0deg);
-          }
-          10%, 30%, 50%, 70%, 90% {
-            transform: translateX(-3px) rotate(-5deg);
-          }
-          20%, 40%, 60%, 80% {
-            transform: translateX(3px) rotate(5deg);
-          }
-        }
-        
         .animate-flip {
           animation: flip 0.6s ease-in-out;
         }
         
-        .animate-shake {
-          animation: shake 0.5s ease-in-out infinite;
+        .animate-flip-hover {
+          animation: flipHover 0.3s ease-out forwards;
         }
         
         .animate-fadeIn {
