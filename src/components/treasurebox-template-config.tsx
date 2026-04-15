@@ -275,7 +275,6 @@ export const defaultTreasureBoxConfig: TreasureBoxConfig = {
 export interface TreasureBoxTemplateConfigPanelProps {
   config: TreasureBoxConfig;
   onChange: (config: TreasureBoxConfig) => void;
-  onSave?: () => void;
   macroVariables?: Record<string, string>;
   onMacroVariablesChange?: (vars: Record<string, string>) => void;
 }
@@ -284,7 +283,6 @@ export interface TreasureBoxTemplateConfigPanelProps {
 export function TreasureBoxTemplateConfigPanel({
   config,
   onChange,
-  onSave,
   macroVariables = {},
   onMacroVariablesChange,
 }: TreasureBoxTemplateConfigPanelProps) {
@@ -596,18 +594,6 @@ export function TreasureBoxTemplateConfigPanel({
           </div>
         )}
       </div>
-
-      {/* 保存按钮 */}
-      {onSave && (
-        <div className="flex justify-center pt-4 mt-4 border-t border-gray-200">
-          <Button
-            onClick={onSave}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium"
-          >
-            保存
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
