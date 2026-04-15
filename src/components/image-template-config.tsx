@@ -281,7 +281,7 @@ function ImageItemEditor({
             onChange={(url) => onChange({ ...image, imageUrl: url, imageMacro: undefined })}
             label="上传图片"
             maxSize={1}
-            aspectRatio="9:16"
+            aspectRatio="16:9"
           />
         )}
       </div>
