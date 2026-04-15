@@ -102,9 +102,9 @@ export function RedpacketRainTemplate({
   const containerHeightRef = useRef(500);
 
   // 红包雨配置
-  const MAX_REDPACKETS = 8; // 最多同时存在8个红包，更有美感
-  const SPAWN_INTERVAL = 667; // 每667ms生成一个，速度增加0.2倍
-  const BASE_DURATION = 6667; // 基础飘落时长6.7秒，速度增加0.2倍
+  const MAX_REDPACKETS = 8; // 最多同时存在8个红包
+  const SPAWN_INTERVAL = 667; // 每667ms生成一个
+  const BASE_DURATION = 6367; // 基础飘落时长6.367秒（6.7秒-0.3秒）
   const BASE_SIZE = 36; // 基础红包大小
 
   // 生成随机红包 - 模仿落叶飘落
@@ -130,8 +130,8 @@ export function RedpacketRainTemplate({
     // 随机大小（32-48像素），稍微大一些更美观
     const size = BASE_SIZE + Math.random() * 16;
     
-    // 随机延迟（1-3秒后开始），避免同时出现在顶部
-    const delay = 1000 + Math.random() * 2000;
+    // 随机延迟（0-500ms），取消入场延迟，直接从引导文案下方开始
+    const delay = Math.random() * 500;
     
     return {
       id,
@@ -292,9 +292,9 @@ export function RedpacketRainTemplate({
       containerHeightRef.current = containerRef.current.offsetHeight;
     }
 
-    // 初始生成几个红包，延迟更大避免同时出现在顶部
+    // 初始生成几个红包，立即开始
     for (let i = 0; i < 4; i++) {
-      setTimeout(() => addRedpacket(), 1000 + i * 600);
+      setTimeout(() => addRedpacket(), i * 100);
     }
 
     // 定时生成新红包
@@ -360,11 +360,9 @@ export function RedpacketRainTemplate({
         <div className={`absolute inset-0 ${previewMode ? "bg-black/30 rounded-xl" : "bg-black/30"}`} />
       )}
 
-      {/* Modal Content - 半屏浮层，宽度小于屏幕，高度为宽度的1.2倍 */}
+      {/* Modal Content - 直接显示，取消入场动画 */}
       <div
-        className={`relative w-full h-full max-w-full flex flex-col transition-all duration-500 ${
-          isVisible ? "translate-y-0" : previewMode ? "" : "-translate-y-full"
-        }`}
+        className={`relative w-full h-full max-w-full flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button - 底边中间，仅图标 */}
