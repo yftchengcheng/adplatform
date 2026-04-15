@@ -181,7 +181,7 @@ export function FlipCardTemplate({
     <div
       className={cn(
         previewMode
-          ? "w-full flex items-center justify-center"
+          ? "w-full flex items-end justify-center pb-4"
           : "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
       )}
       onClick={() => !previewMode && onClose?.()}
@@ -211,12 +211,12 @@ export function FlipCardTemplate({
         </button>
 
         {/* Content */}
-        <div className="p-6 flex flex-col items-center relative">
+        <div className="p-4 flex flex-col items-center relative">
           {!showReward ? (
             /* 翻卡场景 */
             <>
               {/* 引导文案 */}
-              <div className="mb-6 text-center">
+              <div className="mb-3 text-center">
                 <div className="bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
                   <p className="text-white text-sm font-semibold animate-pulse">
                     {resolveGuideText()}
@@ -225,7 +225,7 @@ export function FlipCardTemplate({
               </div>
 
               {/* 三个卡牌并排 - 手势内嵌到卡牌上方 */}
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex items-center justify-center gap-4 mb-2">
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
@@ -262,7 +262,7 @@ export function FlipCardTemplate({
               </div>
 
               {/* 提示文字 */}
-              <p className="mt-6 text-white/70 text-xs text-center invisible">
+              <p className="text-white/70 text-xs text-center invisible">
                 占位
               </p>
             </>
