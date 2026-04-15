@@ -252,7 +252,7 @@ export function FlipRedpacketTemplate({
                         src="/flip-redpacket-gesture.png"
                         alt="手势"
                         className="w-10 h-auto absolute animate-bounce z-10"
-                        style={{ top: '15px', left: 'calc(50% + 5px)', transform: 'translateX(-50%)', animationDuration: '0.8s' }}
+                        style={{ top: '20px', left: 'calc(50% + 5px)', transform: 'translateX(-50%)', animationDuration: '0.8s' }}
                         draggable={false}
                       />
                     )}
