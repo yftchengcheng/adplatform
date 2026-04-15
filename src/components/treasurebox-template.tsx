@@ -240,8 +240,8 @@ export function TreasureBoxTemplate({
                       <img
                         src="/treasurebox-gesture.png"
                         alt="手势"
-                        className="w-10 h-auto absolute left-1/2 -translate-x-1/2 animate-bounce z-10"
-                        style={{ top: '20px', animationDuration: '0.8s' }}
+                        className="w-10 h-auto absolute animate-bounce z-10"
+                        style={{ top: '20px', left: 'calc(50% + 2px)', transform: 'translateX(-50%)', animationDuration: '0.8s' }}
                         draggable={false}
                       />
                     )}
