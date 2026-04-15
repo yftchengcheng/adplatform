@@ -386,8 +386,8 @@ export function RedpacketRainTemplate({
                   </p>
                 </div>
 
-                {/* 手势提示 - 闪现提示用户点击红包 */}
-                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+                {/* 手势提示 - 闪现提示用户点击红包，移到组件底部 */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
                   <img
                     src="/gesture-hand.png"
                     alt="手势提示"
