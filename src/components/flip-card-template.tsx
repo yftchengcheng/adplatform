@@ -203,7 +203,7 @@ export function FlipCardTemplate({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 transition-colors"
+          className="absolute top-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 transition-colors"
         >
           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -216,7 +216,7 @@ export function FlipCardTemplate({
             /* 翻卡场景 */
             <>
               {/* 引导文案 */}
-              <div className="mt-8 mb-3 text-center">
+              <div className="mt-4 mb-3 text-center">
                 <div className="bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
                   <p className="text-white text-sm font-semibold animate-pulse">
                     {resolveGuideText()}
