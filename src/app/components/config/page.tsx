@@ -532,7 +532,7 @@ function ConfigContent() {
                     </svg>
                     效果预览
                   </h3>
-                  {(isRedpacketRainComponent || isFlipRedpacketComponent || isTreasureBoxComponent || isFlipCardComponent) && (
+                  {isRedpacketRainComponent && (
                     <button
                       onClick={() => setPreviewResetKey(k => k + 1)}
                       className="px-2 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md border border-blue-200 transition-colors"
