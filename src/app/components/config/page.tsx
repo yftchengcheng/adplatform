@@ -543,6 +543,14 @@ function ConfigContent() {
                       重新预览
                     </button>
                   )}
+                  {(isFlipRedpacketComponent || isTreasureBoxComponent || isFlipCardComponent) && (
+                    <button
+                      onClick={() => setPreviewResetKey(k => k + 1)}
+                      className="px-2 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md border border-blue-200 transition-colors"
+                    >
+                      重新预览
+                    </button>
+                  )}
                 </div>
                 <p className="text-xs text-gray-400 mt-1">随滚动固定</p>
               </div>
