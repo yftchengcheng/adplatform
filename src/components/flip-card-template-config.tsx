@@ -342,7 +342,7 @@ export function FlipCardTemplateConfigPanel({
             <ImageUpload
               value={config.cardImageUrl || ""}
               onChange={(url) => updateConfig({ cardImageUrl: url })}
-              aspectRatio="133:115"
+              aspectRatio="3:4"
               maxSize={0.03}
               placeholder="点击上传卡牌图片"
               error={
@@ -352,7 +352,7 @@ export function FlipCardTemplateConfigPanel({
               }
             />
             <p className="text-xs text-gray-400">
-              尺寸：133×115px，JPG/PNG/JPEG，最大 30KB
+              宽高比 3:4，JPG/PNG/JPEG，最大 30KB
             </p>
           </div>
 
