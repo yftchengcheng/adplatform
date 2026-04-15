@@ -436,6 +436,11 @@ export function FlipRedpacketTemplateConfigPanel({
     config.componentName ? "macro" : "input"
   );
 
+  // 奖励图片模式状态
+  const [rewardImageMode, setRewardImageMode] = useState<"input" | "macro">(
+    config.rewardImageMacro ? "macro" : "input"
+  );
+
   // 获取引导文案值
   const getGuideTextValue = () => {
     return guideTextMode === "macro"
@@ -453,6 +458,13 @@ export function FlipRedpacketTemplateConfigPanel({
   // 获取组件名称值
   const getComponentNameValue = () => {
     return componentNameMode ? (config.componentNameMacro || "") : (config.componentName || "");
+  };
+
+  // 获取奖励图片值
+  const getRewardImageValue = () => {
+    return rewardImageMode === "macro"
+      ? (config.rewardImageMacro || "")
+      : (config.rewardImageUrl || "");
   };
 
   // 落地页展开状态
@@ -567,17 +579,35 @@ export function FlipRedpacketTemplateConfigPanel({
           {/* 自定义奖励图片 */}
           {config.rewardType === "custom" && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">奖励图片</label>
-              <ImageUpload
-                value={config.rewardImageUrl || ""}
-                onChange={(url) => updateConfig({ rewardImageUrl: url })}
-                aspectRatio="690:360"
-                maxSize={0.1}
-                placeholder="点击上传奖励图片"
-              />
-              <p className="text-xs text-gray-400">
-                尺寸：690×360px，JPG/PNG/JPEG，最大 100KB
-              </p>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">奖励图片</label>
+                <ModeToggle value={rewardImageMode} onChange={setRewardImageMode} />
+              </div>
+              {rewardImageMode === "input" ? (
+                <>
+                  <ImageUpload
+                    value={config.rewardImageUrl || ""}
+                    onChange={(url) => updateConfig({ rewardImageUrl: url })}
+                    aspectRatio="690:360"
+                    maxSize={0.1}
+                    placeholder="点击上传奖励图片"
+                  />
+                  <p className="text-xs text-gray-400">
+                    尺寸：690×360px，JPG/PNG/JPEG，最大 100KB
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Input
+                    value={getRewardImageValue()}
+                    onChange={(e) => updateConfig({ rewardImageMacro: e.target.value })}
+                    placeholder="如 ${reward_image}"
+                  />
+                  <p className="text-xs text-gray-400">
+                    图片宏变量，如 ${reward_image}
+                  </p>
+                </>
+              )}
             </div>
           )}
 
