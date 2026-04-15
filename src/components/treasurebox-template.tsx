@@ -144,7 +144,7 @@ export function TreasureBoxTemplate({
     if (!isVisible || showReward) return;
     
     const interval = setInterval(() => {
-      const nextIndex = (gestureIndex + 1) % 1; // 只有一个宝箱
+      const nextIndex = (gestureIndex + 1) % 3; // 三个宝箱
       setGestureIndex(nextIndex);
       setFlipHoverIndex(nextIndex);
     }, 1500);
@@ -223,36 +223,41 @@ export function TreasureBoxTemplate({
                 </div>
               </div>
 
-              {/* 宝箱 - 手势内嵌到宝箱上方 */}
-              <div
-                className={cn(
-                  "relative cursor-pointer select-none",
-                  "transform transition-transform duration-300",
-                  "hover:scale-105 active:scale-95"
-                )}
-                onClick={handleTreasureboxClick}
-              >
-                {/* 手势提示 */}
-                {gestureIndex === 0 && (
-                  <img
-                    src="/treasurebox-gesture.png"
-                    alt="手势"
-                    className="w-10 h-auto absolute left-1/2 -translate-x-1/2 animate-bounce z-10"
-                    style={{ top: '20px', animationDuration: '0.8s' }}
-                    draggable={false}
-                  />
-                )}
-                {/* 宝箱图片 - 手势指向时翻转 */}
-                <img
-                  src={resolveTreasureboxImage()}
-                  alt="宝箱"
-                  className={cn(
-                    "w-[100px] h-auto object-contain transition-transform duration-300",
-                    flipHoverIndex === 0 && "animate-gesture-flip",
-                    isFlipping && "animate-flip"
-                  )}
-                  draggable={false}
-                />
+              {/* 三个宝箱并排 - 手势内嵌到宝箱上方 */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                {[0, 1, 2].map((index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "relative cursor-pointer select-none",
+                      "transform transition-transform duration-300",
+                      "hover:scale-105 active:scale-95"
+                    )}
+                    onClick={handleTreasureboxClick}
+                  >
+                    {/* 手势提示 */}
+                    {gestureIndex === index && (
+                      <img
+                        src="/treasurebox-gesture.png"
+                        alt="手势"
+                        className="w-10 h-auto absolute left-1/2 -translate-x-1/2 animate-bounce z-10"
+                        style={{ top: '20px', animationDuration: '0.8s' }}
+                        draggable={false}
+                      />
+                    )}
+                    {/* 宝箱图片 - 手势指向时翻转 */}
+                    <img
+                      src={resolveTreasureboxImage()}
+                      alt={`宝箱${index + 1}`}
+                      className={cn(
+                        "w-[100px] h-auto object-contain transition-transform duration-300",
+                        flipHoverIndex === index && "animate-gesture-flip",
+                        isFlipping && "animate-flip"
+                      )}
+                      draggable={false}
+                    />
+                  </div>
+                ))}
               </div>
 
               {/* 提示文字 */}
