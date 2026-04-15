@@ -319,10 +319,10 @@ function ConfigContent() {
       }
       clearSavedConfig();
       showToast(componentId ? "组件更新成功！" : "组件保存成功！", "success");
-      // 延迟跳转，让用户看到成功提示
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
+      
+      // 等待一小段时间确保数据库写入完成，然后强制刷新列表页
+      await new Promise(resolve => setTimeout(resolve, 500));
+      window.location.href = "/";
     } catch (error) {
       console.error("保存失败:", error);
       showToast("保存失败，请重试", "error");
