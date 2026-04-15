@@ -238,12 +238,7 @@ export function FlipRedpacketTemplate({
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
-                    className={cn(
-                      "relative cursor-pointer select-none",
-                      "transform transition-transform duration-300",
-                      "hover:scale-105 active:scale-95",
-                      isFlipping && "animate-flip"
-                    )}
+                    className="relative w-[100px] h-[120px] flex items-center justify-center cursor-pointer select-none"
                     onClick={handleRedpacketClick}
                   >
                     {/* 手势提示 */}
@@ -251,16 +246,21 @@ export function FlipRedpacketTemplate({
                       <img
                         src="/flip-redpacket-gesture.png"
                         alt="手势"
-                        className="w-10 h-auto absolute -top-2 left-1/2 -translate-x-1/2 animate-bounce z-10"
+                        className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-auto animate-bounce z-10"
                         style={{ animationDuration: '0.8s' }}
                         draggable={false}
                       />
                     )}
-                    {/* 红包图片 */}
+                    {/* 红包图片 - 居中填充容器 */}
                     <img
                       src={resolveRedpacketImage()}
                       alt={`红包${index + 1}`}
-                      className="w-[100px] h-auto object-contain"
+                      className={cn(
+                        "w-full h-full object-contain",
+                        "transform transition-transform duration-300",
+                        "hover:scale-105 active:scale-95",
+                        isFlipping && "animate-flip"
+                      )}
                       draggable={false}
                     />
                   </div>
