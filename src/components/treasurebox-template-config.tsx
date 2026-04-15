@@ -89,6 +89,9 @@ function ImageUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 清除之前的错误提示
+    setUploadError("");
+
     // Validate file type
     if (!file.type.startsWith("image/")) {
       setUploadError("请上传图片文件（支持 JPG、PNG、GIF、WebP 等格式）");
