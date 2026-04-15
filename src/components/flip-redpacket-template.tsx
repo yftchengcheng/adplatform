@@ -207,7 +207,7 @@ export function FlipRedpacketTemplate({
         {/* Content */}
         <div className="p-6 flex flex-col items-center">
           {!showReward ? (
-            /* 红包场景 */
+            /* 红包场景 - 三个红包并排 */
             <>
               {/* 引导文案 */}
               <div className="mb-8 text-center">
@@ -218,41 +218,45 @@ export function FlipRedpacketTemplate({
                 </div>
               </div>
 
-              {/* 红包 */}
-              <div
-                className={cn(
-                  "relative cursor-pointer select-none",
-                  "transform transition-transform duration-300",
-                  "hover:scale-105 active:scale-95",
-                  isFlipping && "animate-flip"
-                )}
-                onClick={handleRedpacketClick}
-                onTouchStart={handleTouchStart}
+              {/* 三个红包并排 */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                {[0, 1, 2].map((index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "relative cursor-pointer select-none",
+                      "transform transition-transform duration-300",
+                      "hover:scale-105 active:scale-95",
+                      isFlipping && "animate-flip"
+                    )}
+                    onClick={handleRedpacketClick}
+                  >
+                    {/* 红包图片 */}
+                    <img
+                      src={resolveRedpacketImage()}
+                      alt={`红包${index + 1}`}
+                      className="w-[100px] h-auto object-contain"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* 手势提示 */}
+              <div 
+                className="flex justify-center animate-bounce"
+                style={{ animationDuration: '1.2s' }}
               >
-                {/* 红包图片 */}
                 <img
-                  src={resolveRedpacketImage()}
-                  alt="红包"
-                  className="w-[200px] h-auto object-contain"
+                  src="/flip-redpacket-gesture.png"
+                  alt="手势"
+                  className="w-10 h-auto"
                   draggable={false}
                 />
-
-                {/* 手势提示 */}
-                <div 
-                  className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce"
-                  style={{ animationDuration: '1.2s' }}
-                >
-                  <img
-                    src="/flip-redpacket-gesture.png"
-                    alt="手势"
-                    className="w-10 h-auto"
-                    draggable={false}
-                  />
-                </div>
               </div>
 
               {/* 提示文字 */}
-              <p className="mt-16 text-white/70 text-xs text-center">
+              <p className="mt-6 text-white/70 text-xs text-center">
                 点击红包翻出惊喜
               </p>
             </>
