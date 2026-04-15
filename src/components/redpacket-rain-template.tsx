@@ -379,8 +379,6 @@ export function RedpacketRainTemplate({
             {/* Guide Text */}
             <div className="absolute top-6 left-0 right-0 z-10">
               <div className="relative flex flex-col items-center">
-                {/* 光晕效果 */}
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 via-yellow-100/40 to-yellow-300/30 blur-sm rounded-full" />
                 {/* 背景 */}
                 <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 whitespace-nowrap">
                   <p className="text-white text-sm font-semibold text-center drop-shadow-lg animate-pulse">
