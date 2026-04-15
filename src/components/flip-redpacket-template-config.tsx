@@ -431,11 +431,6 @@ export function FlipRedpacketTemplateConfigPanel({
     config.landingPageMacro ? "macro" : "input"
   );
 
-  // 组件名称状态
-  const [componentNameMode, setComponentNameMode] = useState<"input" | "macro">(
-    config.componentName ? "macro" : "input"
-  );
-
   // 奖励图片模式状态
   const [rewardImageMode, setRewardImageMode] = useState<"input" | "macro">(
     config.rewardImageMacro ? "macro" : "input"
@@ -453,11 +448,6 @@ export function FlipRedpacketTemplateConfigPanel({
     return landingPageMode === "macro"
       ? (config.landingPageMacro || "")
       : (config.landingPageUrl || "");
-  };
-
-  // 获取组件名称值
-  const getComponentNameValue = () => {
-    return componentNameMode ? (config.componentNameMacro || "") : (config.componentName || "");
   };
 
   // 获取奖励图片值
@@ -707,19 +697,9 @@ export function FlipRedpacketTemplateConfigPanel({
         {basicOpen && (
           <div className="p-4 space-y-4 border-t border-gray-200">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">组件名称</label>
-                <ModeToggle value={componentNameMode} onChange={setComponentNameMode} />
-              </div>
               <Input
-                value={getComponentNameValue()}
-                onChange={(e) => {
-                  if (componentNameMode) {
-                    updateConfig({ componentNameMacro: e.target.value });
-                  } else {
-                    updateConfig({ componentName: e.target.value });
-                  }
-                }}
+                value={config.componentName || ""}
+                onChange={(e) => updateConfig({ componentName: e.target.value })}
                 placeholder="输入组件名称"
               />
             </div>
