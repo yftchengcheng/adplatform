@@ -294,17 +294,20 @@ export function FlipRedpacketTemplate({
                 ) : (
                   /* 自定义图片奖励 */
                   <div className="rounded-xl overflow-hidden shadow-lg">
-                    {resolveRewardImage() ? (
-                      <img
-                        src={resolveRewardImage()}
-                        alt="奖励"
-                        className="w-[280px] h-auto object-contain"
-                      />
-                    ) : (
-                      <div className="w-[280px] h-[150px] bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400">奖励图片</span>
-                      </div>
-                    )}
+                    {((): React.ReactNode => {
+                      const rewardImg = resolveRewardImage();
+                      return rewardImg ? (
+                        <img
+                          src={rewardImg}
+                          alt="奖励"
+                          className="w-[280px] h-auto object-contain"
+                        />
+                      ) : (
+                        <div className="w-[280px] h-[150px] bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400">奖励图片</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
