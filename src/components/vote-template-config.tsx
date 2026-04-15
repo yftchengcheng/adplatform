@@ -513,6 +513,33 @@ export function VoteTemplateConfigPanel({
 
           {isLandingOpen && (
             <div className="px-4 pb-4 space-y-4">
+              {/* Action */}
+              <div className="space-y-2">
+                <label className="text-xs text-gray-500">
+                  点击后动作 <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={config.action || "jump"}
+                  onValueChange={(v) => handleActionChange(v as "jump" | "show_image")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="jump">
+                      <div className="flex items-center gap-2">
+                        <span>跳转落地页</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="show_image">
+                      <div className="flex items-center gap-2">
+                        <span>显示图片</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Image Upload - Only show when action is "show_image" */}
               {config.action === "show_image" && (
                 <div className="space-y-2">
