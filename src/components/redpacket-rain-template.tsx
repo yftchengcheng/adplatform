@@ -379,24 +379,23 @@ export function RedpacketRainTemplate({
             {/* Guide Text */}
             <div className="absolute top-6 left-0 right-0 z-10">
               <div className="relative flex flex-col items-center">
-                {/* 背景 */}
                 <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 whitespace-nowrap">
                   <p className="text-white text-sm font-semibold text-center drop-shadow-lg animate-pulse">
                     {resolveGuideText()}
                   </p>
                 </div>
               </div>
+            </div>
 
-              {/* 手势提示 - 闪现提示用户点击红包，放在场景底部 */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                <img
-                  src="/gesture-hand.png"
-                  alt="手势提示"
-                  className="w-6 h-auto animate-pulse opacity-60"
-                  style={{ animationDuration: '1s' }}
-                  draggable={false}
-                />
-              </div>
+            {/* 手势提示 - 闪现提示用户点击红包，放在场景底部 */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+              <img
+                src="/gesture-hand.png"
+                alt="手势提示"
+                className="w-6 h-auto animate-pulse opacity-60"
+                style={{ animationDuration: '1s' }}
+                draggable={false}
+              />
             </div>
 
             {/* Falling Redpackets - 落叶飘落效果，从文字下方开始 */}
