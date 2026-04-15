@@ -221,8 +221,10 @@ export function GameGiftTemplateConfigPanel({
   // 处理应用名称输入
   const handleAppNameInput = (value: string) => {
     if (appNameMode === "macro") {
-      updateConfig({ appNameMacro: value, appName: value });
+      // 宏模式下只设置 appNameMacro，保留 appName 作为默认值
+      updateConfig({ appNameMacro: value });
     } else {
+      // 输入模式下只设置 appName，清空宏变量
       updateConfig({ appName: value, appNameMacro: "" });
     }
   };
@@ -230,8 +232,10 @@ export function GameGiftTemplateConfigPanel({
   // 处理组件名称输入
   const handleComponentNameInput = (value: string) => {
     if (componentNameMode) {
-      updateConfig({ componentNameMacro: value, componentName: value });
+      // 宏模式下只设置 componentNameMacro，保留 componentName 作为默认值
+      updateConfig({ componentNameMacro: value });
     } else {
+      // 输入模式下只设置 componentName，清空宏变量
       updateConfig({ componentName: value, componentNameMacro: "" });
     }
   };
@@ -244,8 +248,10 @@ export function GameGiftTemplateConfigPanel({
   // 处理应用描述输入
   const handleAppDescInput = (value: string) => {
     if (appDescMode === "macro") {
-      updateConfig({ appDescriptionMacro: value, appDescription: value });
+      // 宏模式下只设置 appDescriptionMacro，保留 appDescription 作为默认值
+      updateConfig({ appDescriptionMacro: value });
     } else {
+      // 输入模式下只设置 appDescription，清空宏变量
       updateConfig({ appDescription: value, appDescriptionMacro: "" });
     }
   };
@@ -262,8 +268,10 @@ export function GameGiftTemplateConfigPanel({
   // 处理应用包名输入
   const handleAppPackageInput = (value: string) => {
     if (appPackageMode === "macro") {
-      updateConfig({ appPackageMacro: value, appPackageName: value });
+      // 宏模式下只设置 appPackageMacro，保留 appPackageName 作为默认值
+      updateConfig({ appPackageMacro: value });
     } else {
+      // 输入模式下只设置 appPackageName，清空宏变量
       updateConfig({ appPackageName: value, appPackageMacro: "" });
     }
   };
@@ -271,8 +279,10 @@ export function GameGiftTemplateConfigPanel({
   // 处理礼包码输入
   const handleGiftCodeInput = (value: string) => {
     if (giftCodeMode === "macro") {
-      updateConfig({ giftCodeMacro: value, giftCode: value });
+      // 宏模式下只设置 giftCodeMacro，保留 giftCode 作为默认值
+      updateConfig({ giftCodeMacro: value });
     } else {
+      // 输入模式下只设置 giftCode，清空宏变量
       updateConfig({ giftCode: value, giftCodeMacro: "" });
     }
   };
