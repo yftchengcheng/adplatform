@@ -432,7 +432,7 @@ export function RedpacketRainTemplate({
                 }
                 100% {
                   top: calc(100% - 60px);
-                  opacity: 0;
+                  opacity: 1;
                   transform: rotate(-5deg);
                 }
               }
