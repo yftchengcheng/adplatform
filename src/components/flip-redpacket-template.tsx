@@ -39,6 +39,7 @@ export function FlipRedpacketTemplate({
   const [showReward, setShowReward] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [gestureIndex, setGestureIndex] = useState(0);
 
   // 使用默认配置填充空值
   const defaultConfig: FlipRedpacketTemplateConfig = {
@@ -147,6 +148,17 @@ export function FlipRedpacketTemplate({
     }
   }, [isOpen]);
 
+  // 手势顺序闪现（1.5秒切换一次）
+  useEffect(() => {
+    if (!isVisible || showReward) return;
+    
+    const interval = setInterval(() => {
+      setGestureIndex((prev) => (prev + 1) % 3);
+    }, 1500);
+    
+    return () => clearInterval(interval);
+  }, [isVisible, showReward]);
+
   // 点击红包
   const handleRedpacketClick = useCallback(() => {
     if (isFlipping) return;
@@ -245,17 +257,21 @@ export function FlipRedpacketTemplate({
                 ))}
               </div>
 
-              {/* 手势提示 */}
-              <div 
-                className="flex justify-center animate-bounce"
-                style={{ animationDuration: '1.2s' }}
-              >
-                <img
-                  src="/flip-redpacket-gesture.png"
-                  alt="手势"
-                  className="w-10 h-auto"
-                  draggable={false}
-                />
+              {/* 手势提示 - 顺序闪现 */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="w-[100px] h-[80px] flex items-start justify-center relative">
+                    {gestureIndex === index && (
+                      <img
+                        src="/flip-redpacket-gesture.png"
+                        alt="手势"
+                        className="w-10 h-auto absolute top-0 animate-bounce"
+                        style={{ animationDuration: '0.8s' }}
+                        draggable={false}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
 
               {/* 提示文字 */}
