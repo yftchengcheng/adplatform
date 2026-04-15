@@ -375,7 +375,7 @@ export function RedpacketRainTemplate({
 
         {/* Redpacket Rain Scene */}
         {!isClaimed ? (
-          <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, rgba(139, 0, 0, 0.3), rgba(74, 0, 0, 0.3))" }}>
+          <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "rgba(0, 0, 0, 0.9)" }}>
             {/* Guide Text */}
             <div className="absolute top-6 left-0 right-0 z-10">
               <div className="relative flex flex-col items-center">
