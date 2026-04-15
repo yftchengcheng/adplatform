@@ -149,7 +149,7 @@ export function TreasureBoxTemplate({
     }, 1500);
     
     return () => clearInterval(interval);
-  }, [isVisible, showReward]);
+  }, [isVisible, showReward, isFlipping]);
 
   // 点击宝箱
   const handleTreasureboxClick = useCallback(() => {
