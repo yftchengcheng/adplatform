@@ -144,12 +144,17 @@ export function TreasureBoxTemplate({
     if (!isVisible || showReward) return;
     
     const interval = setInterval(() => {
+      // 同步更新手势和宝箱状态
       setGestureIndex((prev) => (prev + 1) % 3);
-      setFlipHoverIndex((prev) => (prev + 1) % 3);
     }, 1500);
     
     return () => clearInterval(interval);
   }, [isVisible, showReward, isFlipping]);
+  
+  // 宝箱抖动跟随手势
+  useEffect(() => {
+    setFlipHoverIndex(gestureIndex);
+  }, [gestureIndex]);
 
   // 点击宝箱
   const handleTreasureboxClick = useCallback(() => {
