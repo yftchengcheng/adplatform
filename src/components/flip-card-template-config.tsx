@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Plus } from "lucide-react";
 import { cn, getStringWidth } from "@/lib/utils";
@@ -274,6 +275,7 @@ export const defaultFlipCardConfig: FlipCardConfig = {
 export interface FlipCardTemplateConfigPanelProps {
   config: FlipCardConfig;
   onChange: (config: FlipCardConfig) => void;
+  onSave?: () => void;
   macroVariables?: Record<string, string>;
   onMacroVariablesChange?: (vars: Record<string, string>) => void;
 }
@@ -282,6 +284,7 @@ export interface FlipCardTemplateConfigPanelProps {
 export function FlipCardTemplateConfigPanel({
   config,
   onChange,
+  onSave,
   macroVariables = {},
   onMacroVariablesChange,
 }: FlipCardTemplateConfigPanelProps) {
@@ -593,6 +596,18 @@ export function FlipCardTemplateConfigPanel({
           </div>
         )}
       </div>
+
+      {/* 保存按钮 */}
+      {onSave && (
+        <div className="flex justify-center pt-4 mt-4 border-t border-gray-200">
+          <Button
+            onClick={onSave}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium"
+          >
+            保存
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
