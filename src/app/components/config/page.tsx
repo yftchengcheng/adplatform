@@ -24,6 +24,8 @@ import { FlipRedpacketTemplateConfig, defaultFlipRedpacketConfig, FlipRedpacketT
 import { FlipRedpacketTemplate } from "@/components/flip-redpacket-template";
 import { TreasureBoxConfig, defaultTreasureBoxConfig, TreasureBoxTemplateConfigPanel } from "@/components/treasurebox-template-config";
 import { TreasureBoxTemplate } from "@/components/treasurebox-template";
+import { FlipCardConfig, defaultFlipCardConfig, FlipCardTemplateConfigPanel } from "@/components/flip-card-template-config";
+import { FlipCardTemplate } from "@/components/flip-card-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType, componentStyleTemplates } from "@/lib/component-types";
@@ -209,6 +211,11 @@ const componentConfigMap: Record<string, {
     name: "翻宝箱",
     description: "点击宝箱翻出惊喜，领取奖励",
   },
+  flip_card: {
+    defaultConfig: defaultFlipCardConfig,
+    name: "翻卡",
+    description: "点击卡牌翻出惊喜，领取奖励",
+  },
 };
 
 function ConfigContent() {
@@ -362,6 +369,7 @@ function ConfigContent() {
   const isRedpacketRainComponent = type === "redpacket_rain";
   const isFlipRedpacketComponent = type === "flip_redpacket";
   const isTreasureBoxComponent = type === "flip_treasure";
+  const isFlipCardComponent = type === "flip_card";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -480,6 +488,13 @@ function ConfigContent() {
                 onSave={handleSave}
                 macroVariables={(config as TreasureBoxConfig).macroVariables}
               />
+            ) : isFlipCardComponent ? (
+              <FlipCardTemplateConfigPanel
+                config={config as FlipCardConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+                macroVariables={(config as FlipCardConfig).macroVariables}
+              />
             ) : (
               <AdTemplateConfigPanel
                 config={config as AdTemplateConfig}
@@ -582,6 +597,16 @@ function ConfigContent() {
                               onClose={() => {}}
                             />
                           </div>
+                        ) : isFlipCardComponent ? (
+                          <div className="w-full px-4">
+                            <FlipCardTemplate
+                              key={`card-${previewResetKey}`}
+                              config={config as FlipCardConfig}
+                              isOpen={true}
+                              previewMode={true}
+                              onClose={() => {}}
+                            />
+                          </div>
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}
@@ -640,10 +665,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : isRedpacketRainComponent ? "红包雨" : isFlipRedpacketComponent ? "翻红包" : isTreasureBoxComponent ? "翻宝箱" : "上文下按钮"}
+                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : isRedpacketRainComponent ? "红包雨" : isFlipRedpacketComponent ? "翻红包" : isTreasureBoxComponent ? "翻宝箱" : isFlipCardComponent ? "翻卡" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : isRedpacketRainComponent ? "红包飘落+领奖场景" : isFlipRedpacketComponent ? "点击红包+翻出惊喜" : isTreasureBoxComponent ? "点击宝箱+翻出惊喜" : "主标题+副标题+双按钮"}
+                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : isRedpacketRainComponent ? "红包飘落+领奖场景" : isFlipRedpacketComponent ? "点击红包+翻出惊喜" : isTreasureBoxComponent ? "点击宝箱+翻出惊喜" : isFlipCardComponent ? "点击卡牌+翻出惊喜" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 
