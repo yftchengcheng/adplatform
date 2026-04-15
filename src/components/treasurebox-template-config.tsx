@@ -161,7 +161,7 @@ function ImageUpload({
 
   return (
     <div className="space-y-2">
-      <label className="flex flex-col items-center justify-center py-6 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors">
+      <label className="relative flex flex-col items-center justify-center py-6 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors">
         {previewUrl ? (
           <div className="relative w-full h-full">
             <img src={previewUrl} alt="Preview" className="w-full h-auto object-contain max-h-32" />
@@ -186,8 +186,8 @@ function ImageUpload({
         )}
       </label>
       {previewUrl && (
-        <div className="flex gap-2">
-          <label className="flex-1 flex items-center justify-center py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm text-gray-600">
+        <div className="relative flex gap-2">
+          <label className="relative flex-1 flex items-center justify-center py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm text-gray-600">
             重新上传
             <input
               type="file"
@@ -198,7 +198,7 @@ function ImageUpload({
           </label>
           <button
             onClick={handleDelete}
-            className="flex-1 flex items-center justify-center py-2 border border-red-200 rounded-lg text-red-500 hover:bg-red-50 transition-colors text-sm"
+            className="relative flex-1 flex items-center justify-center py-2 border border-red-200 rounded-lg text-red-500 hover:bg-red-50 transition-colors text-sm"
           >
             删除
           </button>
