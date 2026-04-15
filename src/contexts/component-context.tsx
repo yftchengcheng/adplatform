@@ -136,67 +136,16 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
         // 过滤旧测试数据
         const filtered = filterLegacyData(deduplicated);
         setComponents(filtered);
-        // 同步到 localStorage 缓存
-        localStorage.setItem("ad_components", JSON.stringify(filtered));
       } else {
-        // 数据库为空，加载初始数据（去重）
-        const seen = new Set<string>();
-        const deduplicated = initialComponents.filter(item => {
-          if (seen.has(item.id)) return false;
-          seen.add(item.id);
-          return true;
-        });
-        // 过滤旧测试数据
-        const filtered = filterLegacyData(deduplicated);
-        setComponents(filtered);
-        localStorage.setItem("ad_components", JSON.stringify(filtered));
-        // 初始化数据库数据
-        for (const item of filtered) {
-          await fetch("/api/components", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(toDbFormat(item)),
-          });
-        }
+        // 数据库为空，使用空数组
+        setComponents([]);
       }
       setError(null);
     } catch (err) {
-      console.error("数据库加载失败，降级到 localStorage:", err);
-      // 降级到 localStorage（去重 + 过滤旧数据）
-      const stored = localStorage.getItem("ad_components");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          const filtered = filterLegacyData(parsed);
-          const seen = new Set<string>();
-          const deduplicated = filtered.filter((item: AdComponentItem) => {
-            if (seen.has(item.id)) return false;
-            seen.add(item.id);
-            return true;
-          });
-          setComponents(deduplicated);
-          localStorage.setItem("ad_components", JSON.stringify(deduplicated));
-        } catch {
-          const filtered = filterLegacyData(initialComponents);
-          const seen = new Set<string>();
-          const deduplicated = filtered.filter(item => {
-            if (seen.has(item.id)) return false;
-            seen.add(item.id);
-            return true;
-          });
-          setComponents(deduplicated);
-        }
-      } else {
-        const filtered = filterLegacyData(initialComponents);
-        const seen = new Set<string>();
-        const deduplicated = filtered.filter(item => {
-          if (seen.has(item.id)) return false;
-          seen.add(item.id);
-          return true;
-        });
-        setComponents(deduplicated);
-      }
-      setError("数据库连接失败，使用本地缓存");
+      console.error("数据库加载失败:", err);
+      // 数据库失败时使用空数组，避免使用 localStorage
+      setComponents([]);
+      setError("数据库连接失败");
     }
   }, []);
 
@@ -204,11 +153,6 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadComponents().finally(() => setIsInitialized(true));
   }, [loadComponents]);
-
-  // 保存数据到 localStorage
-  const saveToStorage = useCallback((data: AdComponentItem[]) => {
-    localStorage.setItem("ad_components", JSON.stringify(data));
-  }, []);
 
   // 生成顺序ID
   const generateSequentialId = useCallback((existingComponents: AdComponentItem[]): string => {
@@ -262,10 +206,9 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     // 更新本地状态
     setComponents(prev => {
       const updated = [newComponent, ...prev];
-      saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage, generateSequentialId, components]);
+  }, [generateSequentialId, components]);
 
   // 更新组件
   const updateComponent = useCallback(async (id: string, updates: Partial<AdComponentItem>) => {
@@ -304,10 +247,9 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
           ? { ...item, ...updates, updateTime: timeStr }
           : item
       );
-      saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, []);
 
   // 删除组件
   const deleteComponent = useCallback(async (id: string) => {
@@ -327,10 +269,9 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     // 更新本地状态
     setComponents(prev => {
       const updated = prev.filter(item => item.id !== id);
-      saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, []);
 
   // 切换状态
   const toggleStatus = useCallback(async (id: string) => {
@@ -362,10 +303,9 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
           ? { ...item, status: newStatus }
           : item
       );
-      saveToStorage(updated);
       return updated;
     });
-  }, [components, saveToStorage]);
+  }, [components]);
 
   // 获取单个组件
   const getComponent = useCallback((id: string) => {
