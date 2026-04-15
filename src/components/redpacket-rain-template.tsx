@@ -387,7 +387,7 @@ export function RedpacketRainTemplate({
                 </div>
 
                 {/* 手势提示 - 提示用户点击红包，往下移55px */}
-                <div className="relative gesture-hint animate-bounce" style={{ marginTop: '71px', animationDuration: '1.2s', animationIterationCount: 'infinite' }}>
+                <div className="relative gesture-hint animate-bounce pointer-events-none" style={{ marginTop: '71px', animationDuration: '1.2s', animationIterationCount: 'infinite' }}>
                   <img
                     src="/gesture-hand.png"
                     alt="手势提示"
