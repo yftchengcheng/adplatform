@@ -733,9 +733,11 @@ export function ComponentList() {
                           />
                         </div>
                       ) : (
+                        // 默认使用 AdTemplate（双按钮磁贴）
                         <AdTemplate
                           config={previewComponent.config as unknown as AdTemplateConfig}
                           isOpen={true}
+                          previewMode={true}
                           onClose={() => {}}
                         />
                       )
