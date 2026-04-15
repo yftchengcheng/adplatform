@@ -307,6 +307,12 @@ function ConfigContent() {
     sessionStorage.removeItem("component_config");
   }, []);
 
+  // 取消编辑
+  const handleCancel = useCallback(() => {
+    clearSavedConfig();
+    router.back();
+  }, [clearSavedConfig, router]);
+
   const handleSave = async () => {
     try {
       // 获取组件名称（根据不同类型获取）
@@ -489,6 +495,7 @@ function ConfigContent() {
                 config={config as TreasureBoxConfig}
                 onChange={handleConfigChange}
                 onSave={handleSave}
+                onCancel={handleCancel}
                 macroVariables={(config as TreasureBoxConfig).macroVariables}
               />
             ) : isFlipCardComponent ? (
