@@ -264,8 +264,8 @@ export function FlipCardTemplate({
               </div>
 
               {/* 提示文字 */}
-              <p className="mt-6 text-white/70 text-xs text-center">
-                点击卡牌翻出惊喜
+              <p className="mt-6 text-white/70 text-xs text-center invisible">
+                占位
               </p>
             </>
           ) : (
