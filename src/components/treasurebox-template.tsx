@@ -187,21 +187,27 @@ export function TreasureBoxTemplate({
       <div
         className={cn(
           previewMode
-            ? "w-full max-w-sm"
-            : "w-full max-w-sm",
-          "relative"
+            ? "relative w-full rounded-2xl overflow-hidden"
+            : "relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden",
+          "transition-all duration-500",
+          isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}
+        style={{
+          background: "rgba(0, 0, 0, 0.2)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景 */}
-        <div
-          className={cn(
-            "absolute inset-0 rounded-2xl",
-            !isVisible && "opacity-0",
-            "transition-opacity duration-300"
-          )}
-          style={{ background: "rgba(0, 0, 0, 0.2)" }}
-        />
+        {/* Close Button */}
+        {!previewMode && (
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 transition-colors"
+          >
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
 
         {/* Content */}
         <div className="p-6 flex flex-col items-center relative">
