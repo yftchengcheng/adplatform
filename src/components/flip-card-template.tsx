@@ -211,12 +211,12 @@ export function FlipCardTemplate({
         </button>
 
         {/* Content */}
-        <div className="p-4 flex flex-col items-center relative">
+        <div className="p-2 pt-3 flex flex-col items-center relative">
           {!showReward ? (
             /* 翻卡场景 */
             <>
               {/* 引导文案 */}
-              <div className="mt-4 mb-3 text-center">
+              <div className="mt-2 mb-2 text-center">
                 <div className="bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
                   <p className="text-white text-sm font-semibold animate-pulse">
                     {resolveGuideText()}
@@ -225,7 +225,7 @@ export function FlipCardTemplate({
               </div>
 
               {/* 三个卡牌并排 - 手势内嵌到卡牌上方 */}
-              <div className="flex items-center justify-center gap-4 mb-2">
+              <div className="flex items-center justify-center gap-3 mb-1">
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
@@ -241,8 +241,8 @@ export function FlipCardTemplate({
                       <img
                         src="/treasurebox-gesture.png"
                         alt="手势"
-                        className="w-10 h-auto absolute animate-bounce z-10"
-                        style={{ top: '20px', left: 'calc(50% + 2px)', transform: 'translateX(-50%)', animationDuration: '0.8s' }}
+                        className="w-8 h-auto absolute animate-bounce z-10"
+                        style={{ top: '15px', left: 'calc(50% + 2px)', transform: 'translateX(-50%)', animationDuration: '0.8s' }}
                         draggable={false}
                       />
                     )}
@@ -251,7 +251,7 @@ export function FlipCardTemplate({
                       src={resolveCardImage()}
                       alt={`卡牌${index + 1}`}
                       className={cn(
-                        "w-[100px] h-auto object-contain transition-transform duration-300",
+                        "w-[80px] h-auto object-contain transition-transform duration-300",
                         flipHoverIndex === index && "animate-gesture-flip",
                         isFlipping && "animate-flip"
                       )}
@@ -261,21 +261,17 @@ export function FlipCardTemplate({
                 ))}
               </div>
 
-              {/* 提示文字 */}
-              <p className="text-white/70 text-xs text-center invisible">
-                占位
-              </p>
             </>
           ) : (
             /* 领奖场景 */
-            <div className="w-full flex flex-col items-center animate-fadeIn">
+            <div className="w-full flex flex-col items-center animate-fadeIn py-2">
               {/* 奖励展示 */}
-              <div className="mb-6 text-center">
+              <div className="mb-3 text-center">
                 {finalConfig.rewardType === "cash" ? (
                   /* 现金奖励 */
-                  <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-6 shadow-lg">
+                  <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-4 shadow-lg">
                     <p className="text-white/80 text-sm mb-1">恭喜获得</p>
-                    <p className="text-white text-4xl font-bold">
+                    <p className="text-white text-3xl font-bold">
                       ¥{resolveCashAmount()}
                     </p>
                   </div>
@@ -298,7 +294,7 @@ export function FlipCardTemplate({
               </div>
 
               {/* 奖品文案 */}
-              <p className="text-white text-lg font-semibold mb-2">
+              <p className="text-white text-base font-semibold mb-2">
                 {resolveRewardText()}
               </p>
 
