@@ -457,6 +457,7 @@ export function FlipRedpacketTemplateConfigPanel({
 
   // 落地页展开状态
   const [landingOpen, setLandingOpen] = useState(true);
+  const [basicOpen, setBasicOpen] = useState(true);
 
   return (
     <div className="space-y-4">
@@ -466,25 +467,6 @@ export function FlipRedpacketTemplateConfigPanel({
           <h3 className="text-sm font-medium text-gray-700">基础配置</h3>
         </div>
         <div className="p-4 space-y-4">
-          {/* 组件名称 */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">组件名称</label>
-              <ModeToggle value={componentNameMode} onChange={setComponentNameMode} />
-            </div>
-            <Input
-              value={getComponentNameValue()}
-              onChange={(e) => {
-                if (componentNameMode) {
-                  updateConfig({ componentNameMacro: e.target.value });
-                } else {
-                  updateConfig({ componentName: e.target.value });
-                }
-              }}
-              placeholder="输入组件名称"
-            />
-          </div>
-
           {/* 红包图片 */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">红包图片</label>
@@ -673,6 +655,43 @@ export function FlipRedpacketTemplateConfigPanel({
               <p className="text-xs text-gray-400">
                 当宏变量未解析时使用此链接
               </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 组件名称 */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <button
+          onClick={() => setBasicOpen(!basicOpen)}
+          className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-gray-50"
+        >
+          <span className="text-sm font-medium text-gray-700">组件名称</span>
+          <ChevronDown
+            className={cn(
+              "w-4 h-4 text-gray-400 transition-transform",
+              !basicOpen && "-rotate-90"
+            )}
+          />
+        </button>
+        {basicOpen && (
+          <div className="p-4 space-y-4 border-t border-gray-200">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">组件名称</label>
+                <ModeToggle value={componentNameMode} onChange={setComponentNameMode} />
+              </div>
+              <Input
+                value={getComponentNameValue()}
+                onChange={(e) => {
+                  if (componentNameMode) {
+                    updateConfig({ componentNameMacro: e.target.value });
+                  } else {
+                    updateConfig({ componentName: e.target.value });
+                  }
+                }}
+                placeholder="输入组件名称"
+              />
             </div>
           </div>
         )}
