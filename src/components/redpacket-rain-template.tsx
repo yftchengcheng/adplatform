@@ -386,34 +386,15 @@ export function RedpacketRainTemplate({
                   </p>
                 </div>
 
-                {/* 手势提示 - 在组件内随机位置闪现 */}
-                <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
-                  {/* 随机位置的手势图标 */}
-                  {[
-                    { top: '25%', left: '15%', delay: '0s' },
-                    { top: '40%', left: '75%', delay: '0.3s' },
-                    { top: '55%', left: '25%', delay: '0.6s' },
-                    { top: '70%', left: '65%', delay: '0.2s' },
-                    { top: '35%', left: '45%', delay: '0.5s' },
-                  ].map((pos, i) => (
-                    <div
-                      key={i}
-                      className="absolute animate-pulse opacity-60"
-                      style={{
-                        top: pos.top,
-                        left: pos.left,
-                        animationDuration: '1s',
-                        animationDelay: pos.delay,
-                      }}
-                    >
-                      <img
-                        src="/gesture-hand.png"
-                        alt="手势提示"
-                        className="w-6 h-auto"
-                        draggable={false}
-                      />
-                    </div>
-                  ))}
+                {/* 手势提示 - 闪现提示用户点击红包 */}
+                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+                  <img
+                    src="/gesture-hand.png"
+                    alt="手势提示"
+                    className="w-8 h-auto animate-pulse opacity-75"
+                    style={{ animationDuration: '1s' }}
+                    draggable={false}
+                  />
                 </div>
               </div>
             </div>
