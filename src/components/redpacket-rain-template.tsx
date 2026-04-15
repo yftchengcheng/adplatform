@@ -392,7 +392,7 @@ export function RedpacketRainTemplate({
               <img
                 src="/gesture-hand.png"
                 alt="手势提示"
-                className="w-6 h-auto animate-pulse opacity-60"
+                className="w-12 h-auto animate-pulse opacity-60"
                 style={{ animationDuration: '1s' }}
                 draggable={false}
               />
