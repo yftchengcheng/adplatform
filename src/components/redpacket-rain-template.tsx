@@ -386,12 +386,13 @@ export function RedpacketRainTemplate({
                   </p>
                 </div>
 
-                {/* 手势提示 - 提示用户点击红包，绝对定位避免阻挡红包 */}
-                <div className="absolute top-1 left-1/2 -translate-x-1/2 z-20 animate-bounce pointer-events-none" style={{ animationDuration: '1.2s', animationIterationCount: 'infinite' }}>
+                {/* 手势提示 - 闪现提示用户点击红包 */}
+                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
                   <img
                     src="/gesture-hand.png"
                     alt="手势提示"
-                    className="w-12 h-auto"
+                    className="w-8 h-auto animate-pulse opacity-75"
+                    style={{ animationDuration: '1s' }}
                     draggable={false}
                   />
                 </div>
