@@ -474,7 +474,10 @@ function ButtonConfigSection({
                   <ImageUpload
                     value={safeConfig.imageUrl || ""}
                     onChange={handleImageChange}
-                    label="上传图片 (472x164, <1MB)"
+                    label="上传图片"
+                    width={720}
+                    height={1280}
+                    maxSize={1}
                   />
                 )}
               </div>
