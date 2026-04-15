@@ -48,7 +48,7 @@ export function FlipCardTemplate({
     rewardTextMacro: "",
     specialNote: "实际奖品以APP为准！",
     specialNoteMacro: "",
-    cardImageUrl: "/card-item.png",
+    cardImageUrl: "/card-default.png",
     cardImageMacro: "",
     landingPageUrl: "",
     landingPageMacro: "",
@@ -111,11 +111,11 @@ export function FlipCardTemplate({
     if (finalConfig.cardImageMacro) {
       const resolved = resolveMacro(finalConfig.cardImageMacro, finalConfig.macroVariables);
       if (resolved.includes("${") || resolved.startsWith("$")) {
-        return finalConfig.cardImageUrl || "/card-item.png";
+        return finalConfig.cardImageUrl || "/card-default.png";
       }
       return resolved;
     }
-    return finalConfig.cardImageUrl || "/card-item.png";
+    return finalConfig.cardImageUrl || "/card-default.png";
   }, [finalConfig.cardImageMacro, finalConfig.cardImageUrl, finalConfig.macroVariables]);
 
   // 解析奖励图片
