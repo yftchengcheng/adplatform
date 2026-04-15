@@ -393,7 +393,7 @@ export function RedpacketRainTemplate({
                   <img
                     src="/gesture-hand.png"
                     alt="手势提示"
-                    className="w-12 h-auto"
+                    className="w-12 h-auto shadow-none"
                   />
                 </div>
               </div>
