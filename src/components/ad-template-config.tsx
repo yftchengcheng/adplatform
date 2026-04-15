@@ -122,6 +122,7 @@ function ImageUpload({
   height = 164,
   maxSize = 1, // MB
   accept = "image/jpeg,image/png,image/gif,image/webp",
+  aspectRatio,
 }: {
   value?: string;
   onChange: (url: string) => void;
@@ -131,10 +132,19 @@ function ImageUpload({
   height?: number;
   maxSize?: number;
   accept?: string;
+  aspectRatio?: string;
 }) {
   const [error, setError] = React.useState<string>("");
   const [previewUrl, setPreviewUrl] = React.useState<string>("");
   const [imageDimensions, setImageDimensions] = React.useState<{width: number, height: number} | null>(null);
+
+  // 计算目标宽高比
+  const getTargetRatio = (): number | null => {
+    if (!aspectRatio) return null;
+    const [w, h] = aspectRatio.split(":").map(Number);
+    if (w && h) return w / h;
+    return null;
+  };
 
   // 验证图片
   const validateImage = (file: File): Promise<{valid: boolean, error?: string, dimensions?: {width: number, height: number}}> => {
@@ -159,20 +169,35 @@ function ImageUpload({
         return;
       }
 
-      // 验证图片尺寸
+      // 验证图片尺寸或宽高比
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          if (img.width !== width || img.height !== height) {
+          const targetRatio = getTargetRatio();
+          if (targetRatio) {
+            // 宽高比校验
+            const actualRatio = img.width / img.height;
+            const ratioDiff = Math.abs(actualRatio - targetRatio);
+            const tolerance = 0.1; // 允许10%的误差
+            if (ratioDiff > targetRatio * tolerance) {
+              resolve({ 
+                valid: false, 
+                error: `图片宽高比需为 ${aspectRatio}，当前 ${img.width}×${img.height}`,
+                dimensions: { width: img.width, height: img.height }
+              });
+              return;
+            }
+          } else if (img.width !== width || img.height !== height) {
+            // 精确尺寸校验
             resolve({ 
               valid: false, 
               error: `图片尺寸应为 ${width}×${height}px，当前 ${img.width}×${img.height}px`,
               dimensions: { width: img.width, height: img.height }
             });
-          } else {
-            resolve({ valid: true, dimensions: { width: img.width, height: img.height } });
+            return;
           }
+          resolve({ valid: true, dimensions: { width: img.width, height: img.height } });
         };
         img.onerror = () => {
           resolve({ valid: false, error: "图片加载失败，请重新上传" });
@@ -475,9 +500,8 @@ function ButtonConfigSection({
                     value={safeConfig.imageUrl || ""}
                     onChange={handleImageChange}
                     label="上传图片"
-                    width={720}
-                    height={1280}
                     maxSize={1}
+                    aspectRatio="9:16"
                   />
                 )}
               </div>
