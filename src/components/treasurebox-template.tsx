@@ -320,16 +320,16 @@ export function TreasureBoxTemplate({
 
       {/* CSS Animations */}
       <style jsx>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0) rotate(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-2px) rotate(-2deg); }
-          20%, 40%, 60%, 80% { transform: translateX(2px) rotate(2deg); }
-        }
-        
         @keyframes flip {
-          0% { transform: scaleX(1) rotateY(0deg); }
-          50% { transform: scaleX(0) rotateY(90deg); }
-          100% { transform: scaleX(1) rotateY(0deg); }
+          0% {
+            transform: rotateY(0deg) scale(1);
+          }
+          50% {
+            transform: rotateY(90deg) scale(1.1);
+          }
+          100% {
+            transform: rotateY(0deg) scale(1);
+          }
         }
         
         @keyframes fadeIn {
@@ -348,11 +348,20 @@ export function TreasureBoxTemplate({
         }
         
         .animate-gesture-flip {
-          animation: flip 0.3s ease-in-out;
+          animation: gestureFlip 0.3s ease-in-out;
         }
         
         .animate-fadeIn {
           animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes gestureFlip {
+          0%, 100% {
+            transform: scaleX(1) rotateY(0deg);
+          }
+          50% {
+            transform: scaleX(0) rotateY(90deg);
+          }
         }
       `}</style>
     </div>
