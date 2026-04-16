@@ -399,37 +399,27 @@ export function RedpacketRainTemplate({
                   transform: translateY(8px) scale(0.95);
                 }
               }
-              @keyframes fallLeaf {
+              @keyframes fallRedpacket {
                 0% {
                   top: 80px;
                   opacity: 0;
-                  transform: rotate(0deg) scale(0.8);
+                  transform: scale(0.8) rotate(0deg);
                 }
-                5% {
-                  opacity: 0.5;
-                }
-                15% {
+                10% {
                   opacity: 1;
-                  transform: rotate(5deg) scale(1);
                 }
-                25% {
-                  transform: rotate(15deg) translateX(10px);
-                }
-                50% {
-                  transform: rotate(-10deg) translateX(-8px);
-                }
-                75% {
-                  transform: rotate(8deg) translateX(6px);
+                90% {
+                  opacity: 1;
                 }
                 100% {
                   top: calc(100% - 60px);
                   opacity: 1;
-                  transform: rotate(-5deg);
+                  transform: scale(1) rotate(360deg);
                 }
               }
               .falling-redpacket {
-                animation-name: fallLeaf;
-                animation-timing-function: ease-in-out;
+                animation-name: fallRedpacket;
+                animation-timing-function: ease-in;
                 animation-fill-mode: forwards;
               }
             `}</style>
