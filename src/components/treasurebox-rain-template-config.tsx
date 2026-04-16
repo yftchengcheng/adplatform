@@ -206,10 +206,20 @@ export function TreasureboxRainTemplateConfigPanel({
     config.treasureboxImageMacro ? "macro" : "input"
   );
 
+  // 确保 rewardType 始终有有效值，避免 hydration mismatch
+  const [rewardType, setRewardType] = useState<"cash" | "custom">(
+    config.rewardType === "custom" ? "custom" : "cash"
+  );
+
   // 更新配置
   const updateConfig = useCallback(
     (updates: Partial<TreasureboxRainConfig>) => {
-      onChange({ ...config, ...updates });
+      const newConfig = { ...config, ...updates };
+      onChange(newConfig);
+      // 同步 rewardType 状态
+      if (updates.rewardType !== undefined) {
+        setRewardType(updates.rewardType);
+      }
     },
     [config, onChange]
   );
@@ -365,7 +375,7 @@ export function TreasureboxRainTemplateConfigPanel({
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
-                    checked={config.rewardType === "cash"}
+                    checked={rewardType === "cash"}
                     onChange={() => updateConfig({ rewardType: "cash" })}
                     className="w-4 h-4 text-blue-500"
                   />
@@ -374,7 +384,7 @@ export function TreasureboxRainTemplateConfigPanel({
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
-                    checked={config.rewardType === "custom"}
+                    checked={rewardType === "custom"}
                     onChange={() => updateConfig({ rewardType: "custom" })}
                     className="w-4 h-4 text-blue-500"
                   />
@@ -384,7 +394,7 @@ export function TreasureboxRainTemplateConfigPanel({
             </div>
 
             {/* 现金奖励 */}
-            {config.rewardType === "cash" && (
+            {rewardType === "cash" && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-gray-700">现金金额</label>
@@ -419,7 +429,7 @@ export function TreasureboxRainTemplateConfigPanel({
             )}
 
             {/* 自定义奖励图片 */}
-            {config.rewardType === "custom" && (
+            {rewardType === "custom" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">奖励图片</label>
                 <div className="flex items-center gap-2 mb-2">
