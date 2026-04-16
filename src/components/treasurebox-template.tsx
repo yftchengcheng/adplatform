@@ -191,14 +191,11 @@ export function TreasureBoxTemplate({
       <div
         className={cn(
           previewMode
-            ? "relative w-full rounded-2xl overflow-hidden"
-            : "relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden",
+            ? "relative w-full rounded-2xl overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]"
+            : "relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]",
           "transition-all duration-500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}
-        style={{
-          background: "rgba(0, 0, 0, 0.2)",
-        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
