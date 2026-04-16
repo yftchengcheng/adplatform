@@ -226,8 +226,8 @@ export function ScratchCardTemplate({
         </div>
       </div>
 
-      {/* 下方飘落动效区 */}
-      <div className="h-32 relative">
+      {/* 下方飘落动效区 - 改为相对定位容器 */}
+      <div className="relative" style={{ height: "30%" }}>
         {renderFallingElements()}
       </div>
 

@@ -239,7 +239,7 @@
 /* 刮刮卡飘落动画 - 在刮奖区域内飘落 */
 @keyframes fallDownRelative {
   0% {
-    top: -60px;
+    top: -80px;
     opacity: 0;
   }
   10% {
@@ -249,7 +249,7 @@
     opacity: 1;
   }
   100% {
-    top: 100%;
+    top: calc(100% + 20px);
     opacity: 0;
   }
 }
