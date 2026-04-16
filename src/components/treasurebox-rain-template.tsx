@@ -359,7 +359,7 @@ export function TreasureboxRainTemplate({
 
   // 预览模式
   return (
-    <div className="w-full rounded-t-2xl overflow-hidden shadow-lg">
+    <div className="w-full rounded-t-2xl overflow-hidden shadow-lg" style={{ minHeight: "300px" }}>
       {/* Rain Scene */}
       {!isClaimed ? (
         <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
