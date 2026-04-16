@@ -212,17 +212,11 @@ export function ScratchCardTemplate({
               className="w-full h-full object-contain"
               draggable={false}
             />
-            {/* 覆盖层 - 模拟刮刮效果 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-300/90 to-gray-400/90 flex items-center justify-center">
-              <span className="text-gray-600 text-lg font-bold pointer-events-none select-none">
-                刮我
-              </span>
-            </div>
           </div>
         </div>
 
         {/* 手势提示 */}
-        <div className="absolute left-8 top-1/2 -translate-y-1/2 gesture-slide">
+        <div className="absolute left-8 top-[calc(50%+50px)] -translate-y-1/2 gesture-slide">
           <img
             src="/gesture-hand.png"
             alt="手势"
