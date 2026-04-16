@@ -180,6 +180,7 @@ export function TreasureboxRainTemplateConfigPanel({
   const [basicOpen, setBasicOpen] = useState(true);
   const [rewardOpen, setRewardOpen] = useState(true);
   const [landingOpen, setLandingOpen] = useState(true);
+  const [otherOpen, setOtherOpen] = useState(true);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // 模式状态
@@ -226,16 +227,6 @@ export function TreasureboxRainTemplateConfigPanel({
         </div>
         {basicOpen && (
           <div className="p-4 space-y-4">
-            {/* 组件名称 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">组件名称</label>
-              <Input
-                value={config.componentName || ""}
-                onChange={(e) => updateConfig({ componentName: e.target.value })}
-                placeholder="输入组件名称"
-              />
-            </div>
-
             {/* 宝箱图片 */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">宝箱图片</label>
@@ -579,6 +570,30 @@ export function TreasureboxRainTemplateConfigPanel({
                 <p className="text-xs text-gray-400">示例: {"${landing_url}"}</p>
               </div>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* 其他配置 */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <SectionHeader
+            title="其他配置"
+            isOpen={otherOpen}
+            onToggle={() => setOtherOpen(!otherOpen)}
+          />
+        </div>
+        {otherOpen && (
+          <div className="p-4 space-y-4">
+            {/* 组件名称 */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">组件名称</label>
+              <Input
+                value={config.componentName || ""}
+                onChange={(e) => updateConfig({ componentName: e.target.value })}
+                placeholder="输入组件名称"
+              />
+            </div>
           </div>
         )}
       </div>
