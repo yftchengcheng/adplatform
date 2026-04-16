@@ -133,7 +133,7 @@ export function SmashEggTemplate({
     >
       {/* 蛋容器 */}
       <div 
-        className="relative cursor-pointer"
+        className="relative cursor-pointer egg-shake-rotate"
         onClick={handleSmash}
       >
         <img
@@ -146,7 +146,7 @@ export function SmashEggTemplate({
 
       {/* 锤子 */}
       <div 
-        className="absolute"
+        className="absolute hammer-shake"
         style={{
           top: "25%",
           right: "15%",
