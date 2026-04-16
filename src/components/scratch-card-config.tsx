@@ -217,18 +217,7 @@ export function ScratchCardTemplateConfigPanel({
         </div>
         {basicOpen && (
           <div className="p-4 space-y-4">
-            {/* 组件名称 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">组件名称</label>
-                <CharCounter value={config.componentName || "好运刮出来！"} max={20} />
-              </div>
-              <Input
-                placeholder="好运刮出来！"
-                value={config.componentName || "好运刮出来！"}
-                onChange={(e) => updateConfig({ componentName: e.target.value })}
-              />
-            </div>
+            {/* 暂无其他基础配置 */}
           </div>
         )}
       </div>
@@ -511,6 +500,31 @@ export function ScratchCardTemplateConfigPanel({
                 onChange={(e) => updateConfig({ landingPageMacro: e.target.value })}
               />
             )}
+          </div>
+        )}
+      </div>
+
+      {/* 组件名称 */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <SectionHeader
+            title="组件名称"
+            isOpen={basicOpen}
+            onToggle={() => setBasicOpen(!basicOpen)}
+          />
+        </div>
+        {basicOpen && (
+          <div className="p-4 space-y-4">
+            <div className="space-y-2">
+              <Input
+                placeholder="好运刮出来！"
+                value={config.componentName || "好运刮出来！"}
+                onChange={(e) => updateConfig({ componentName: e.target.value })}
+              />
+              <p className="text-xs text-gray-400 text-right">
+                {getStringWidth(config.componentName || "好运刮出来！")}/20字符
+              </p>
+            </div>
           </div>
         )}
       </div>
