@@ -744,22 +744,40 @@ export function ComponentList() {
                           />
                         </div>
                       ) : previewComponent?.type === "flip_redpacket" ? (
-                        <div className="w-full px-2">
+                        <div className="relative w-full px-2">
                           <FlipRedpacketTemplate
                             config={previewComponent.config as unknown as FlipRedpacketTemplateConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => {}}
                           />
+                          <button
+                            onClick={() => setPreviewComponent(null)}
+                            className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+                          >
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                         </div>
                       ) : previewComponent?.type === "flip_treasure" ? (
-                        <div className="w-full px-2">
+                        <div className="relative w-full px-2">
                           <TreasureBoxTemplate
                             config={previewComponent.config as unknown as TreasureBoxConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => {}}
                           />
+                          <button
+                            onClick={() => setPreviewComponent(null)}
+                            className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+                          >
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                         </div>
                       ) : previewComponent?.type === "flip_card" ? (
                         <div className="w-full px-2">
