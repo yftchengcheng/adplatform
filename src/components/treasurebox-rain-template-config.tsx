@@ -231,10 +231,30 @@ export function TreasureboxRainTemplateConfigPanel({
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">宝箱图片</label>
               <div className="flex items-center gap-2 mb-2">
-                <ModeToggle
-                  value={treasureboxImageMode}
-                  onChange={setTreasureboxImageMode}
-                />
+                <div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
+                  <button
+                    onClick={() => setTreasureboxImageMode("input")}
+                    className={cn(
+                      "px-3 py-1 text-xs font-medium rounded-md transition-all",
+                      treasureboxImageMode === "input"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    )}
+                  >
+                    自定义上传
+                  </button>
+                  <button
+                    onClick={() => setTreasureboxImageMode("macro")}
+                    className={cn(
+                      "px-3 py-1 text-xs font-medium rounded-md transition-all",
+                      treasureboxImageMode === "macro"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    )}
+                  >
+                    宏替换
+                  </button>
+                </div>
               </div>
               {treasureboxImageMode === "input" ? (
                 <div className="space-y-2">
