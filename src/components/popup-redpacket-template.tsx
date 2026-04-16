@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils";
 
 // 配置数据类型
 export interface PopupRedpacketConfig {
+  // 红包图片
+  redpacketImageUrl?: string;
+  redpacketImageMacro?: string;
   // 引导文案
   guideText: string;
   guideTextMacro?: string;
@@ -78,6 +81,8 @@ export function PopupRedpacketTemplate({
     rewardTextMacro: "",
     specialNote: "实际奖品以APP为准",
     specialNoteMacro: "",
+    redpacketImageUrl: "",
+    redpacketImageMacro: "",
     landingPageUrl: "",
     landingPageMacro: "",
     defaultLandingPageUrl: "",
@@ -99,6 +104,7 @@ export function PopupRedpacketTemplate({
     rewardText: resolveMacro(finalConfig.rewardText, finalConfig.macroVariables),
     specialNote: resolveMacro(finalConfig.specialNote, finalConfig.macroVariables),
     landingPageUrl: resolveMacro(finalConfig.landingPageUrl, finalConfig.macroVariables) || finalConfig.defaultLandingPageUrl || "",
+    redpacketImageUrl: resolveMacro(finalConfig.redpacketImageUrl, finalConfig.macroVariables),
   };
 
   // 入场动画
@@ -174,347 +180,46 @@ export function PopupRedpacketTemplate({
         <X className="w-4 h-4 text-white" />
       </button>
 
-      {/* 红包主体 */}
-      <div className="relative w-[280px]">
-        {/* 红包背景 - 精确颜色渐变 */}
-        <div 
-          className="w-full rounded-2xl overflow-hidden shadow-2xl"
-          style={{
-            background: "linear-gradient(180deg, #F24A30 0%, #E03A24 30%, #B92B19 100%)",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
-          }}
-        >
-          {/* 顶部装饰区域 - 卡通形象和金币红包 */}
-          <div className="relative h-[100px]">
-            {/* 卡通形象 - 坐姿元宝小人 */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
-              {/* 身体（圆球形） */}
-              <div 
-                className="relative rounded-full"
-                style={{
-                  width: "70px",
-                  height: "65px",
-                  background: "linear-gradient(180deg, #FF7B4A 0%, #E85C3A 50%, #D44A28 100%)",
-                }}
-              >
-                {/* 帽子 - 元宝形状 */}
-                <div className="absolute -top-[18px] left-1/2 -translate-x-1/2">
-                  {/* 帽子主体 */}
-                  <div 
-                    className="relative"
-                    style={{
-                      width: "40px",
-                      height: "28px",
-                      background: "linear-gradient(180deg, #FFE066 0%, #FFD230 50%, #E6B820 100%)",
-                      borderRadius: "50% 50% 50% 50% / 80% 80% 20% 20%",
-                      border: "2px solid #A67A10",
-                    }}
-                  >
-                    {/* 帽子高光 */}
-                    <div 
-                      className="absolute top-1 left-1 w-3 h-2 rounded-full opacity-60"
-                      style={{ background: "#FFF5CC" }}
-                    />
-                    {/* 人民币符号 */}
-                    <span 
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#8B6914] font-bold"
-                      style={{ fontSize: "12px" }}
-                    >
-                      ¥
-                    </span>
-                  </div>
-                  {/* 帽子顶部 */}
-                  <div 
-                    className="absolute -top-2 left-1/2 -translate-x-1/2"
-                    style={{
-                      width: "20px",
-                      height: "15px",
-                      background: "linear-gradient(180deg, #FFE066 0%, #FFD230 100%)",
-                      borderRadius: "50% 50% 20% 20% / 100% 100% 0% 0%",
-                      border: "2px solid #A67A10",
-                      borderBottom: "none",
-                    }}
-                  />
-                </div>
-
-                {/* 眼睛 */}
-                <div className="absolute top-[18px] left-[14px]">
-                  {/* 左眼 */}
-                  <div 
-                    className="absolute rounded-full"
-                    style={{
-                      width: "10px",
-                      height: "10px",
-                      background: "#5C2E10",
-                    }}
-                  >
-                    {/* 眼睛高光 */}
-                    <div 
-                      className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full opacity-80"
-                      style={{ background: "white" }}
-                    />
-                  </div>
-                  {/* 右眼 */}
-                  <div 
-                    className="absolute left-[36px] rounded-full"
-                    style={{
-                      width: "10px",
-                      height: "10px",
-                      background: "#5C2E10",
-                    }}
-                  >
-                    {/* 眼睛高光 */}
-                    <div 
-                      className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full opacity-80"
-                      style={{ background: "white" }}
-                    />
-                  </div>
-                  {/* 眉毛 */}
-                  <div 
-                    className="absolute -top-0.5 left-[12px] w-4 h-1 rounded-full"
-                    style={{ background: "#5C2E10" }}
-                  />
-                  <div 
-                    className="absolute -top-0.5 left-[44px] w-4 h-1 rounded-full"
-                    style={{ background: "#5C2E10" }}
-                  />
-                </div>
-
-                {/* 腮红 */}
-                <div 
-                  className="absolute top-[28px] left-[6px] w-6 h-3 rounded-full opacity-70"
-                  style={{ background: "#FFB4B4" }}
-                />
-                <div 
-                  className="absolute top-[28px] right-[6px] w-6 h-3 rounded-full opacity-70"
-                  style={{ background: "#FFB4B4" }}
-                />
-
-                {/* 嘴巴 */}
-                <div 
-                  className="absolute bottom-[10px] left-1/2 -translate-x-1/2"
-                  style={{ width: "24px", height: "16px" }}
-                >
-                  {/* 嘴型 */}
-                  <div 
-                    className="absolute inset-0 rounded-b-full"
-                    style={{ background: "#E85C5C" }}
-                  >
-                    {/* 牙齿 */}
-                    <div 
-                      className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-3 rounded-t-full"
-                      style={{ background: "white" }}
-                    />
-                    {/* 舌头 */}
-                    <div 
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-2 rounded-b-full"
-                      style={{ background: "#FF6B6B" }}
-                    />
-                  </div>
-                </div>
-
-                {/* 手臂 - 红色细手臂扒着边缘 */}
-                <div 
-                  className="absolute -left-3 top-[25px]"
-                  style={{
-                    width: "12px",
-                    height: "20px",
-                    background: "linear-gradient(180deg, #E03A24 0%, #C52E1A 100%)",
-                    borderRadius: "6px 6px 0 0",
-                    transform: "rotate(-30deg)",
-                  }}
-                />
-                <div 
-                  className="absolute -right-3 top-[25px]"
-                  style={{
-                    width: "12px",
-                    height: "20px",
-                    background: "linear-gradient(180deg, #E03A24 0%, #C52E1A 100%)",
-                    borderRadius: "6px 6px 0 0",
-                    transform: "rotate(30deg)",
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* 左侧小红包 */}
+      {/* 红包主体 - 使用用户上传的图片 */}
+      <div className="relative w-full max-w-[300px]">
+        {resolvedConfig.redpacketImageUrl ? (
+          // 使用用户上传的红包图片
+          <div 
+            className="relative overflow-hidden rounded-2xl"
+            style={{
+              boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
+            }}
+          >
+            <img
+              src={resolvedConfig.redpacketImageUrl}
+              alt="红包"
+              className="w-full h-auto object-contain"
+            />
+            {/* 点击区域遮罩 - 覆盖整个红包可点击 */}
             <div 
-              className="absolute left-[18%] bottom-[8px] rounded-lg overflow-hidden"
-              style={{
-                width: "28px",
-                height: "36px",
-                background: "linear-gradient(180deg, #F24A30 0%, #E03A24 100%)",
-                transform: "rotate(-15deg)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-              }}
-            >
-              {/* 小红包封口线 */}
-              <div 
-                className="absolute top-[10px] left-0 right-0 h-[2px]"
-                style={{ background: "#B92B19" }}
-              />
-              {/* 小红包上的¥符号 */}
-              <div 
-                className="absolute top-[14px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full"
-                style={{ background: "#FFD230" }}
-              >
-                <span className="absolute inset-0 flex items-center justify-center text-[#8B6914] text-[8px] font-bold">¥</span>
-              </div>
-            </div>
-
-            {/* 左侧金币1 */}
-            <div 
-              className="absolute left-[30%] bottom-[5px]"
-              style={{
-                width: "16px",
-                height: "16px",
-                background: "linear-gradient(135deg, #FFE066 0%, #FFD230 50%, #E6B820 100%)",
-                borderRadius: "50%",
-                border: "1px solid #A67A10",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-              }}
-            >
-              {/* 金币高光 */}
-              <div 
-                className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full opacity-60"
-                style={{ background: "white" }}
-              />
-            </div>
-
-            {/* 左侧金币2 */}
-            <div 
-              className="absolute left-[36%] bottom-[18px]"
-              style={{
-                width: "14px",
-                height: "14px",
-                background: "linear-gradient(135deg, #FFE066 0%, #FFD230 50%, #E6B820 100%)",
-                borderRadius: "50%",
-                border: "1px solid #A67A10",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
-            >
-              <div className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full opacity-60" style={{ background: "white" }} />
-            </div>
-
-            {/* 右侧小红包 */}
-            <div 
-              className="absolute right-[18%] bottom-[8px] rounded-lg overflow-hidden"
-              style={{
-                width: "28px",
-                height: "36px",
-                background: "linear-gradient(180deg, #F24A30 0%, #E03A24 100%)",
-                transform: "rotate(15deg)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-              }}
-            >
-              <div className="absolute top-[10px] left-0 right-0 h-[2px]" style={{ background: "#B92B19" }} />
-              <div className="absolute top-[14px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full" style={{ background: "#FFD230" }}>
-                <span className="absolute inset-0 flex items-center justify-center text-[#8B6914] text-[8px] font-bold">¥</span>
-              </div>
-            </div>
-
-            {/* 右侧金币1 */}
-            <div 
-              className="absolute right-[30%] bottom-[5px]"
-              style={{
-                width: "16px",
-                height: "16px",
-                background: "linear-gradient(135deg, #FFE066 0%, #FFD230 50%, #E6B820 100%)",
-                borderRadius: "50%",
-                border: "1px solid #A67A10",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-              }}
-            >
-              <div className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full opacity-60" style={{ background: "white" }} />
-            </div>
-
-            {/* 右侧金币2 */}
-            <div 
-              className="absolute right-[36%] bottom-[18px]"
-              style={{
-                width: "14px",
-                height: "14px",
-                background: "linear-gradient(135deg, #FFE066 0%, #FFD230 50%, #E6B820 100%)",
-                borderRadius: "50%",
-                border: "1px solid #A67A10",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
-            >
-              <div className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full opacity-60" style={{ background: "white" }} />
-            </div>
-
-            {/* 最右侧金币 */}
-            <div 
-              className="absolute right-[25%] bottom-[25px]"
-              style={{
-                width: "12px",
-                height: "12px",
-                background: "linear-gradient(135deg, #FFE066 0%, #FFD230 50%, #E6B820 100%)",
-                borderRadius: "50%",
-                border: "1px solid #A67A10",
-              }}
-            >
-              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-full opacity-60" style={{ background: "white" }} />
-            </div>
-
-            {/* 翻盖褶皱线 */}
-            <div 
-              className="absolute top-[55px] left-0 right-0 h-[3px]"
-              style={{
-                background: "linear-gradient(90deg, transparent 0%, #B92B19 20%, #8B1A1A 50%, #B92B19 80%, transparent 100%)",
-              }}
+              className="absolute inset-0 cursor-pointer"
+              onClick={handleOpen}
             />
           </div>
-
-          {/* 领取按钮区域 */}
-          <div className="flex items-center justify-center py-12">
-            {/* 金色领取按钮 */}
+        ) : (
+          // 无图片时的占位提示
+          <div 
+            className="flex flex-col items-center justify-center rounded-2xl overflow-hidden"
+            style={{
+              background: "linear-gradient(180deg, #F24A30 0%, #E03A24 50%, #B92B19 100%)",
+              minHeight: "400px",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
+            }}
+          >
+            <p className="text-white/80 text-sm mb-4">请上传红包图片</p>
             <button
               onClick={handleOpen}
-              className={cn(
-                "relative rounded-full",
-                "hover:scale-105 active:scale-95 transition-transform",
-                "animate-pulse-subtle"
-              )}
-              style={{
-                width: "100px",
-                height: "100px",
-                background: "linear-gradient(180deg, #FFE270 0%, #FFB730 40%, #E69A20 100%)",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.5), inset 0 -2px 4px rgba(166,106,21,0.5)",
-                border: "2px solid #A66A15",
-              }}
+              className="px-6 py-3 bg-white/20 hover:bg-white/30 rounded-full text-white font-medium"
             >
-              {/* 按钮高光 */}
-              <div 
-                className="absolute top-3 left-1/2 -translate-x-1/2 w-[60px] h-[20px] rounded-full opacity-40"
-                style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.8) 0%, transparent 100%)" }}
-              />
-              {/* 按钮文字 */}
-              <span 
-                className="absolute inset-0 flex items-center justify-center font-bold"
-                style={{ 
-                  color: "#A66A15", 
-                  fontSize: "42px",
-                  fontFamily: "sans-serif",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.1)",
-                }}
-              >
-                领
-              </span>
+              点击预览效果
             </button>
           </div>
-
-          {/* 底部留白 */}
-          <div className="h-8" />
-        </div>
-
-        {/* 红包边缘光泽 */}
-        <div 
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
-        />
+        )}
       </div>
     </div>
   );
@@ -523,7 +228,7 @@ export function PopupRedpacketTemplate({
   const renderClaimedState = () => (
     <div
       className={cn(
-        "relative w-[280px]",
+        "relative w-full max-w-[300px]",
         "animate-reward-enter"
       )}
     >
@@ -561,7 +266,7 @@ export function PopupRedpacketTemplate({
           {finalConfig.rewardType === "cash" ? (
             // 现金奖励
             <div 
-              className="flex items-center justify-center mb-4"
+              className="flex items-center justify-center mb-4 animate-reward-pop"
               style={{
                 background: "linear-gradient(180deg, #FFD230 0%, #FFA500 100%)",
                 borderRadius: "12px",
