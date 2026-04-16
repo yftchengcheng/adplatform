@@ -166,6 +166,7 @@ interface RedpacketRainTemplateConfigPanelProps {
   onChange: (config: RedpacketRainConfig) => void;
   previewUrl?: string;
   onSave?: () => void;
+  onCancel?: () => void;
 }
 
 export function RedpacketRainTemplateConfigPanel({
@@ -173,11 +174,13 @@ export function RedpacketRainTemplateConfigPanel({
   onChange,
   previewUrl,
   onSave,
+  onCancel,
 }: RedpacketRainTemplateConfigPanelProps) {
   // 折叠状态
   const [basicOpen, setBasicOpen] = useState(true);
   const [rewardOpen, setRewardOpen] = useState(true);
   const [landingOpen, setLandingOpen] = useState(true);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // 模式状态
   const [guideTextMode, setGuideTextMode] = useState<"input" | "macro">(
@@ -751,16 +754,61 @@ export function RedpacketRainTemplateConfigPanel({
         </div>
       </div>
 
-      {/* 保存按钮 */}
-      {onSave && (
-        <div className="flex justify-center pt-4 border-t border-gray-200">
-          <Button
-            onClick={onSave}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium"
-          >
-            保存
-          </Button>
+      {/* 底部按钮 */}
+      {(onSave || onCancel) && (
+        <div className="flex gap-3 pt-4 mt-4 border-t border-gray-200">
+          {onCancel && (
+            <button
+              onClick={() => setShowCancelConfirm(true)}
+              className="flex-1 h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              取消
+            </button>
+          )}
+          {onSave && (
+            <button
+              onClick={onSave}
+              className="flex-1 h-10 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+            >
+              保存
+            </button>
+          )}
         </div>
+      )}
+
+      {/* 取消确认弹窗 */}
+      {showCancelConfirm && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/50"
+            onClick={() => setShowCancelConfirm(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <div className="px-5 pt-6 pb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">确认取消</h3>
+                <p className="text-sm text-gray-500 mb-6">确定要取消编辑吗？未保存的更改将会丢失。</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="flex-1 h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    继续编辑
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCancelConfirm(false);
+                      onCancel?.();
+                    }}
+                    className="flex-1 h-10 px-4 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+                  >
+                    确认取消
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

@@ -482,6 +482,7 @@ function ConfigContent() {
                 config={config as RedpacketRainTemplateConfig}
                 onChange={handleConfigChange}
                 onSave={handleSave}
+                onCancel={handleCancel}
               />
             ) : isFlipRedpacketComponent ? (
               <FlipRedpacketTemplateConfigPanel
