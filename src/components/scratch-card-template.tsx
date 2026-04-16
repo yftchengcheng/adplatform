@@ -235,7 +235,7 @@ export function ScratchCardTemplate({
       onClick={handleClaim}
     >
       {/* 奖励展示 */}
-      <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center reward-pop">
+      <div className="absolute top-[calc(35%-20px)] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center reward-pop">
         {finalConfig.rewardType === "cash" ? (
           <div className="flex flex-col items-center">
             <p className="text-2xl font-bold text-yellow-400 mb-1">¥{resolveCashAmount()}</p>
