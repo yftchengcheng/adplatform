@@ -33,7 +33,7 @@ export function SmashEggTemplate({
   const [isSmashed, setIsSmashed] = useState(false);
   // 默认配置
   const defaultConfig: SmashEggConfig = {
-    componentName: "砸金蛋",
+    componentName: "砸金蛋得好礼！",
     guideText: "砸蛋送大礼",
     guideTextMacro: "",
     rewardType: "cash",
