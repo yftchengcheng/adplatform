@@ -161,9 +161,9 @@ export function SmashEggTemplate({
         />
       </div>
 
-      {/* 点击提示 */}
+      {/* 点击提示 - 距离底部15% */}
       {!isSmashed && (
-        <div className="absolute bottom-8 left-0 right-0 text-center">
+        <div className="absolute bottom-[15%] left-0 right-0 text-center">
           <p className="text-white text-xs font-bold drop-shadow-lg animate-pulse">
             {resolveGuideText()}
           </p>
