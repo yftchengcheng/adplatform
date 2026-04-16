@@ -326,7 +326,7 @@ export function ScratchCardTemplateConfigPanel({
                         <label className="flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-gray-50">
                           <Plus className="w-6 h-6 text-gray-400" />
                           <span className="text-sm text-gray-500 mt-2">点击上传奖励图片</span>
-                          <span className="text-xs text-gray-400">推荐 690×360px，最大 100KB</span>
+                          <span className="text-xs text-gray-400">宽高比 16:9，最大 300KB</span>
                           <input
                             type="file"
                             accept="image/jpeg,image/png,image/jpg"
@@ -339,15 +339,27 @@ export function ScratchCardTemplateConfigPanel({
                                   setRewardImageError("仅支持 JPG/PNG/JPEG 格式");
                                   return;
                                 }
-                                if (file.size > 100 * 1024) {
-                                  setRewardImageError(`图片大小不能超过 100KB，当前 ${(file.size / 1024).toFixed(1)}KB`);
+                                if (file.size > 300 * 1024) {
+                                  setRewardImageError(`图片大小不能超过 300KB，当前 ${(file.size / 1024).toFixed(1)}KB`);
                                   return;
                                 }
-                                const reader = new FileReader();
-                                reader.onload = (ev) => {
-                                  updateConfig({ rewardImageUrl: ev.target?.result as string });
+                                // 校验宽高比 16:9
+                                const img = new window.Image();
+                                img.onload = () => {
+                                  const ratio = img.width / img.height;
+                                  const targetRatio = 16 / 9;
+                                  const tolerance = 0.1;
+                                  if (Math.abs(ratio - targetRatio) > tolerance) {
+                                    setRewardImageError(`图片宽高比需为 16:9，当前 ${img.width}x${img.height}`);
+                                    return;
+                                  }
+                                  setRewardImageError("");
+                                  updateConfig({ rewardImageUrl: img.src });
                                 };
-                                reader.readAsDataURL(file);
+                                img.onerror = () => {
+                                  setRewardImageError("图片加载失败，请重新上传");
+                                };
+                                img.src = URL.createObjectURL(file);
                               }
                             }}
                           />
