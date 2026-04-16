@@ -337,7 +337,7 @@ export function TreasureboxRainTemplate({
                   onClick={handleClaim}
                   className="w-full py-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
                 >
-                  领取奖品
+                  立即领取
                 </button>
               </div>
             </div>
@@ -468,7 +468,7 @@ export function TreasureboxRainTemplate({
               onClick={handleClaim}
               className="w-full py-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              领取奖品
+              立即领取
             </button>
           </div>
         </div>
