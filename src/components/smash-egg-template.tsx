@@ -244,7 +244,7 @@ export function SmashEggTemplate({
       }}
     >
       {/* 奖品展示区域 */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 flex flex-col items-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
         {/* 奖励展示 */}
         <div className="text-center reward-pop">
           {finalConfig.rewardType === "cash" ? (
@@ -256,7 +256,7 @@ export function SmashEggTemplate({
             <img
               src={resolveRewardImage()}
               alt="奖励"
-              className="max-w-full max-h-24 object-contain rounded-xl shadow-lg"
+              className="max-w-full max-h-40 object-contain"
               draggable={false}
             />
           ) : null}
