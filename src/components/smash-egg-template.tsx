@@ -235,51 +235,50 @@ export function SmashEggTemplate({
 
   // 渲染领奖场景
   const renderRewardScene = () => (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-6">
-      {/* 背景 */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundImage: "url('/smash-page.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(0.7)",
-        }}
-      />
-      
-      {/* 内容 */}
-      <div className="relative z-10 flex flex-col items-center">
+    <div 
+      className="relative w-full h-full flex flex-col items-center justify-center"
+      style={{
+        backgroundImage: "url('/reward-page.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* 奖品展示区域 */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 flex flex-col items-center">
         {/* 奖励展示 */}
-        <div className="mb-6 text-center reward-pop">
+        <div className="text-center reward-pop">
           {finalConfig.rewardType === "cash" ? (
-            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-2xl">
-              <p className="text-white/90 text-sm mb-1">恭喜获得</p>
-              <p className="text-white text-4xl font-bold">¥{resolveCashAmount()}</p>
+            <div className="flex flex-col items-center">
+              <p className="text-2xl font-bold text-red-500 mb-2">恭喜获得</p>
+              <p className="text-5xl font-bold text-red-600">¥{resolveCashAmount()}</p>
             </div>
           ) : resolveRewardImage() ? (
             <img
               src={resolveRewardImage()}
               alt="奖励"
-              className="max-w-full max-h-32 object-contain rounded-xl shadow-lg"
+              className="max-w-full max-h-24 object-contain rounded-xl shadow-lg"
               draggable={false}
             />
           ) : null}
         </div>
-
-        {/* 奖品文案 */}
-        <p className="text-white text-xl font-bold mb-2 drop-shadow-lg">{resolveRewardText()}</p>
-
-        {/* 特殊说明 */}
-        <p className="text-white/80 text-sm mb-8 drop-shadow">{resolveSpecialNote()}</p>
-
-        {/* 领取按钮 */}
-        <button
-          onClick={handleClaim}
-          className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
-        >
-          立即领取
-        </button>
       </div>
+
+      {/* 底部按钮区域 */}
+      <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
+        {/* 奖品文案 */}
+        <p className="text-lg font-bold text-amber-800">{resolveRewardText()}</p>
+        
+        {/* 特殊说明 */}
+        <p className="text-sm text-amber-700">{resolveSpecialNote()}</p>
+      </div>
+
+      {/* 领取按钮 */}
+      <button
+        onClick={handleClaim}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-full font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
+      >
+        立即领取
+      </button>
     </div>
   );
 
