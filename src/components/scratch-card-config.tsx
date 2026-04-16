@@ -206,22 +206,6 @@ export function ScratchCardTemplateConfigPanel({
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
-      {/* 基础配置 */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <SectionHeader
-            title="基础配置"
-            isOpen={basicOpen}
-            onToggle={() => setBasicOpen(!basicOpen)}
-          />
-        </div>
-        {basicOpen && (
-          <div className="p-4 space-y-4">
-            {/* 暂无其他基础配置 */}
-          </div>
-        )}
-      </div>
-
       {/* 领奖配置 */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
