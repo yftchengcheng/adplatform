@@ -93,6 +93,8 @@ export default function ComponentCreatePage() {
       router.push("/components/config?type=flip_card");
     } else if (template.id === "treasure_rain") {
       router.push("/components/config?type=treasure_rain");
+    } else if (template.id === "smash_egg") {
+      router.push("/components/config?type=smash_egg");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);
