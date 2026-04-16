@@ -232,22 +232,16 @@ export function TreasureboxRainTemplate({
                 </div>
               </div>
 
-              {/* Falling Treasureboxes */}
+              {/* Falling Treasureboxes - 流水式持续飘落 */}
               <style jsx>{`
-                @keyframes fallTreasurebox {
+                @keyframes fallTreasureboxWater {
                   0% {
-                    top: 80px;
-                    opacity: 0;
+                    top: -60px;
+                    opacity: 1;
                     transform: scale(0.8) rotate(0deg);
                   }
-                  10% {
-                    opacity: 1;
-                  }
-                  90% {
-                    opacity: 1;
-                  }
                   100% {
-                    top: calc(100% - 60px);
+                    top: 100%;
                     opacity: 1;
                     transform: scale(1) rotate(360deg);
                   }
@@ -262,7 +256,7 @@ export function TreasureboxRainTemplate({
                   style={{
                     left: `${tb.x}%`,
                     top: 0,
-                    animation: `fallTreasurebox ${tb.duration}ms ease-in forwards`,
+                    animation: `fallTreasureboxWater ${tb.duration}ms linear infinite`,
                     animationDelay: `${tb.delay}ms`,
                     transform: `scale(${tb.scale})`,
                     zIndex: 10,
@@ -363,22 +357,16 @@ export function TreasureboxRainTemplate({
             </div>
           </div>
 
-          {/* Falling Treasureboxes */}
+          {/* Falling Treasureboxes - 流水式持续飘落 */}
           <style jsx>{`
-            @keyframes fallTreasureboxPreview {
+            @keyframes fallTreasureboxWaterPreview {
               0% {
-                top: 10px;
-                opacity: 0;
+                top: -60px;
+                opacity: 1;
                 transform: scale(0.8) rotate(0deg);
               }
-              10% {
-                opacity: 1;
-              }
-              90% {
-                opacity: 1;
-              }
               100% {
-                top: calc(100% - 30px);
+                top: 100%;
                 opacity: 1;
                 transform: scale(1) rotate(360deg);
               }
@@ -393,7 +381,7 @@ export function TreasureboxRainTemplate({
               style={{
                 left: `${tb.x}%`,
                 top: 0,
-                animation: `fallTreasureboxPreview ${tb.duration}ms ease-in forwards`,
+                animation: `fallTreasureboxWaterPreview ${tb.duration}ms linear infinite`,
                 animationDelay: `${tb.delay}ms`,
                 transform: `scale(${tb.scale * 0.8})`,
                 zIndex: 10,
