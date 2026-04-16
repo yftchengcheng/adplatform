@@ -710,26 +710,12 @@ export function ComponentList() {
               组件预览 - {previewComponent?.name}
             </DialogTitle>
             
-            {/* 预览区域 - 手机模拟器 */}
-            <div className="p-8 bg-gradient-to-b from-gray-100 to-gray-200 flex justify-center">
-              <div className="relative">
-                {/* 手机边框 */}
-                <div className="w-[375px] h-[667px] bg-white rounded-[3rem] shadow-2xl overflow-hidden border-[12px] border-gray-800 relative">
-                  {/* 刘海区域 */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-800 rounded-b-2xl z-10"></div>
-                  
-                  {/* 状态栏 */}
-                  <div className="h-12 bg-white flex items-end justify-between px-6 pb-1">
-                    <span className="text-xs font-medium">9:41</span>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-2 border border-gray-400 rounded-sm">
-                        <div className="w-3 h-1 bg-gray-400 rounded-sm m-px"></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* 内容区域 */}
-                  <div className="h-[571px] overflow-hidden">
+            {/* 预览区域 - 与配置页面右侧预览一致 */}
+            <div className="p-8 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              {/* 手机框架 */}
+              <div className="relative z-10">
+                <div className="w-[280px] h-[520px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
+                  <div className="w-full h-full bg-white rounded-[2rem] overflow-hidden relative">
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
                       previewComponent?.type === "promotion_card" ? (
@@ -769,41 +755,33 @@ export function ComponentList() {
                           previewMode={true}
                         />
                       ) : previewComponent?.type === "redpacket_rain" ? (
-                        <div className="w-full px-2">
-                          <RedpacketRainTemplate
-                            config={previewComponent.config as unknown as RedpacketRainTemplateConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => {}}
-                          />
-                        </div>
+                        <RedpacketRainTemplate
+                          config={previewComponent.config as unknown as RedpacketRainTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => {}}
+                        />
                       ) : previewComponent?.type === "flip_redpacket" ? (
-                        <div className="relative w-full h-full">
-                          <FlipRedpacketTemplate
-                            config={editingPreviewConfig["flip_redpacket"] as unknown as FlipRedpacketTemplateConfig || previewComponent.config as unknown as FlipRedpacketTemplateConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewComponent(null)}
-                          />
-                        </div>
+                        <FlipRedpacketTemplate
+                          config={editingPreviewConfig["flip_redpacket"] as unknown as FlipRedpacketTemplateConfig || previewComponent.config as unknown as FlipRedpacketTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : previewComponent?.type === "flip_treasure" ? (
-                        <div className="relative w-full h-full">
-                          <TreasureBoxTemplate
-                            config={editingPreviewConfig["flip_treasure"] as unknown as TreasureBoxConfig || previewComponent.config as unknown as TreasureBoxConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewComponent(null)}
-                          />
-                        </div>
+                        <TreasureBoxTemplate
+                          config={editingPreviewConfig["flip_treasure"] as unknown as TreasureBoxConfig || previewComponent.config as unknown as TreasureBoxConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : previewComponent?.type === "flip_card" ? (
-                        <div className="w-full h-full">
-                          <FlipCardTemplate
-                            config={editingPreviewConfig["flip_card"] as unknown as FlipCardConfig || previewComponent.config as unknown as FlipCardConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewComponent(null)}
-                          />
-                        </div>
+                        <FlipCardTemplate
+                          config={editingPreviewConfig["flip_card"] as unknown as FlipCardConfig || previewComponent.config as unknown as FlipCardConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : previewComponent?.type === "smash_egg" ? (
                         <SmashEggTemplateDefault
                           config={(editingPreviewConfig["smash_egg"] as SmashEggConfig) || defaultSmashEggConfig}
@@ -812,68 +790,39 @@ export function ComponentList() {
                           onClose={() => setPreviewComponent(null)}
                         />
                       ) : previewComponent?.type === "scratch_card" ? (
-                        <div className="relative w-full h-full">
-                          <ScratchCardTemplateDefault
-                            config={(editingPreviewConfig["scratch_card"] as ScratchCardConfig) || defaultScratchCardConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewComponent(null)}
-                          />
-                        </div>
+                        <ScratchCardTemplateDefault
+                          config={(editingPreviewConfig["scratch_card"] as ScratchCardConfig) || defaultScratchCardConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : previewComponent?.type === "popup_redpacket" ? (
-                        <div className="relative w-full h-full">
-                          <PopupRedpacketTemplate
-                            config={editingPreviewConfig["popup_redpacket"] as PopupRedpacketConfig || previewComponent.config as unknown as PopupRedpacketConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewComponent(null)}
-                          />
-                        </div>
+                        <PopupRedpacketTemplate
+                          config={editingPreviewConfig["popup_redpacket"] as PopupRedpacketConfig || previewComponent.config as unknown as PopupRedpacketConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : previewComponent?.type === "treasure_rain" ? (
-                        <div className="w-full px-2">
-                          <TreasureboxRainTemplateDefault
-                            config={previewComponent.config as unknown as TreasureboxRainTemplateConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => {}}
-                          />
-                        </div>
+                        <TreasureboxRainTemplateDefault
+                          config={editingPreviewConfig["treasure_rain"] as unknown as TreasureboxRainTemplateConfig || previewComponent.config as unknown as TreasureboxRainTemplateConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : (
-                        // 默认使用 AdTemplate（双按钮磁贴）
                         <AdTemplate
                           config={previewComponent.config as unknown as AdTemplateConfig}
                           isOpen={true}
                           previewMode={true}
-                          onClose={() => {}}
                         />
                       )
                     ) : (
-                      <div className="h-full flex items-center justify-center text-gray-400">
-                        <div className="text-center p-6">
-                          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                            <Eye className="w-8 h-8" />
-                          </div>
-                          <p className="text-sm">该组件暂无配置数据</p>
-                          <p className="text-xs mt-2 text-gray-400">
-                            请先编辑并保存组件配置
-                          </p>
-                          <p className="text-xs mt-1 text-gray-500">
-                            类型: {previewComponent?.type}
-                          </p>
-                        </div>
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        <p className="text-sm">无预览数据</p>
                       </div>
                     )}
                   </div>
-                  
-                  {/* Home 指示条 */}
-                  <div className="h-8 bg-white flex items-center justify-center">
-                    <div className="w-32 h-1 bg-gray-300 rounded-full"></div>
-                  </div>
-                </div>
-                
-                {/* 底部标签 */}
-                <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-center">
-                  <p className="text-xs text-gray-500">iPhone 尺寸预览 (375×667)</p>
                 </div>
               </div>
             </div>
