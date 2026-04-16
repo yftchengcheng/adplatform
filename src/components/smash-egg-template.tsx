@@ -222,7 +222,7 @@ export function SmashEggTemplate({
   // 预览模式
   if (previewMode) {
     return (
-      <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden" style={{ minHeight: "500px" }}>
+      <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden">
         {/* Close Button */}
         {onClose && (
           <button
@@ -260,7 +260,7 @@ export function SmashEggTemplate({
       )}
 
       {/* Main Content */}
-      <div className="flex-1">
+      <div className="flex-1 flex items-center justify-center">
         {isSmashed ? renderRewardScene() : renderSmashScene()}
       </div>
     </div>
