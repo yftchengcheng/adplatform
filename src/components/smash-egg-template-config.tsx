@@ -43,7 +43,7 @@ export interface SmashEggConfig {
 
 // 砸蛋默认配置
 export const defaultSmashEggConfig: SmashEggConfig = {
-  componentName: "砸金蛋",
+  componentName: "砸金蛋得好礼！",
   guideText: "点击金蛋，领取奖品",
   guideTextMacro: "",
   rewardType: "cash",
@@ -494,6 +494,19 @@ export function SmashEggTemplateConfigPanel({
             </div>
           </div>
         )}
+      </div>
+
+      {/* 组件名称 */}
+      <div className="space-y-2 pt-4 border-t border-gray-200">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-gray-700">组件名称</label>
+          <CharCounter value={config.componentName || ""} max={20} />
+        </div>
+        <Input
+          placeholder="请输入组件名称"
+          value={config.componentName || ""}
+          onChange={(e) => updateConfig({ componentName: e.target.value })}
+        />
       </div>
 
       {/* 操作按钮 */}
