@@ -239,7 +239,7 @@
 /* 刮刮卡飘落动画 - 从手势上部10px区域飘落 */
 @keyframes fallDownRelative {
   0% {
-    top: 5%;
+    top: 0%;
     opacity: 0;
   }
   10% {
