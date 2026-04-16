@@ -304,16 +304,6 @@ export function TreasureboxRainTemplate({
               </button>
 
               <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
-                {/* 宝箱已开 */}
-                <div className="mb-6">
-                  <img
-                    src="/treasurebox-open.png"
-                    alt="开启的宝箱"
-                    className="w-32 h-auto object-contain"
-                    draggable={false}
-                  />
-                </div>
-
                 {/* 奖励展示 */}
                 <div className="mb-6 text-center">
                   {finalConfig.rewardType === "cash" ? (
@@ -445,16 +435,6 @@ export function TreasureboxRainTemplate({
           </button>
 
           <div className="w-full h-full flex flex-col items-center justify-center">
-            {/* 宝箱已开 */}
-            <div className="mb-4">
-              <img
-                src="/treasurebox-open.png"
-                alt="开启的宝箱"
-                className="w-24 h-auto object-contain"
-                draggable={false}
-              />
-            </div>
-
             {/* 奖励展示 */}
             <div className="mb-4 text-center">
               {finalConfig.rewardType === "cash" ? (
