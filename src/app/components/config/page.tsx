@@ -616,7 +616,7 @@ function ConfigContent() {
                             />
                           </div>
                         ) : isFlipRedpacketComponent ? (
-                          <div className="w-full px-4">
+                          <div className="relative w-full px-4">
                             <FlipRedpacketTemplate
                               key={`flip-${previewResetKey}`}
                               config={config as FlipRedpacketTemplateConfig}
@@ -624,9 +624,19 @@ function ConfigContent() {
                               previewMode={true}
                               onClose={() => setPreviewResetKey(k => k + 1)}
                             />
+                            {/* 预览关闭按钮 */}
+                            <button
+                              onClick={() => setPreviewResetKey(k => k + 1)}
+                              className="absolute top-2 right-6 z-20 w-6 h-6 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-opacity"
+                              style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+                            >
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
                         ) : isTreasureBoxComponent ? (
-                          <div className="w-full px-4">
+                          <div className="relative w-full px-4">
                             <TreasureBoxTemplate
                               key={`treasure-${previewResetKey}`}
                               config={config as TreasureBoxConfig}
@@ -634,6 +644,16 @@ function ConfigContent() {
                               previewMode={true}
                               onClose={() => setPreviewResetKey(k => k + 1)}
                             />
+                            {/* 预览关闭按钮 */}
+                            <button
+                              onClick={() => setPreviewResetKey(k => k + 1)}
+                              className="absolute top-2 right-6 z-20 w-6 h-6 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-opacity"
+                              style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+                            >
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
                         ) : isFlipCardComponent ? (
                           <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
