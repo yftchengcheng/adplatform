@@ -93,6 +93,7 @@ export function PopupRedpacketTemplate({
   // 状态管理
   const [isVisible, setIsVisible] = useState(false);
   const [isOpening, setIsOpening] = useState(false);
+  const [isEntered, setIsEntered] = useState(false);
   const [isClaimed, setIsClaimed] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -114,7 +115,12 @@ export function PopupRedpacketTemplate({
       setIsOpening(true);
       setIsClaimed(false);
       setIsExiting(false);
-      setTimeout(() => setIsOpening(false), 600);
+      setIsEntered(false);
+      // 入场动画完成后切换到循环动画
+      setTimeout(() => {
+        setIsOpening(false);
+        setIsEntered(true);
+      }, 800);
     }
   }, [isOpen]);
 
@@ -164,6 +170,8 @@ export function PopupRedpacketTemplate({
         "relative",
         isOpening
           ? "animate-popup-enter"
+          : isEntered
+          ? "animate-popup-loop"
           : isExiting
           ? "animate-popup-exit"
           : "scale-100"
