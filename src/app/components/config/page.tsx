@@ -251,15 +251,13 @@ function ConfigContent() {
     if (editingComponent?.config) {
       return editingComponent.config as AllConfigTypes;
     }
-    // 其次使用sessionStorage中的配置（仅客户端）
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("component_config");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore parse errors
-        }
+    // 其次使用sessionStorage中的配置
+    const saved = sessionStorage.getItem("component_config");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        // ignore parse errors
       }
     }
     // 最后使用默认配置
