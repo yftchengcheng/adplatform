@@ -67,6 +67,9 @@ interface ComponentContextType {
   components: AdComponentItem[];
   loading: boolean;
   error: string | null;
+  // 当前编辑的组件预览配置（用于组件列表实时预览）
+  editingPreviewConfig: Record<string, Record<string, unknown>>;
+  setEditingPreviewConfig: (type: string, config: Record<string, unknown>) => void;
   addComponent: (component: Omit<AdComponentItem, "id" | "updateTime" | "templateCount" | "editor">) => Promise<void>;
   updateComponent: (id: string, updates: Partial<AdComponentItem>) => Promise<void>;
   deleteComponent: (id: string) => Promise<void>;
@@ -84,6 +87,9 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // 当前编辑的组件预览配置（用于组件列表实时预览）
+  const [editingPreviewConfig, setEditingPreviewConfig] = useState<Record<string, Record<string, unknown>>>({});
   
   // 数据缓存，避免重复加载
   const [lastLoadTime, setLastLoadTime] = useState<number>(0);
@@ -323,6 +329,8 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       components: isInitialized ? components : initialComponents,
       loading,
       error,
+      editingPreviewConfig,
+      setEditingPreviewConfig,
       addComponent,
       updateComponent,
       deleteComponent,

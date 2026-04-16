@@ -269,7 +269,7 @@ function ConfigContent() {
   const searchParams = useSearchParams();
   const type = (searchParams.get("type") || "dual_button") as ComponentType;
   const componentId = searchParams.get("id");
-  const { addComponent, updateComponent, components } = useComponents();
+  const { addComponent, updateComponent, components, setEditingPreviewConfig } = useComponents();
   const { showToast } = useToast();
 
   // 根据类型获取组件名称（优先从配置读取，否则使用静态名称）
@@ -342,13 +342,17 @@ function ConfigContent() {
 
   const handleConfigChange = useCallback((newConfig: AllConfigTypes) => {
     setConfig(newConfig);
+    // 同步更新到全局预览配置（用于组件列表实时预览）
+    if (type) {
+      setEditingPreviewConfig(type, newConfig as Record<string, unknown>);
+    }
     try {
       const cleanConfig = deepClone(newConfig);
       sessionStorage.setItem("component_config", JSON.stringify(cleanConfig));
     } catch (e) {
       console.error("配置序列化失败:", e);
     }
-  }, []);
+  }, [type, setEditingPreviewConfig]);
 
   // 清空 sessionStorage
   const clearSavedConfig = useCallback(() => {

@@ -82,7 +82,7 @@ import { useRouter } from "next/navigation";
 
 export function ComponentList() {
   const router = useRouter();
-  const { components, toggleStatus, deleteComponent } = useComponents();
+  const { components, toggleStatus, deleteComponent, editingPreviewConfig } = useComponents();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; templateCount: number } | null>(null);
   const [filters, setFilters] = useState<ComponentFilters>({
@@ -778,54 +778,36 @@ export function ComponentList() {
                           />
                         </div>
                       ) : previewComponent?.type === "flip_redpacket" ? (
-                        <div className="relative w-full px-2">
+                        <div className="relative w-full h-full">
                           <FlipRedpacketTemplate
-                            config={previewComponent.config as unknown as FlipRedpacketTemplateConfig}
+                            config={editingPreviewConfig["flip_redpacket"] as unknown as FlipRedpacketTemplateConfig || previewComponent.config as unknown as FlipRedpacketTemplateConfig}
                             isOpen={true}
                             previewMode={true}
-                            onClose={() => {}}
+                            onClose={() => setPreviewComponent(null)}
                           />
-                          <button
-                            onClick={() => setPreviewComponent(null)}
-                            className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-                          >
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
                         </div>
                       ) : previewComponent?.type === "flip_treasure" ? (
-                        <div className="relative w-full px-2">
+                        <div className="relative w-full h-full">
                           <TreasureBoxTemplate
-                            config={previewComponent.config as unknown as TreasureBoxConfig}
+                            config={editingPreviewConfig["flip_treasure"] as unknown as TreasureBoxConfig || previewComponent.config as unknown as TreasureBoxConfig}
                             isOpen={true}
                             previewMode={true}
-                            onClose={() => {}}
+                            onClose={() => setPreviewComponent(null)}
                           />
-                          <button
-                            onClick={() => setPreviewComponent(null)}
-                            className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-                          >
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
                         </div>
                       ) : previewComponent?.type === "flip_card" ? (
-                        <div className="w-full px-2">
+                        <div className="w-full h-full">
                           <FlipCardTemplate
-                            config={previewComponent.config as unknown as FlipCardConfig}
+                            config={editingPreviewConfig["flip_card"] as unknown as FlipCardConfig || previewComponent.config as unknown as FlipCardConfig}
                             isOpen={true}
                             previewMode={true}
-                            onClose={() => {}}
+                            onClose={() => setPreviewComponent(null)}
                           />
                         </div>
                       ) : previewComponent?.type === "smash_egg" ? (
                         <div className="relative w-full h-full">
                           <SmashEggTemplateDefault
-                            config={defaultSmashEggConfig}
+                            config={(editingPreviewConfig["smash_egg"] as SmashEggConfig) || defaultSmashEggConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => setPreviewComponent(null)}
@@ -834,29 +816,20 @@ export function ComponentList() {
                       ) : previewComponent?.type === "scratch_card" ? (
                         <div className="relative w-full h-full">
                           <ScratchCardTemplateDefault
-                            config={defaultScratchCardConfig}
+                            config={(editingPreviewConfig["scratch_card"] as ScratchCardConfig) || defaultScratchCardConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => setPreviewComponent(null)}
                           />
                         </div>
                       ) : previewComponent?.type === "popup_redpacket" ? (
-                        <div className="relative w-full px-2">
+                        <div className="relative w-full h-full">
                           <PopupRedpacketTemplate
-                            config={previewComponent.config as unknown as PopupRedpacketConfig}
+                            config={editingPreviewConfig["popup_redpacket"] as PopupRedpacketConfig || previewComponent.config as unknown as PopupRedpacketConfig}
                             isOpen={true}
                             previewMode={true}
-                            onClose={() => {}}
+                            onClose={() => setPreviewComponent(null)}
                           />
-                          <button
-                            onClick={() => setPreviewComponent(null)}
-                            className="absolute top-2 right-4 z-[70] w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-                          >
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
                         </div>
                       ) : previewComponent?.type === "treasure_rain" ? (
                         <div className="w-full px-2">
