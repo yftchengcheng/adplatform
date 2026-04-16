@@ -227,7 +227,7 @@ const componentConfigMap: Record<string, {
   },
   smash_egg: {
     defaultConfig: defaultSmashEggConfig,
-    name: "砸金蛋",
+    name: "砸金蛋得好礼！",
     description: "点击金蛋，领取奖品",
   },
 };
