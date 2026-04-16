@@ -131,10 +131,11 @@ export function SmashEggTemplate({
         backgroundPosition: "center",
       }}
     >
-      {/* 蛋容器 - 居中显示 */}
+      {/* 蛋容器 - 居中显示，下移10px */}
       <div 
         className="relative cursor-pointer egg-shake-rotate"
         onClick={handleSmash}
+        style={{ transform: "translateY(10px)" }}
       >
         <img
           src="/egg-shake.png"
