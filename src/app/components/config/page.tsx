@@ -646,13 +646,15 @@ function ConfigContent() {
                             />
                           </div>
                         ) : isTreasureboxRainComponent ? (
-                          <TreasureboxRainTemplate
-                            key={`treasureboxrain-${previewResetKey}`}
-                            config={config as TreasureboxRainTemplateConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => {}}
-                          />
+                          <div className="-mt-24">
+                            <TreasureboxRainTemplate
+                              key={`treasureboxrain-${previewResetKey}`}
+                              config={config as TreasureboxRainTemplateConfig}
+                              isOpen={true}
+                              previewMode={true}
+                              onClose={() => {}}
+                            />
+                          </div>
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}
