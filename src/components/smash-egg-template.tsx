@@ -145,11 +145,11 @@ export function SmashEggTemplate({
         />
       </div>
 
-      {/* 锤子 - 相对于蛋的位置 */}
+      {/* 锤子 - 相对于容器顶部30%，右侧18% */}
       <div 
         className="absolute hammer-shake"
         style={{
-          top: "25%",
+          top: "30%",
           right: "18%",
         }}
       >
