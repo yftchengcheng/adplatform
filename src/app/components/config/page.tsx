@@ -218,7 +218,7 @@ const componentConfigMap: Record<string, {
     name: "翻卡",
     description: "点击卡牌翻出惊喜，领取奖励",
   },
-  treasurebox_rain: {
+  treasure_rain: {
     defaultConfig: defaultTreasureboxRainConfig,
     name: "宝箱雨",
     description: "配置宝箱样式、引导文案和领奖场景",
@@ -386,7 +386,7 @@ function ConfigContent() {
   const isFlipRedpacketComponent = type === "flip_redpacket";
   const isTreasureBoxComponent = type === "flip_treasure";
   const isFlipCardComponent = type === "flip_card";
-  const isTreasureboxRainComponent = type === "treasurebox_rain";
+  const isTreasureboxRainComponent = type === "treasure_rain";
 
   return (
     <div className="min-h-screen bg-gray-50">

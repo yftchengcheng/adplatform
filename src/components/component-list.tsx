@@ -300,7 +300,7 @@ export function ComponentList() {
       flip_card: "翻卡",
       flip_redpacket: "翻红包",
       flip_treasure: "翻宝箱",
-      treasurebox_rain: "宝箱雨",
+      treasure_rain: "宝箱雨",
       treasure_rain: "宝箱雨",
       scratch_card: "刮刮卡",
       smash_egg: "砸蛋",
@@ -388,8 +388,10 @@ export function ComponentList() {
                 <SelectContent>
                   <SelectItem value="all">不限</SelectItem>
                   <SelectItem value="redpacket_rain">红包雨</SelectItem>
-                  <SelectItem value="flip_card">翻卡</SelectItem>
+                  <SelectItem value="flip_redpacket">翻红包</SelectItem>
                   <SelectItem value="flip_treasure">翻宝箱</SelectItem>
+                  <SelectItem value="treasure_rain">宝箱雨</SelectItem>
+                  <SelectItem value="flip_card">翻卡</SelectItem>
                   <SelectItem value="scratch_card">刮刮卡</SelectItem>
                   <SelectItem value="smash_egg">砸蛋</SelectItem>
                   <SelectItem value="dual_button">双按钮磁贴</SelectItem>
@@ -768,7 +770,7 @@ export function ComponentList() {
                             onClose={() => {}}
                           />
                         </div>
-                      ) : previewComponent?.type === "treasurebox_rain" ? (
+                      ) : previewComponent?.type === "treasure_rain" ? (
                         <div className="w-full px-2">
                           <TreasureboxRainTemplate
                             config={previewComponent.config as unknown as TreasureboxRainTemplateConfig}
