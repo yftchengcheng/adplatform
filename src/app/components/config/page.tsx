@@ -612,7 +612,7 @@ function ConfigContent() {
                               config={config as RedpacketRainTemplateConfig}
                               isOpen={true}
                               previewMode={true}
-                              onClose={() => {}}
+                              onClose={() => setPreviewResetKey(k => k + 1)}
                             />
                           </div>
                         ) : isFlipRedpacketComponent ? (
@@ -622,7 +622,7 @@ function ConfigContent() {
                               config={config as FlipRedpacketTemplateConfig}
                               isOpen={true}
                               previewMode={true}
-                              onClose={() => {}}
+                              onClose={() => setPreviewResetKey(k => k + 1)}
                             />
                           </div>
                         ) : isTreasureBoxComponent ? (
@@ -632,7 +632,7 @@ function ConfigContent() {
                               config={config as TreasureBoxConfig}
                               isOpen={true}
                               previewMode={true}
-                              onClose={() => {}}
+                              onClose={() => setPreviewResetKey(k => k + 1)}
                             />
                           </div>
                         ) : isFlipCardComponent ? (
@@ -642,7 +642,7 @@ function ConfigContent() {
                               config={config as FlipCardConfig}
                               isOpen={true}
                               previewMode={true}
-                              onClose={() => {}}
+                              onClose={() => setPreviewResetKey(k => k + 1)}
                             />
                           </div>
                         ) : isTreasureboxRainComponent ? (
@@ -651,7 +651,7 @@ function ConfigContent() {
                             config={config as TreasureboxRainTemplateConfig}
                             isOpen={true}
                             previewMode={true}
-                            onClose={() => {}}
+                            onClose={() => setPreviewResetKey(k => k + 1)}
                           />
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
