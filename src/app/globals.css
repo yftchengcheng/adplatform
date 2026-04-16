@@ -236,6 +236,25 @@
   animation: scratchReveal 1s ease-out forwards;
 }
 
+/* 刮刮卡飘落动画 - 从手势上部10px区域飘落 */
+@keyframes fallDownRelative {
+  0% {
+    top: 10%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    top: 95%;
+    opacity: 0;
+  }
+}
+
+.fall-down-relative {
+  animation: fallDownRelative 3s ease-in forwards;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

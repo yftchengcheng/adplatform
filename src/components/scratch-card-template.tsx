@@ -170,14 +170,14 @@ export function ScratchCardTemplate({
           key={element.id}
           src={`/${element.type}.png`}
           alt=""
-          className="absolute pointer-events-auto cursor-pointer"
+          className="absolute"
           style={{
             left: `${element.x}%`,
-            top: '-50px',
+            top: '0px',
             width: '30px',
             height: 'auto',
             transform: `scale(${element.scale}) rotate(${element.rotation}deg)`,
-            animation: `fallDown ${element.duration}ms ease-in forwards`,
+            animation: `fallDownRelative ${element.duration}ms ease-in forwards`,
             animationDelay: `${element.delay}ms`,
           }}
           onClick={(e) => {
