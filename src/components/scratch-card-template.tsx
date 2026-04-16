@@ -252,7 +252,7 @@ export function ScratchCardTemplate({
 
       {/* 特殊说明 */}
       <div className="absolute top-[calc(62%-40px)] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center">
-        <p className="text-gray-900 text-xs font-semibold drop-shadow-sm text-center">
+        <p className="text-yellow-400 text-xs font-medium drop-shadow-lg text-center">
           {resolveSpecialNote()}
         </p>
       </div>
