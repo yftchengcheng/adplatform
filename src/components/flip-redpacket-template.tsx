@@ -213,7 +213,8 @@ export function FlipRedpacketTemplate({
         {!previewMode && (
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
           >
             <X className="w-5 h-5 text-white" />
           </button>
