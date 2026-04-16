@@ -114,9 +114,6 @@ export function SmashEggTemplate({
     return finalConfig.defaultLandingPageUrl || "#";
   }, [finalConfig.landingPageUrl, finalConfig.landingPageMacro, finalConfig.defaultLandingPageUrl, finalConfig.macroVariables]);
 
-  // 砸蛋场景淡出
-  const [smashSceneVisible, setSmashSceneVisible] = useState(true);
-
   // 处理砸蛋点击
   const handleSmash = useCallback(() => {
     if (isSmashed || isHammerHit) return;
@@ -135,16 +132,11 @@ export function SmashEggTemplate({
       setShowEggOpen(true);
     }, 1000);
 
-    // 4. 砸蛋场景淡出，切换到领奖场景
+    // 4. 切换到领奖场景
     setTimeout(() => {
-      setSmashSceneVisible(false);
       setIsSmashed(true);
-    }, 1800);
-
-    // 5. 显示领奖场景
-    setTimeout(() => {
       setShowReward(true);
-    }, 2200);
+    }, 1500);
   }, [isSmashed, isHammerHit]);
 
   // 处理领取
@@ -169,87 +161,129 @@ export function SmashEggTemplate({
     setIsEggShaking(false);
     setShowEggOpen(false);
     setShowReward(false);
-    setSmashSceneVisible(true);
   }, []);
 
   // 渲染砸蛋场景
   const renderSmashScene = () => (
-    <div
-      className={cn(
-        "absolute inset-0 flex items-center justify-center transition-opacity duration-500",
-        smashSceneVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-      )}
+    <div 
+      className="relative w-full h-full flex items-center justify-center overflow-hidden"
+      style={{
+        backgroundImage: "url('/smash-page.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
     >
+      {/* 蛋容器 */}
       <div 
-        className="relative w-full h-full flex items-center justify-center overflow-hidden"
+        className={cn(
+          "relative cursor-pointer",
+          isEggShaking && "egg-shake-lr",
+          !isEggShaking && !isHammerHit && "egg-shake-rotate"
+        )}
+        onClick={handleSmash}
+      >
+        <img
+          src="/egg-shake.png"
+          alt="彩蛋"
+          className="w-48 h-auto object-contain"
+          draggable={false}
+        />
+      </div>
+
+      {/* 锤子 */}
+      <div 
+        className={cn(
+          "absolute",
+          isHammerHit ? "hammer-hit" : "hammer-shake"
+        )}
+        style={{
+          top: "25%",
+          right: "15%",
+        }}
+        onClick={handleSmash}
+      >
+        <img
+          src="/hammer.png"
+          alt="锤子"
+          className="w-24 h-auto object-contain"
+          draggable={false}
+        />
+      </div>
+
+      {/* 开蛋效果 */}
+      {showEggOpen && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <img
+            src="/egg-open.png"
+            alt="开蛋"
+            className="w-48 h-auto object-contain egg-open-anim"
+            draggable={false}
+          />
+        </div>
+      )}
+
+      {/* 点击提示 */}
+      {!isEggShaking && !isHammerHit && !showEggOpen && (
+        <div className="absolute bottom-20 left-0 right-0 text-center">
+          <p className="text-white text-sm font-bold drop-shadow-lg animate-pulse">
+            {resolveGuideText()}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  // 渲染领奖场景
+  const renderRewardScene = () => (
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-6">
+      {/* 背景 */}
+      <div 
+        className="absolute inset-0"
         style={{
           backgroundImage: "url('/smash-page.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          filter: "brightness(0.7)",
         }}
-      >
-        {/* 蛋容器 */}
-        <div 
-          className={cn(
-            "relative cursor-pointer",
-            isEggShaking && "egg-shake-lr",
-            !isEggShaking && !isHammerHit && "egg-shake-rotate"
-          )}
-          onClick={handleSmash}
-        >
-          <img
-            src="/egg-shake.png"
-            alt="彩蛋"
-            className="w-48 h-auto object-contain"
-            draggable={false}
-          />
-        </div>
-
-        {/* 锤子 */}
-        <div 
-          className={cn(
-            "absolute",
-            isHammerHit ? "hammer-hit" : "hammer-shake"
-          )}
-          style={{
-            top: "25%",
-            right: "15%",
-          }}
-          onClick={handleSmash}
-        >
-          <img
-            src="/hammer.png"
-            alt="锤子"
-            className="w-24 h-auto object-contain"
-            draggable={false}
-          />
-        </div>
-
-        {/* 开蛋效果 */}
-        {showEggOpen && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      />
+      
+      {/* 内容 */}
+      <div className="relative z-10 flex flex-col items-center">
+        {/* 奖励展示 */}
+        <div className="mb-6 text-center reward-pop">
+          {finalConfig.rewardType === "cash" ? (
+            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-2xl">
+              <p className="text-white/90 text-sm mb-1">恭喜获得</p>
+              <p className="text-white text-4xl font-bold">¥{resolveCashAmount()}</p>
+            </div>
+          ) : resolveRewardImage() ? (
             <img
-              src="/egg-open.png"
-              alt="开蛋"
-              className="w-48 h-auto object-contain egg-open-anim"
+              src={resolveRewardImage()}
+              alt="奖励"
+              className="max-w-full max-h-32 object-contain rounded-xl shadow-lg"
               draggable={false}
             />
-          </div>
-        )}
+          ) : null}
+        </div>
 
-        {/* 点击提示 */}
-        {!isEggShaking && !isHammerHit && !showEggOpen && (
-          <div className="absolute bottom-20 left-0 right-0 text-center">
-            <p className="text-white text-sm font-bold drop-shadow-lg animate-pulse">
-              {resolveGuideText()}
-            </p>
-          </div>
-        )}
+        {/* 奖品文案 */}
+        <p className="text-white text-xl font-bold mb-2 drop-shadow-lg">{resolveRewardText()}</p>
+
+        {/* 特殊说明 */}
+        <p className="text-white/80 text-sm mb-8 drop-shadow">{resolveSpecialNote()}</p>
+
+        {/* 领取按钮 */}
+        <button
+          onClick={handleClaim}
+          className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
+        >
+          立即领取
+        </button>
       </div>
     </div>
   );
 
-  // 全屏模式
+  // 预览模式
   if (previewMode) {
     return (
       <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden" style={{ minHeight: "500px" }}>
@@ -264,53 +298,7 @@ export function SmashEggTemplate({
           </button>
         )}
 
-        {/* 砸蛋场景 */}
-        {renderSmashScene()}
-
-        {/* 领奖场景 */}
-        <div
-          className={cn(
-            "absolute inset-0 flex flex-col items-center justify-center p-6 transition-opacity duration-500",
-            showReward ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          )}
-          style={{
-            backgroundImage: "url('/smash-page.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "brightness(0.7)",
-          }}
-        >
-          {/* 奖励展示 */}
-          <div className="reward-pop">
-            {finalConfig.rewardType === "cash" ? (
-              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-2xl">
-                <p className="text-white/90 text-sm mb-1">恭喜获得</p>
-                <p className="text-white text-2xl font-bold">¥{resolveCashAmount()}</p>
-              </div>
-            ) : resolveRewardImage() ? (
-              <img
-                src={resolveRewardImage()}
-                alt="奖励"
-                className="max-w-full max-h-24 object-contain rounded-xl shadow-lg"
-                draggable={false}
-              />
-            ) : null}
-          </div>
-
-          {/* 奖品文案 */}
-          <p className="text-white text-lg font-bold mt-4 drop-shadow-lg">{resolveRewardText()}</p>
-
-          {/* 特殊说明 */}
-          <p className="text-white/80 text-xs mt-1 mb-6 drop-shadow">{resolveSpecialNote()}</p>
-
-          {/* 领取按钮 */}
-          <button
-            onClick={handleClaim}
-            className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold shadow-lg hover:opacity-90 transition-opacity"
-          >
-            立即领取
-          </button>
-        </div>
+        {!isSmashed ? renderSmashScene() : renderRewardScene()}
       </div>
     );
   }
@@ -329,52 +317,9 @@ export function SmashEggTemplate({
         </button>
       )}
 
-      {/* 砸蛋场景 */}
-      {renderSmashScene()}
-
-      {/* 领奖场景 */}
-      <div
-        className={cn(
-          "absolute inset-0 flex flex-col items-center justify-center p-6 transition-opacity duration-500",
-          showReward ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        )}
-        style={{
-          backgroundImage: "url('/smash-page.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(0.7)",
-        }}
-      >
-        {/* 奖励展示 */}
-        <div className="reward-pop">
-          {finalConfig.rewardType === "cash" ? (
-            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-2xl">
-              <p className="text-white/90 text-sm mb-1">恭喜获得</p>
-              <p className="text-white text-4xl font-bold">¥{resolveCashAmount()}</p>
-            </div>
-          ) : resolveRewardImage() ? (
-            <img
-              src={resolveRewardImage()}
-              alt="奖励"
-              className="max-w-full max-h-32 object-contain rounded-xl shadow-lg"
-              draggable={false}
-            />
-          ) : null}
-        </div>
-
-        {/* 奖品文案 */}
-        <p className="text-white text-xl font-bold mt-4 drop-shadow-lg">{resolveRewardText()}</p>
-
-        {/* 特殊说明 */}
-        <p className="text-white/80 text-sm mt-1 mb-8 drop-shadow">{resolveSpecialNote()}</p>
-
-        {/* 领取按钮 */}
-        <button
-          onClick={handleClaim}
-          className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
-        >
-          立即领取
-        </button>
+      {/* Main Content */}
+      <div className="flex-1">
+        {isSmashed ? renderRewardScene() : renderSmashScene()}
       </div>
     </div>
   );
