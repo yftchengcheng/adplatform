@@ -197,8 +197,9 @@ export function PopupRedpacketTemplate({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center",
-        "bg-black/60 backdrop-blur-sm",
+        previewMode 
+          ? "relative w-full h-full flex items-center justify-center bg-black/60" 
+          : "fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm",
         isExiting ? "animate-fade-out" : "animate-fade-in"
       )}
       onClick={handleBackdropClick}
