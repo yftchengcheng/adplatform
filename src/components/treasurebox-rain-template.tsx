@@ -346,7 +346,17 @@ export function TreasureboxRainTemplate({
 
   // 预览模式
   return (
-    <div className="w-full rounded-t-2xl overflow-hidden shadow-lg">
+    <div className="w-full rounded-t-2xl shadow-lg relative" style={{ overflow: 'visible' }}>
+      {/* Close Button - 预览模式下显示 */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
+
       {/* Rain Scene */}
       {!isClaimed ? (
         <div ref={containerRef} className="relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]" style={{ height: "300px" }}>
