@@ -206,12 +206,7 @@ export function ScratchCardTemplate({
         >
           {/* 刮刮卡涂层 */}
           <div className="relative w-[280px] h-[160px] rounded-xl overflow-hidden">
-            <img
-              src="/scratch-card-page.png"
-              alt="刮刮卡"
-              className="w-full h-full object-contain"
-              draggable={false}
-            />
+            {/* 可点击的刮刮区域 */}
           </div>
         </div>
 
