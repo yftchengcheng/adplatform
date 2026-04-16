@@ -25,7 +25,7 @@ function resolveMacro(macro: string, variables?: Record<string, string>): string
 
 // 金币飘落元素类型
 interface FallingElement {
-  id: number;
+  id: string;
   x: number;
   delay: number;
   duration: number;
@@ -125,24 +125,41 @@ export function ScratchCardTemplate({
   // 飘落元素计数器
   const elementCounterRef = useRef(0);
 
-  // 生成飘落元素
+  // 生成飘落元素 - 参考宝箱雨方式
   const generateFallingElements = useCallback(() => {
     const elements: FallingElement[] = [];
     const types: FallingElement['type'][] = ['yuanbao1', 'yuanbao2', 'yuanbao3', 'yuanbao4', 'yuanbao5', 'yuanbao6'];
-    const count = 8; // 降低50%: 从15个减少到8个
+    const positions = [15, 50, 85]; // 三条垂直轨迹位置（与宝箱雨一致）
     
-    for (let i = 0; i < count; i++) {
+    // 生成15个元素（与宝箱雨一致）
+    for (let i = 0; i < 15; i++) {
       elements.push({
-        id: elementCounterRef.current++,
-        x: Math.random() * 90 + 5,
-        delay: Math.random() * 4000, // 延迟范围扩大，分散飘落
-        duration: 4000 + Math.random() * 2000, // 飘落时长增加
+        id: `scratch-${Date.now()}-${elementCounterRef.current++}`,
+        x: positions[i % 3],
+        delay: Math.random() * 3000,
+        duration: 3000 + Math.random() * 1000,
         scale: 0.8 + Math.random() * 0.4,
         rotation: -15 + Math.random() * 30,
         type: types[Math.floor(Math.random() * types.length)],
       });
     }
     return elements;
+  }, []);
+
+  // 生成单个飘落元素
+  const generateSingleFallingElement = useCallback(() => {
+    const types: FallingElement['type'][] = ['yuanbao1', 'yuanbao2', 'yuanbao3', 'yuanbao4', 'yuanbao5', 'yuanbao6'];
+    const positions = [15, 50, 85];
+    
+    return {
+      id: `scratch-${Date.now()}-${Math.random()}`,
+      x: positions[Math.floor(Math.random() * 3)],
+      delay: 0,
+      duration: 3000 + Math.random() * 1000,
+      scale: 0.8 + Math.random() * 0.4,
+      rotation: -15 + Math.random() * 30,
+      type: types[Math.floor(Math.random() * types.length)],
+    };
   }, []);
 
   // 处理刮卡点击
@@ -159,47 +176,75 @@ export function ScratchCardTemplate({
     }
   }, [getLandingPageUrl]);
 
-  // 重置状态
+  // 重置状态 - 参考宝箱雨方式
   useEffect(() => {
     setIsScratched(false);
     setFallingElements(generateFallingElements());
     
-    // 重复生成飘落元素 - 间隔增加到8秒
+    // 定期添加新的飘落元素 - 与宝箱雨一致
     const interval = setInterval(() => {
       if (!isScratched) {
-        setFallingElements(prev => [...prev, ...generateFallingElements()]);
+        setFallingElements((prev) => {
+          const newElement = generateSingleFallingElement();
+          return [...prev.slice(-10), newElement]; // 保持最多10个
+        });
       }
-    }, 8000);
+    }, 500);
     
     return () => clearInterval(interval);
-  }, [generateFallingElements, isScratched]);
+  }, [generateFallingElements, generateSingleFallingElement, isScratched]);
 
-  // 渲染飘落金币
+  // 渲染飘落元素 - 参考宝箱雨方式
   const renderFallingElements = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {fallingElements.map((element) => (
-        <img
-          key={element.id}
-          src={`/${element.type}.png`}
-          alt=""
-          className="absolute"
-          style={{
-            left: `${element.x}%`,
-            top: '0px',
-            width: '30px',
-            height: 'auto',
-            transform: `scale(${element.scale}) rotate(${element.rotation}deg)`,
-            animation: `fallDownRelative ${element.duration}ms ease-in forwards`,
-            animationDelay: `${element.delay}ms`,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleScratch();
-          }}
-          draggable={false}
-        />
-      ))}
-    </div>
+    <>
+      {/* 内联样式 - 飘落动画 */}
+      <style jsx>{`
+        @keyframes fallTreasurebox {
+          0% {
+            top: 80px;
+            opacity: 0;
+            transform: scale(0.8) rotate(0deg);
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            top: calc(100% - 60px);
+            opacity: 1;
+            transform: scale(1) rotate(360deg);
+          }
+        }
+      `}</style>
+
+      <div className="absolute inset-0 overflow-hidden">
+        {fallingElements.map((element) => (
+          <img
+            key={element.id}
+            src={`/${element.type}.png`}
+            alt=""
+            className="absolute cursor-pointer hover:scale-110 transition-transform"
+            style={{
+              left: `${element.x}%`,
+              top: 0,
+              width: '40px',
+              height: 'auto',
+              animation: `fallTreasurebox ${element.duration}ms ease-in forwards`,
+              animationDelay: `${element.delay}ms`,
+              transform: `scale(${element.scale})`,
+              zIndex: 10,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleScratch();
+            }}
+            draggable={false}
+          />
+        ))}
+      </div>
+    </>
   );
 
   // 渲染刮刮卡场景
