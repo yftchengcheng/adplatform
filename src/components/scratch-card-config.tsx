@@ -346,23 +346,33 @@ export function ScratchCardTemplateConfigPanel({
                                   setRewardImageError(`图片大小不能超过 300KB，当前 ${(file.size / 1024).toFixed(1)}KB`);
                                   return;
                                 }
-                                // 校验宽高比 16:9
-                                const img = new window.Image();
-                                img.onload = () => {
-                                  const ratio = img.width / img.height;
-                                  const targetRatio = 16 / 9;
-                                  const tolerance = 0.1;
-                                  if (Math.abs(ratio - targetRatio) > tolerance) {
-                                    setRewardImageError(`图片宽高比需为 16:9，当前 ${img.width}x${img.height}`);
-                                    return;
-                                  }
-                                  setRewardImageError("");
-                                  updateConfig({ rewardImageUrl: img.src });
+                                // 使用 FileReader 读取文件为 base64，确保数据持久化
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                  const result = e.target?.result as string;
+                                  // 校验宽高比
+                                  const img = new window.Image();
+                                  img.onload = () => {
+                                    const ratio = img.width / img.height;
+                                    const targetRatio = 16 / 9;
+                                    const tolerance = 0.1;
+                                    if (Math.abs(ratio - targetRatio) > tolerance) {
+                                      setRewardImageError(`图片宽高比需为 16:9，当前 ${img.width}x${img.height}`);
+                                      return;
+                                    }
+                                    setRewardImageError("");
+                                    // 使用 base64 格式保存图片数据
+                                    updateConfig({ rewardImageUrl: result });
+                                  };
+                                  img.onerror = () => {
+                                    setRewardImageError("图片加载失败，请重新上传");
+                                  };
+                                  img.src = result;
                                 };
-                                img.onerror = () => {
-                                  setRewardImageError("图片加载失败，请重新上传");
+                                reader.onerror = () => {
+                                  setRewardImageError("图片读取失败，请重新上传");
                                 };
-                                img.src = URL.createObjectURL(file);
+                                reader.readAsDataURL(file);
                               }
                             }}
                           />
