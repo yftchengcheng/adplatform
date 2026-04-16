@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SmashEggConfig } from "./smash-egg-template-config";
@@ -115,13 +115,6 @@ export function SmashEggTemplate({
       window.open(url, "_blank");
     }
   }, [getLandingPageUrl]);
-
-  // 组件显示动画
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-    }
-  }, [isOpen]);
 
   // 重置状态
   useEffect(() => {
