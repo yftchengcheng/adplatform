@@ -69,6 +69,8 @@ import TreasureBoxTemplate from "@/components/treasurebox-template";
 import { TreasureBoxConfig } from "@/components/treasurebox-template-config";
 import FlipCardTemplate from "@/components/flip-card-template";
 import { FlipCardConfig } from "@/components/flip-card-template-config";
+import TreasureboxRainTemplate from "@/components/treasurebox-rain-template";
+import { TreasureboxRainTemplateConfig } from "@/components/treasurebox-rain-template-config";
 
 import { useRouter } from "next/navigation";
 
@@ -298,6 +300,7 @@ export function ComponentList() {
       flip_card: "翻卡",
       flip_redpacket: "翻红包",
       flip_treasure: "翻宝箱",
+      treasurebox_rain: "宝箱雨",
       treasure_rain: "宝箱雨",
       scratch_card: "刮刮卡",
       smash_egg: "砸蛋",
@@ -760,6 +763,15 @@ export function ComponentList() {
                         <div className="w-full px-2">
                           <FlipCardTemplate
                             config={previewComponent.config as unknown as FlipCardConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
+                        </div>
+                      ) : previewComponent?.type === "treasurebox_rain" ? (
+                        <div className="w-full px-2">
+                          <TreasureboxRainTemplate
+                            config={previewComponent.config as unknown as TreasureboxRainTemplateConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => {}}
