@@ -497,16 +497,22 @@ export function SmashEggTemplateConfigPanel({
       </div>
 
       {/* 组件名称 */}
-      <div className="space-y-2 pt-4 border-t border-gray-200">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-700">组件名称</label>
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+          <SectionHeader
+            title="组件名称"
+            isOpen={true}
+            onToggle={() => {}}
+          />
+        </div>
+        <div className="p-4 space-y-2">
+          <Input
+            placeholder="请输入组件名称"
+            value={config.componentName || ""}
+            onChange={(e) => updateConfig({ componentName: e.target.value })}
+          />
           <CharCounter value={config.componentName || ""} max={20} />
         </div>
-        <Input
-          placeholder="请输入组件名称"
-          value={config.componentName || ""}
-          onChange={(e) => updateConfig({ componentName: e.target.value })}
-        />
       </div>
 
       {/* 操作按钮 */}
