@@ -239,7 +239,7 @@ export function SmashEggTemplate({
       onClick={handleClaim}
     >
       {/* 奖品展示区域 */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 flex flex-col items-center">
+      <div className="absolute top-[36%] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center">
         {/* 奖励展示 */}
         <div className="text-center reward-pop">
           {finalConfig.rewardType === "cash" ? (
