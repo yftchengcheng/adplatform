@@ -423,16 +423,6 @@ export function TreasureboxRainTemplate({
       ) : (
         /* Reward Scene */
         <div className="relative bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-4" style={{ height: "300px" }}>
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-2 right-2 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors"
-          >
-            <svg className="w-3 h-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
           <div className="w-full h-full flex flex-col items-center justify-center">
             {/* 奖励展示 */}
             <div className="mb-4 text-center">
