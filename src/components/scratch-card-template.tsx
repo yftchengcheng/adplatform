@@ -180,7 +180,10 @@ export function ScratchCardTemplate({
             animation: `fallDown ${element.duration}ms ease-in forwards`,
             animationDelay: `${element.delay}ms`,
           }}
-          onClick={handleScratch}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleScratch();
+          }}
           draggable={false}
         />
       ))}
@@ -190,26 +193,16 @@ export function ScratchCardTemplate({
   // 渲染刮刮卡场景
   const renderScratchScene = () => (
     <div 
-      className="relative w-full h-full flex flex-col overflow-hidden"
+      className="relative w-full h-full flex flex-col overflow-hidden cursor-pointer"
       style={{
         backgroundImage: "url('/scratch-card-page.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
+      onClick={handleScratch}
     >
       {/* 上方刮刮卡区域 */}
       <div className="flex-1 flex items-center justify-center relative">
-        {/* 刮刮卡浮层 - 可点击区域 */}
-        <div 
-          className="relative cursor-pointer hover:scale-105 transition-transform duration-200"
-          onClick={handleScratch}
-        >
-          {/* 刮刮卡涂层 */}
-          <div className="relative w-[280px] h-[160px] rounded-xl overflow-hidden">
-            {/* 可点击的刮刮区域 */}
-          </div>
-        </div>
-
         {/* 手势提示 */}
         <div className="absolute left-[calc(2rem+30px)] top-[110%] -translate-y-1/2 gesture-slide">
           <img
@@ -227,7 +220,7 @@ export function ScratchCardTemplate({
       </div>
 
       {/* 好运刮出来提示 */}
-      <div className="absolute bottom-4 left-0 right-0 text-center">
+      <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
         <p className="text-white text-sm font-bold drop-shadow-lg scale-pulse animate-pulse">
           好运刮出来
         </p>
