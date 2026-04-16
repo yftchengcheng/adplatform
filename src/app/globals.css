@@ -179,6 +179,63 @@
   animation: rewardPop 0.6s ease-out forwards;
 }
 
+/* 刮刮卡动画 */
+@keyframes fallDown {
+  0% {
+    transform: translateY(-50px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes scalePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes gestureSlide {
+  0% {
+    transform: translateX(0) translateY(-50%);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(30px) translateY(-50%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(60px) translateY(-50%);
+    opacity: 0;
+  }
+}
+
+@keyframes scratchReveal {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(100% at 50% 50%);
+  }
+}
+
+.fall-down {
+  animation: fallDown 3s ease-in forwards;
+}
+
+.scale-pulse {
+  animation: scalePulse 1.5s ease-in-out infinite;
+}
+
+.gesture-slide {
+  animation: gestureSlide 2s ease-in-out infinite;
+}
+
+.scratch-reveal {
+  animation: scratchReveal 1s ease-out forwards;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

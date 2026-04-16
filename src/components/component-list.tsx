@@ -73,6 +73,8 @@ import { TreasureboxRainTemplateConfig } from "@/components/treasurebox-rain-tem
 import { TreasureboxRainTemplate as TreasureboxRainTemplateDefault } from "@/components/treasurebox-rain-template";
 import { SmashEggConfig } from "@/components/smash-egg-template-config";
 import { SmashEggTemplate as SmashEggTemplateDefault } from "@/components/smash-egg-template";
+import { ScratchCardConfig } from "@/components/scratch-card-config";
+import { ScratchCardTemplate as ScratchCardTemplateDefault } from "@/components/scratch-card-template";
 
 import { useRouter } from "next/navigation";
 
@@ -810,6 +812,24 @@ export function ComponentList() {
                         <div className="relative w-full px-2">
                           <SmashEggTemplateDefault
                             config={previewComponent.config as unknown as SmashEggConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
+                          <button
+                            onClick={() => setPreviewComponent(null)}
+                            className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+                          >
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ) : previewComponent?.type === "scratch_card" ? (
+                        <div className="relative w-full px-2">
+                          <ScratchCardTemplateDefault
+                            config={previewComponent.config as unknown as ScratchCardConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => {}}
