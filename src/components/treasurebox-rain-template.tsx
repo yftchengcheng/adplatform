@@ -237,7 +237,7 @@ export function TreasureboxRainTemplate({
               <style jsx>{`
                 @keyframes fallTreasurebox {
                   0% {
-                    top: 40px;
+                    top: 80px;
                     opacity: 0;
                     transform: scale(0.8) rotate(0deg);
                   }
@@ -364,9 +364,9 @@ export function TreasureboxRainTemplate({
       {!isClaimed ? (
         <div ref={containerRef} className="relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]" style={{ height: "300px" }}>
           {/* Guide Text */}
-          <div className="absolute top-1 left-0 right-0 z-10">
+          <div className="absolute top-4 left-0 right-0 z-10">
             <div className="relative flex flex-col items-center">
-              <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20 whitespace-nowrap">
+              <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white/20 whitespace-nowrap">
                 <p className="text-white text-xs font-semibold text-center drop-shadow-lg animate-pulse">
                   {resolveGuideText()}
                 </p>
@@ -378,7 +378,7 @@ export function TreasureboxRainTemplate({
           <style jsx>{`
             @keyframes fallTreasureboxPreview {
               0% {
-                top: 20px;
+                top: 40px;
                 opacity: 0;
                 transform: scale(0.8) rotate(0deg);
               }
@@ -421,7 +421,7 @@ export function TreasureboxRainTemplate({
           ))}
 
           {/* Gesture hint */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
             <img
               src="/treasurebox-gesture.png"
               alt="手势提示"
