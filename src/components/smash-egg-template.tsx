@@ -131,11 +131,11 @@ export function SmashEggTemplate({
         backgroundPosition: "center",
       }}
     >
-      {/* 蛋容器 - 使用距离底部比例定位，20%表示距离底部20% */}
+      {/* 蛋容器 - 使用距离底部比例定位，30%表示距离底部30% */}
       <div 
         className="absolute left-1/2 -translate-x-1/2 cursor-pointer egg-shake-rotate"
         onClick={handleSmash}
-        style={{ bottom: "20%" }}
+        style={{ bottom: "30%" }}
       >
         <img
           src="/egg-shake.png"
