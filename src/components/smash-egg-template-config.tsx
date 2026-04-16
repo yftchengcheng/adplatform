@@ -48,6 +48,30 @@ export interface SmashEggConfig {
   macroVariables: Record<string, string>;
 }
 
+// 砸蛋默认配置
+export const defaultSmashEggConfig: SmashEggConfig = {
+  componentName: "砸金蛋",
+  guideText: "点击金蛋，领取奖品",
+  guideTextMacro: "",
+  rewardType: "cash",
+  cashAmount: "88.88",
+  cashAmountMacro: "",
+  rewardImageUrl: "",
+  rewardImageMacro: "",
+  rewardText: "恭喜发财",
+  rewardTextMacro: "",
+  specialNote: "实际奖品以APP为准！",
+  specialNoteMacro: "",
+  eggImageUrl: "",
+  eggImageMacro: "",
+  hammerImageUrl: "",
+  hammerImageMacro: "",
+  landingPageUrl: "",
+  landingPageMacro: "",
+  defaultLandingPageUrl: "",
+  macroVariables: {},
+};
+
 // Tab switch component
 function ModeToggle({
   value,

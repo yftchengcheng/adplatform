@@ -28,7 +28,7 @@ import { FlipCardConfig, defaultFlipCardConfig, FlipCardTemplateConfigPanel } fr
 import { FlipCardTemplate } from "@/components/flip-card-template";
 import { TreasureboxRainTemplateConfig, defaultTreasureboxRainConfig, TreasureboxRainTemplateConfigPanel } from "@/components/treasurebox-rain-template-config";
 import { TreasureboxRainTemplate } from "@/components/treasurebox-rain-template";
-import { SmashEggConfig, SmashEggTemplateConfigPanel } from "@/components/smash-egg-template-config";
+import { SmashEggConfig, SmashEggTemplateConfigPanel, defaultSmashEggConfig } from "@/components/smash-egg-template-config";
 import { SmashEggTemplate } from "@/components/smash-egg-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
@@ -224,6 +224,11 @@ const componentConfigMap: Record<string, {
     defaultConfig: defaultTreasureboxRainConfig,
     name: "宝箱雨",
     description: "配置宝箱样式、引导文案和领奖场景",
+  },
+  smash_egg: {
+    defaultConfig: defaultSmashEggConfig,
+    name: "砸金蛋",
+    description: "点击金蛋，领取奖品",
   },
 };
 
