@@ -784,14 +784,14 @@ export function ComponentList() {
                         />
                       ) : previewComponent?.type === "smash_egg" ? (
                         <SmashEggTemplateDefault
-                          config={(editingPreviewConfig["smash_egg"] as SmashEggConfig) || defaultSmashEggConfig}
+                          config={previewComponent.config as unknown as SmashEggConfig}
                           isOpen={true}
                           previewMode={true}
                           onClose={() => setPreviewComponent(null)}
                         />
                       ) : previewComponent?.type === "scratch_card" ? (
                         <ScratchCardTemplateDefault
-                          config={(editingPreviewConfig["scratch_card"] as ScratchCardConfig) || defaultScratchCardConfig}
+                          config={previewComponent.config as unknown as ScratchCardConfig}
                           isOpen={true}
                           previewMode={true}
                           onClose={() => setPreviewComponent(null)}
