@@ -206,6 +206,9 @@ export function TreasureboxRainTemplateConfigPanel({
     config.treasureboxImageMacro ? "macro" : "input"
   );
 
+  // 奖励图片错误信息
+  const [rewardImageError, setRewardImageError] = useState("");
+
   // 确保 rewardType 始终有有效值，避免 hydration mismatch
   // 使用固定初始值，不依赖 config，确保服务端和客户端一致
   const [rewardType, setRewardType] = useState<"cash" | "custom">("cash");
@@ -446,7 +449,7 @@ export function TreasureboxRainTemplateConfigPanel({
                 </div>
                 {rewardImageMode === "input" ? (
                   <div className="space-y-2">
-                    <div className="border-2 border-dashed border-gray-200 rounded-lg overflow-hidden">
+                    <div className={cn("border-2 border-dashed rounded-lg overflow-hidden", rewardImageError ? "border-red-300" : "border-gray-200")}>
                       {config.rewardImageUrl ? (
                         <div className="relative group p-2">
                           <img
@@ -455,7 +458,10 @@ export function TreasureboxRainTemplateConfigPanel({
                             className="w-full h-auto max-h-32 object-contain rounded"
                           />
                           <button
-                            onClick={() => updateConfig({ rewardImageUrl: "" })}
+                            onClick={() => {
+                              updateConfig({ rewardImageUrl: "" });
+                              setRewardImageError("");
+                            }}
                             className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             X
@@ -465,29 +471,55 @@ export function TreasureboxRainTemplateConfigPanel({
                         <label className="flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-gray-50">
                           <Plus className="w-6 h-6 text-gray-400" />
                           <span className="text-sm text-gray-500 mt-2">点击上传奖励图片</span>
-                          <span className="text-xs text-gray-400">推荐 690×360px，小于 100KB</span>
+                          <span className="text-xs text-gray-400">16:9 比例，JPG/PNG/JPEG，最大 300KB</span>
                           <input
                             type="file"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/jpg"
                             className="hidden"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                if (file.size > 100 * 1024) {
-                                  alert("图片大小不能超过 100KB");
+                                // 检验文件类型
+                                const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+                                if (!validTypes.includes(file.type)) {
+                                  setRewardImageError("仅支持 JPG/PNG/JPEG 格式");
                                   return;
                                 }
-                                const reader = new FileReader();
-                                reader.onload = (ev) => {
-                                  updateConfig({ rewardImageUrl: ev.target?.result as string });
+                                // 检验文件大小
+                                if (file.size > 300 * 1024) {
+                                  setRewardImageError(`图片大小不能超过 300KB，当前 ${(file.size / 1024).toFixed(1)}KB`);
+                                  return;
+                                }
+                                // 检验宽高比 16:9
+                                const img = new window.Image();
+                                img.onload = () => {
+                                  const ratio = img.width / img.height;
+                                  const targetRatio = 16 / 9;
+                                  const tolerance = 0.05; // 允许 5% 的误差
+                                  if (Math.abs(ratio - targetRatio) > tolerance) {
+                                    setRewardImageError(`图片宽高比需为 16:9，当前 ${img.width}×${img.height}`);
+                                    return;
+                                  }
+                                  setRewardImageError("");
+                                  const reader = new FileReader();
+                                  reader.onload = (ev) => {
+                                    updateConfig({ rewardImageUrl: ev.target?.result as string });
+                                  };
+                                  reader.readAsDataURL(file);
                                 };
-                                reader.readAsDataURL(file);
+                                img.onerror = () => {
+                                  setRewardImageError("图片加载失败，请重新上传");
+                                };
+                                img.src = URL.createObjectURL(file);
                               }
                             }}
                           />
                         </label>
                       )}
                     </div>
+                    {rewardImageError && (
+                      <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">{rewardImageError}</p>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-2">
