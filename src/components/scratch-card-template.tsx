@@ -122,6 +122,9 @@ export function ScratchCardTemplate({
     return finalConfig.defaultLandingPageUrl || "#";
   }, [finalConfig.landingPageUrl, finalConfig.landingPageMacro, finalConfig.defaultLandingPageUrl, finalConfig.macroVariables]);
 
+  // 飘落元素计数器
+  const elementCounterRef = useRef(0);
+
   // 生成飘落元素
   const generateFallingElements = useCallback(() => {
     const elements: FallingElement[] = [];
@@ -130,7 +133,7 @@ export function ScratchCardTemplate({
     
     for (let i = 0; i < count; i++) {
       elements.push({
-        id: i,
+        id: elementCounterRef.current++,
         x: Math.random() * 90 + 5,
         delay: Math.random() * 2000,
         duration: 3000 + Math.random() * 1000,
@@ -160,7 +163,16 @@ export function ScratchCardTemplate({
   useEffect(() => {
     setIsScratched(false);
     setFallingElements(generateFallingElements());
-  }, [generateFallingElements]);
+    
+    // 重复生成飘落元素
+    const interval = setInterval(() => {
+      if (!isScratched) {
+        setFallingElements(prev => [...prev, ...generateFallingElements()]);
+      }
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [generateFallingElements, isScratched]);
 
   // 渲染飘落金币
   const renderFallingElements = () => (
