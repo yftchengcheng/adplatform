@@ -225,7 +225,7 @@ export function TreasureboxRainTemplateConfigPanel({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" suppressHydrationWarning>
       {/* 基础配置 */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
