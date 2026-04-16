@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SmashEggConfig } from "./smash-egg-template-config";
 
@@ -277,15 +276,18 @@ export function SmashEggTemplate({
   // 预览模式
   if (previewMode) {
     return (
-      <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden" style={{ minHeight: "500px" }}>
-        {/* Close Button */}
+      <div className="w-full h-full relative overflow-hidden">
+        {/* 重新预览按钮 */}
         {onClose && (
           <button
             onClick={onClose}
             className="absolute top-2 right-2 z-20 w-7 h-7 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
             style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+            title="重新预览"
           >
-            <X className="w-4 h-4 text-white" />
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
           </button>
         )}
 
