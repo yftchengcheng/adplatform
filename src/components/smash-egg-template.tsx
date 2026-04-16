@@ -259,7 +259,7 @@ export function SmashEggTemplate({
       </div>
 
       {/* 底部特殊说明 */}
-      <div className="absolute bottom-[32%] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
+      <div className="absolute bottom-[38%] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
         <p className="text-sm text-amber-700">{resolveSpecialNote()}</p>
       </div>
 
