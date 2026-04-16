@@ -389,7 +389,7 @@ export function RedpacketRainTemplate({
 
 
 
-            {/* Falling Redpackets - 落叶飘落效果，从文字下方开始 */}
+            {/* Falling Redpackets - 流水式持续飘落 */}
             <style jsx>{`
               @keyframes gestureBounce {
                 0%, 100% {
@@ -399,28 +399,22 @@ export function RedpacketRainTemplate({
                   transform: translateY(8px) scale(0.95);
                 }
               }
-              @keyframes fallRedpacket {
+              @keyframes fallRedpacketWater {
                 0% {
-                  top: 80px;
-                  opacity: 0;
+                  top: -60px;
+                  opacity: 1;
                   transform: scale(0.8) rotate(0deg);
                 }
-                10% {
-                  opacity: 1;
-                }
-                90% {
-                  opacity: 1;
-                }
                 100% {
-                  top: calc(100% - 60px);
+                  top: 100%;
                   opacity: 1;
                   transform: scale(1) rotate(360deg);
                 }
               }
               .falling-redpacket {
-                animation-name: fallRedpacket;
-                animation-timing-function: ease-in;
-                animation-fill-mode: forwards;
+                animation-name: fallRedpacketWater;
+                animation-timing-function: linear;
+                animation-iteration-count: infinite;
               }
             `}</style>
 
