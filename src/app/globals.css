@@ -94,7 +94,14 @@
   100% { transform: translateX(-50%); }
 }
 
-@keyframes eggShake {
+/* 砸蛋组件动画 */
+@keyframes eggShakeLR {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-8px) rotate(-3deg); }
+  75% { transform: translateX(8px) rotate(3deg); }
+}
+
+@keyframes eggShakeRotate {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(-5deg); }
   75% { transform: rotate(5deg); }
@@ -103,6 +110,25 @@
 @keyframes eggBreak {
   0% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes hammerShake {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-2deg); }
+  75% { transform: translateY(-6px) rotate(2deg); }
+}
+
+@keyframes hammerHit {
+  0% { transform: rotate(-30deg) translateY(-60px); }
+  60% { transform: rotate(-30deg) translateY(0); }
+  80% { transform: rotate(15deg); }
+  100% { transform: rotate(0deg); opacity: 0; }
+}
+
+@keyframes eggOpen {
+  0% { opacity: 0; transform: scale(0.5); }
+  50% { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes fadeIn {
@@ -120,12 +146,29 @@
   animation: cloudScroll 20s linear infinite;
 }
 
-.egg-shake {
-  animation: eggShake 0.2s ease-in-out infinite;
+/* 砸蛋相关类 */
+.egg-shake-lr {
+  animation: eggShakeLR 0.3s ease-in-out infinite;
+}
+
+.egg-shake-rotate {
+  animation: eggShakeRotate 0.2s ease-in-out infinite;
 }
 
 .egg-break {
   animation: eggBreak 0.5s ease-out forwards;
+}
+
+.hammer-shake {
+  animation: hammerShake 0.3s ease-in-out infinite;
+}
+
+.hammer-hit {
+  animation: hammerHit 0.5s ease-out forwards;
+}
+
+.egg-open-anim {
+  animation: eggOpen 0.6s ease-out forwards;
 }
 
 .fade-in {

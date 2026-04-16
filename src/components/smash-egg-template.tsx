@@ -23,19 +23,6 @@ function resolveMacro(macro: string, variables?: Record<string, string>): string
   return result;
 }
 
-// 获取字符串显示宽度（中文2字符，英文1字符）
-function getStringWidth(str: string): number {
-  let width = 0;
-  for (const char of str) {
-    if (/[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(char)) {
-      width += 2;
-    } else {
-      width += 1;
-    }
-  }
-  return width;
-}
-
 export function SmashEggTemplate({
   config,
   isOpen = true,
@@ -44,17 +31,16 @@ export function SmashEggTemplate({
 }: SmashEggTemplateProps) {
   // 状态
   const [isSmashed, setIsSmashed] = useState(false);
-  const [isHammerUp, setIsHammerUp] = useState(false);
+  const [isHammerHit, setIsHammerHit] = useState(false);
   const [isEggShaking, setIsEggShaking] = useState(false);
-  const [isEggBreaking, setIsEggBreaking] = useState(false);
+  const [showEggOpen, setShowEggOpen] = useState(false);
   const [showReward, setShowReward] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const hammerRef = useRef<HTMLDivElement>(null);
-  const eggRef = useRef<HTMLDivElement>(null);
 
-  // 使用默认配置填充空值
+  // 默认配置
   const defaultConfig: SmashEggConfig = {
-    guideText: "点击金蛋，领取奖品",
+    componentName: "砸金蛋",
+    guideText: "砸蛋送大礼",
     guideTextMacro: "",
     rewardType: "cash",
     cashAmount: "88.88",
@@ -65,15 +51,14 @@ export function SmashEggTemplate({
     rewardTextMacro: "",
     specialNote: "实际奖品以APP为准！",
     specialNoteMacro: "",
-    eggImageUrl: "/smash-egg.jpg",
+    eggImageUrl: "/egg-shake.png",
     eggImageMacro: "",
-    hammerImageUrl: "/smash-hammer.jpg",
+    hammerImageUrl: "/hammer.png",
     hammerImageMacro: "",
     landingPageUrl: "",
     landingPageMacro: "",
     defaultLandingPageUrl: "",
     macroVariables: {},
-    componentName: "砸金蛋",
   };
 
   const finalConfig = { ...defaultConfig, ...config };
@@ -119,26 +104,6 @@ export function SmashEggTemplate({
     return finalConfig.rewardImageUrl;
   }, [finalConfig.rewardImageUrl, finalConfig.rewardImageMacro, finalConfig.macroVariables]);
 
-  const resolveEggImage = useCallback(() => {
-    if (finalConfig.eggImageMacro) {
-      const resolved = resolveMacro(finalConfig.eggImageMacro, finalConfig.macroVariables);
-      if (!resolved.includes("${") && !resolved.startsWith("$")) {
-        return resolved;
-      }
-    }
-    return finalConfig.eggImageUrl || "/smash-egg.jpg";
-  }, [finalConfig.eggImageUrl, finalConfig.eggImageMacro, finalConfig.macroVariables]);
-
-  const resolveHammerImage = useCallback(() => {
-    if (finalConfig.hammerImageMacro) {
-      const resolved = resolveMacro(finalConfig.hammerImageMacro, finalConfig.macroVariables);
-      if (!resolved.includes("${") && !resolved.startsWith("$")) {
-        return resolved;
-      }
-    }
-    return finalConfig.hammerImageUrl || "/smash-hammer.jpg";
-  }, [finalConfig.hammerImageUrl, finalConfig.hammerImageMacro, finalConfig.macroVariables]);
-
   // 获取落地页链接
   const getLandingPageUrl = useCallback(() => {
     if (finalConfig.landingPageMacro) {
@@ -155,30 +120,28 @@ export function SmashEggTemplate({
 
   // 处理砸蛋点击
   const handleSmash = useCallback(() => {
-    if (isSmashed) return;
+    if (isSmashed || isHammerHit) return;
 
-    // 开始砸蛋动画序列
-    // 1. 金蛋抖动
+    // 1. 蛋开始抖动
     setIsEggShaking(true);
     
-    // 2. 锤子抬起
+    // 2. 锤子砸下
     setTimeout(() => {
-      setIsHammerUp(true);
-    }, 200);
-
-    // 3. 锤子落下砸蛋
-    setTimeout(() => {
-      setIsHammerUp(false);
       setIsEggShaking(false);
-      setIsEggBreaking(true);
+      setIsHammerHit(true);
     }, 500);
+
+    // 3. 显示开蛋效果
+    setTimeout(() => {
+      setShowEggOpen(true);
+    }, 1000);
 
     // 4. 切换到领奖场景
     setTimeout(() => {
       setIsSmashed(true);
       setShowReward(true);
-    }, 1000);
-  }, [isSmashed]);
+    }, 1500);
+  }, [isSmashed, isHammerHit]);
 
   // 处理领取
   const handleClaim = useCallback(() => {
@@ -195,95 +158,80 @@ export function SmashEggTemplate({
     }
   }, [isOpen]);
 
+  // 重置状态
+  useEffect(() => {
+    setIsSmashed(false);
+    setIsHammerHit(false);
+    setIsEggShaking(false);
+    setShowEggOpen(false);
+    setShowReward(false);
+  }, []);
+
   // 渲染砸蛋场景
   const renderSmashScene = () => (
-    <div className="relative flex-1 flex flex-col items-center justify-center overflow-hidden" style={{ background: "linear-gradient(180deg, #FFF8E7 0%, #FFE4B5 100%)" }}>
-      {/* 背景装饰 - 云彩滚动 */}
-      <div className="absolute inset-x-0 bottom-0 h-1/4 overflow-hidden pointer-events-none">
-        <div className="cloud-scroll flex items-end h-full whitespace-nowrap">
-          {[...Array(10)].map((_, i) => (
-            <img
-              key={i}
-              src="/smash-cloud.png"
-              alt=""
-              className="h-12 w-auto object-contain opacity-60"
-              style={{ marginRight: "20px" }}
-              draggable={false}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* 引导文案 */}
-      <div className="absolute top-4 left-0 right-0 z-10">
-        <div className="relative flex flex-col items-center">
-          <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white/20 whitespace-nowrap">
-            <p className="text-white text-xs font-semibold text-center drop-shadow-lg">
-              {resolveGuideText()}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 金蛋和锤子容器 */}
-      <div className="relative w-48 h-48 flex items-center justify-center">
-        {/* 金蛋 */}
-        <div
-          ref={eggRef}
-          onClick={handleSmash}
-          className={cn(
-            "relative cursor-pointer transition-all",
-            isEggShaking && "egg-shake",
-            isEggBreaking && "egg-break"
-          )}
-        >
-          <img
-            src={resolveEggImage()}
-            alt="金蛋"
-            className="w-40 h-auto object-contain"
-            draggable={false}
-          />
-        </div>
-
-        {/* 锤子 */}
-        <div
-          ref={hammerRef}
-          className={cn(
-            "absolute top-0 right-0 w-20 h-auto transition-transform origin-bottom-right",
-            isHammerUp && "-rotate-[30deg]",
-            !isHammerUp && !isEggBreaking && "rotate-0",
-            isEggBreaking && "opacity-0"
-          )}
-          style={{ transform: isHammerUp ? "rotate(-30deg)" : "rotate(0deg)" }}
-          onClick={handleSmash}
-        >
-          <img
-            src={resolveHammerImage()}
-            alt="锤子"
-            className="w-full h-auto object-contain"
-            draggable={false}
-          />
-        </div>
-
-        {/* 点击提示 */}
-        {!isEggShaking && !isEggBreaking && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-            <p className="text-xs text-gray-500 animate-pulse">点击金蛋或锤子</p>
-          </div>
+    <div 
+      className="relative w-full h-full flex items-center justify-center overflow-hidden"
+      style={{
+        backgroundImage: "url('/smash-page.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* 蛋容器 */}
+      <div 
+        className={cn(
+          "relative cursor-pointer",
+          isEggShaking && "egg-shake-lr",
+          !isEggShaking && !isHammerHit && "egg-shake-rotate"
         )}
+        onClick={handleSmash}
+      >
+        <img
+          src={finalConfig.eggImageUrl || "/egg-shake.png"}
+          alt="彩蛋"
+          className="w-48 h-auto object-contain"
+          draggable={false}
+        />
       </div>
 
-      {/* 碎裂动画效果 */}
-      {isEggBreaking && (
+      {/* 锤子 */}
+      <div 
+        className={cn(
+          "absolute",
+          isHammerHit ? "hammer-hit" : "hammer-shake"
+        )}
+        style={{
+          top: "25%",
+          right: "15%",
+        }}
+        onClick={handleSmash}
+      >
+        <img
+          src={finalConfig.hammerImageUrl || "/hammer.png"}
+          alt="锤子"
+          className="w-24 h-auto object-contain"
+          draggable={false}
+        />
+      </div>
+
+      {/* 开蛋效果 */}
+      {showEggOpen && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="egg-break">
-            <img
-              src="/smash-break.jpg"
-              alt="碎裂"
-              className="w-48 h-auto object-contain"
-              draggable={false}
-            />
-          </div>
+          <img
+            src="/egg-open.png"
+            alt="开蛋"
+            className="w-48 h-auto object-contain egg-open-anim"
+            draggable={false}
+          />
+        </div>
+      )}
+
+      {/* 点击提示 */}
+      {!isEggShaking && !isHammerHit && !showEggOpen && (
+        <div className="absolute bottom-20 left-0 right-0 text-center">
+          <p className="text-white text-sm font-bold drop-shadow-lg animate-pulse">
+            {resolveGuideText()}
+          </p>
         </div>
       )}
     </div>
@@ -291,51 +239,66 @@ export function SmashEggTemplate({
 
   // 渲染领奖场景
   const renderRewardScene = () => (
-    <div className="relative flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
-      {/* 奖励展示 */}
-      <div className="mb-4 text-center reward-pop">
-        {finalConfig.rewardType === "cash" ? (
-          <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-4 shadow-lg">
-            <p className="text-white/80 text-xs mb-1">恭喜获得</p>
-            <p className="text-white text-2xl font-bold">¥{resolveCashAmount()}</p>
-          </div>
-        ) : resolveRewardImage() ? (
-          <img
-            src={resolveRewardImage()}
-            alt="奖励"
-            className="max-w-full max-h-24 object-contain rounded-lg"
-            draggable={false}
-          />
-        ) : null}
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-6">
+      {/* 背景 */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "url('/smash-page.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "brightness(0.7)",
+        }}
+      />
+      
+      {/* 内容 */}
+      <div className="relative z-10 flex flex-col items-center">
+        {/* 奖励展示 */}
+        <div className="mb-6 text-center reward-pop">
+          {finalConfig.rewardType === "cash" ? (
+            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-2xl">
+              <p className="text-white/90 text-sm mb-1">恭喜获得</p>
+              <p className="text-white text-4xl font-bold">¥{resolveCashAmount()}</p>
+            </div>
+          ) : resolveRewardImage() ? (
+            <img
+              src={resolveRewardImage()}
+              alt="奖励"
+              className="max-w-full max-h-32 object-contain rounded-xl shadow-lg"
+              draggable={false}
+            />
+          ) : null}
+        </div>
+
+        {/* 奖品文案 */}
+        <p className="text-white text-xl font-bold mb-2 drop-shadow-lg">{resolveRewardText()}</p>
+
+        {/* 特殊说明 */}
+        <p className="text-white/80 text-sm mb-8 drop-shadow">{resolveSpecialNote()}</p>
+
+        {/* 领取按钮 */}
+        <button
+          onClick={handleClaim}
+          className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
+        >
+          立即领取
+        </button>
       </div>
-
-      {/* 奖品文案 */}
-      <p className="text-center text-gray-800 font-medium mb-2">{resolveRewardText()}</p>
-
-      {/* 特殊说明 */}
-      <p className="text-center text-gray-400 text-xs mb-6">{resolveSpecialNote()}</p>
-
-      {/* 领取按钮 */}
-      <button
-        onClick={handleClaim}
-        className="w-full py-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
-      >
-        立即领取
-      </button>
     </div>
   );
 
   // 预览模式
   if (previewMode) {
     return (
-      <div className="w-full rounded-t-2xl shadow-lg relative" style={{ overflow: 'visible' }}>
-        {/* Close Button - 预览模式下显示 */}
+      <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden" style={{ minHeight: "500px" }}>
+        {/* Close Button */}
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+            className="absolute top-2 right-2 z-20 w-7 h-7 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
           >
-            <X className="w-3 h-3" />
+            <X className="w-4 h-4 text-white" />
           </button>
         )}
 
@@ -347,18 +310,19 @@ export function SmashEggTemplate({
   // 全屏模式
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex flex-col">
-      {/* Close Button - 底边中间 */}
+      {/* Close Button */}
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+          className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5 text-white" />
         </button>
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col transition-all duration-500">
+      <div className="flex-1">
         {isSmashed ? renderRewardScene() : renderSmashScene()}
       </div>
     </div>
