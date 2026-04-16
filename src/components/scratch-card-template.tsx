@@ -162,17 +162,9 @@ export function ScratchCardTemplate({
   // 重置状态
   useEffect(() => {
     setIsScratched(false);
+    // 只生成一次飘落元素，持续飘落
     setFallingElements(generateFallingElements());
-    
-    // 重复生成飘落元素 - 间隔增加到8秒
-    const interval = setInterval(() => {
-      if (!isScratched) {
-        setFallingElements(prev => [...prev, ...generateFallingElements()]);
-      }
-    }, 8000);
-    
-    return () => clearInterval(interval);
-  }, [generateFallingElements, isScratched]);
+  }, [generateFallingElements]);
 
   // 渲染飘落金币
   const renderFallingElements = () => (
