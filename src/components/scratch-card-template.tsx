@@ -82,17 +82,9 @@ export function ScratchCardTemplate({
     [finalConfig.macroVariables]
   );
 
-  const resolveGuideText = useCallback(() => {
-    return resolveMacroText(finalConfig.guideText, finalConfig.guideTextMacro);
-  }, [finalConfig.guideText, finalConfig.guideTextMacro, resolveMacroText]);
-
   const resolveCashAmount = useCallback(() => {
     return resolveMacroText(finalConfig.cashAmount, finalConfig.cashAmountMacro);
   }, [finalConfig.cashAmount, finalConfig.cashAmountMacro, resolveMacroText]);
-
-  const resolveRewardText = useCallback(() => {
-    return resolveMacroText(finalConfig.rewardText, finalConfig.rewardTextMacro);
-  }, [finalConfig.rewardText, finalConfig.rewardTextMacro, resolveMacroText]);
 
   const resolveSpecialNote = useCallback(() => {
     return resolveMacroText(finalConfig.specialNote, finalConfig.specialNoteMacro);
@@ -242,13 +234,6 @@ export function ScratchCardTemplate({
       }}
       onClick={handleClaim}
     >
-      {/* 引导文案 */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 text-center">
-        <p className="text-white text-xl font-bold drop-shadow-lg">
-          {resolveGuideText()}
-        </p>
-      </div>
-
       {/* 奖励展示 */}
       <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center reward-pop">
         {finalConfig.rewardType === "cash" ? (
@@ -263,13 +248,6 @@ export function ScratchCardTemplate({
             draggable={false}
           />
         ) : null}
-      </div>
-
-      {/* 奖品文案 */}
-      <div className="absolute top-[50%] left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center">
-        <p className="text-white text-base font-semibold drop-shadow-lg text-center">
-          {resolveRewardText()}
-        </p>
       </div>
 
       {/* 特殊说明 */}

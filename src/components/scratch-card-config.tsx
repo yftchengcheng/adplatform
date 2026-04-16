@@ -233,33 +233,6 @@ export function ScratchCardTemplateConfigPanel({
         </div>
         {rewardOpen && (
           <div className="p-4 space-y-4">
-            {/* 引导文案 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">引导文案</label>
-                <CharCounter value={config.guideText || ""} max={20} />
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <ModeToggle
-                  value={guideTextMode}
-                  onChange={setGuideTextMode}
-                />
-              </div>
-              {guideTextMode === "input" ? (
-                <Input
-                  placeholder="最多20个字符，10个汉字"
-                  value={config.guideText || ""}
-                  onChange={(e) => updateConfig({ guideText: e.target.value, guideTextMacro: "" })}
-                />
-              ) : (
-                <Input
-                  placeholder="如 ${guide_text}"
-                  value={config.guideTextMacro || ""}
-                  onChange={(e) => updateConfig({ guideTextMacro: e.target.value })}
-                />
-              )}
-            </div>
-
             {/* 奖励类型 */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">奖励类型</label>
@@ -412,33 +385,6 @@ export function ScratchCardTemplateConfigPanel({
                 )}
               </div>
             )}
-
-            {/* 奖品文案 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">奖品文案</label>
-                <CharCounter value={config.rewardText || ""} max={30} />
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <ModeToggle
-                  value={rewardTextMode}
-                  onChange={setRewardTextMode}
-                />
-              </div>
-              {rewardTextMode === "input" ? (
-                <Input
-                  placeholder="最多30个字符，15个汉字"
-                  value={config.rewardText || ""}
-                  onChange={(e) => updateConfig({ rewardText: e.target.value, rewardTextMacro: "" })}
-                />
-              ) : (
-                <Input
-                  placeholder="如 ${reward_text}"
-                  value={config.rewardTextMacro || ""}
-                  onChange={(e) => updateConfig({ rewardTextMacro: e.target.value })}
-                />
-              )}
-            </div>
 
             {/* 特殊说明 */}
             <div className="space-y-2">
