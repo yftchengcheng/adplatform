@@ -216,7 +216,7 @@ export function ScratchCardTemplate({
       {/* 上方刮刮卡区域 */}
       <div className="flex-1 flex items-center justify-center relative">
         {/* 手势提示 */}
-        <div className="absolute left-[calc(2rem+30px)] top-[110%] -translate-y-1/2 gesture-slide">
+        <div className="absolute left-[calc(2rem+30px)] top-[calc(110%+10px)] -translate-y-1/2 gesture-slide">
           <img
             src="/gesture-hand.png"
             alt="手势"
