@@ -239,14 +239,20 @@ export function SmashEggTemplate({
     );
   }
 
-  // 全屏模式
+  // 预览模式或独立模式使用相对定位
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex flex-col">
+    <div className={cn(
+      previewMode ? "relative w-full h-full" : "fixed inset-0 z-50",
+      "bg-black/80 flex flex-col"
+    )}>
       {/* Close Button */}
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+          className={cn(
+            "z-20 w-10 h-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity",
+            previewMode ? "absolute top-2 right-2" : "absolute top-4 right-4"
+          )}
           style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
         >
           <X className="w-5 h-5 text-white" />

@@ -271,7 +271,7 @@ export function ScratchCardTemplate({
   // 预览模式
   if (previewMode) {
     return (
-      <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden" style={{ minHeight: "500px" }}>
+      <div className="w-full h-full rounded-t-2xl shadow-lg relative overflow-hidden" style={{ minHeight: "100%" }}>
         {/* Close Button */}
         {onClose && (
           <button

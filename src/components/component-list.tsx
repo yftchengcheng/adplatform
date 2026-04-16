@@ -729,7 +729,7 @@ export function ComponentList() {
                   </div>
                   
                   {/* 内容区域 */}
-                  <div className="h-[calc(100%-96px)] overflow-hidden flex items-center justify-center">
+                  <div className="h-[571px] overflow-hidden">
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
                       previewComponent?.type === "promotion_card" ? (
@@ -823,7 +823,7 @@ export function ComponentList() {
                           />
                         </div>
                       ) : previewComponent?.type === "smash_egg" ? (
-                        <div className="relative w-full px-2">
+                        <div className="relative w-full h-full px-2">
                           <SmashEggTemplateDefault
                             config={previewComponent.config as unknown as SmashEggConfig}
                             isOpen={true}
@@ -841,7 +841,7 @@ export function ComponentList() {
                           </button>
                         </div>
                       ) : previewComponent?.type === "scratch_card" ? (
-                        <div className="relative w-full px-2">
+                        <div className="relative w-full h-full px-2">
                           <ScratchCardTemplateDefault
                             config={previewComponent.config as unknown as ScratchCardConfig}
                             isOpen={true}
