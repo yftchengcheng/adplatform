@@ -71,9 +71,9 @@ import FlipCardTemplate from "@/components/flip-card-template";
 import { FlipCardConfig } from "@/components/flip-card-template-config";
 import { TreasureboxRainTemplateConfig } from "@/components/treasurebox-rain-template-config";
 import { TreasureboxRainTemplate as TreasureboxRainTemplateDefault } from "@/components/treasurebox-rain-template";
-import { SmashEggConfig } from "@/components/smash-egg-template-config";
+import { SmashEggConfig, defaultSmashEggConfig } from "@/components/smash-egg-template-config";
 import { SmashEggTemplate as SmashEggTemplateDefault } from "@/components/smash-egg-template";
-import { ScratchCardConfig } from "@/components/scratch-card-config";
+import { ScratchCardConfig, defaultScratchCardConfig } from "@/components/scratch-card-config";
 import { ScratchCardTemplate as ScratchCardTemplateDefault } from "@/components/scratch-card-template";
 import { PopupRedpacketConfig } from "@/components/popup-redpacket-config";
 import PopupRedpacketTemplate from "@/components/popup-redpacket-template";
@@ -823,29 +823,22 @@ export function ComponentList() {
                           />
                         </div>
                       ) : previewComponent?.type === "smash_egg" ? (
-                        <SmashEggTemplateDefault
-                          config={previewComponent.config as unknown as SmashEggConfig}
-                          isOpen={true}
-                          previewMode={true}
-                          onClose={() => setPreviewComponent(null)}
-                        />
-                      ) : previewComponent?.type === "scratch_card" ? (
-                        <div className="relative w-full h-full px-2">
-                          <ScratchCardTemplateDefault
-                            config={previewComponent.config as unknown as ScratchCardConfig}
+                        <div className="relative w-full h-full">
+                          <SmashEggTemplateDefault
+                            config={defaultSmashEggConfig}
                             isOpen={true}
                             previewMode={true}
-                            onClose={() => {}}
+                            onClose={() => setPreviewComponent(null)}
                           />
-                          <button
-                            onClick={() => setPreviewComponent(null)}
-                            className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-                            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-                          >
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
+                        </div>
+                      ) : previewComponent?.type === "scratch_card" ? (
+                        <div className="relative w-full h-full">
+                          <ScratchCardTemplateDefault
+                            config={defaultScratchCardConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => setPreviewComponent(null)}
+                          />
                         </div>
                       ) : previewComponent?.type === "popup_redpacket" ? (
                         <div className="relative w-full px-2">
