@@ -359,13 +359,13 @@ export function TreasureboxRainTemplate({
 
   // 预览模式
   return (
-    <div className="w-full rounded-t-2xl overflow-hidden shadow-lg">
+    <div className="w-full overflow-hidden shadow-lg">
       {/* Rain Scene */}
       {!isClaimed ? (
         <div ref={containerRef} className="relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]" style={{ height: "300px" }}>
           {/* Guide Text */}
-          <div className="absolute top-2 left-0 right-0 z-10">
-            <div className="relative flex flex-col items-center">
+          <div className="absolute top-0 left-0 right-0 z-10">
+            <div className="relative flex flex-col items-center pt-2">
               <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white/20 whitespace-nowrap">
                 <p className="text-white text-xs font-semibold text-center drop-shadow-lg animate-pulse">
                   {resolveGuideText()}
@@ -437,7 +437,7 @@ export function TreasureboxRainTemplate({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors"
+            className="absolute top-0 right-0 z-10 w-8 h-8 flex items-center justify-center rounded-bl-lg bg-black/10 hover:bg-black/20 transition-colors"
           >
             <svg className="w-3 h-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
