@@ -26,8 +26,8 @@ import { TreasureBoxConfig, defaultTreasureBoxConfig, TreasureBoxTemplateConfigP
 import { TreasureBoxTemplate } from "@/components/treasurebox-template";
 import { FlipCardConfig, defaultFlipCardConfig, FlipCardTemplateConfigPanel } from "@/components/flip-card-template-config";
 import { FlipCardTemplate } from "@/components/flip-card-template";
-import TreasureboxRainTemplate, { TreasureboxRainTemplateConfig, defaultTreasureboxRainConfig } from "@/components/treasurebox-rain-template-config";
-import { TreasureboxRainTemplateConfigPanel } from "@/components/treasurebox-rain-template-config";
+import { TreasureboxRainTemplateConfig, defaultTreasureboxRainConfig, TreasureboxRainTemplateConfigPanel } from "@/components/treasurebox-rain-template-config";
+import TreasureboxRainTemplate from "@/components/treasurebox-rain-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType, componentStyleTemplates } from "@/lib/component-types";
