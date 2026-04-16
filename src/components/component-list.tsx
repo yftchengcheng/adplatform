@@ -805,14 +805,12 @@ export function ComponentList() {
                           />
                         </div>
                       ) : previewComponent?.type === "smash_egg" ? (
-                        <div className="relative w-full h-full">
-                          <SmashEggTemplateDefault
-                            config={(editingPreviewConfig["smash_egg"] as SmashEggConfig) || defaultSmashEggConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewComponent(null)}
-                          />
-                        </div>
+                        <SmashEggTemplateDefault
+                          config={(editingPreviewConfig["smash_egg"] as SmashEggConfig) || defaultSmashEggConfig}
+                          isOpen={true}
+                          previewMode={true}
+                          onClose={() => setPreviewComponent(null)}
+                        />
                       ) : previewComponent?.type === "scratch_card" ? (
                         <div className="relative w-full h-full">
                           <ScratchCardTemplateDefault

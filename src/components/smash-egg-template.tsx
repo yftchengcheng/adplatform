@@ -131,7 +131,7 @@ export function SmashEggTemplate({
         backgroundPosition: "center",
       }}
     >
-      {/* 蛋容器 */}
+      {/* 蛋容器 - 居中显示 */}
       <div 
         className="relative cursor-pointer egg-shake-rotate"
         onClick={handleSmash}
@@ -139,23 +139,24 @@ export function SmashEggTemplate({
         <img
           src="/egg-shake.png"
           alt="彩蛋"
-          className="w-48 h-auto object-contain"
+          className="w-40 h-auto object-contain"
+          style={{ maxHeight: "60%" }}
           draggable={false}
         />
       </div>
 
-      {/* 锤子 */}
+      {/* 锤子 - 相对于蛋的位置 */}
       <div 
         className="absolute hammer-shake"
         style={{
-          top: "25%",
-          right: "15%",
+          top: "30%",
+          right: "20%",
         }}
       >
         <img
           src="/hammer.png"
           alt="锤子"
-          className="w-24 h-auto object-contain"
+          className="w-20 h-auto object-contain"
           draggable={false}
         />
       </div>
@@ -163,8 +164,8 @@ export function SmashEggTemplate({
 
       {/* 点击提示 */}
       {!isSmashed && (
-        <div className="absolute bottom-20 left-0 right-0 text-center">
-          <p className="text-white text-sm font-bold drop-shadow-lg animate-pulse">
+        <div className="absolute bottom-8 left-0 right-0 text-center">
+          <p className="text-white text-xs font-bold drop-shadow-lg animate-pulse">
             {resolveGuideText()}
           </p>
         </div>
@@ -239,20 +240,14 @@ export function SmashEggTemplate({
     );
   }
 
-  // 预览模式或独立模式使用相对定位
+  // 独立模式（fixed 全屏）
   return (
-    <div className={cn(
-      previewMode ? "relative w-full h-full" : "fixed inset-0 z-50",
-      "bg-black/80 flex flex-col"
-    )}>
+    <div className="fixed inset-0 z-50 bg-black/80 flex flex-col">
       {/* Close Button */}
       {onClose && (
         <button
           onClick={onClose}
-          className={cn(
-            "z-20 w-10 h-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity",
-            previewMode ? "absolute top-2 right-2" : "absolute top-4 right-4"
-          )}
+          className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
         >
           <X className="w-5 h-5 text-white" />
