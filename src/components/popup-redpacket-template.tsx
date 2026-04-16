@@ -100,11 +100,21 @@ export function PopupRedpacketTemplate({
   // 解析宏变量后的配置
   const resolvedConfig = {
     ...finalConfig,
-    guideText: resolveMacro(finalConfig.guideText, finalConfig.macroVariables),
-    cashAmount: resolveMacro(finalConfig.cashAmount, finalConfig.macroVariables),
-    rewardText: resolveMacro(finalConfig.rewardText, finalConfig.macroVariables),
-    specialNote: resolveMacro(finalConfig.specialNote, finalConfig.macroVariables),
+    // 引导文案：优先使用宏变量字段
+    guideText: finalConfig.guideTextMacro && finalConfig.macroVariables
+      ? resolveMacro(finalConfig.guideTextMacro, finalConfig.macroVariables)
+      : resolveMacro(finalConfig.guideText, finalConfig.macroVariables),
+    // 现金金额：优先使用宏变量字段
+    cashAmount: finalConfig.cashAmountMacro && finalConfig.macroVariables
+      ? resolveMacro(finalConfig.cashAmountMacro, finalConfig.macroVariables)
+      : resolveMacro(finalConfig.cashAmount, finalConfig.macroVariables),
+    // 特殊说明：优先使用宏变量字段
+    specialNote: finalConfig.specialNoteMacro && finalConfig.macroVariables
+      ? resolveMacro(finalConfig.specialNoteMacro, finalConfig.macroVariables)
+      : resolveMacro(finalConfig.specialNote, finalConfig.macroVariables),
+    // 落地页
     landingPageUrl: resolveMacro(finalConfig.landingPageUrl, finalConfig.macroVariables) || finalConfig.defaultLandingPageUrl || "",
+    // 红包图片
     redpacketImageUrl: resolveMacro(finalConfig.redpacketImageUrl, finalConfig.macroVariables),
   };
 

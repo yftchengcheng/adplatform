@@ -325,6 +325,21 @@ export function PopupRedpacketConfigPanel({
     config.landingPageMacro ? "macro" : "input"
   );
 
+  // 引导文案输入模式
+  const [guideTextMode, setGuideTextMode] = useState<"input" | "macro">(
+    config.guideTextMacro ? "macro" : "input"
+  );
+
+  // 现金金额输入模式
+  const [cashAmountMode, setCashAmountMode] = useState<"input" | "macro">(
+    config.cashAmountMacro ? "macro" : "input"
+  );
+
+  // 特殊说明输入模式
+  const [specialNoteMode, setSpecialNoteMode] = useState<"input" | "macro">(
+    config.specialNoteMacro ? "macro" : "input"
+  );
+
   // 更新配置
   const updateConfig = useCallback(
     (updates: Partial<PopupRedpacketConfig>) => {
@@ -403,15 +418,33 @@ export function PopupRedpacketConfigPanel({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm text-gray-700">引导文案</label>
-              <CharCounter value={config.guideText} max={20} />
+              <ModeToggle
+                value={guideTextMode}
+                onChange={setGuideTextMode}
+              />
             </div>
-            <Input
-              placeholder="如：点击开红包"
-              value={config.guideText}
-              onChange={(e) => updateConfig({ guideText: e.target.value })}
-              maxLength={50}
-              className="text-sm"
-            />
+            {guideTextMode === "input" ? (
+              <>
+                <Input
+                  placeholder="如：点击开红包"
+                  value={config.guideText}
+                  onChange={(e) => updateConfig({ guideText: e.target.value })}
+                  maxLength={50}
+                  className="text-sm"
+                />
+                <CharCounter value={config.guideText} max={20} />
+              </>
+            ) : (
+              <>
+                <Input
+                  placeholder="输入引导文案宏变量，如 ${guide_text}"
+                  value={config.guideTextMacro || ""}
+                  onChange={(e) => updateConfig({ guideTextMacro: e.target.value })}
+                  className="text-sm"
+                />
+                <p className="text-xs text-gray-400">使用宏变量动态设置引导文案</p>
+              </>
+            )}
           </div>
         </SectionCollapse>
 
@@ -455,14 +488,32 @@ export function PopupRedpacketConfigPanel({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-sm text-gray-700">现金金额</label>
-                <CharCounter value={config.cashAmount || ""} max={20} />
+                <ModeToggle
+                  value={cashAmountMode}
+                  onChange={setCashAmountMode}
+                />
               </div>
-              <Input
-                placeholder="如：88.88"
-                value={config.cashAmount || ""}
-                onChange={(e) => updateConfig({ cashAmount: e.target.value })}
-                className="text-sm"
-              />
+              {cashAmountMode === "input" ? (
+                <>
+                  <Input
+                    placeholder="如：88.88"
+                    value={config.cashAmount || ""}
+                    onChange={(e) => updateConfig({ cashAmount: e.target.value })}
+                    className="text-sm"
+                  />
+                  <CharCounter value={config.cashAmount || ""} max={20} />
+                </>
+              ) : (
+                <>
+                  <Input
+                    placeholder="输入现金金额宏变量，如 ${cash_amount}"
+                    value={config.cashAmountMacro || ""}
+                    onChange={(e) => updateConfig({ cashAmountMacro: e.target.value })}
+                    className="text-sm"
+                  />
+                  <p className="text-xs text-gray-400">使用宏变量动态设置现金金额</p>
+                </>
+              )}
             </div>
           )}
 
@@ -501,15 +552,33 @@ export function PopupRedpacketConfigPanel({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm text-gray-700">特殊说明</label>
-              <CharCounter value={config.specialNote} max={20} />
+              <ModeToggle
+                value={specialNoteMode}
+                onChange={setSpecialNoteMode}
+              />
             </div>
-            <Input
-              placeholder="如：实际奖品以APP为准"
-              value={config.specialNote}
-              onChange={(e) => updateConfig({ specialNote: e.target.value })}
-              maxLength={30}
-              className="text-sm"
-            />
+            {specialNoteMode === "input" ? (
+              <>
+                <Input
+                  placeholder="如：实际奖品以APP为准"
+                  value={config.specialNote}
+                  onChange={(e) => updateConfig({ specialNote: e.target.value })}
+                  maxLength={30}
+                  className="text-sm"
+                />
+                <CharCounter value={config.specialNote} max={20} />
+              </>
+            ) : (
+              <>
+                <Input
+                  placeholder="输入特殊说明宏变量，如 ${note}"
+                  value={config.specialNoteMacro || ""}
+                  onChange={(e) => updateConfig({ specialNoteMacro: e.target.value })}
+                  className="text-sm"
+                />
+                <p className="text-xs text-gray-400">使用宏变量动态设置特殊说明</p>
+              </>
+            )}
           </div>
         </SectionCollapse>
 
