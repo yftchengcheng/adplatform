@@ -211,7 +211,7 @@ export function ScratchCardTemplate({
         </div>
 
         {/* 手势提示 */}
-        <div className="absolute left-8 top-[95%] -translate-y-1/2 gesture-slide">
+        <div className="absolute left-8 top-[99%] -translate-y-1/2 gesture-slide">
           <img
             src="/gesture-hand.png"
             alt="手势"
