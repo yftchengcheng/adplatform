@@ -47,8 +47,6 @@ export function SmashEggTemplate({
     cashAmountMacro: "",
     rewardImageUrl: "",
     rewardImageMacro: "",
-    rewardText: "恭喜发财",
-    rewardTextMacro: "",
     specialNote: "实际奖品以APP为准！",
     specialNoteMacro: "",
     landingPageUrl: "",
@@ -81,10 +79,6 @@ export function SmashEggTemplate({
   const resolveCashAmount = useCallback(() => {
     return resolveMacroText(finalConfig.cashAmount, finalConfig.cashAmountMacro);
   }, [finalConfig.cashAmount, finalConfig.cashAmountMacro, resolveMacroText]);
-
-  const resolveRewardText = useCallback(() => {
-    return resolveMacroText(finalConfig.rewardText, finalConfig.rewardTextMacro);
-  }, [finalConfig.rewardText, finalConfig.rewardTextMacro, resolveMacroText]);
 
   const resolveSpecialNote = useCallback(() => {
     return resolveMacroText(finalConfig.specialNote, finalConfig.specialNoteMacro);
@@ -264,10 +258,7 @@ export function SmashEggTemplate({
       </div>
 
       {/* 底部按钮区域 */}
-      <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
-        {/* 奖品文案 */}
-        <p className="text-lg font-bold text-amber-800">{resolveRewardText()}</p>
-        
+      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
         {/* 特殊说明 */}
         <p className="text-sm text-amber-700">{resolveSpecialNote()}</p>
       </div>
