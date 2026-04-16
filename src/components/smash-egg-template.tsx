@@ -65,9 +65,9 @@ export function SmashEggTemplate({
     rewardTextMacro: "",
     specialNote: "实际奖品以APP为准！",
     specialNoteMacro: "",
-    eggImageUrl: "",
+    eggImageUrl: "/smash-egg.jpg",
     eggImageMacro: "",
-    hammerImageUrl: "",
+    hammerImageUrl: "/smash-hammer.jpg",
     hammerImageMacro: "",
     landingPageUrl: "",
     landingPageMacro: "",
@@ -126,7 +126,7 @@ export function SmashEggTemplate({
         return resolved;
       }
     }
-    return finalConfig.eggImageUrl || "/smash-egg.png";
+    return finalConfig.eggImageUrl || "/smash-egg.jpg";
   }, [finalConfig.eggImageUrl, finalConfig.eggImageMacro, finalConfig.macroVariables]);
 
   const resolveHammerImage = useCallback(() => {
@@ -136,7 +136,7 @@ export function SmashEggTemplate({
         return resolved;
       }
     }
-    return finalConfig.hammerImageUrl || "/smash-hammer.png";
+    return finalConfig.hammerImageUrl || "/smash-hammer.jpg";
   }, [finalConfig.hammerImageUrl, finalConfig.hammerImageMacro, finalConfig.macroVariables]);
 
   // 获取落地页链接
@@ -200,15 +200,6 @@ export function SmashEggTemplate({
     <div className="relative flex-1 flex flex-col items-center justify-center overflow-hidden" style={{ background: "linear-gradient(180deg, #FFF8E7 0%, #FFE4B5 100%)" }}>
       {/* 背景装饰 - 云彩滚动 */}
       <div className="absolute inset-x-0 bottom-0 h-1/4 overflow-hidden pointer-events-none">
-        <style jsx>{`
-          @keyframes cloudScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .cloud-scroll {
-            animation: cloudScroll 20s linear infinite;
-          }
-        `}</style>
         <div className="cloud-scroll flex items-end h-full whitespace-nowrap">
           {[...Array(10)].map((_, i) => (
             <img
@@ -242,8 +233,8 @@ export function SmashEggTemplate({
           onClick={handleSmash}
           className={cn(
             "relative cursor-pointer transition-all",
-            isEggShaking && "animate-[shake_0.2s_ease-in-out_infinite]",
-            isEggBreaking && "animate-[break_0.5s_ease-out_forwards]"
+            isEggShaking && "egg-shake",
+            isEggBreaking && "egg-break"
           )}
         >
           <img
@@ -285,18 +276,9 @@ export function SmashEggTemplate({
       {/* 碎裂动画效果 */}
       {isEggBreaking && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <style jsx>{`
-            @keyframes break {
-              0% { opacity: 1; transform: scale(1); }
-              100% { opacity: 0; transform: scale(1.5); }
-            }
-            .break-effect {
-              animation: break 0.5s ease-out forwards;
-            }
-          `}</style>
-          <div className="break-effect">
+          <div className="egg-break">
             <img
-              src="/smash-break.png"
+              src="/smash-break.jpg"
               alt="碎裂"
               className="w-48 h-auto object-contain"
               draggable={false}
@@ -311,7 +293,7 @@ export function SmashEggTemplate({
   const renderRewardScene = () => (
     <div className="relative flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
       {/* 奖励展示 */}
-      <div className="mb-4 text-center animate-fadeIn">
+      <div className="mb-4 text-center reward-pop">
         {finalConfig.rewardType === "cash" ? (
           <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-4 shadow-lg">
             <p className="text-white/80 text-xs mb-1">恭喜获得</p>
