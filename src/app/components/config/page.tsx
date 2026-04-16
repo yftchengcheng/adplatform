@@ -28,6 +28,8 @@ import { FlipCardConfig, defaultFlipCardConfig, FlipCardTemplateConfigPanel } fr
 import { FlipCardTemplate } from "@/components/flip-card-template";
 import { TreasureboxRainTemplateConfig, defaultTreasureboxRainConfig, TreasureboxRainTemplateConfigPanel } from "@/components/treasurebox-rain-template-config";
 import TreasureboxRainTemplate from "@/components/treasurebox-rain-template";
+import { SmashEggConfig, SmashEggTemplateConfigPanel } from "@/components/smash-egg-template-config";
+import SmashEggTemplate from "@/components/smash-egg-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType, componentStyleTemplates } from "@/lib/component-types";
@@ -389,6 +391,7 @@ function ConfigContent() {
   const isTreasureBoxComponent = type === "flip_treasure";
   const isFlipCardComponent = type === "flip_card";
   const isTreasureboxRainComponent = type === "treasure_rain";
+  const isSmashEggComponent = type === "smash_egg";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -521,6 +524,13 @@ function ConfigContent() {
             ) : isTreasureboxRainComponent ? (
               <TreasureboxRainTemplateConfigPanel
                 config={config as TreasureboxRainTemplateConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+                onCancel={handleCancel}
+              />
+            ) : isSmashEggComponent ? (
+              <SmashEggTemplateConfigPanel
+                config={config as SmashEggConfig}
                 onChange={handleConfigChange}
                 onSave={handleSave}
                 onCancel={handleCancel}
@@ -665,6 +675,14 @@ function ConfigContent() {
                               onClose={() => setPreviewResetKey(k => k + 1)}
                             />
                           </div>
+                        ) : isSmashEggComponent ? (
+                          <SmashEggTemplate
+                            key={`smashegg-${previewResetKey}`}
+                            config={config as SmashEggConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => setPreviewResetKey(k => k + 1)}
+                          />
                         ) : isTreasureboxRainComponent ? (
                           <TreasureboxRainTemplate
                             key={`treasureboxrain-${previewResetKey}`}
