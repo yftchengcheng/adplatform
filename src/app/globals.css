@@ -236,22 +236,18 @@
   animation: scratchReveal 1s ease-out forwards;
 }
 
-/* 刮刮卡飘落动画 - 在刮奖区域内飘落 */
-@keyframes fallDownRelative {
+/* 刮刮卡飘落动画 - 流水式循环飘落 */
+@keyframes fallDownWater {
   0% {
     top: -80px;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
   }
   100% {
-    top: calc(100% + 20px);
-    opacity: 0;
+    top: 100%;
   }
+}
+
+.fall-down-water {
+  animation: fallDownWater linear infinite;
 }
 
 .fall-down-relative {

@@ -164,18 +164,9 @@ export function ScratchCardTemplate({
     setIsScratched(false);
     // 初始生成飘落元素
     setFallingElements(generateFallingElements());
-    
-    // 持续生成飘落元素
-    const interval = setInterval(() => {
-      if (!isScratched) {
-        setFallingElements(prev => [...prev, ...generateFallingElements()]);
-      }
-    }, 8000);
-    
-    return () => clearInterval(interval);
-  }, [generateFallingElements, isScratched]);
+  }, [generateFallingElements]);
 
-  // 渲染飘落金币
+  // 渲染飘落金币 - 流水式持续飘落
   const renderFallingElements = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {fallingElements.map((element) => (
@@ -183,15 +174,14 @@ export function ScratchCardTemplate({
           key={element.id}
           src={`/${element.type}.png`}
           alt=""
-          className="absolute"
+          className="absolute fall-down-water"
           style={{
             left: `${element.x}%`,
-            top: '0px',
             width: '30px',
             height: 'auto',
             transform: `scale(${element.scale}) rotate(${element.rotation}deg)`,
-            animation: `fallDownRelative ${element.duration}ms ease-in forwards`,
-            animationDelay: `${element.delay}ms`,
+            animationDuration: `${element.duration}ms`,
+            animationDelay: `-${element.delay}ms`,
           }}
           onClick={(e) => {
             e.stopPropagation();
