@@ -620,8 +620,24 @@ export function ComponentList() {
 
           {/* Pagination */}
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
-            <div className="text-sm text-gray-500">
-              共 {filteredData.length} 条记录
+            {/* 左侧：展示条数选择 */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">每页</span>
+              <select
+                value={pagination.pageSize}
+                onChange={(e) => {
+                  const newPageSize = Number(e.target.value);
+                  setPagination((prev) => ({ ...prev, pageSize: newPageSize, page: 1 }));
+                }}
+                className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span className="text-sm text-gray-500">条</span>
+              <span className="text-sm text-gray-500 ml-2">共 {filteredData.length} 条记录</span>
             </div>
             <div className="flex items-center gap-1">
               <Button
