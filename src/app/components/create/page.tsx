@@ -97,6 +97,8 @@ export default function ComponentCreatePage() {
       router.push("/components/config?type=smash_egg");
     } else if (template.id === "scratch_card") {
       router.push("/components/config?type=scratch_card");
+    } else if (template.id === "popup_redpacket") {
+      router.push("/components/config?type=popup_redpacket");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);

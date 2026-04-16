@@ -300,3 +300,221 @@
 body {
   @apply font-sans;
 }
+
+/* ============================================
+   弹窗红包动画样式
+   ============================================ */
+
+/* 入场淡入 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* 退出淡出 */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+/* 弹窗入场弹簧效果 */
+@keyframes popupEnter {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-popup-enter {
+  animation: popupEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 弹窗退出缩小 */
+@keyframes popupExit {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-popup-exit {
+  animation: popupExit 0.3s ease-out forwards;
+}
+
+/* 红包浮动效果 */
+@keyframes redpacketFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-redpacket-float {
+  animation: redpacketFloat 1.5s ease-in-out infinite;
+}
+
+/* 中文字符脉冲 */
+@keyframes pulseZh {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.9;
+  }
+}
+
+.animate-pulse-zh {
+  animation: pulseZh 1s ease-in-out infinite;
+}
+
+/* 光晕脉冲效果 */
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-glow {
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+/* 奖励入场 */
+@keyframes rewardEnter {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  80% {
+    transform: scale(0.95) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-reward-enter {
+  animation: rewardEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 奖励旋转入场 */
+@keyframes rotateIn {
+  0% {
+    transform: rotate(-360deg) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-rotate-in {
+  animation: rotateIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 淡入上移 */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* 按钮呼吸效果 */
+@keyframes btnBreathe {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(255, 107, 107, 0.7);
+  }
+}
+
+.animate-btn-breathe {
+  animation: btnBreathe 1.5s ease-in-out infinite;
+}
+
+/* 粒子飞散 */
+@keyframes particleFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc((var(--random-x, 0) - 0.5) * 150px),
+      calc((var(--random-y, 0) - 0.5) * 150px)
+    );
+    opacity: 0;
+    scale: 0.3;
+  }
+}
+
+.animate-particle-fly {
+  animation: particleFly 0.8s ease-out forwards;
+}
+
+/* 闪白效果 */
+@keyframes flash {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-flash {
+  animation: flash 0.2s ease-out forwards;
+}

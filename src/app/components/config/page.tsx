@@ -32,6 +32,8 @@ import { SmashEggConfig, SmashEggTemplateConfigPanel, defaultSmashEggConfig } fr
 import { SmashEggTemplate } from "@/components/smash-egg-template";
 import { ScratchCardConfig, ScratchCardTemplateConfigPanel, defaultScratchCardConfig } from "@/components/scratch-card-config";
 import { ScratchCardTemplate } from "@/components/scratch-card-template";
+import { PopupRedpacketConfig, PopupRedpacketConfigPanel } from "@/components/popup-redpacket-config";
+import PopupRedpacketTemplate from "@/components/popup-redpacket-template";
 import { useComponents } from "@/contexts/component-context";
 import { useToast } from "@/components/ui/toast";
 import { ComponentType, componentStyleTemplates } from "@/lib/component-types";
@@ -160,7 +162,7 @@ const defaultGameGiftConfig: GameGiftTemplateConfig = {
 };
 
 // 组件类型对应的默认配置和名称
-type AllConfigTypes = AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig | FlipRedpacketTemplateConfig | TreasureBoxConfig | FlipCardConfig | TreasureboxRainTemplateConfig | SmashEggConfig | ScratchCardConfig;
+type AllConfigTypes = AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig | FlipRedpacketTemplateConfig | TreasureBoxConfig | FlipCardConfig | TreasureboxRainTemplateConfig | SmashEggConfig | ScratchCardConfig | PopupRedpacketConfig;
 
 const componentConfigMap: Record<string, {
   defaultConfig: AllConfigTypes;
@@ -236,6 +238,29 @@ const componentConfigMap: Record<string, {
     defaultConfig: defaultScratchCardConfig,
     name: "好运刮出来！",
     description: "刮开涂层，领取奖励",
+  },
+  popup_redpacket: {
+    defaultConfig: {
+      guideText: "点击开红包",
+      guideTextMacro: "",
+      rewardType: "cash",
+      cashAmount: "88.88",
+      cashAmountMacro: "",
+      rewardImageUrl: "",
+      rewardImageMacro: "",
+      rewardText: "恭喜获得100元优惠券",
+      rewardTextMacro: "",
+      specialNote: "实际奖品以APP为准",
+      specialNoteMacro: "",
+      redpacketImageUrl: "",
+      redpacketImageMacro: "",
+      landingPageUrl: "",
+      landingPageMacro: "",
+      defaultLandingPageUrl: "",
+      componentName: "弹窗红包",
+    } as PopupRedpacketConfig,
+    name: "恭喜发财！",
+    description: "点击红包，领取奖励",
   },
 };
 
@@ -405,6 +430,7 @@ function ConfigContent() {
   const isTreasureboxRainComponent = type === "treasure_rain";
   const isSmashEggComponent = type === "smash_egg";
   const isScratchCardComponent = type === "scratch_card";
+  const isPopupRedpacketComponent = type === "popup_redpacket";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -555,6 +581,13 @@ function ConfigContent() {
                 onSave={handleSave}
                 onCancel={handleCancel}
               />
+            ) : isPopupRedpacketComponent ? (
+              <PopupRedpacketConfigPanel
+                config={config as PopupRedpacketConfig}
+                onChange={handleConfigChange}
+                onSave={handleSave}
+                onCancel={handleCancel}
+              />
             ) : (
               <AdTemplateConfigPanel
                 config={config as AdTemplateConfig}
@@ -592,7 +625,7 @@ function ConfigContent() {
                     </svg>
                     效果预览
                   </h3>
-                  {(isRedpacketRainComponent || isFlipRedpacketComponent || isTreasureBoxComponent || isFlipCardComponent || isTreasureboxRainComponent || isSmashEggComponent || isScratchCardComponent) && (
+                  {(isRedpacketRainComponent || isFlipRedpacketComponent || isTreasureBoxComponent || isFlipCardComponent || isTreasureboxRainComponent || isSmashEggComponent || isScratchCardComponent || isPopupRedpacketComponent) && (
                     <button
                       onClick={() => setPreviewResetKey(k => k + 1)}
                       className="px-2 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md border border-blue-200 transition-colors"
@@ -703,6 +736,14 @@ function ConfigContent() {
                             previewMode={true}
                             onClose={() => setPreviewResetKey(k => k + 1)}
                           />
+                        ) : isPopupRedpacketComponent ? (
+                          <PopupRedpacketTemplate
+                            key={`popupredpacket-${previewResetKey}`}
+                            config={config as PopupRedpacketConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => setPreviewResetKey(k => k + 1)}
+                          />
                         ) : isTreasureboxRainComponent ? (
                           <TreasureboxRainTemplate
                             key={`treasureboxrain-${previewResetKey}`}
@@ -769,10 +810,10 @@ function ConfigContent() {
                     </svg>
                   </div>
                   <h4 className="text-xs font-semibold text-gray-900">
-                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : isRedpacketRainComponent ? "红包雨" : isFlipRedpacketComponent ? "翻红包" : isTreasureBoxComponent ? "翻宝箱" : isFlipCardComponent ? "翻卡" : isTreasureboxRainComponent ? "宝箱雨" : isSmashEggComponent ? "砸金蛋" : isScratchCardComponent ? "刮刮卡" : "上文下按钮"}
+                    {isGameGiftComponent ? "游戏礼包码" : isPromotionComponent ? "推广卡片" : isCouponComponent ? "优惠券磁贴" : isEcommerceComponent ? "电商磁贴" : isImageComponent ? "图片磁贴" : isVoteComponent ? "投票选项" : isRedpacketRainComponent ? "红包雨" : isFlipRedpacketComponent ? "翻红包" : isTreasureBoxComponent ? "翻宝箱" : isFlipCardComponent ? "翻卡" : isTreasureboxRainComponent ? "宝箱雨" : isSmashEggComponent ? "砸金蛋" : isScratchCardComponent ? "刮刮卡" : isPopupRedpacketComponent ? "弹窗红包" : "上文下按钮"}
                   </h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">
-                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : isRedpacketRainComponent ? "红包飘落+领奖场景" : isFlipRedpacketComponent ? "点击红包+翻出惊喜" : isTreasureBoxComponent ? "点击宝箱+翻出惊喜" : isFlipCardComponent ? "点击卡牌+翻出惊喜" : isTreasureboxRainComponent ? "宝箱飘落+领奖场景" : isSmashEggComponent ? "点击金蛋+领取奖励" : isScratchCardComponent ? "刮开涂层+领取奖励" : "主标题+副标题+双按钮"}
+                    {isGameGiftComponent ? "应用图片+Logo+名称+描述+下载" : isPromotionComponent ? "图标+标题+推广卖点+行动号召" : isCouponComponent ? "活动名称+优惠信息+领取按钮" : isEcommerceComponent ? "左图右文电商风格" : isImageComponent ? "单图或多图轮播展示" : isVoteComponent ? "支持多个投票选项" : isRedpacketRainComponent ? "红包飘落+领奖场景" : isFlipRedpacketComponent ? "点击红包+翻出惊喜" : isTreasureBoxComponent ? "点击宝箱+翻出惊喜" : isFlipCardComponent ? "点击卡牌+翻出惊喜" : isTreasureboxRainComponent ? "宝箱飘落+领奖场景" : isSmashEggComponent ? "点击金蛋+领取奖励" : isScratchCardComponent ? "刮开涂层+领取奖励" : isPopupRedpacketComponent ? "点击红包+领取奖励" : "主标题+副标题+双按钮"}
                   </p>
                 </div>
 
