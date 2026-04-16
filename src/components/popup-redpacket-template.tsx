@@ -345,10 +345,11 @@ export function PopupRedpacketTemplate({
   return (
     <div
       className={cn(
-        previewMode 
-          ? "relative w-full h-full flex items-center justify-center" 
-          : "fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm",
-        isExiting ? "animate-fade-out" : "animate-fade-in"
+        "fixed inset-0 z-50 flex items-center justify-center",
+        isClaimed
+          ? "bg-black/60 backdrop-blur-sm"
+          : "bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]",
+        isExiting ? "animate-fade-out" : isClaimed ? "" : "animate-fade-in"
       )}
       onClick={handleBackdropClick}
     >
