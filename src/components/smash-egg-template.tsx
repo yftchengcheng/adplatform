@@ -51,10 +51,6 @@ export function SmashEggTemplate({
     rewardTextMacro: "",
     specialNote: "实际奖品以APP为准！",
     specialNoteMacro: "",
-    eggImageUrl: "/egg-shake.png",
-    eggImageMacro: "",
-    hammerImageUrl: "/hammer.png",
-    hammerImageMacro: "",
     landingPageUrl: "",
     landingPageMacro: "",
     defaultLandingPageUrl: "",
@@ -187,7 +183,7 @@ export function SmashEggTemplate({
         onClick={handleSmash}
       >
         <img
-          src={finalConfig.eggImageUrl || "/egg-shake.png"}
+          src="/egg-shake.png"
           alt="彩蛋"
           className="w-48 h-auto object-contain"
           draggable={false}
@@ -207,7 +203,7 @@ export function SmashEggTemplate({
         onClick={handleSmash}
       >
         <img
-          src={finalConfig.hammerImageUrl || "/hammer.png"}
+          src="/hammer.png"
           alt="锤子"
           className="w-24 h-auto object-contain"
           draggable={false}
