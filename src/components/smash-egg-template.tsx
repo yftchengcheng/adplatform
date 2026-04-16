@@ -31,12 +31,6 @@ export function SmashEggTemplate({
 }: SmashEggTemplateProps) {
   // 状态
   const [isSmashed, setIsSmashed] = useState(false);
-  const [isHammerHit, setIsHammerHit] = useState(false);
-  const [isEggShaking, setIsEggShaking] = useState(false);
-  const [showEggOpen, setShowEggOpen] = useState(false);
-  const [showReward, setShowReward] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-
   // 默认配置
   const defaultConfig: SmashEggConfig = {
     componentName: "砸金蛋",
@@ -108,30 +102,11 @@ export function SmashEggTemplate({
     return finalConfig.defaultLandingPageUrl || "#";
   }, [finalConfig.landingPageUrl, finalConfig.landingPageMacro, finalConfig.defaultLandingPageUrl, finalConfig.macroVariables]);
 
-  // 处理砸蛋点击
+  // 处理砸蛋点击 - 直接跳转到领奖页面
   const handleSmash = useCallback(() => {
-    if (isSmashed || isHammerHit) return;
-
-    // 1. 蛋开始抖动
-    setIsEggShaking(true);
-    
-    // 2. 锤子砸下
-    setTimeout(() => {
-      setIsEggShaking(false);
-      setIsHammerHit(true);
-    }, 500);
-
-    // 3. 显示开蛋效果
-    setTimeout(() => {
-      setShowEggOpen(true);
-    }, 1000);
-
-    // 4. 切换到领奖场景
-    setTimeout(() => {
-      setIsSmashed(true);
-      setShowReward(true);
-    }, 1500);
-  }, [isSmashed, isHammerHit]);
+    if (isSmashed) return;
+    setIsSmashed(true);
+  }, [isSmashed]);
 
   // 处理领取
   const handleClaim = useCallback(() => {
@@ -151,10 +126,6 @@ export function SmashEggTemplate({
   // 重置状态
   useEffect(() => {
     setIsSmashed(false);
-    setIsHammerHit(false);
-    setIsEggShaking(false);
-    setShowEggOpen(false);
-    setShowReward(false);
   }, []);
 
   // 渲染砸蛋场景
@@ -169,11 +140,7 @@ export function SmashEggTemplate({
     >
       {/* 蛋容器 */}
       <div 
-        className={cn(
-          "relative cursor-pointer",
-          isEggShaking && "egg-shake-lr",
-          !isEggShaking && !isHammerHit && "egg-shake-rotate"
-        )}
+        className="relative cursor-pointer"
         onClick={handleSmash}
       >
         <img
@@ -186,15 +153,11 @@ export function SmashEggTemplate({
 
       {/* 锤子 */}
       <div 
-        className={cn(
-          "absolute",
-          isHammerHit ? "hammer-hit" : "hammer-shake"
-        )}
+        className="absolute"
         style={{
           top: "25%",
           right: "15%",
         }}
-        onClick={handleSmash}
       >
         <img
           src="/hammer.png"
@@ -204,20 +167,9 @@ export function SmashEggTemplate({
         />
       </div>
 
-      {/* 开蛋效果 */}
-      {showEggOpen && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <img
-            src="/egg-open.png"
-            alt="开蛋"
-            className="w-48 h-auto object-contain egg-open-anim"
-            draggable={false}
-          />
-        </div>
-      )}
 
       {/* 点击提示 */}
-      {!isEggShaking && !isHammerHit && !showEggOpen && (
+      {!isSmashed && (
         <div className="absolute bottom-20 left-0 right-0 text-center">
           <p className="text-white text-sm font-bold drop-shadow-lg animate-pulse">
             {resolveGuideText()}
