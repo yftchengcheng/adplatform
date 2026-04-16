@@ -230,12 +230,13 @@ export function SmashEggTemplate({
   // 渲染领奖场景
   const renderRewardScene = () => (
     <div 
-      className="relative w-full h-full flex flex-col items-center justify-center"
+      className="relative w-full h-full flex flex-col items-center justify-center cursor-pointer"
       style={{
         backgroundImage: "url('/reward-page.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
+      onClick={handleClaim}
     >
       {/* 奖品展示区域 */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 flex flex-col items-center">
@@ -257,19 +258,19 @@ export function SmashEggTemplate({
         </div>
       </div>
 
-      {/* 底部按钮区域 */}
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
-        {/* 特殊说明 */}
+      {/* 底部特殊说明 */}
+      <div className="absolute bottom-36 left-1/2 -translate-x-1/2 w-3/4 flex flex-col items-center gap-2">
         <p className="text-sm text-amber-700">{resolveSpecialNote()}</p>
       </div>
 
-      {/* 领取按钮 */}
-      <button
-        onClick={handleClaim}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-full font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
-      >
-        立即领取
-      </button>
+      {/* 图片按钮点击区域 - 与背景图片中的"马上去领奖"按钮位置对齐 */}
+      <div 
+        className="absolute bottom-[8%] left-1/2 -translate-x-1/2 w-[45%] aspect-[120/35] cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleClaim();
+        }}
+      />
     </div>
   );
 
