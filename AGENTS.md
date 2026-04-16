@@ -967,5 +967,81 @@ interface RedpacketRainConfig {
 1. **入场动画**：遮罩层淡入，红包雨延迟500ms开始
 2. **飘落动画**：15个红包从顶部随机位置飘落，点击任意红包触发领取
 3. **领取场景**：点击红包后切换到领奖场景
+
+---
+
+## 十七、组件预览一致性规范
+
+### 核心原则
+**组件列表页面预览与组件配置页面右侧预览必须保持完全一致**
+
+### 关闭按钮规范
+在两个预览位置（组件列表、组件配置页面）都需要展示关闭按钮：
+
+**组件列表页面（component-list.tsx）**：
+```tsx
+{/* 需要添加关闭按钮的组件 */}
+previewComponent?.type === "flip_redpacket" || previewComponent?.type === "flip_treasure" ? (
+  <div className="relative w-full px-2">
+    <FlipRedpacketTemplate
+      config={previewComponent.config}
+      isOpen={true}
+      previewMode={true}
+      onClose={() => {}}
+    />
+    {/* 预览关闭按钮 - 必须添加 */}
+    <button
+      onClick={() => setPreviewComponent(null)}
+      className="absolute top-2 right-4 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+      style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+    >
+      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+) : null
+```
+
+**组件配置页面（config/page.tsx）**：
+```tsx
+{/* 需要添加关闭按钮的组件 */}
+isFlipRedpacketComponent || isTreasureBoxComponent ? (
+  <div className="relative w-full px-4">
+    <FlipRedpacketTemplate
+      config={config}
+      isOpen={true}
+      previewMode={true}
+      onClose={() => setPreviewResetKey(k => k + 1)}
+    />
+    {/* 预览关闭按钮 - 必须添加 */}
+    <button
+      onClick={() => setPreviewResetKey(k => k + 1)}
+      className="absolute top-2 right-6 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+      style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+    >
+      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+) : null
+```
+
+### 关闭按钮样式规范
+| 属性 | 值 | 说明 |
+|------|------|------|
+| 位置 | `top-2 right-4/6` | 右上角，组件配置页偏右 |
+| z-index | `z-20` | 确保在最上层 |
+| 尺寸 | `w-6 h-6` | 24px 圆形 |
+| 背景 | `rgba(255,255,255,0.25)` | 白色25%透明度 |
+| 悬停 | `hover:opacity-80` | 透明度降低 |
+| 图标 | 白色 X 形状 | `text-white` |
+
+### 检查清单
+- [ ] 组件列表页面预览是否包含关闭按钮
+- [ ] 组件配置页面预览是否包含关闭按钮
+- [ ] 两个位置的关闭按钮样式是否一致
+- [ ] 点击关闭按钮是否正确执行关闭操作
 4. **点击领取**：跳转到落地页链接
 5. **宏变量替换**：支持引导文案、金额、图片、文案、落地页的宏替换
