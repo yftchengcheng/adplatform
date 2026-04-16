@@ -84,6 +84,10 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // 数据缓存，避免重复加载
+  const [lastLoadTime, setLastLoadTime] = useState<number>(0);
+  const CACHE_DURATION = 5000; // 5秒缓存
 
   // 检查 Supabase 是否可用
   const isSupabaseAvailable = useCallback((): boolean => {
@@ -95,28 +99,20 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // 加载数据
-  const loadComponents = useCallback(async () => {
+  // 加载数据 - 添加缓存机制
+  const loadComponents = useCallback(async (forceRefresh = false) => {
+    // 如果缓存有效且不是强制刷新，直接返回
+    const now = Date.now();
+    if (!forceRefresh && lastLoadTime && now - lastLoadTime < CACHE_DURATION) {
+      return;
+    }
+
     // 需要过滤的旧测试ID
     const legacyIds = ["A100001", "A100002", "A100003"];
 
-    // 过滤掉旧测试数据
-    const filterLegacyData = (items: AdComponentItem[]): AdComponentItem[] => {
-      return items.filter(item => !legacyIds.includes(item.id));
-    };
-
-    // 去重辅助函数
-    const deduplicate = (items: AdComponentItem[]): AdComponentItem[] => {
-      const seen = new Set<string>();
-      return items.filter(item => {
-        if (seen.has(item.id)) return false;
-        seen.add(item.id);
-        return true;
-      });
-    };
-
     // 使用 API 加载数据
     try {
+      setLoading(true);
       const response = await fetch("/api/components");
       const result = await response.json();
 
@@ -125,34 +121,37 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (result.data && result.data.length > 0) {
-        const formatted = result.data.map(toFrontendFormat);
-        // 去重：以 id 为 key，保持第一个出现的记录
+        // 一次遍历完成去重和过滤
         const seen = new Set<string>();
-        const deduplicated = formatted.filter((item: AdComponentItem) => {
-          if (seen.has(item.id)) return false;
-          seen.add(item.id);
-          return true;
-        });
-        // 过滤旧测试数据
-        const filtered = filterLegacyData(deduplicated);
-        setComponents(filtered);
+        const processed = result.data
+          .map(toFrontendFormat)
+          .filter((item: AdComponentItem) => {
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return !legacyIds.includes(item.id);
+          });
+        setComponents(processed);
+        setLastLoadTime(now);
       } else {
-        // 数据库为空，使用空数组
         setComponents([]);
+        setLastLoadTime(now);
       }
       setError(null);
     } catch (err) {
       console.error("数据库加载失败:", err);
-      // 数据库失败时使用空数组，避免使用 localStorage
       setComponents([]);
       setError("数据库连接失败");
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [lastLoadTime]);
 
-  // 初始化加载
+  // 初始化加载 - 添加加载状态检查
   useEffect(() => {
-    loadComponents().finally(() => setIsInitialized(true));
-  }, [loadComponents]);
+    if (!isInitialized) {
+      loadComponents().finally(() => setIsInitialized(true));
+    }
+  }, [isInitialized, loadComponents]);
 
   // 生成顺序ID
   const generateSequentialId = useCallback((existingComponents: AdComponentItem[]): string => {

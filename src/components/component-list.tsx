@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -97,6 +97,9 @@ export function ComponentList() {
   const [sortField, setSortField] = useState<string>("updateTime");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [previewComponent, setPreviewComponent] = useState<AdComponentItem | null>(null);
+
+  // 搜索防抖
+  const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // 更新 total
   useEffect(() => {
@@ -203,10 +206,19 @@ export function ComponentList() {
     setPagination((prev) => ({ ...prev, page: 1 }));
   }, []);
 
-  // 搜索
+  // 搜索 - 带防抖
   const handleSearch = useCallback((value: string) => {
+    // 清除之前的防抖
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+    // 立即更新输入值
     setFilters((prev) => ({ ...prev, keyword: value }));
     setPagination((prev) => ({ ...prev, page: 1 }));
+    // 300ms 防抖
+    searchDebounceRef.current = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, keyword: value }));
+    }, 300);
   }, []);
 
   // 分页

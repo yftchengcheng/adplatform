@@ -4,6 +4,9 @@ import { FetchClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
 const config = new Config();
 const client = new FetchClient(config);
 
+// 15秒超时保护
+const FETCH_TIMEOUT = 15000;
+
 export async function POST(request: NextRequest) {
   try {
     const { url } = await request.json();
@@ -15,7 +18,16 @@ export async function POST(request: NextRequest) {
     // Extract forward headers for tracing
     const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
     
-    const response = await client.fetch(url, customHeaders);
+    // 创建超时Promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Fetch URL timeout")), FETCH_TIMEOUT);
+    });
+
+    // 并行执行查询和超时
+    const response = await Promise.race([
+      client.fetch(url, customHeaders),
+      timeoutPromise
+    ]) as ReturnType<typeof client.fetch>;
     
     return NextResponse.json({
       success: response.status_code === 0,
@@ -24,10 +36,10 @@ export async function POST(request: NextRequest) {
       url: response.url,
       filetype: response.filetype,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch URL' },
+      { error: error.message || 'Failed to fetch URL' },
       { status: 500 }
     );
   }

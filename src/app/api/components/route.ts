@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/storage/database/supabase-server";
 
-// GET - 获取所有组件
+// GET - 获取所有组件（10秒超时保护）
 export async function GET() {
   try {
     const supabase = getSupabaseServerClient();
-    const { data, error } = await supabase
-      .from("ad_components")
-      .select("*")
-      .order("update_time", { ascending: false });
+    
+    // 创建超时Promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Database query timeout")), 10000);
+    });
+
+    // 并行执行查询和超时
+    const { data, error } = await Promise.race([
+      supabase
+        .from("ad_components")
+        .select("*")
+        .order("update_time", { ascending: false }),
+      timeoutPromise
+    ]) as { data: any; error: any };
 
     if (error) {
       console.error("Database query error:", error);
@@ -16,9 +26,9 @@ export async function GET() {
     }
 
     return NextResponse.json({ data: data || [] });
-  } catch (err) {
+  } catch (err: any) {
     console.error("API error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
   }
 }
 
