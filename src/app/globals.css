@@ -236,10 +236,10 @@
   animation: scratchReveal 1s ease-out forwards;
 }
 
-/* 刮刮卡飘落动画 - 从手势上方区域开始飘落 */
+/* 刮刮卡飘落动画 - 从页面上方开始飘落 */
 @keyframes fallDownRelative {
   0% {
-    top: -60px;
+    top: -120px;
     opacity: 0;
   }
   10% {
