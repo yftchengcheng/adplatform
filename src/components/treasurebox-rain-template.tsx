@@ -292,14 +292,6 @@ export function TreasureboxRainTemplate({
           ) : (
             /* Reward Scene */
             <div className="relative flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
-              {/* Close Button - 底边中间 */}
-              <button
-                onClick={onClose}
-                className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
               <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
                 {/* 奖励展示 */}
                 <div className="mb-6 text-center">
