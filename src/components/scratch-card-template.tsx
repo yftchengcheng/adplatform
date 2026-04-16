@@ -129,14 +129,14 @@ export function ScratchCardTemplate({
   const generateFallingElements = useCallback(() => {
     const elements: FallingElement[] = [];
     const types: FallingElement['type'][] = ['yuanbao1', 'yuanbao2', 'yuanbao3', 'yuanbao4', 'yuanbao5', 'yuanbao6'];
-    const count = 15;
+    const count = 8; // 降低50%: 从15个减少到8个
     
     for (let i = 0; i < count; i++) {
       elements.push({
         id: elementCounterRef.current++,
         x: Math.random() * 90 + 5,
-        delay: Math.random() * 2000,
-        duration: 3000 + Math.random() * 1000,
+        delay: Math.random() * 4000, // 延迟范围扩大，分散飘落
+        duration: 4000 + Math.random() * 2000, // 飘落时长增加
         scale: 0.8 + Math.random() * 0.4,
         rotation: -15 + Math.random() * 30,
         type: types[Math.floor(Math.random() * types.length)],
@@ -164,12 +164,12 @@ export function ScratchCardTemplate({
     setIsScratched(false);
     setFallingElements(generateFallingElements());
     
-    // 重复生成飘落元素
+    // 重复生成飘落元素 - 间隔增加到8秒
     const interval = setInterval(() => {
       if (!isScratched) {
         setFallingElements(prev => [...prev, ...generateFallingElements()]);
       }
-    }, 4000);
+    }, 8000);
     
     return () => clearInterval(interval);
   }, [generateFallingElements, isScratched]);
