@@ -182,6 +182,9 @@ export function ScratchCardTemplateConfigPanel({
   // 奖励图片错误信息
   const [rewardImageError, setRewardImageError] = useState("");
 
+  // 取消确认弹窗状态
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
   // 确保 rewardType 始终有有效值
   const [rewardType, setRewardType] = useState<"cash" | "custom">("cash");
 
@@ -470,6 +473,59 @@ export function ScratchCardTemplateConfigPanel({
           </div>
         )}
       </div>
+
+      {/* 底部按钮 */}
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 mt-4">
+        <button
+          onClick={() => setShowCancelConfirm(true)}
+          className="h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50"
+        >
+          取消
+        </button>
+        <button
+          onClick={onSave}
+          className="h-10 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600"
+        >
+          保存
+        </button>
+      </div>
+
+      {/* 取消确认弹窗 */}
+      {showCancelConfirm && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-50 bg-black/50"
+            onClick={() => setShowCancelConfirm(false)}
+          />
+          {/* Modal */}
+          <div className="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <div className="px-5 pt-6 pb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">确认取消</h3>
+                <p className="text-sm text-gray-500 mb-6">确定要取消配置吗？所有未保存的更改将丢失。</p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="h-10 px-4 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50"
+                  >
+                    返回
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCancelConfirm(false);
+                      onCancel?.();
+                    }}
+                    className="h-10 px-4 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600"
+                  >
+                    确定取消
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
