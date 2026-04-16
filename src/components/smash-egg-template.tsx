@@ -124,24 +124,23 @@ export function SmashEggTemplate({
   // 渲染砸蛋场景
   const renderSmashScene = () => (
     <div 
-      className="relative w-full h-full flex items-center justify-center overflow-hidden"
+      className="relative w-full h-full overflow-hidden"
       style={{
         backgroundImage: "url('/smash-page.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* 蛋容器 - 居中显示，下移50px */}
+      {/* 蛋容器 - 使用距离底部比例定位，20%表示距离底部20% */}
       <div 
-        className="relative cursor-pointer egg-shake-rotate"
+        className="absolute left-1/2 -translate-x-1/2 cursor-pointer egg-shake-rotate"
         onClick={handleSmash}
-        style={{ transform: "translateY(50px)" }}
+        style={{ bottom: "20%" }}
       >
         <img
           src="/egg-shake.png"
           alt="彩蛋"
           className="w-40 h-auto object-contain"
-          style={{ maxHeight: "60%" }}
           draggable={false}
         />
       </div>
@@ -150,8 +149,8 @@ export function SmashEggTemplate({
       <div 
         className="absolute hammer-shake"
         style={{
-          top: "30%",
-          right: "20%",
+          top: "25%",
+          right: "18%",
         }}
       >
         <img
@@ -161,7 +160,6 @@ export function SmashEggTemplate({
           draggable={false}
         />
       </div>
-
 
       {/* 点击提示 */}
       {!isSmashed && (
