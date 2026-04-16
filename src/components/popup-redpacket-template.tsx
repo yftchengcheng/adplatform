@@ -9,9 +9,6 @@ export interface PopupRedpacketConfig {
   // 红包图片
   redpacketImageUrl?: string;
   redpacketImageMacro?: string;
-  // 引导文案
-  guideText: string;
-  guideTextMacro?: string;
   // 奖励类型
   rewardType: "cash" | "custom";
   // 现金奖励
@@ -20,9 +17,6 @@ export interface PopupRedpacketConfig {
   // 自定义奖励图片
   rewardImageUrl?: string;
   rewardImageMacro?: string;
-  // 奖品文案
-  rewardText: string;
-  rewardTextMacro?: string;
   // 特殊说明
   specialNote: string;
   specialNoteMacro?: string;
@@ -70,15 +64,11 @@ export function PopupRedpacketTemplate({
   onButtonClick,
 }: PopupRedpacketTemplateProps) {
   const finalConfig: PopupRedpacketConfig = {
-    guideText: "点击开红包",
-    guideTextMacro: "",
     rewardType: "cash",
     cashAmount: "88.88",
     cashAmountMacro: "",
     rewardImageUrl: "",
     rewardImageMacro: "",
-    rewardText: "恭喜获得100元优惠券",
-    rewardTextMacro: "",
     specialNote: "实际奖品以APP为准",
     specialNoteMacro: "",
     redpacketImageUrl: "",
@@ -100,10 +90,6 @@ export function PopupRedpacketTemplate({
   // 解析宏变量后的配置
   const resolvedConfig = {
     ...finalConfig,
-    // 引导文案：优先使用宏变量字段
-    guideText: finalConfig.guideTextMacro && finalConfig.macroVariables
-      ? resolveMacro(finalConfig.guideTextMacro, finalConfig.macroVariables)
-      : resolveMacro(finalConfig.guideText, finalConfig.macroVariables),
     // 现金金额：优先使用宏变量字段
     cashAmount: finalConfig.cashAmountMacro && finalConfig.macroVariables
       ? resolveMacro(finalConfig.cashAmountMacro, finalConfig.macroVariables)
@@ -315,14 +301,6 @@ export function PopupRedpacketTemplate({
               />
             )
           )}
-
-          {/* 奖品文案 */}
-          <p 
-            className="text-center mb-3"
-            style={{ color: "#333", fontSize: "14px", fontWeight: 500 }}
-          >
-            {resolvedConfig.rewardText}
-          </p>
 
           {/* 特殊说明 */}
           <p 

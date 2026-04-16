@@ -14,12 +14,9 @@ import {
 
 // 配置数据类型
 export interface PopupRedpacketConfig {
-  // 红包元素
+  // 红包图片
   redpacketImageUrl?: string;
   redpacketImageMacro?: string;
-  // 引导文案
-  guideText: string;
-  guideTextMacro?: string;
   // 奖励类型
   rewardType: "cash" | "custom";
   // 现金奖励
@@ -28,9 +25,6 @@ export interface PopupRedpacketConfig {
   // 自定义奖励图片
   rewardImageUrl?: string;
   rewardImageMacro?: string;
-  // 奖品文案
-  rewardText: string;
-  rewardTextMacro?: string;
   // 特殊说明
   specialNote: string;
   specialNoteMacro?: string;
@@ -325,11 +319,6 @@ export function PopupRedpacketConfigPanel({
     config.landingPageMacro ? "macro" : "input"
   );
 
-  // 引导文案输入模式
-  const [guideTextMode, setGuideTextMode] = useState<"input" | "macro">(
-    config.guideTextMacro ? "macro" : "input"
-  );
-
   // 现金金额输入模式
   const [cashAmountMode, setCashAmountMode] = useState<"input" | "macro">(
     config.cashAmountMacro ? "macro" : "input"
@@ -414,38 +403,6 @@ export function PopupRedpacketConfigPanel({
             title="红包图片"
             placeholder="推荐 9:16 比例，最大 1MB"
           />
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm text-gray-700">引导文案</label>
-              <ModeToggle
-                value={guideTextMode}
-                onChange={setGuideTextMode}
-              />
-            </div>
-            {guideTextMode === "input" ? (
-              <>
-                <Input
-                  placeholder="如：点击开红包"
-                  value={config.guideText}
-                  onChange={(e) => updateConfig({ guideText: e.target.value })}
-                  maxLength={50}
-                  className="text-sm"
-                />
-                <CharCounter value={config.guideText} max={20} />
-              </>
-            ) : (
-              <>
-                <Input
-                  placeholder="输入引导文案宏变量，如 ${guide_text}"
-                  value={config.guideTextMacro || ""}
-                  onChange={(e) => updateConfig({ guideTextMacro: e.target.value })}
-                  className="text-sm"
-                />
-                <p className="text-xs text-gray-400">使用宏变量动态设置引导文案</p>
-              </>
-            )}
-          </div>
         </SectionCollapse>
 
         {/* 领奖配置 */}
@@ -532,21 +489,6 @@ export function PopupRedpacketConfigPanel({
               placeholder="推荐 16:9 比例，最大 300KB"
             />
           )}
-
-          {/* 奖品文案 */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm text-gray-700">奖品文案</label>
-              <CharCounter value={config.rewardText} max={30} />
-            </div>
-            <Input
-              placeholder="如：恭喜获得100元优惠券"
-              value={config.rewardText}
-              onChange={(e) => updateConfig({ rewardText: e.target.value })}
-              maxLength={50}
-              className="text-sm"
-            />
-          </div>
 
           {/* 特殊说明 */}
           <div className="space-y-2">
