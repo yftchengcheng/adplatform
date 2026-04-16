@@ -362,7 +362,7 @@ export function TreasureboxRainTemplate({
     <div className="w-full rounded-t-2xl overflow-hidden shadow-lg">
       {/* Rain Scene */}
       {!isClaimed ? (
-        <div ref={containerRef} className="relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]" style={{ height: "400px" }}>
+        <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
           {/* Guide Text */}
           <div className="absolute top-4 left-0 right-0 z-10">
             <div className="relative flex flex-col items-center">
@@ -433,7 +433,7 @@ export function TreasureboxRainTemplate({
         </div>
       ) : (
         /* Reward Scene */
-        <div className="relative bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-4" style={{ height: "400px" }}>
+        <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
           {/* Close Button */}
           <button
             onClick={onClose}
