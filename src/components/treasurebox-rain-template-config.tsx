@@ -207,9 +207,15 @@ export function TreasureboxRainTemplateConfigPanel({
   );
 
   // 确保 rewardType 始终有有效值，避免 hydration mismatch
-  const [rewardType, setRewardType] = useState<"cash" | "custom">(
-    config.rewardType === "custom" ? "custom" : "cash"
-  );
+  // 使用固定初始值，不依赖 config，确保服务端和客户端一致
+  const [rewardType, setRewardType] = useState<"cash" | "custom">("cash");
+
+  // 使用 useEffect 同步 config 中的 rewardType（只在客户端执行）
+  React.useEffect(() => {
+    if (config.rewardType === "custom") {
+      setRewardType("custom");
+    }
+  }, [config.rewardType]);
 
   // 更新配置
   const updateConfig = useCallback(
