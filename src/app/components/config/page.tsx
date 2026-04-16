@@ -592,19 +592,19 @@ function ConfigContent() {
                 {/* Phone frame */}
                 <div className="relative z-10">
                   <div className="w-[280px] h-[520px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
-                    <div className={`w-full h-full ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'bg-transparent' : 'bg-white'} rounded-[2rem] overflow-hidden relative`}>
+                    <div className={`w-full h-full ${isRedpacketRainComponent ? 'bg-transparent' : 'bg-white'} rounded-[2rem] overflow-hidden relative`}>
                       {/* Status bar */}
-                      <div className={`h-7 flex items-end justify-between px-5 pb-0.5 ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'bg-black/30' : 'bg-white'}`}>
-                        <span className={`text-[9px] font-medium ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'text-white' : 'text-gray-900'}`}>9:41</span>
-                        <div className={`flex items-center gap-0.5 ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'text-white' : 'text-gray-900'}`}>
-                          <div className={`w-3 h-1.5 border rounded-sm ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'border-white' : 'border-gray-900'}`}>
-                            <div className={`w-2 h-0.5 rounded-sm m-px ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'bg-white' : 'bg-gray-900'}`} />
+                      <div className="h-7 bg-white flex items-end justify-between px-5 pb-0.5">
+                        <span className="text-[9px] font-medium text-gray-900">9:41</span>
+                        <div className="flex items-center gap-0.5">
+                          <div className="w-3 h-1.5 border border-gray-900 rounded-sm">
+                            <div className="w-2 h-0.5 bg-gray-900 rounded-sm m-px" />
                           </div>
                         </div>
                       </div>
 
                       {/* App content */}
-                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'flex-col items-center justify-start pt-4' : 'items-center justify-center'} ${(isRedpacketRainComponent || isTreasureboxRainComponent) ? 'bg-transparent' : ''}`}>
+                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'flex-col items-center justify-start pt-4' : 'items-center justify-center'} ${isRedpacketRainComponent ? 'bg-transparent' : ''}`}>
                         {isRedpacketRainComponent ? (
                           <div className="w-full px-4">
                             <RedpacketRainTemplate
@@ -646,15 +646,13 @@ function ConfigContent() {
                             />
                           </div>
                         ) : isTreasureboxRainComponent ? (
-                          <div className="w-full px-4">
-                            <TreasureboxRainTemplate
-                              key={`treasureboxrain-${previewResetKey}`}
-                              config={config as TreasureboxRainTemplateConfig}
-                              isOpen={true}
-                              previewMode={true}
-                              onClose={() => {}}
-                            />
-                          </div>
+                          <TreasureboxRainTemplate
+                            key={`treasureboxrain-${previewResetKey}`}
+                            config={config as TreasureboxRainTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}

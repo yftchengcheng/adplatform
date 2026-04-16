@@ -221,7 +221,7 @@ export function TreasureboxRainTemplate({
         <div className="flex-1 flex flex-col">
           {/* Rain Scene */}
           {!isClaimed ? (
-            <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
+            <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
               {/* Guide Text */}
               <div className="absolute top-8 left-0 right-0 z-10">
                 <div className="relative flex flex-col items-center">
@@ -292,7 +292,7 @@ export function TreasureboxRainTemplate({
             </div>
           ) : (
             /* Reward Scene */
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-4">
+            <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
               {/* Close Button */}
               <button
                 onClick={onClose}
@@ -359,10 +359,10 @@ export function TreasureboxRainTemplate({
 
   // 预览模式
   return (
-    <div className="relative mx-auto overflow-hidden shadow-lg" style={{ aspectRatio: "5 / 6", maxWidth: "260px" }}>
+    <div className="w-full rounded-t-2xl overflow-hidden shadow-lg">
       {/* Rain Scene */}
       {!isClaimed ? (
-        <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
+        <div ref={containerRef} className="relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]" style={{ height: "400px" }}>
           {/* Guide Text */}
           <div className="absolute top-4 left-0 right-0 z-10">
             <div className="relative flex flex-col items-center">
@@ -433,7 +433,7 @@ export function TreasureboxRainTemplate({
         </div>
       ) : (
         /* Reward Scene */
-        <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
+        <div className="relative bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-4" style={{ height: "400px" }}>
           {/* Close Button */}
           <button
             onClick={onClose}
