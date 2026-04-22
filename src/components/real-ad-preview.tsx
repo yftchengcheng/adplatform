@@ -54,6 +54,225 @@ interface RealAdPreviewProps {
   onClick?: () => void;
 }
 
+// 激励视频动态小组件（列表页小预览用）
+function RewardedVideoMiniPreview({ defaultImage, onClick, className }: { defaultImage: string; onClick?: () => void; className?: string }) {
+  const [progress, setProgress] = useState(0);
+  const [diamondCount, setDiamondCount] = useState(0);
+  const maxSeconds = 15;
+  const currentSeconds = Math.max(0, Math.ceil((100 - progress) / (100 / maxSeconds)));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 100 : p + 0.8));
+    }, 150);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDiamondCount((c) => (c >= 50 ? 50 : c + 1));
+    }, 300);
+    return () => clearInterval(timer);
+  }, []);
+
+  const isCompleted = progress >= 100;
+
+  return (
+    <div
+      className={cn(
+        "relative w-full h-full overflow-hidden cursor-pointer bg-black",
+        onClick && "hover:opacity-90 transition-opacity",
+        className
+      )}
+      onClick={onClick}
+    >
+      {/* 视频背景 */}
+      <video
+        src={defaultImage}
+        className="absolute inset-0 w-full h-full object-cover"
+        muted
+        loop
+        playsInline
+      />
+      {/* 底部渐变 */}
+      <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/40 to-transparent" />
+
+      {/* 顶部：金色横幅 */}
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20">
+        <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-0.5 px-2 rounded-full shadow border border-amber-300/30">
+          <p className="text-[5px] font-semibold whitespace-nowrap">观看视频领取双倍金币</p>
+        </div>
+      </div>
+
+      {/* 右下角：倒计时角标 - 动态 */}
+      <div className="absolute bottom-8 right-1 z-20">
+        <div className="bg-white/90 rounded px-1 py-0.5 shadow">
+          <p className="text-gray-800 text-[5px] font-medium">
+            {isCompleted ? "可领取" : `${currentSeconds}s后`}
+          </p>
+        </div>
+      </div>
+
+      {/* 底部左侧：钻石计数 - 动态 */}
+      <div className="absolute bottom-1 left-1 z-20">
+        <div className="bg-white/25 backdrop-blur-sm rounded px-1 py-0.5">
+          <div className="flex items-center gap-0.5">
+            <span className="text-[6px]">💎</span>
+            <span className="text-white text-[6px] font-bold tabular-nums">×{diamondCount}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 底部进度条 - 动态 */}
+      <div className="absolute bottom-1 right-1 left-8 z-20">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full px-1 py-0.5 border border-white/20">
+          <div className="flex items-center gap-0.5">
+            <span className="text-white/80 text-[4px]">▶</span>
+            <div className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-amber-400 to-yellow-400 transition-all duration-150 rounded-full"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <span className="text-white/90 text-[4px] font-medium">{Math.floor(progress)}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 视频结束画面 */}
+      {isCompleted && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+          <span className="text-3xl mb-1">🎉</span>
+          <div className="flex items-center gap-0.5 mb-1">
+            <span className="text-lg">🪙</span>
+            <span className="text-xl font-bold text-yellow-400">{diamondCount * 2}</span>
+            <span className="text-[6px] text-yellow-300">金币</span>
+          </div>
+          <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1 rounded-lg">
+            <p className="text-[6px] font-bold">点击领取奖励</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 激励视频动态组件（全屏预览弹窗用，中等尺寸）
+function RewardedVideoFullPreview({ defaultImage, onClose }: { defaultImage: string; onClose: () => void }) {
+  const [progress, setProgress] = useState(0);
+  const [diamondCount, setDiamondCount] = useState(0);
+  const maxSeconds = 15;
+  const currentSeconds = Math.max(0, Math.ceil((100 - progress) / (100 / maxSeconds)));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 100 : p + 0.8));
+    }, 150);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDiamondCount((c) => (c >= 50 ? 50 : c + 1));
+    }, 300);
+    return () => clearInterval(timer);
+  }, []);
+
+  const isCompleted = progress >= 100;
+
+  return (
+    <div className="absolute inset-0 bg-black">
+      {/* 视频背景 */}
+      <video
+        src={defaultImage}
+        className="absolute inset-0 w-full h-full object-cover"
+        muted
+        loop
+        playsInline
+        autoPlay
+      />
+      {/* 底部渐变 */}
+      <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
+
+      {/* 顶部：金色横幅 */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
+        <div className="relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-sm" />
+          <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-1.5 px-5 rounded-full shadow-lg border border-amber-300/30">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">🎁</span>
+              <p className="text-[9px] font-semibold whitespace-nowrap">观看视频以领取双倍金币奖励</p>
+              <span className="text-xs">🎁</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 右下角：倒计时角标 - 动态 */}
+      <div className="absolute bottom-20 right-3 z-20">
+        <div className="bg-white/90 backdrop-blur-md rounded-lg px-2.5 py-1 shadow-lg border border-white/50">
+          <p className="text-gray-800 text-[9px] font-medium">
+            {isCompleted ? "可领取" : `${currentSeconds}s后可领取`}
+          </p>
+        </div>
+      </div>
+
+      {/* 底部左侧：钻石计数 - 动态 */}
+      <div className="absolute bottom-6 left-3 z-20">
+        <div className="bg-white/25 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-lg border border-white/30">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">💎</span>
+            <span className="text-white text-xs font-bold drop-shadow-md tabular-nums">×{diamondCount}</span>
+          </div>
+          <div className="mt-1 w-12 h-1 bg-white/30 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-300 rounded-full"
+              style={{ width: `${(diamondCount / 50) * 100}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 底部右侧：视频进度条 - 动态 */}
+      <div className="absolute bottom-6 right-3 left-20 z-20">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20">
+          <div className="flex items-center gap-1.5">
+            <span className="text-white/80 text-[8px]">▶️</span>
+            <div className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-amber-400 to-yellow-400 transition-all duration-150 rounded-full"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <span className="text-white/90 text-[8px] font-medium">{Math.floor(progress)}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 视频结束画面 */}
+      {isCompleted && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+          <span className="text-5xl mb-3">🎉</span>
+          <p className="text-white/80 text-xs mb-1">恭喜获得</p>
+          <div className="flex items-center gap-1 mb-3">
+            <span className="text-2xl">🪙</span>
+            <span className="text-3xl font-bold text-yellow-400">{diamondCount * 2}</span>
+            <span className="text-sm text-yellow-300">金币</span>
+          </div>
+          <button className="relative group" onClick={onClose}>
+            <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-xl blur opacity-60 group-hover:opacity-90 transition-opacity" />
+            <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white px-6 py-2.5 rounded-xl shadow">
+              <p className="text-xs font-bold">点击屏幕领取奖励</p>
+            </div>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RealAdPreview({
   templateType,
   templateName,
@@ -158,67 +377,9 @@ export function RealAdPreview({
     );
   }
 
-  // 激励视频：在手机框架内展示完整UI（进度、倒计时、奖励）
+  // 激励视频：在手机框架内展示完整UI（动态进度、倒计时、钻石计数）
   if (templateType === "rewarded_video") {
-    return (
-      <div
-        className={cn(
-          "relative w-full h-full overflow-hidden cursor-pointer bg-black",
-          onClick && "hover:opacity-90 transition-opacity",
-          className
-        )}
-        onClick={onClick}
-      >
-        {/* 视频背景 */}
-        <video
-          src={defaultImage}
-          className="absolute inset-0 w-full h-full object-cover"
-          muted
-          loop
-          playsInline
-        />
-        {/* 底部渐变 */}
-        <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/40 to-transparent" />
-
-        {/* 顶部：金色横幅 */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-0.5 px-2 rounded-full shadow border border-amber-300/30">
-            <p className="text-[5px] font-semibold whitespace-nowrap">观看视频领取双倍金币</p>
-          </div>
-        </div>
-
-        {/* 右下角：倒计时角标 */}
-        <div className="absolute bottom-8 right-1 z-20">
-          <div className="bg-white/90 rounded px-1 py-0.5 shadow">
-            <p className="text-gray-800 text-[5px] font-medium">15s后</p>
-          </div>
-        </div>
-
-        {/* 底部左侧：钻石 */}
-        <div className="absolute bottom-1 left-1 z-20">
-          <div className="bg-white/25 backdrop-blur-sm rounded px-1 py-0.5">
-            <div className="flex items-center gap-0.5">
-              <span className="text-[6px]">💎</span>
-              <span className="text-white text-[6px] font-bold">×50</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 底部进度条 */}
-        <div className="absolute bottom-1 right-1 left-8 z-20">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full px-1 py-0.5 border border-white/20">
-            <div className="flex items-center gap-0.5">
-              <span className="text-white/80 text-[4px]">▶</span>
-              <div className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-gradient-to-r from-amber-400 to-yellow-400 rounded-full" />
-              </div>
-              <span className="text-white/90 text-[4px] font-medium">67%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <RewardedVideoMiniPreview defaultImage={defaultImage} onClick={onClick} className={className} />;
   }
 
   // 全屏类型：填满整个区域
@@ -397,69 +558,9 @@ export function FullscreenPreviewModal({
                 </div>
               )}
 
-              {/* 激励视频 - 在手机框架内展示完整UI */}
+              {/* 激励视频 - 在手机框架内展示动态UI */}
               {templateType === "rewarded_video" && (
-                <div className="absolute inset-0 bg-black">
-                  {/* 视频背景 */}
-                  <video
-                    src={defaultImage}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    muted
-                    loop
-                    playsInline
-                    autoPlay
-                  />
-                  {/* 底部渐变 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
-
-                  {/* 顶部：金色横幅 */}
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
-                    <div className="relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-sm" />
-                      <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-1.5 px-5 rounded-full shadow-lg border border-amber-300/30">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs">🎁</span>
-                          <p className="text-[9px] font-semibold whitespace-nowrap">观看视频以领取双倍金币奖励</p>
-                          <span className="text-xs">🎁</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 右下角：倒计时角标 - 白底黑字圆角矩形 */}
-                  <div className="absolute bottom-20 right-3 z-20">
-                    <div className="bg-white/90 backdrop-blur-md rounded-lg px-2.5 py-1 shadow-lg border border-white/50">
-                      <p className="text-gray-800 text-[9px] font-medium">15s后可领取</p>
-                    </div>
-                  </div>
-
-                  {/* 底部左侧：钻石计数 */}
-                  <div className="absolute bottom-6 left-3 z-20">
-                    <div className="bg-white/25 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-lg border border-white/30">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm">💎</span>
-                        <span className="text-white text-xs font-bold drop-shadow-md">×50</span>
-                      </div>
-                      <div className="mt-1 w-12 h-1 bg-white/30 rounded-full overflow-hidden">
-                        <div className="h-full w-full bg-gradient-to-r from-cyan-400 to-emerald-400 rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 底部右侧：视频进度条 */}
-                  <div className="absolute bottom-6 right-3 left-20 z-20">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-white/80 text-[8px]">▶️</span>
-                        <div className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
-                          <div className="h-full w-2/3 bg-gradient-to-r from-amber-400 to-yellow-400 rounded-full" />
-                        </div>
-                        <span className="text-white/90 text-[8px] font-medium">67%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <RewardedVideoFullPreview defaultImage={defaultImage} onClose={onClose} />
               )}
 
               {/* 全屏类型 - 填满整个内容区 */}
