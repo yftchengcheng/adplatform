@@ -28,19 +28,19 @@ export default function SDKPage() {
             </div>
 
             {/* Navigation Tabs */}
-            <nav className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
-              <Link href="/">
-                <button
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-white hover:shadow-sm"
-                >
-                  组件管理
-                </button>
+            <nav className="flex items-center gap-6">
+              <Link 
+                href="/"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+              >
+                组件管理
               </Link>
-              <button
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-blue-50 text-blue-600 shadow-sm"
+              <Link 
+                href="/sdk"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-blue-50 text-blue-600"
               >
                 SDK模板
-              </button>
+              </Link>
             </nav>
           </div>
         </div>

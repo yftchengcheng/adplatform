@@ -356,34 +356,38 @@ export function ComponentList() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">组件管理</h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  管理和配置您的广告组件
-                </p>
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
               </div>
-              <nav className="flex items-center gap-1 ml-6">
-                <button
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-blue-50 text-blue-600"
-                >
-                  组件管理
-                </button>
-                <Link href="/sdk">
-                  <button
-                    className="px-4 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
-                  >
-                    SDK模板
-                  </button>
-                </Link>
-              </nav>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">Ad Platform</h1>
+                <p className="text-xs text-gray-500">广告组件管理系统</p>
+              </div>
             </div>
+
+            {/* Navigation Tabs */}
+            <nav className="flex items-center gap-6">
+              <Link 
+                href="/"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-blue-50 text-blue-600"
+              >
+                组件管理
+              </Link>
+              <Link 
+                href="/sdk"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+              >
+                SDK模板
+              </Link>
               <Link href="/components/create">
                 <Button className="bg-blue-500 hover:bg-blue-600">
                   <Plus className="w-4 h-4 mr-2" />
                   创建
                 </Button>
               </Link>
+            </nav>
           </div>
         </div>
       </header>
