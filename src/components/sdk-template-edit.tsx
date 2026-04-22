@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -14,10 +14,13 @@ import {
   Hand,
   Zap,
   Clock,
-  Trash2
+  Trash2,
+  ImageIcon,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useComponents } from "@/contexts/component-context";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -86,16 +89,6 @@ interface ComponentLinkConfig {
   status: "enabled" | "disabled";
 }
 
-// 模拟组件数据
-const MOCK_COMPONENTS = [
-  { id: "comp_001", name: "红包雨-春节活动", type: "红包雨", preview: "https://picsum.photos/seed/comp1/120/80" },
-  { id: "comp_002", name: "砸蛋-惊喜礼包", type: "砸蛋", preview: "https://picsum.photos/seed/comp2/120/80" },
-  { id: "comp_003", name: "刮刮卡-幸运抽奖", type: "刮刮卡", preview: "https://picsum.photos/seed/comp3/120/80" },
-  { id: "comp_004", name: "翻卡-神秘大奖", type: "翻卡", preview: "https://picsum.photos/seed/comp4/120/80" },
-  { id: "comp_005", name: "投票-选择偏好", type: "投票磁贴", preview: "https://picsum.photos/seed/comp5/120/80" },
-  { id: "comp_006", name: "优惠券-新人专享", type: "优惠券", preview: "https://picsum.photos/seed/comp6/120/80" },
-];
-
 // SDK模板信息
 const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }> = {
   static_splash: { name: "静态开屏", desc: "静态图片展示，应用启动时展示品牌广告" },
@@ -118,6 +111,65 @@ const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: numbe
   rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
 };
 
+// 组件类型对应的中文名称
+const COMPONENT_TYPE_NAMES: Record<string, string> = {
+  redpacket_rain: "红包雨",
+  flip_card: "翻卡",
+  flip_redpacket: "翻红包",
+  flip_treasure: "翻宝箱",
+  treasure_rain: "宝箱雨",
+  scratch_card: "刮刮卡",
+  smash_egg: "砸蛋",
+  popup_redpacket: "弹窗红包",
+  dual_button: "双按钮",
+  vote: "投票磁贴",
+  image: "图片磁贴",
+  ecommerce: "电商磁贴",
+  coupon: "优惠券磁贴",
+  promotion_card: "推广卡片",
+  game_gift: "游戏礼包码",
+};
+
+// 获取组件预览图
+function getComponentPreview(componentType: string, config?: Record<string, unknown>): string {
+  // 根据组件类型和配置获取预览图
+  if (config) {
+    // 优先使用配置的预览图
+    if (config.previewUrl) return config.previewUrl as string;
+    if (config.imageUrl) return config.imageUrl as string;
+    if (config.redpacketImageUrl) return config.redpacketImageUrl as string;
+    // 电商磁贴
+    if ((config as { imageUrl?: string }).imageUrl) {
+      return (config as { imageUrl: string }).imageUrl;
+    }
+  }
+  // 使用组件类型生成默认预览图
+  const seedMap: Record<string, string> = {
+    redpacket_rain: "redpacket",
+    flip_card: "flipcard",
+    flip_redpacket: "flipred",
+    flip_treasure: "fliptreasure",
+    treasure_rain: "treasure",
+    scratch_card: "scratch",
+    smash_egg: "smash",
+    popup_redpacket: "popup",
+    dual_button: "dualbtn",
+    vote: "vote",
+    image: "image",
+    ecommerce: "ecom",
+    coupon: "coupon",
+    promotion_card: "promo",
+    game_gift: "game",
+  };
+  const seed = seedMap[componentType] || componentType;
+  return `https://picsum.photos/seed/${seed}/120/80`;
+}
+
+// 获取组件类型中文名称
+function getComponentTypeName(componentType: string): string {
+  return COMPONENT_TYPE_NAMES[componentType] || componentType;
+}
+
 interface SDKTemplateEditProps {
   type: SDKTemplateType;
   templateId?: string;
@@ -125,25 +177,21 @@ interface SDKTemplateEditProps {
 
 export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   const router = useRouter();
+  const { components, loading } = useComponents();
   const info = SDK_TEMPLATE_INFO[type];
   const sizeConfig = SDK_TEMPLATE_SIZES[type];
   
-  // 组件关联配置列表
-  const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([
-    {
-      id: "link_1",
-      componentId: "comp_001",
-      componentName: "红包雨-春节活动",
-      componentType: "红包雨",
-      componentPreview: "https://picsum.photos/seed/comp1/120/80",
-      triggerRule: "show_time",
-      triggerTime: 5,
-      parentId: "main",
-      parentName: "主素材",
-      status: "enabled"
-    }
-  ]);
+  // 组件关联配置列表（初始为空）
+  const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([]);
   
+  // 将组件列表转换为选择器需要的格式
+  const availableComponents = components.map(comp => ({
+    id: comp.id,
+    name: comp.name,
+    type: comp.type,
+    preview: getComponentPreview(comp.type, comp.config),
+  }));
+
   // 选择组件弹窗
   const [showComponentPicker, setShowComponentPicker] = useState(false);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
@@ -164,12 +212,18 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   };
 
   // 选择组件
-  const handleSelectComponent = (component: typeof MOCK_COMPONENTS[0]) => {
+  interface SelectableComponent {
+    id: string;
+    name: string;
+    type: string;
+    preview: string;
+  }
+  const handleSelectComponent = (component: SelectableComponent) => {
     const newLink: ComponentLinkConfig = {
       id: `link_${Date.now()}`,
       componentId: component.id,
       componentName: component.name,
-      componentType: component.type,
+      componentType: getComponentTypeName(component.type),
       componentPreview: component.preview,
       triggerRule: "show_time",
       triggerTime: 5,
@@ -530,25 +584,38 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
             {/* 组件预览 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <h3 className="text-sm font-medium text-gray-900 mb-4">组件预览</h3>
-              <div className="flex flex-wrap gap-2">
-                {MOCK_COMPONENTS.map((comp) => (
-                  <div 
-                    key={comp.id}
-                    className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
-                    onClick={() => {
-                      if (!componentLinks.find(l => l.componentId === comp.id)) {
-                        handleSelectComponent(comp);
-                      }
-                    }}
-                  >
-                    <img 
-                      src={comp.preview}
-                      alt={comp.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
+              {loading ? (
+                <div className="flex items-center justify-center py-8 text-gray-400">
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  <span className="text-sm">加载中...</span>
+                </div>
+              ) : availableComponents.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <ImageIcon className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm">暂无组件</p>
+                  <p className="text-xs mt-1">请先在「模板组件」中创建组件</p>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {availableComponents.map((comp) => (
+                    <div 
+                      key={comp.id}
+                      className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
+                      onClick={() => {
+                        if (!componentLinks.find(l => l.componentId === comp.id)) {
+                          handleSelectComponent(comp);
+                        }
+                      }}
+                    >
+                      <img 
+                        src={comp.preview}
+                        alt={comp.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               <p className="text-xs text-gray-400 mt-2">点击组件卡片可快速添加到关联列表</p>
             </div>
           </div>
@@ -572,46 +639,59 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
               <p className="text-sm text-gray-500 mt-1">请选择要关联的组件</p>
             </div>
             <div className="p-4 overflow-y-auto max-h-[60vh]">
-              <div className="space-y-2">
-                {MOCK_COMPONENTS.map((comp) => {
-                  const isLinked = componentLinks.some(l => l.componentId === comp.id);
-                  return (
-                    <div
-                      key={comp.id}
-                      onClick={() => !isLinked && handleSelectComponent(comp)}
-                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                        isLinked
-                          ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-50"
-                          : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
-                      }`}
-                    >
-                      <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                        <img 
-                          src={comp.preview}
-                          alt={comp.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {comp.name}
-                          </span>
-                          {isLinked && (
-                            <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-xs rounded">
-                              已关联
-                            </span>
-                          )}
+              {loading ? (
+                <div className="flex items-center justify-center py-8 text-gray-400">
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  <span className="text-sm">加载中...</span>
+                </div>
+              ) : availableComponents.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <ImageIcon className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm">暂无组件可关联</p>
+                  <p className="text-xs mt-1">请先在「模板组件」中创建组件</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {availableComponents.map((comp) => {
+                    const isLinked = componentLinks.some(l => l.componentId === comp.id);
+                    return (
+                      <div
+                        key={comp.id}
+                        onClick={() => !isLinked && handleSelectComponent(comp)}
+                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                          isLinked
+                            ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-50"
+                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
+                        }`}
+                      >
+                        <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
+                          <img 
+                            src={comp.preview}
+                            alt={comp.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <span className="text-xs text-gray-500">{comp.type}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">
+                              {comp.name}
+                            </span>
+                            {isLinked && (
+                              <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-xs rounded">
+                                已关联
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-500">{comp.type}</span>
+                        </div>
+                        {isLinked && (
+                          <span className="text-xs text-gray-400">不可重复添加</span>
+                        )}
                       </div>
-                      {isLinked && (
-                        <span className="text-xs text-gray-400">不可重复添加</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
