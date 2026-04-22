@@ -425,35 +425,12 @@ const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: numbe
   rewarded_video: { width: 1080, height: 1920 },
 };
 
-// SDK模板样式展示组件 - 与列表页RealAdPreview保持完全一致
+// SDK模板样式展示组件 - 与RealAdPreview保持完全一致
 export function SDKTemplatesShowcase({ className }: { className?: string }) {
   const [activeTemplate, setActiveTemplate] = useState<SDKTemplateType>("static_splash");
   
   const templateInfo = SDK_TEMPLATE_INFO_STYLES[activeTemplate];
   const isVideoType = activeTemplate === "video_splash" || activeTemplate === "rewarded_video";
-  
-  // 判断是否为特殊模板（内容不需要全屏展示）
-  const isSpecialType = activeTemplate === "interstitial_half" || activeTemplate === "native" || activeTemplate === "banner";
-
-  // 全屏模板的尺寸
-  const fullPhoneWidth = "w-[270px]";
-  const fullPhoneHeight = "h-[540px]";
-
-  // 特殊模板的尺寸
-  const getSpecialSize = () => {
-    switch (activeTemplate) {
-      case "banner":
-        return { width: "w-[320px]", height: "h-[50px]" };
-      case "native":
-        return { width: "w-[360px]", height: "h-[120px]" };
-      case "interstitial_half":
-        return { width: "w-[320px]", height: "h-[320px]" };
-      default:
-        return { width: fullPhoneWidth, height: fullPhoneHeight };
-    }
-  };
-
-  const containerSize = isSpecialType ? getSpecialSize() : { width: fullPhoneWidth, height: fullPhoneHeight };
 
   return (
     <div className={cn("w-full h-full flex flex-col", className)}>
@@ -477,63 +454,40 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
         </div>
       </div>
 
-      {/* 样式展示区域 - 与RealAdPreview保持一致 */}
+      {/* 样式展示区域 - 与RealAdPreview保持完全一致 */}
       <div className="flex-1 flex items-center justify-center p-4 bg-gray-100 overflow-auto">
         <div className="flex flex-col items-center gap-4">
-          {isSpecialType ? (
-            // 特殊模板展示
-            <div className={cn(
-              "bg-gray-100 rounded-lg p-3 shadow-inner flex items-center justify-center",
-              containerSize.width,
-              containerSize.height
-            )}>
-              {isVideoType ? (
-                <video
-                  src={DEFAULT_IMAGES[activeTemplate]}
-                  className="max-w-full max-h-full object-contain rounded"
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                />
-              ) : (
-                <img
-                  src={DEFAULT_IMAGES[activeTemplate]}
-                  alt={templateInfo.name}
-                  className="max-w-full max-h-full object-contain rounded"
-                />
-              )}
+          {/* 手机框架 - 与RealAdPreview一致：270px × 540px */}
+          <div 
+            className="relative w-full h-full bg-gray-900 overflow-hidden"
+            style={{ maxWidth: "270px", maxHeight: "540px" }}
+          >
+            {/* 图片或视频 - 全屏填充 */}
+            {isVideoType ? (
+              <video
+                src={DEFAULT_IMAGES[activeTemplate]}
+                className="absolute inset-0 w-full h-full object-cover"
+                muted
+                loop
+                playsInline
+                autoPlay
+              />
+            ) : (
+              <img
+                src={DEFAULT_IMAGES[activeTemplate]}
+                alt={templateInfo.name}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+
+            {/* 底部遮罩 - 与RealAdPreview一致 */}
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+
+            {/* 模板名称 - 与RealAdPreview一致 */}
+            <div className="absolute bottom-1 left-1 right-1">
+              <p className="text-white text-[8px] font-medium truncate">{templateInfo.name}</p>
             </div>
-          ) : (
-            // 全屏模板展示 - 与RealAdPreview一致
-            <>
-              <div className={cn("relative bg-gray-900 rounded-2xl p-3 shadow-2xl", containerSize.width, containerSize.height)}>
-                {/* 手机听筒 */}
-                <div className="absolute top-5 left-1/2 -translate-x-1/2 w-20 h-1 bg-gray-700 rounded-full" />
-                
-                {/* 内容区域 */}
-                <div className="relative w-full h-full bg-gray-900 overflow-hidden rounded-xl mt-4">
-                  {/* 图片或视频 */}
-                  {isVideoType ? (
-                    <video
-                      src={DEFAULT_IMAGES[activeTemplate]}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      muted
-                      loop
-                      playsInline
-                      autoPlay
-                    />
-                  ) : (
-                    <img
-                      src={DEFAULT_IMAGES[activeTemplate]}
-                      alt={templateInfo.name}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-              </div>
-            </>
-          )}
+          </div>
 
           {/* 模板信息 */}
           <div className="text-center">
@@ -547,7 +501,7 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
   );
 }
 
-// 单独的模板样式卡片组件（用于列表展示）- 与RealAdPreview保持一致
+// 单独的模板样式卡片组件（用于列表展示）- 与RealAdPreview保持完全一致
 export function SDKTemplateStyleCard({ 
   type, 
   className,
@@ -559,29 +513,6 @@ export function SDKTemplateStyleCard({
 }) {
   const templateInfo = SDK_TEMPLATE_INFO_STYLES[type];
   const isVideoType = type === "video_splash" || type === "rewarded_video";
-  
-  // 判断是否为特殊模板（内容不需要全屏展示）
-  const isSpecialType = type === "interstitial_half" || type === "native" || type === "banner";
-
-  // 与RealAdPreview保持一致的尺寸（全屏模板）
-  const phoneWidth = "w-[68px]";
-  const phoneHeight = "h-[136px]";
-
-  // 特殊模板的尺寸
-  const getSpecialSize = () => {
-    switch (type) {
-      case "banner":
-        return { width: "w-[64px]", height: "h-[10px]" };
-      case "native":
-        return { width: "w-[60px]", height: "h-[22px]" };
-      case "interstitial_half":
-        return { width: "w-[50px]", height: "h-[60px]" };
-      default:
-        return { width: phoneWidth, height: phoneHeight };
-    }
-  };
-
-  const specialSize = getSpecialSize();
 
   if (!showFrame) {
     return (
@@ -589,7 +520,7 @@ export function SDKTemplateStyleCard({
         {isVideoType ? (
           <video
             src={DEFAULT_IMAGES[type]}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             muted
             loop
             playsInline
@@ -599,72 +530,43 @@ export function SDKTemplateStyleCard({
           <img
             src={DEFAULT_IMAGES[type]}
             alt={templateInfo.name}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
       </div>
     );
   }
 
-  // 特殊模板的展示方式
-  if (isSpecialType) {
-    return (
-      <div className="flex items-center justify-center">
-        <div className={cn(
-          "bg-gray-900 rounded-lg p-0.5 shadow-lg flex items-center justify-center",
-          specialSize.width
-        )}>
-          <div className="bg-gray-900 rounded overflow-hidden relative w-full" style={{ height: specialSize.height.replace('h-', '') + 'px' }}>
-            {isVideoType ? (
-              <video
-                src={DEFAULT_IMAGES[type]}
-                className="absolute inset-0 w-full h-full object-cover"
-                muted
-                loop
-                playsInline
-                autoPlay
-              />
-            ) : (
-              <img
-                src={DEFAULT_IMAGES[type]}
-                alt={templateInfo.name}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 全屏模板的展示方式
+  // 与RealAdPreview保持一致的展示方式（全屏填充 + 底部遮罩 + 模板名称）
   return (
     <div className={cn(
-      "bg-gray-900 rounded-lg p-0.5 shadow-lg flex items-center justify-center",
-      phoneWidth,
-      phoneHeight
+      "relative w-full h-full bg-gray-900 overflow-hidden rounded-lg",
+      className
     )}>
-      {/* 手机外框 */}
-      <div className={cn(
-        "bg-gray-900 rounded overflow-hidden relative w-full h-full",
-      )}>
-        {/* 内容区域 - 与RealAdPreview保持一致 */}
-        {isVideoType ? (
-          <video
-            src={DEFAULT_IMAGES[type]}
-            className="absolute inset-0 w-full h-full object-cover"
-            muted
-            loop
-            playsInline
-            autoPlay
-          />
-        ) : (
-          <img
-            src={DEFAULT_IMAGES[type]}
-            alt={templateInfo.name}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        )}
+      {/* 图片或视频 - 全屏填充 */}
+      {isVideoType ? (
+        <video
+          src={DEFAULT_IMAGES[type]}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          autoPlay
+        />
+      ) : (
+        <img
+          src={DEFAULT_IMAGES[type]}
+          alt={templateInfo.name}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+
+      {/* 底部遮罩 - 与RealAdPreview一致 */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+
+      {/* 模板名称 - 与RealAdPreview一致 */}
+      <div className="absolute bottom-1 left-1 right-1">
+        <p className="text-white text-[8px] font-medium truncate">{templateInfo.name}</p>
       </div>
     </div>
   );
