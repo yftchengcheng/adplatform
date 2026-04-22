@@ -134,10 +134,7 @@ export function FullscreenPreviewModal({
   const templateSize = SDK_TEMPLATE_SIZES[templateType] || { width: 540, height: 960 };
   const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
-  
-  // 这些类型不需要手机框架，直接展示内容
-  const isSpecialType = templateType === "interstitial_half" || templateType === "banner" || templateType === "native";
-  
+
   // 倒计时状态
   const [countdown, setCountdown] = useState(5);
   const [currentTime, setCurrentTime] = useState("9:41");
@@ -183,131 +180,76 @@ export function FullscreenPreviewModal({
 
   if (!isOpen) return null;
 
-  // 渲染内容区域（无倒计时，用于特殊类型）
-  const renderSpecialContent = () => (
-    <>
-      {/* 图片或视频 */}
-      {isVideoType ? (
-        <video
-          src={defaultImage}
-          className="absolute inset-0 w-full h-full object-cover"
-          muted
-          loop
-          playsInline
-          autoPlay
-        />
-      ) : (
-        <img
-          src={defaultImage}
-          alt={displayName}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
-    </>
-  );
-
-  // 渲染内容区域（带倒计时）
-  const renderContent = () => (
-    <>
-      {/* 图片或视频 */}
-      {isVideoType ? (
-        <video
-          src={defaultImage}
-          className="absolute inset-0 w-full h-full object-cover"
-          muted
-          loop
-          playsInline
-          autoPlay
-        />
-      ) : (
-        <img
-          src={defaultImage}
-          alt={displayName}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
-
-      {/* 底部渐变遮罩 */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-
-      {/* 跳过按钮 */}
-      <button 
-        onClick={onClose}
-        className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
-      >
-        <span className="text-white/80 text-xs">
-          {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
-        </span>
-      </button>
-
-      {/* 关闭按钮 */}
-      <button 
-        onClick={onClose}
-        className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
-      >
-        <X className="w-4 h-4" />
-      </button>
-
-      {/* 底部文字 */}
-      <div className="absolute bottom-4 left-0 right-0 text-center">
-        <h2 className="text-lg font-bold text-white">{displayName}</h2>
-        <p className="text-xs text-white/80 mt-1">点击查看详情</p>
-      </div>
-    </>
-  );
-
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
       <div className="relative w-full max-w-sm mx-auto">
-        {/* 特殊类型：直接展示内容，不显示手机框架 */}
-        {isSpecialType ? (
+        {/* 手机框架 - 统一显示 */}
+        <div className="bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl">
+          {/* 状态栏 */}
+          <div className="h-5 bg-white rounded-t-[1.2rem] flex items-center justify-between px-4">
+            <span className="text-[9px] font-medium text-gray-900">{currentTime}</span>
+            <div className="flex gap-0.5">
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+            </div>
+          </div>
+
+          {/* 内容 */}
           <div 
-            className="bg-white rounded-xl overflow-hidden relative shadow-2xl"
-            style={{ 
-              // 根据类型设置合适的尺寸
-              ...(templateType === "banner" && { 
-                width: "320px", 
-                height: "50px" 
-              }),
-              ...(templateType === "interstitial_half" && { 
-                width: "300px",
-                aspectRatio: "6/5"
-              }),
-              ...(templateType === "native" && { 
-                width: "270px",
-                aspectRatio: "27/10"
-              })
-            }}
+            className="bg-white rounded-[1rem] overflow-hidden relative"
+            style={{ aspectRatio: `${templateSize.width}/${templateSize.height}` }}
           >
-            {renderSpecialContent()}
-          </div>
-        ) : (
-          /* 手机框架 */
-          <div className="bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl">
-            {/* 状态栏 */}
-            <div className="h-5 bg-white rounded-t-[1.2rem] flex items-center justify-between px-4">
-              <span className="text-[9px] font-medium text-gray-900">{currentTime}</span>
-              <div className="flex gap-0.5">
-                <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-                <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-                <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-              </div>
-            </div>
+            {isVideoType ? (
+              <video
+                src={defaultImage}
+                className="absolute inset-0 w-full h-full object-cover"
+                muted
+                loop
+                playsInline
+                autoPlay
+              />
+            ) : (
+              <img
+                src={defaultImage}
+                alt={displayName}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
 
-            {/* 内容 */}
-            <div 
-              className="bg-white rounded-[1rem] overflow-hidden relative"
-              style={{ aspectRatio: `${templateSize.width}/${templateSize.height}` }}
+            {/* 底部渐变遮罩 */}
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+
+            {/* 跳过按钮 */}
+            <button 
+              onClick={onClose}
+              className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
             >
-              {renderContent()}
-            </div>
+              <span className="text-white/80 text-xs">
+                {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
+              </span>
+            </button>
 
-            {/* 主页指示器 */}
-            <div className="h-4 bg-white rounded-b-[1.2rem] flex items-center justify-center">
-              <div className="w-16 h-0.5 bg-gray-300 rounded-full" />
+            {/* 关闭按钮 */}
+            <button 
+              onClick={onClose}
+              className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* 底部文字 */}
+            <div className="absolute bottom-4 left-0 right-0 text-center">
+              <h2 className="text-lg font-bold text-white">{displayName}</h2>
+              <p className="text-xs text-white/80 mt-1">点击查看详情</p>
             </div>
           </div>
-        )}
+
+          {/* 主页指示器 */}
+          <div className="h-4 bg-white rounded-b-[1.2rem] flex items-center justify-center">
+            <div className="w-16 h-0.5 bg-gray-300 rounded-full" />
+          </div>
+        </div>
 
         {/* 关闭按钮 */}
         <button
