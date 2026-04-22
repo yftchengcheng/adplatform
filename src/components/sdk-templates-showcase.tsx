@@ -128,12 +128,12 @@ function VideoSplashStyle() {
 // ============================================
 function InterstitialHalfStyle() {
   return (
-    <div className="relative w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+    <div className="relative w-full h-full bg-black/30 flex items-center justify-center">
       {/* 白色卡片弹窗 */}
-      <div className="w-[90%] bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-[85%] bg-white rounded-xl shadow-xl overflow-hidden">
         {/* 关闭按钮 */}
-        <div className="absolute top-2 right-2 w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center z-10">
-          <span className="text-gray-500 text-lg font-light leading-none">×</span>
+        <div className="absolute top-1 right-1 w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center z-10">
+          <span className="text-gray-500 text-xs font-light leading-none">×</span>
         </div>
 
         {/* 背景图 */}
@@ -146,17 +146,16 @@ function InterstitialHalfStyle() {
           {/* 底部渐变 */}
           <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
           {/* 底部文字 */}
-          <div className="absolute bottom-3 left-4 right-4">
-            <h3 className="font-bold text-white text-sm drop-shadow">大连五一旅游季</h3>
-            <p className="text-white/80 text-xs mt-0.5">邂逅滨海浪漫 畅玩活力五一</p>
+          <div className="absolute bottom-2 left-3 right-3">
+            <h3 className="font-bold text-white text-[8px] drop-shadow">大连五一旅游季</h3>
           </div>
         </div>
 
         {/* 底部信息 */}
-        <div className="px-4 py-3 flex items-center justify-between">
-          <span className="text-[10px] text-gray-400">Sponsored</span>
-          <button className="px-4 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium">
-            查看详情
+        <div className="px-2 py-1.5 flex items-center justify-between">
+          <span className="text-[6px] text-gray-400">Sponsored</span>
+          <button className="px-2 py-0.5 bg-green-500 text-white text-[6px] rounded font-medium">
+            查看
           </button>
         </div>
       </div>
@@ -232,34 +231,34 @@ function InterstitialFullStyle() {
 // ============================================
 function NativeStyle() {
   return (
-    <div className="relative w-full h-full bg-gray-50 p-2">
+    <div className="relative w-full h-full flex items-center justify-center p-1">
       {/* 广告卡片 */}
-      <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex gap-2 p-2">
+      <div className="w-full bg-white rounded shadow-sm border border-gray-100 overflow-hidden">
+        <div className="flex gap-1 p-1">
           {/* 左侧文字区 */}
-          <div className="flex-1 flex flex-col justify-between">
+          <div className="flex-1 flex flex-col justify-between min-w-0">
             {/* 顶部标签 */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-gray-400">推荐</span>
-              <span className="text-[9px] text-gray-400 bg-gray-100 px-1 py-0.5 rounded">Ad</span>
+            <div className="flex items-center gap-1">
+              <span className="text-[6px] text-gray-400">推荐</span>
+              <span className="text-[6px] text-gray-400 bg-gray-100 px-0.5 rounded">Ad</span>
             </div>
 
             {/* 标题 */}
-            <h3 className="text-xs font-bold text-gray-800 line-clamp-2">
+            <h3 className="text-[7px] font-bold text-gray-800 line-clamp-2 leading-tight">
               大连五一·海滨之旅
             </h3>
 
             {/* 描述 */}
-            <p className="text-[10px] text-gray-400">蔚蓝海岸 金色假期</p>
+            <p className="text-[6px] text-gray-400 leading-tight">蔚蓝海岸</p>
 
             {/* 底部 */}
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-[10px] text-green-600">查看详情</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[6px] text-green-600">查看详情</span>
             </div>
           </div>
 
           {/* 右侧：图片 */}
-          <div className="w-20 h-12 bg-gradient-to-br from-amber-100 to-orange-100 rounded-md overflow-hidden flex-shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-br from-amber-100 to-orange-100 rounded overflow-hidden flex-shrink-0">
             <img 
               src={DEFAULT_IMAGES.native} 
               alt="原生信息流"
@@ -279,37 +278,38 @@ function NativeStyle() {
 // ============================================
 function BannerStyle() {
   return (
-    <div className="relative w-full h-full bg-[#F8F9FA] border-t border-gray-200 flex items-center overflow-hidden">
-      {/* 背景图（半透明） */}
-      <div className="absolute inset-0 opacity-20">
-        <img 
-          src={DEFAULT_IMAGES.banner} 
-          alt="横幅"
-          className="w-full h-full object-cover object-left"
-        />
-      </div>
-
-      <div className="relative flex items-center gap-1.5 px-1.5 w-full">
-        {/* 应用图标 */}
-        <div className="w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-[10px]">🏖️</span>
+    <div className="relative w-full h-full flex items-center justify-center p-0.5">
+      <div className="relative w-full h-[18px] bg-white border border-gray-200 rounded flex items-center overflow-hidden">
+        {/* 背景图（半透明） */}
+        <div className="absolute inset-0 opacity-20">
+          <img 
+            src={DEFAULT_IMAGES.banner} 
+            alt="横幅"
+            className="w-full h-full object-cover object-left"
+          />
         </div>
 
-        {/* 文字内容 */}
-        <div className="flex-1 min-w-0">
-          <h4 className="text-[10px] font-medium text-gray-800 truncate leading-tight">大连五一旅游季</h4>
-          <p className="text-[9px] text-gray-500 truncate leading-tight">邂逅滨海浪漫 畅玩活力五一</p>
+        <div className="relative flex items-center gap-1 px-1 w-full">
+          {/* 应用图标 */}
+          <div className="w-4 h-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-[6px]">🏖️</span>
+          </div>
+
+          {/* 文字内容 */}
+          <div className="flex-1 min-w-0">
+            <h4 className="text-[7px] font-medium text-gray-800 truncate leading-tight">大连五一旅游</h4>
+          </div>
+
+          {/* 查看按钮 */}
+          <button className="px-1 py-0.5 bg-blue-500 text-white text-[6px] rounded font-medium flex-shrink-0">
+            查看
+          </button>
+
+          {/* 关闭按钮 */}
+          <button className="w-3 h-3 text-gray-400 flex items-center justify-center flex-shrink-0">
+            <span className="text-[8px] leading-none">×</span>
+          </button>
         </div>
-
-        {/* 查看按钮 */}
-        <button className="px-2 py-1 bg-blue-500 text-white text-[9px] rounded-md font-medium flex-shrink-0">
-          查看
-        </button>
-
-        {/* 关闭按钮 */}
-        <button className="w-4 h-4 text-gray-400 flex items-center justify-center flex-shrink-0">
-          <span className="text-xs leading-none">×</span>
-        </button>
       </div>
     </div>
   );
@@ -550,14 +550,9 @@ export function SDKTemplateStyleCard({
 }) {
   const TemplateComponent = TEMPLATE_STYLES[type];
 
-  // 获取手机框架尺寸（统一手机框架大小）
-  const getPhoneFrameClasses = () => {
-    return "w-[80px]"; // 统一手机框架尺寸
-  };
-
-  const getPhoneContentClasses = () => {
-    return "h-[144px]"; // 统一内容区域高度
-  };
+  // 统一手机框架尺寸
+  const phoneWidth = "w-[80px]";
+  const phoneHeight = "h-[144px]";
 
   if (!showFrame) {
     return (
@@ -570,15 +565,15 @@ export function SDKTemplateStyleCard({
   return (
     <div className={cn(
       "bg-gray-900 rounded-xl p-1 shadow-lg flex items-center justify-center",
-      getPhoneFrameClasses()
+      phoneWidth
     )}>
       {/* 手机外框 */}
       <div className={cn(
-        "bg-white rounded-lg overflow-hidden relative",
-        getPhoneContentClasses()
+        "bg-white rounded-lg overflow-hidden relative flex flex-col",
+        phoneHeight
       )}>
         {/* 状态栏 */}
-        <div className="h-2 bg-white flex items-center justify-between px-1.5">
+        <div className="h-2 bg-white flex items-center justify-between px-1.5 flex-shrink-0">
           <span className="text-[6px] text-gray-900">9:41</span>
           <div className="flex gap-0.5">
             <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
@@ -587,13 +582,13 @@ export function SDKTemplateStyleCard({
           </div>
         </div>
 
-        {/* 内容 - 保持原始比例 */}
-        <div className="w-full flex-1 overflow-hidden">
+        {/* 内容区域 - 自适应高度 */}
+        <div className="flex-1 overflow-hidden">
           <TemplateComponent />
         </div>
 
         {/* 底部指示器 */}
-        <div className="h-1.5 bg-white flex items-center justify-center">
+        <div className="h-1.5 bg-white flex items-center justify-center flex-shrink-0">
           <div className="w-6 h-0.5 bg-gray-300 rounded-full" />
         </div>
       </div>
