@@ -186,7 +186,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
 
       if (result.success && result.data) {
         // 将新克隆的数据添加到列表开头
-        setTemplates([result.data, ...templates]);
+        setData([result.data, ...data]);
         toast.success("克隆成功");
       } else {
         toast.error(result.error || "克隆失败");
