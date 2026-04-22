@@ -168,49 +168,6 @@ export default function SDKPage() {
             </div>
           </div>
         </div>
-
-        {/* SDK下载 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">SDK下载</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <span className="text-orange-600 font-bold text-sm">JS</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">JavaScript SDK</h4>
-                  <p className="text-xs text-gray-500">Web应用</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500">支持React、Vue等主流框架，快速集成广告组件</p>
-            </div>
-            <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <span className="text-blue-600 font-bold text-sm">iOS</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">iOS SDK</h4>
-                  <p className="text-xs text-gray-500">原生应用</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500">支持Swift和Objective-C，适配iPhone和iPad设备</p>
-            </div>
-            <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-green-600 font-bold text-sm">A</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">Android SDK</h4>
-                  <p className="text-xs text-gray-500">原生应用</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500">支持Java和Kotlin，兼容各类Android设备</p>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );
