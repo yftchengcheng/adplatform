@@ -183,7 +183,30 @@ export function FullscreenPreviewModal({
 
   if (!isOpen) return null;
 
-  // 渲染内容区域
+  // 渲染内容区域（无倒计时，用于特殊类型）
+  const renderSpecialContent = () => (
+    <>
+      {/* 图片或视频 */}
+      {isVideoType ? (
+        <video
+          src={defaultImage}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          autoPlay
+        />
+      ) : (
+        <img
+          src={defaultImage}
+          alt={displayName}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+    </>
+  );
+
+  // 渲染内容区域（带倒计时）
   const renderContent = () => (
     <>
       {/* 图片或视频 */}
@@ -256,7 +279,7 @@ export function FullscreenPreviewModal({
               })
             }}
           >
-            {renderContent()}
+            {renderSpecialContent()}
           </div>
         ) : (
           /* 手机框架 */
