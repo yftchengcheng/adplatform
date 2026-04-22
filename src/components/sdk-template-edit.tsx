@@ -156,8 +156,10 @@ interface ComponentLinkConfig {
   id: string;
   componentId: string;        // 关联的组件ID
   componentName: string;      // 关联的组件名称
-  componentType: string;      // 组件类型
+  componentType: string;      // 组件类型（中文显示名）
+  componentTypeKey: string;   // 组件类型原始key（如 redpacket_rain）
   componentPreview: string;    // 组件预览图
+  componentConfig?: Record<string, unknown>; // 组件配置数据
   triggerRule: TriggerRule;    // 触发规则
   triggerTime?: number;       // 触发时间（秒），仅show_time类型使用
   parentId?: string;          // 上一级ID（主素材或已添加的组件）
@@ -538,7 +540,9 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         componentId: selectedComponent.id,
         componentName: selectedComponent.name,
         componentType: getComponentTypeName(selectedComponent.type),
+        componentTypeKey: selectedComponent.type,
         componentPreview: selectedComponent.preview,
+        componentConfig: components.find(c => c.id === selectedComponent.id)?.config,
         triggerRule: autoRule,
         triggerTime: autoRule === "show_time" ? 5 : undefined,
         parentId: parent.id,

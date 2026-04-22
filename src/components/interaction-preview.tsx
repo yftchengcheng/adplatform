@@ -8,10 +8,15 @@ import {
   MousePointer,
   RotateCcw,
   Zap,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
 } from "lucide-react";
+import { AdTemplate, AdTemplateConfig } from "./ad-template";
+import { GameGiftTemplate, GameGiftTemplateConfig } from "./game-gift-template";
+import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "./redpacket-rain-template";
+import { VoteTemplateConfig } from "./vote-template";
+import { ImageTemplateConfig } from "./image-template";
+import { EcommerceTemplateConfig } from "./ecommerce-template";
+import { CouponTemplateConfig } from "./coupon-template";
+import { PromotionTemplateConfig } from "./promotion-template";
 
 // ---- 类型定义 ----
 
@@ -37,7 +42,9 @@ interface ComponentLinkConfig {
   componentId: string;
   componentName: string;
   componentType: string;
+  componentTypeKey: string;
   componentPreview: string;
+  componentConfig?: Record<string, unknown>;
   triggerRule: TriggerRule;
   triggerTime?: number;
   parentId?: string;
@@ -66,6 +73,219 @@ const TRIGGER_RULES: Record<TriggerRule, { label: string; autoDelay: number }> =
   in_app_interaction: { label: "应用内互动", autoDelay: 3000 },
 };
 
+// ---- 组件类型默认配置 ----
+
+const DEFAULT_COMPONENT_CONFIGS: Record<string, Record<string, unknown>> = {
+  dual_button: {
+    title: "限时特惠活动",
+    subtitle: "新用户首单立减50元，更有超值礼包等你来拿",
+    button1: { text: "立即领取", action: "jump", landingPageUrl: "" },
+    button2: { text: "查看详情", action: "show_image", imageUrl: "", resultText: "", buttonClickText: "" },
+    action: "open",
+    defaultLandingPageUrl: "",
+  },
+  vote: {
+    title: "限时特惠活动",
+    subtitle: "新用户首单立减50元",
+    options: [{ id: "1", buttonText: "选项A" }, { id: "2", buttonText: "选项B" }],
+    action: "jump",
+    defaultLandingPageUrl: "",
+  },
+  image: {
+    images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
+    defaultLandingPageUrl: "",
+  },
+  ecommerce: {
+    title: "商品名称",
+    content: "商品描述内容",
+    buttonText: "立即购买",
+    imageUrl: "",
+    landingPageUrl: "",
+    defaultLandingPageUrl: "",
+  },
+  coupon: {
+    title: "限时优惠活动",
+    discountInfo: "30元",
+    discountCondition: "满100立减！",
+    buttonText: "立即领取",
+    validFrom: "2024-01-01",
+    validTo: "2024-12-31",
+    landingPageUrl: "",
+    defaultLandingPageUrl: "",
+  },
+  promotion_card: {
+    iconUrl: "",
+    title: "官方推广",
+    promotionPoints: [{ id: "1", text: "官方正版授权" }, { id: "2", text: "安全无毒无插件" }],
+    buttonText: "立即下载",
+    landingPageUrl: "",
+    defaultLandingPageUrl: "",
+  },
+  game_gift: {
+    componentName: "游戏礼包码",
+    images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
+    logoUrl: "",
+    appName: "游戏名称",
+    appDescription: "游戏描述内容",
+    appPackageName: "com.example.game",
+    downloadUrl: "",
+    giftCode: "ABCD123456",
+    defaultLandingPageUrl: "",
+  },
+  redpacket_rain: {
+    guideText: "点击红包，领取奖品",
+    guideTextMacro: "",
+    rewardType: "cash",
+    cashAmount: "88.88",
+    cashAmountMacro: "",
+    rewardImageUrl: "",
+    rewardImageMacro: "",
+    rewardText: "恭喜发财",
+    rewardTextMacro: "",
+    specialNote: "实际奖品以APP为准！",
+    specialNoteMacro: "",
+    redpacketImageUrl: "",
+    redpacketImageMacro: "",
+    landingPageUrl: "",
+    landingPageMacro: "",
+    defaultLandingPageUrl: "",
+  },
+  flip_card: {
+    title: "翻转卡片",
+    subtitle: "点击卡片查看惊喜",
+    button1: { text: "翻转", action: "jump", landingPageUrl: "" },
+    button2: { text: "关闭", action: "jump", landingPageUrl: "" },
+    action: "open",
+    defaultLandingPageUrl: "",
+  },
+  flip_redpacket: {
+    guideText: "点击红包，领取奖品",
+    guideTextMacro: "",
+    rewardType: "cash",
+    cashAmount: "6.66",
+    cashAmountMacro: "",
+    rewardImageUrl: "",
+    rewardImageMacro: "",
+    rewardText: "恭喜发财",
+    rewardTextMacro: "",
+    specialNote: "实际奖品以APP为准！",
+    specialNoteMacro: "",
+    redpacketImageUrl: "",
+    redpacketImageMacro: "",
+    landingPageUrl: "",
+    landingPageMacro: "",
+    defaultLandingPageUrl: "",
+  },
+  flip_treasure: {
+    guideText: "点击宝箱，领取奖品",
+    guideTextMacro: "",
+    rewardType: "cash",
+    cashAmount: "8.88",
+    cashAmountMacro: "",
+    rewardImageUrl: "",
+    rewardImageMacro: "",
+    rewardText: "恭喜发财",
+    rewardTextMacro: "",
+    specialNote: "实际奖品以APP为准！",
+    specialNoteMacro: "",
+    redpacketImageUrl: "",
+    redpacketImageMacro: "",
+    landingPageUrl: "",
+    landingPageMacro: "",
+    defaultLandingPageUrl: "",
+  },
+  treasure_rain: {
+    guideText: "点击宝箱，领取奖品",
+    guideTextMacro: "",
+    rewardType: "cash",
+    cashAmount: "18.88",
+    cashAmountMacro: "",
+    rewardImageUrl: "",
+    rewardImageMacro: "",
+    rewardText: "恭喜发财",
+    rewardTextMacro: "",
+    specialNote: "实际奖品以APP为准！",
+    specialNoteMacro: "",
+    redpacketImageUrl: "",
+    redpacketImageMacro: "",
+    landingPageUrl: "",
+    landingPageMacro: "",
+    defaultLandingPageUrl: "",
+  },
+  scratch_card: {
+    title: "刮刮卡",
+    subtitle: "刮开涂层查看惊喜",
+    button1: { text: "刮一刮", action: "jump", landingPageUrl: "" },
+    button2: { text: "关闭", action: "jump", landingPageUrl: "" },
+    action: "open",
+    defaultLandingPageUrl: "",
+  },
+  smash_egg: {
+    title: "砸蛋",
+    subtitle: "砸开金蛋查看惊喜",
+    button1: { text: "砸一砸", action: "jump", landingPageUrl: "" },
+    button2: { text: "关闭", action: "jump", landingPageUrl: "" },
+    action: "open",
+    defaultLandingPageUrl: "",
+  },
+  popup_redpacket: {
+    title: "弹窗红包",
+    subtitle: "点击领取红包",
+    button1: { text: "立即领取", action: "jump", landingPageUrl: "" },
+    button2: { text: "关闭", action: "jump", landingPageUrl: "" },
+    action: "open",
+    defaultLandingPageUrl: "",
+  },
+};
+
+// ---- 真实组件渲染 ----
+
+function RealComponentPreview({
+  componentTypeKey,
+  componentConfig,
+  onDismiss,
+}: {
+  componentTypeKey: string;
+  componentConfig?: Record<string, unknown>;
+  onDismiss: () => void;
+}) {
+  const config = componentConfig || DEFAULT_COMPONENT_CONFIGS[componentTypeKey] || DEFAULT_COMPONENT_CONFIGS.dual_button;
+
+  // 红包雨
+  if (componentTypeKey === "redpacket_rain") {
+    return (
+      <RedpacketRainTemplate
+        config={config as unknown as RedpacketRainTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 游戏礼包码
+  if (componentTypeKey === "game_gift") {
+    return (
+      <GameGiftTemplate
+        config={config as unknown as GameGiftTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 其他所有类型使用 AdTemplate
+  return (
+    <AdTemplate
+      config={config as unknown as AdTemplateConfig}
+      isOpen={true}
+      onClose={onDismiss}
+      previewMode={true}
+    />
+  );
+}
+
 // ---- 手机框架内模板预览 ----
 
 function PhoneTemplatePreview({
@@ -78,7 +298,6 @@ function PhoneTemplatePreview({
   const defaultImage = DEFAULT_IMAGES[templateType];
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
 
-  // 开屏倒计时
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
@@ -89,7 +308,6 @@ function PhoneTemplatePreview({
     return () => clearInterval(timer);
   }, [templateType]);
 
-  // 横幅
   if (templateType === "banner") {
     return (
       <div className="w-full h-full bg-gray-50">
@@ -126,7 +344,6 @@ function PhoneTemplatePreview({
     );
   }
 
-  // 插屏半屏
   if (templateType === "interstitial_half") {
     return (
       <div className="w-full h-full bg-black/40 flex items-center justify-center">
@@ -145,7 +362,6 @@ function PhoneTemplatePreview({
     );
   }
 
-  // 原生信息流
   if (templateType === "native") {
     return (
       <div className="w-full h-full bg-gray-50">
@@ -178,12 +394,10 @@ function PhoneTemplatePreview({
     );
   }
 
-  // 激励视频
   if (templateType === "rewarded_video") {
     return <RewardedVideoPhonePreview defaultImage={defaultImage} onCloseClick={onCloseClick} />;
   }
 
-  // 全屏类型（静态开屏/视频开屏/插屏全屏）
   return (
     <div className="w-full h-full bg-gray-900 relative">
       {isVideoType ? (
@@ -199,7 +413,6 @@ function PhoneTemplatePreview({
         <img src={defaultImage} alt="开屏" className="absolute inset-0 w-full h-full object-cover" />
       )}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-      {/* 跳过按钮（开屏类型） */}
       {["static_splash", "video_splash"].includes(templateType) && (
         <button
           onClick={onCloseClick}
@@ -210,7 +423,7 @@ function PhoneTemplatePreview({
           </span>
         </button>
       )}
-      {onCloseClick && (
+      {onCloseClick && !["static_splash", "video_splash"].includes(templateType) && (
         <button
           onClick={onCloseClick}
           className="absolute top-8 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
@@ -267,7 +480,6 @@ function RewardedVideoPhonePreview({
       <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
       <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
 
-      {/* 金色横幅 */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
         <div className="relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-sm" />
@@ -277,7 +489,6 @@ function RewardedVideoPhonePreview({
         </div>
       </div>
 
-      {/* 倒计时 */}
       <div className="absolute bottom-20 right-3 z-20">
         <div className="bg-white/90 backdrop-blur-md rounded-lg px-2.5 py-1 shadow-lg border border-white/50">
           <p className="text-gray-800 text-[9px] font-medium">
@@ -286,7 +497,6 @@ function RewardedVideoPhonePreview({
         </div>
       </div>
 
-      {/* 钻石计数 */}
       <div className="absolute bottom-6 left-3 z-20">
         <div className="bg-white/25 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-lg border border-white/30">
           <div className="flex items-center gap-1.5">
@@ -296,7 +506,6 @@ function RewardedVideoPhonePreview({
         </div>
       </div>
 
-      {/* 进度条 */}
       <div className="absolute bottom-6 right-3 left-20 z-20">
         <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20">
           <div className="flex items-center gap-1.5">
@@ -311,7 +520,6 @@ function RewardedVideoPhonePreview({
         </div>
       </div>
 
-      {/* 完成画面 */}
       {isCompleted && (
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
           <span className="text-5xl mb-3">🎉</span>
@@ -326,45 +534,6 @@ function RewardedVideoPhonePreview({
           </button>
         </div>
       )}
-    </div>
-  );
-}
-
-// ---- 组件弹出层 ----
-
-function ComponentPopup({
-  link,
-  onDismiss,
-  onChildTrigger,
-}: {
-  link: ComponentLinkConfig;
-  onDismiss: () => void;
-  onChildTrigger: (childLink: ComponentLinkConfig) => void;
-}) {
-  return (
-    <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40 animate-in fade-in duration-300">
-      <div className="relative w-[85%] bg-white rounded-xl shadow-2xl overflow-hidden">
-        {/* 组件预览 */}
-        <div className="aspect-[16/10] bg-gray-100 overflow-hidden">
-          <img src={link.componentPreview} alt={link.componentName} className="w-full h-full object-cover" />
-        </div>
-        {/* 组件信息 */}
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">{link.componentName}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{link.componentType}</p>
-            </div>
-          </div>
-        </div>
-        {/* 关闭按钮 */}
-        <button
-          onClick={onDismiss}
-          className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      </div>
     </div>
   );
 }
@@ -390,27 +559,35 @@ export function InteractionPreview({
   const [activeComponents, setActiveComponents] = useState<ComponentLinkConfig[]>([]);
   const [dismissedComponents, setDismissedComponents] = useState<Set<string>>(new Set());
 
-  // 当前场景阶段：template / triggered / component
-  const [phase, setPhase] = useState<"template" | "triggering" | "component">("template");
-
   // 自动触发计时器
   const triggerTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
-  // 清除所有计时器
   const clearAllTimers = useCallback(() => {
     triggerTimersRef.current.forEach((timer) => clearTimeout(timer));
     triggerTimersRef.current.clear();
   }, []);
 
-  // 重置预览
-  const handleReset = useCallback(() => {
-    clearAllTimers();
-    setActiveComponents([]);
-    setDismissedComponents(new Set());
-    setPhase("template");
-    // 重新启动自动触发
-    startAutoTriggers();
-  }, [clearAllTimers]);
+  // 触发组件弹出
+  const triggerComponent = useCallback((link: ComponentLinkConfig) => {
+    setActiveComponents((prev) => {
+      if (prev.find((l) => l.id === link.id)) return prev;
+      return [...prev, link];
+    });
+  }, []);
+
+  // 关闭组件弹出
+  const dismissComponent = useCallback((linkId: string) => {
+    setDismissedComponents((prev) => new Set(prev).add(linkId));
+    setActiveComponents((prev) => prev.filter((l) => l.id !== linkId));
+    // 触发 back_from_media 类型的子组件
+    const backLinks = enabledLinks.filter(
+      (l) => l.triggerRule === "back_from_media" && l.parentId === linkId && !dismissedComponents.has(l.id)
+    );
+    backLinks.forEach((link) => {
+      const delay = TRIGGER_RULES[link.triggerRule].autoDelay;
+      setTimeout(() => triggerComponent(link), delay);
+    });
+  }, [enabledLinks, dismissedComponents, triggerComponent]);
 
   // 启动自动触发逻辑
   const startAutoTriggers = useCallback(() => {
@@ -428,16 +605,7 @@ export function InteractionPreview({
         triggerTimersRef.current.set(link.id, timer);
       }
     });
-  }, [enabledLinks]);
-
-  // 触发组件弹出
-  const triggerComponent = useCallback((link: ComponentLinkConfig) => {
-    setActiveComponents((prev) => {
-      if (prev.find((l) => l.id === link.id)) return prev;
-      return [...prev, link];
-    });
-    setPhase("component");
-  }, []);
+  }, [enabledLinks, clearAllTimers, triggerComponent]);
 
   // 处理关闭按钮点击（click_close 类型触发）
   const handleCloseClick = useCallback(() => {
@@ -449,33 +617,19 @@ export function InteractionPreview({
     });
   }, [enabledLinks, dismissedComponents, triggerComponent]);
 
-  // 关闭组件弹出
-  const dismissComponent = useCallback((linkId: string) => {
-    setDismissedComponents((prev) => new Set(prev).add(linkId));
-    setActiveComponents((prev) => prev.filter((l) => l.id !== linkId));
-    // 触发 back_from_media 类型的子组件
-    const backLinks = enabledLinks.filter(
-      (l) => l.triggerRule === "back_from_media" && l.parentId === linkId && !dismissedComponents.has(l.id)
-    );
-    backLinks.forEach((link) => {
-      const delay = TRIGGER_RULES[link.triggerRule].autoDelay;
-      setTimeout(() => triggerComponent(link), delay);
-    });
-    if (activeComponents.length <= 1) {
-      setPhase("template");
-    }
-  }, [enabledLinks, dismissedComponents, triggerComponent, activeComponents.length]);
+  // 重置预览
+  const handleReset = useCallback(() => {
+    clearAllTimers();
+    setActiveComponents([]);
+    setDismissedComponents(new Set());
+    startAutoTriggers();
+  }, [clearAllTimers, startAutoTriggers]);
 
   // 初始启动
   useEffect(() => {
     startAutoTriggers();
     return () => clearAllTimers();
   }, []);
-
-  // 获取当前最顶层的弹出组件
-  const topComponent = activeComponents.length > 0
-    ? activeComponents[activeComponents.length - 1]
-    : null;
 
   // 计算链路描述
   const getChainDescription = () => {
@@ -510,14 +664,19 @@ export function InteractionPreview({
                 onCloseClick={handleCloseClick}
               />
 
-              {/* 上层：组件弹出 */}
-              {activeComponents.map((link) => (
-                <ComponentPopup
+              {/* 上层：组件真实预览弹出（逐层覆盖） */}
+              {activeComponents.map((link, idx) => (
+                <div
                   key={link.id}
-                  link={link}
-                  onDismiss={() => dismissComponent(link.id)}
-                  onChildTrigger={triggerComponent}
-                />
+                  className="absolute inset-0 z-40"
+                  style={{ zIndex: 40 + idx }}
+                >
+                  <RealComponentPreview
+                    componentTypeKey={link.componentTypeKey}
+                    componentConfig={link.componentConfig}
+                    onDismiss={() => dismissComponent(link.id)}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -542,10 +701,8 @@ export function InteractionPreview({
 
         {/* 手机下方：操作区 */}
         <div className="mt-6 text-center space-y-3">
-          {/* 链路描述 */}
           <p className="text-white/70 text-xs">{getChainDescription()}</p>
 
-          {/* 控制按钮 */}
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={handleReset}
