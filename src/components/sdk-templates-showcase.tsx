@@ -633,8 +633,13 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
                   </div>
                 )}
 
-                {/* 全屏类型 - 填满整个内容区 */}
-                {!["banner", "interstitial_half", "native"].includes(activeTemplate) && (
+                {/* 激励视频 - 完整UI */}
+                {activeTemplate === "rewarded_video" && (
+                  <RewardedVideoStyle />
+                )}
+
+                {/* 全屏类型 - 填满整个内容区（不含激励视频） */}
+                {!["banner", "interstitial_half", "native", "rewarded_video"].includes(activeTemplate) && (
                   <>
                     {isVideoType ? (
                       <video
@@ -789,6 +794,11 @@ export function SDKTemplateStyleCard({
         </div>
       </div>
     );
+  }
+
+  // 激励视频：在手机中展示完整UI
+  if (type === "rewarded_video") {
+    return <RewardedVideoStyle />;
   }
 
   // 全屏类型：填满整个手机框架
