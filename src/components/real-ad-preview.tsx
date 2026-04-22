@@ -139,9 +139,9 @@ export function FullscreenPreviewModal({
   const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
 
-  // 计算手机框架尺寸
-  const phoneWidth = `${Math.round(templateSize.width * 0.4)}px`;
-  const phoneHeight = `${Math.round(templateSize.height * 0.4)}px`;
+  // 固定的手机框架尺寸（统一使用标准手机比例）
+  const phoneWidth = "270px";
+  const phoneHeight = "540px";
 
   // 倒计时状态
   const [countdown, setCountdown] = useState(5);
