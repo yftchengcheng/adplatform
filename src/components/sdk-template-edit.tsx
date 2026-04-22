@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useComponents } from "@/contexts/component-context";
+import { AdInteractionPreview } from "./ad-interaction-preview";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -485,99 +486,13 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
             {/* 广告互动链路示意图 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <h3 className="text-sm font-medium text-gray-900 mb-4">广告互动链路示意图</h3>
-              
               <div className="relative">
-                {/* 链路图 */}
-                <div className="flex flex-col items-center">
-                  {/* 主素材 */}
-                  <div className="w-32 h-44 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg border-2 border-blue-300 flex flex-col items-center justify-center p-2">
-                    <div className="w-full h-24 bg-white rounded mb-2 flex items-center justify-center">
-                      <img 
-                        src={`https://picsum.photos/seed/${type}/80/120`}
-                        alt="主素材"
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-blue-700">主素材</span>
-                    <span className="text-[10px] text-blue-500">{info.name}</span>
-                  </div>
-                  
-                  {/* 连接线 */}
-                  {componentLinks.length > 0 && (
-                    <div className="relative py-2">
-                      <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-300 -translate-x-1/2" />
-                      <div className="relative z-10 w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center">
-                        <ChevronRight className="w-3 h-3 text-gray-400" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 已配置组件 */}
-                  {componentLinks.length > 0 ? (
-                    <div className="space-y-3">
-                      {componentLinks.map((link) => (
-                        <div key={link.id} className="relative">
-                          {/* 连接线 */}
-                          {componentLinks.indexOf(link) > 0 && (
-                            <div className="absolute left-1/2 -top-3 w-0.5 h-3 bg-gray-300 -translate-x-1/2" />
-                          )}
-                          
-                          <div className={`w-32 rounded-lg border-2 p-2 flex flex-col items-center ${
-                            link.status === "enabled"
-                              ? "bg-gradient-to-br from-purple-100 to-purple-200 border-purple-300"
-                              : "bg-gray-100 border-gray-300"
-                          }`}>
-                            <div className="w-full h-10 bg-white rounded mb-1.5 flex items-center justify-center overflow-hidden">
-                              <img 
-                                src={link.componentPreview}
-                                alt={link.componentName}
-                                className="max-w-full max-h-full object-contain"
-                              />
-                            </div>
-                            <span className={`text-[10px] font-medium ${
-                              link.status === "enabled" ? "text-purple-700" : "text-gray-500"
-                            }`}>
-                              {link.componentName}
-                            </span>
-                            <span className={`text-[9px] px-1 py-0.5 rounded mt-0.5 ${
-                              link.status === "enabled" 
-                                ? "bg-purple-200 text-purple-600" 
-                                : "bg-gray-200 text-gray-500"
-                            }`}>
-                              {TRIGGER_RULES[link.triggerRule].label}
-                              {link.triggerRule === "show_time" && ` · ${link.triggerTime}s`}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    /* 未配置提示 */
-                    <div className="w-32 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center">
-                      <Plus className="w-5 h-5 text-gray-300" />
-                      <span className="text-xs text-gray-400 mt-1">添加组件</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* 图例 */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-xs text-gray-500 mb-2">图例</p>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-4 h-3 bg-gradient-to-br from-blue-100 to-blue-200 border border-blue-300 rounded" />
-                      <span className="text-xs text-gray-600">主素材</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-4 h-3 bg-gradient-to-br from-purple-100 to-purple-200 border border-purple-300 rounded" />
-                      <span className="text-xs text-gray-600">关联组件</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-4 h-0.5 bg-gray-300" />
-                      <span className="text-xs text-gray-600">触发链路</span>
-                    </div>
-                  </div>
-                </div>
+                {/* 使用广告互动链路预览组件 */}
+                <AdInteractionPreview
+                  templateType={type}
+                  templateName={info.name}
+                  componentLinks={componentLinks}
+                />
               </div>
             </div>
 
