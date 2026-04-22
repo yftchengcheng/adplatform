@@ -549,45 +549,74 @@ export function SDKTemplateStyleCard({
   showFrame?: boolean;
 }) {
   const TemplateComponent = TEMPLATE_STYLES[type];
+  const templateInfo = SDK_TEMPLATE_INFO_STYLES[type];
 
-  const content = (
-    <div className={cn(
-      "overflow-hidden",
-      type === "banner" ? "h-[28px]" : 
-      type === "native" ? "h-[48px]" : "h-[120px]"
-    )}>
-      <TemplateComponent />
-    </div>
-  );
+  // 获取不同模板类型的手机框架尺寸
+  const getPhoneFrameClasses = () => {
+    switch (type) {
+      case "banner":
+        return "w-[140px]";
+      case "native":
+        return "w-[130px]";
+      default:
+        return "w-[80px]";
+    }
+  };
+
+  const getPhoneContentClasses = () => {
+    switch (type) {
+      case "banner":
+        return "h-[28px]";
+      case "native":
+        return "h-[52px]";
+      default:
+        return "h-[144px]";
+    }
+  };
+
+  // 获取预览内容高度
+  const getContentHeight = () => {
+    switch (type) {
+      case "banner":
+        return "h-[26px]";
+      case "native":
+        return "h-[48px]";
+      default:
+        return "h-[132px]";
+    }
+  };
 
   if (!showFrame) {
     return (
       <div className={cn("rounded-lg overflow-hidden", className)}>
-        {content}
+        <TemplateComponent />
       </div>
     );
   }
 
   return (
     <div className={cn(
-      "bg-gray-900 rounded-xl p-1 shadow-lg",
-      type === "banner" ? "w-[130px]" : 
-      type === "native" ? "w-[120px]" : "w-[72px]"
+      "bg-gray-900 rounded-xl p-1 shadow-lg flex items-center justify-center",
+      getPhoneFrameClasses()
     )}>
       <div className={cn(
         "bg-white rounded-lg overflow-hidden relative",
-        type === "banner" ? "h-[26px]" : 
-        type === "native" ? "h-[44px]" : "h-[108px]"
+        getPhoneContentClasses()
       )}>
         {/* 状态栏 */}
         {type !== "banner" && type !== "native" && (
           <div className="h-2 bg-white flex items-center justify-between px-1.5">
             <span className="text-[6px] text-gray-900">9:41</span>
+            <div className="flex gap-0.5">
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+            </div>
           </div>
         )}
 
         {/* 内容 */}
-        <div className={type === "banner" || type === "native" ? "h-full" : "flex-1"}>
+        <div className={getContentHeight()}>
           <TemplateComponent />
         </div>
 
