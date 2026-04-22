@@ -549,15 +549,19 @@ export function SDKTemplateStyleCard({
   showFrame?: boolean;
 }) {
   const TemplateComponent = TEMPLATE_STYLES[type];
-  const templateInfo = SDK_TEMPLATE_INFO_STYLES[type];
 
-  // 获取不同模板类型的手机框架尺寸
+  // 判断是否需要手机框架（全屏类型需要，半屏/横幅/原生不需要）
+  const needsPhoneFrame = type !== "banner" && type !== "native" && type !== "interstitial_half";
+
+  // 获取手机框架尺寸
   const getPhoneFrameClasses = () => {
     switch (type) {
       case "banner":
         return "w-[140px]";
       case "native":
         return "w-[130px]";
+      case "interstitial_half":
+        return "w-[100px]";
       default:
         return "w-[80px]";
     }
@@ -569,6 +573,8 @@ export function SDKTemplateStyleCard({
         return "h-[28px]";
       case "native":
         return "h-[52px]";
+      case "interstitial_half":
+        return "h-[180px]";
       default:
         return "h-[144px]";
     }
@@ -581,22 +587,27 @@ export function SDKTemplateStyleCard({
         return "h-[26px]";
       case "native":
         return "h-[48px]";
+      case "interstitial_half":
+        return "h-[168px]";
       default:
         return "h-[132px]";
     }
   };
 
-  if (!showFrame) {
+  if (!showFrame || !needsPhoneFrame) {
+    // 横幅、原生、插屏-半屏：直接展示广告内容，不需要手机框架
     return (
       <div className={cn("rounded-lg overflow-hidden", className)}>
-        <TemplateComponent />
+        <div className={getContentHeight()}>
+          <TemplateComponent />
+        </div>
       </div>
     );
   }
 
   return (
     <div className={cn(
-      "relative bg-gray-900 rounded-xl p-1 shadow-lg flex items-center justify-center",
+      "bg-gray-900 rounded-xl p-1 shadow-lg flex items-center justify-center",
       getPhoneFrameClasses()
     )}>
       {/* 手机外框 */}
@@ -605,16 +616,14 @@ export function SDKTemplateStyleCard({
         getPhoneContentClasses()
       )}>
         {/* 状态栏 */}
-        {type !== "banner" && type !== "native" && (
-          <div className="h-2 bg-white flex items-center justify-between px-1.5">
-            <span className="text-[6px] text-gray-900">9:41</span>
-            <div className="flex gap-0.5">
-              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-            </div>
+        <div className="h-2 bg-white flex items-center justify-between px-1.5">
+          <span className="text-[6px] text-gray-900">9:41</span>
+          <div className="flex gap-0.5">
+            <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+            <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+            <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
           </div>
-        )}
+        </div>
 
         {/* 内容 */}
         <div className={getContentHeight()}>
@@ -622,31 +631,9 @@ export function SDKTemplateStyleCard({
         </div>
 
         {/* 底部指示器 */}
-        {type !== "banner" && type !== "native" && (
-          <div className="h-1.5 bg-white flex items-center justify-center">
-            <div className="w-6 h-0.5 bg-gray-300 rounded-full" />
-          </div>
-        )}
-
-        {/* 红框标注 - 全屏类型：覆盖整个手机屏幕 */}
-        {(type === "static_splash" || type === "video_splash" || type === "interstitial_full" || type === "rewarded_video") && (
-          <div className="absolute inset-0 border-[1.5px] border-red-500 rounded-lg pointer-events-none" />
-        )}
-
-        {/* 红框标注 - 横幅：只标注横幅本身 */}
-        {type === "banner" && (
-          <div className="absolute inset-0 border-[1.5px] border-red-500 rounded-md pointer-events-none m-[1px]" />
-        )}
-
-        {/* 红框标注 - 原生：只标注广告内容 */}
-        {type === "native" && (
-          <div className="absolute inset-0 border-[1.5px] border-red-500 rounded-md pointer-events-none m-[1px]" />
-        )}
-
-        {/* 红框标注 - 插屏半屏：标注半屏弹窗区域 */}
-        {type === "interstitial_half" && (
-          <div className="absolute top-1 left-1 right-1 bottom-1 border-[1.5px] border-red-500 rounded-lg pointer-events-none" />
-        )}
+        <div className="h-1.5 bg-white flex items-center justify-center">
+          <div className="w-6 h-0.5 bg-gray-300 rounded-full" />
+        </div>
       </div>
     </div>
   );
