@@ -43,7 +43,7 @@ const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: numbe
   video_splash: { width: 1080, height: 1920, ratio: "9:16" },      // 9:16
   interstitial_half: { width: 600, height: 500, ratio: "6:5" },
   interstitial_full: { width: 1080, height: 1920, ratio: "9:16" },
-  banner: { width: 1080, height: 120, ratio: "9:1" },
+  banner: { width: 320, height: 50, ratio: "32:5" },
   native: { width: 1080, height: 540, ratio: "2:1" },
   rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
 };
