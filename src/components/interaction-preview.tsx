@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   X,
   Play,
   Clock,
   MousePointer,
   RotateCcw,
-  Hand,
   Zap,
+  ChevronLeft,
   ChevronRight,
-  ArrowRight,
+  Eye,
 } from "lucide-react";
 
 // ---- 类型定义 ----
@@ -57,298 +57,319 @@ const DEFAULT_IMAGES: Record<string, string> = {
   rewarded_video: "/rewarded-video.mp4",
 };
 
-const SDK_TEMPLATE_NAMES: Record<string, string> = {
-  static_splash: "静态开屏",
-  video_splash: "视频开屏",
-  interstitial_half: "插屏-半屏",
-  interstitial_full: "插屏-全屏",
-  banner: "横幅",
-  native: "原生信息流",
-  rewarded_video: "激励视频",
+const TRIGGER_RULES: Record<TriggerRule, { label: string; autoDelay: number }> = {
+  video_complete: { label: "视频播放完毕", autoDelay: 5000 },
+  show_time: { label: "出现时间", autoDelay: 3000 },
+  click_close: { label: "点击关闭按钮", autoDelay: 0 },
+  back_from_media: { label: "跳转后返回", autoDelay: 4000 },
+  click_other_ad: { label: "点击其他广告", autoDelay: 0 },
+  in_app_interaction: { label: "应用内互动", autoDelay: 3000 },
 };
-
-const TRIGGER_RULES: Record<TriggerRule, { label: string; icon: React.ReactNode; desc: string }> = {
-  video_complete: { label: "视频播放完毕", icon: <Play className="w-4 h-4" />, desc: "视频广告播放完毕，即组件弹出展示" },
-  show_time: { label: "出现时间", icon: <Clock className="w-4 h-4" />, desc: "广告展示指定时间后组件弹出" },
-  click_close: { label: "点击关闭按钮", icon: <X className="w-4 h-4" />, desc: "点击广告关闭按钮后触发组件展示" },
-  back_from_media: { label: "跳转后返回", icon: <RotateCcw className="w-4 h-4" />, desc: "跳转后返回媒体时触发组件展示" },
-  click_other_ad: { label: "点击其他广告", icon: <MousePointer className="w-4 h-4" />, desc: "点击其他(匿名)广告后触发" },
-  in_app_interaction: { label: "应用内互动", icon: <Hand className="w-4 h-4" />, desc: "应用内非广告互动，如滑动、点击文章等" },
-};
-
-// 交互链路步骤
-interface FlowStep {
-  id: string;
-  type: "template" | "trigger" | "component";
-  name: string;
-  subtitle?: string;
-  preview?: string;
-  triggerRule?: TriggerRule;
-  triggerTime?: number;
-  status?: "enabled" | "disabled";
-  parentId?: string;
-  parentName?: string;
-  componentType?: string;
-}
-
-// ---- 构建交互链路步骤 ----
-
-function buildFlowSteps(
-  templateType: SDKTemplateType,
-  templateName: string,
-  links: ComponentLinkConfig[]
-): FlowStep[][] {
-  const defaultImage = DEFAULT_IMAGES[templateType];
-  const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
-
-  // 找出直接挂在主素材下的组件
-  const rootLinks = links.filter((l) => l.parentId === "main" && l.status === "enabled");
-
-  if (rootLinks.length === 0) {
-    return [[
-      { id: "template", type: "template", name: displayName, preview: defaultImage },
-    ]];
-  }
-
-  // 每条链路: template → trigger → component
-  const chains: FlowStep[][] = rootLinks.map((link) => {
-    const chain: FlowStep[] = [
-      { id: "template", type: "template", name: displayName, preview: defaultImage },
-      {
-        id: `trigger_${link.id}`,
-        type: "trigger",
-        name: TRIGGER_RULES[link.triggerRule]?.label || link.triggerRule,
-        triggerRule: link.triggerRule,
-        triggerTime: link.triggerTime,
-        subtitle:
-          link.triggerRule === "show_time" && link.triggerTime
-            ? `${link.triggerTime}s 后触发`
-            : undefined,
-      },
-      {
-        id: link.id,
-        type: "component",
-        name: link.componentName,
-        preview: link.componentPreview,
-        componentType: link.componentType,
-        triggerRule: link.triggerRule,
-        triggerTime: link.triggerTime,
-        status: link.status,
-        parentId: link.parentId,
-        parentName: link.parentName,
-      },
-    ];
-
-    // 递归查找子组件链路
-    const addChildChains = (parentLinkId: string, currentChain: FlowStep[]) => {
-      const childLinks = links.filter(
-        (l) => l.parentId === parentLinkId && l.status === "enabled"
-      );
-      childLinks.forEach((childLink) => {
-        currentChain.push(
-          {
-            id: `trigger_${childLink.id}`,
-            type: "trigger",
-            name: TRIGGER_RULES[childLink.triggerRule]?.label || childLink.triggerRule,
-            triggerRule: childLink.triggerRule,
-            triggerTime: childLink.triggerTime,
-            subtitle:
-              childLink.triggerRule === "show_time" && childLink.triggerTime
-                ? `${childLink.triggerTime}s 后触发`
-                : undefined,
-          },
-          {
-            id: childLink.id,
-            type: "component",
-            name: childLink.componentName,
-            preview: childLink.componentPreview,
-            componentType: childLink.componentType,
-            triggerRule: childLink.triggerRule,
-            triggerTime: childLink.triggerTime,
-            status: childLink.status,
-            parentId: childLink.parentId,
-            parentName: childLink.parentName,
-          }
-        );
-        addChildChains(childLink.id, currentChain);
-      });
-    };
-    addChildChains(link.id, chain);
-
-    return chain;
-  });
-
-  return chains;
-}
 
 // ---- 手机框架内模板预览 ----
 
-function PhoneTemplatePreview({ templateType }: { templateType: SDKTemplateType }) {
+function PhoneTemplatePreview({
+  templateType,
+  onCloseClick,
+}: {
+  templateType: SDKTemplateType;
+  onCloseClick?: () => void;
+}) {
   const defaultImage = DEFAULT_IMAGES[templateType];
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
 
+  // 开屏倒计时
+  const [countdown, setCountdown] = useState(5);
+
+  useEffect(() => {
+    if (!["static_splash", "video_splash"].includes(templateType)) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev <= 0 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [templateType]);
+
+  // 横幅
   if (templateType === "banner") {
     return (
       <div className="w-full h-full bg-gray-50">
-        <div className="h-6 bg-white flex items-center px-3">
-          <span className="text-[8px] text-gray-900">9:41</span>
+        <div className="h-8 bg-white flex items-center justify-between px-4 pt-2">
+          <span className="text-[10px] text-gray-900 font-medium">9:41</span>
+          <div className="flex gap-1">
+            <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+            <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+            <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+          </div>
         </div>
-        <div className="p-2 space-y-2">
-          <div className="h-2 bg-gray-200 rounded w-3/4" />
-          <div className="h-8 bg-gray-200 rounded" />
-          <div className="h-2 bg-gray-200 rounded w-1/2" />
-          <div className="h-8 bg-gray-200 rounded" />
+        <div className="p-3 space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-3/4" />
+          <div className="h-4 bg-gray-200 rounded w-1/2" />
+          <div className="h-16 bg-gray-200 rounded" />
+          <div className="h-4 bg-gray-200 rounded w-2/3" />
+          <div className="h-16 bg-gray-200 rounded" />
+          <div className="h-4 bg-gray-200 rounded w-4/5" />
         </div>
-        <div className="absolute bottom-4 left-0 right-0 px-2">
+        <div className="absolute bottom-6 left-0 right-0">
           <div className="relative">
-            <img src={defaultImage} alt="横幅" className="w-full h-auto rounded" />
+            <img src={defaultImage} alt="横幅" className="w-full h-auto" />
+            {onCloseClick && (
+              <button
+                onClick={onCloseClick}
+                className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+              >
+                <span className="text-white/80 text-[10px] leading-none">x</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
+  // 插屏半屏
   if (templateType === "interstitial_half") {
     return (
-      <div className="w-full h-full bg-black/30 flex items-center justify-center">
-        <img src={defaultImage} alt="插屏" className="w-[80%] h-auto rounded-lg shadow-lg" />
+      <div className="w-full h-full bg-black/40 flex items-center justify-center">
+        <div className="relative w-[75%] overflow-hidden rounded-lg shadow-xl">
+          <img src={defaultImage} alt="插屏" className="w-full h-auto" />
+          {onCloseClick && (
+            <button
+              onClick={onCloseClick}
+              className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
       </div>
     );
   }
 
+  // 原生信息流
   if (templateType === "native") {
     return (
       <div className="w-full h-full bg-gray-50">
-        <div className="h-6 bg-white flex items-center px-3">
-          <span className="text-[8px] text-gray-900">9:41</span>
-        </div>
-        <div className="p-2 space-y-2">
-          <div className="h-2 bg-gray-200 rounded w-3/4" />
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <img src={defaultImage} alt="原生" className="w-full h-auto" />
+        <div className="h-8 bg-white flex items-center justify-between px-4 pt-2">
+          <span className="text-[10px] text-gray-900 font-medium">9:41</span>
+          <div className="flex gap-1">
+            <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+            <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+            <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
           </div>
+        </div>
+        <div className="p-3 space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-3/4" />
+          <div className="h-16 bg-gray-200 rounded" />
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden relative">
+            <img src={defaultImage} alt="原生" className="w-full h-auto" />
+            {onCloseClick && (
+              <button
+                onClick={onCloseClick}
+                className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+              >
+                <span className="text-white/80 text-[10px] leading-none">x</span>
+              </button>
+            )}
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-2/3" />
+          <div className="h-16 bg-gray-200 rounded" />
         </div>
       </div>
     );
   }
 
+  // 激励视频
   if (templateType === "rewarded_video") {
-    return (
-      <div className="w-full h-full bg-black">
-        <video src={defaultImage} className="w-full h-full object-cover" muted loop playsInline />
-        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/70 to-transparent" />
-        <div className="absolute top-3 left-1/2 -translate-x-1/2">
-          <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-0.5 px-3 rounded-full shadow border border-amber-300/30">
-            <p className="text-[7px] font-semibold whitespace-nowrap">观看视频领取双倍金币</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <RewardedVideoPhonePreview defaultImage={defaultImage} onCloseClick={onCloseClick} />;
   }
 
   // 全屏类型（静态开屏/视频开屏/插屏全屏）
   return (
-    <div className="w-full h-full bg-gray-900">
+    <div className="w-full h-full bg-gray-900 relative">
       {isVideoType ? (
-        <video src={defaultImage} className="w-full h-full object-cover" muted loop playsInline />
+        <video
+          src={defaultImage}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          autoPlay
+        />
       ) : (
-        <img src={defaultImage} alt="开屏" className="w-full h-full object-cover" />
+        <img src={defaultImage} alt="开屏" className="absolute inset-0 w-full h-full object-cover" />
       )}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
-    </div>
-  );
-}
-
-// ---- 组件预览小卡片 ----
-
-function ComponentPreviewCard({
-  name,
-  preview,
-  componentType,
-}: {
-  name: string;
-  preview: string;
-  componentType?: string;
-}) {
-  return (
-    <div className="w-full bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-      <div className="aspect-[16/10] bg-gray-100 overflow-hidden">
-        <img src={preview} alt={name} className="w-full h-full object-cover" />
-      </div>
-      <div className="px-2 py-1.5 flex items-center gap-1.5">
-        <span className="text-[10px] font-medium text-gray-900 truncate">{name}</span>
-        {componentType && (
-          <span className="text-[8px] text-gray-400 bg-gray-100 px-1 py-0.5 rounded flex-shrink-0">
-            {componentType}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+      {/* 跳过按钮（开屏类型） */}
+      {["static_splash", "video_splash"].includes(templateType) && (
+        <button
+          onClick={onCloseClick}
+          className="absolute top-8 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
+        >
+          <span className="text-white/80 text-xs">
+            {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
           </span>
-        )}
+        </button>
+      )}
+      {onCloseClick && (
+        <button
+          onClick={onCloseClick}
+          className="absolute top-8 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+      <div className="absolute bottom-8 left-0 right-0 text-center">
+        <h2 className="text-lg font-bold text-white">广告展示</h2>
+        <p className="text-xs text-white/80 mt-1">点击查看详情</p>
       </div>
     </div>
   );
 }
 
-// ---- 手机框架 ----
-
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative mx-auto bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl" style={{ width: "220px", height: "440px" }}>
-      <div className="relative w-full h-full bg-white rounded-[1.7rem] overflow-hidden">
-        {/* 刘海 */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-5 bg-gray-900 rounded-b-xl z-10" />
-        {/* 内容 */}
-        <div className="relative w-full h-full overflow-hidden">{children}</div>
-      </div>
-    </div>
-  );
-}
-
-// ---- 触发规则动画指示 ----
-
-function TriggerAnimation({ step }: { step: FlowStep }) {
-  const [show, setShow] = useState(false);
+// 激励视频手机预览
+function RewardedVideoPhonePreview({
+  defaultImage,
+  onCloseClick,
+}: {
+  defaultImage: string;
+  onCloseClick?: () => void;
+}) {
+  const [progress, setProgress] = useState(0);
+  const [diamondCount, setDiamondCount] = useState(0);
+  const maxSeconds = 15;
+  const currentSeconds = Math.max(0, Math.ceil(((100 - progress) / 100) * maxSeconds));
+  const isCompleted = progress >= 100;
 
   useEffect(() => {
-    const t = setTimeout(() => setShow(true), 100);
-    return () => clearTimeout(t);
+    const timer = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 100 : p + 0.8));
+    }, 150);
+    return () => clearInterval(timer);
   }, []);
 
-  const icon = step.triggerRule ? TRIGGER_RULES[step.triggerRule]?.icon : <Zap className="w-4 h-4" />;
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDiamondCount((c) => (c >= 50 ? 50 : c + 1));
+    }, 300);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div
-      className={`flex flex-col items-center transition-all duration-500 ${
-        show ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
-      }`}
-    >
-      {/* 连接线 + 箭头 */}
-      <div className="flex flex-col items-center">
-        <div className="w-px h-4 bg-gradient-to-b from-blue-300 to-blue-500" />
-        <svg width="10" height="8" className="text-blue-500 -mt-0.5">
-          <polygon points="5,8 0,0 10,0" fill="currentColor" />
-        </svg>
-      </div>
-      {/* 规则标签 */}
-      <div className="mt-1 flex flex-col items-center">
-        <div className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg shadow-sm">
-          <span className="text-amber-600">{icon}</span>
-          <span className="text-[11px] font-medium text-amber-700">{step.name}</span>
+    <div className="w-full h-full bg-black relative">
+      <video
+        src={defaultImage}
+        className="absolute inset-0 w-full h-full object-cover"
+        muted
+        loop
+        playsInline
+        autoPlay
+      />
+      <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
+
+      {/* 金色横幅 */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
+        <div className="relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-sm" />
+          <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-1.5 px-5 rounded-full shadow-lg border border-amber-300/30">
+            <p className="text-[9px] font-semibold whitespace-nowrap">观看视频以领取双倍金币奖励</p>
+          </div>
         </div>
-        {step.subtitle && (
-          <span className="text-[10px] text-gray-400 mt-1">{step.subtitle}</span>
-        )}
       </div>
-      {/* 下方连接线 */}
-      <div className="flex flex-col items-center mt-1">
-        <div className="w-px h-4 bg-gradient-to-b from-blue-500 to-purple-400" />
-        <svg width="10" height="8" className="text-purple-400 -mt-0.5">
-          <polygon points="5,8 0,0 10,0" fill="currentColor" />
-        </svg>
+
+      {/* 倒计时 */}
+      <div className="absolute bottom-20 right-3 z-20">
+        <div className="bg-white/90 backdrop-blur-md rounded-lg px-2.5 py-1 shadow-lg border border-white/50">
+          <p className="text-gray-800 text-[9px] font-medium">
+            {isCompleted ? "可领取" : `${currentSeconds}s后可领取`}
+          </p>
+        </div>
+      </div>
+
+      {/* 钻石计数 */}
+      <div className="absolute bottom-6 left-3 z-20">
+        <div className="bg-white/25 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-lg border border-white/30">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">💎</span>
+            <span className="text-white text-xs font-bold drop-shadow-md tabular-nums">x{diamondCount}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 进度条 */}
+      <div className="absolute bottom-6 right-3 left-20 z-20">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20">
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-yellow-400 transition-all duration-150 rounded-full"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <span className="text-white/90 text-[8px] font-medium">{Math.floor(progress)}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 完成画面 */}
+      {isCompleted && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+          <span className="text-5xl mb-3">🎉</span>
+          <p className="text-white/80 text-xs mb-1">恭喜获得</p>
+          <div className="flex items-center gap-1 mb-3">
+            <span className="text-2xl">🪙</span>
+            <span className="text-3xl font-bold text-yellow-400">{diamondCount * 2}</span>
+            <span className="text-sm text-yellow-300">金币</span>
+          </div>
+          <button className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white px-6 py-2.5 rounded-xl shadow" onClick={onCloseClick}>
+            <p className="text-xs font-bold">点击领取奖励</p>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---- 组件弹出层 ----
+
+function ComponentPopup({
+  link,
+  onDismiss,
+  onChildTrigger,
+}: {
+  link: ComponentLinkConfig;
+  onDismiss: () => void;
+  onChildTrigger: (childLink: ComponentLinkConfig) => void;
+}) {
+  return (
+    <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40 animate-in fade-in duration-300">
+      <div className="relative w-[85%] bg-white rounded-xl shadow-2xl overflow-hidden">
+        {/* 组件预览 */}
+        <div className="aspect-[16/10] bg-gray-100 overflow-hidden">
+          <img src={link.componentPreview} alt={link.componentName} className="w-full h-full object-cover" />
+        </div>
+        {/* 组件信息 */}
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{link.componentName}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{link.componentType}</p>
+            </div>
+          </div>
+        </div>
+        {/* 关闭按钮 */}
+        <button
+          onClick={onDismiss}
+          className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+        >
+          <X className="w-3 h-3" />
+        </button>
       </div>
     </div>
   );
 }
 
-// ---- 主组件：全屏预览 ----
+// ---- 主组件：真实预览 ----
 
 interface InteractionPreviewProps {
   templateType: SDKTemplateType;
@@ -363,372 +384,212 @@ export function InteractionPreview({
   componentLinks,
   onClose,
 }: InteractionPreviewProps) {
-  const chains = buildFlowSteps(templateType, templateName, componentLinks);
   const enabledLinks = componentLinks.filter((l) => l.status === "enabled");
-  const hasLinks = enabledLinks.length > 0;
 
-  // 当前播放的链路索引和步骤
-  const [activeChainIndex, setActiveChainIndex] = useState(0);
-  const [activeStepIndex, setActiveStepIndex] = useState(0);
+  // 交互状态：追踪当前弹出的组件栈
+  const [activeComponents, setActiveComponents] = useState<ComponentLinkConfig[]>([]);
+  const [dismissedComponents, setDismissedComponents] = useState<Set<string>>(new Set());
 
-  // 自动播放
-  const [isPlaying, setIsPlaying] = useState(false);
-  const currentChain = chains[activeChainIndex] || [];
+  // 当前场景阶段：template / triggered / component
+  const [phase, setPhase] = useState<"template" | "triggering" | "component">("template");
 
-  const totalSteps = currentChain.length;
-  const canPlayNext = activeStepIndex < totalSteps - 1;
-  const canPlayPrev = activeStepIndex > 0;
-  const hasMultipleChains = chains.length > 1;
+  // 自动触发计时器
+  const triggerTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
-  // 播放下一步
-  const playNext = useCallback(() => {
-    if (canPlayNext) {
-      setActiveStepIndex((i) => i + 1);
-    } else if (activeChainIndex < chains.length - 1) {
-      // 切换到下一条链路
-      setActiveChainIndex((i) => i + 1);
-      setActiveStepIndex(0);
-    }
-  }, [canPlayNext, activeChainIndex, chains.length]);
+  // 清除所有计时器
+  const clearAllTimers = useCallback(() => {
+    triggerTimersRef.current.forEach((timer) => clearTimeout(timer));
+    triggerTimersRef.current.clear();
+  }, []);
 
-  // 播放上一步
-  const playPrev = useCallback(() => {
-    if (canPlayPrev) {
-      setActiveStepIndex((i) => i - 1);
-    } else if (activeChainIndex > 0) {
-      setActiveChainIndex((i) => i - 1);
-      setActiveStepIndex(chains[activeChainIndex - 1].length - 1);
-    }
-  }, [canPlayPrev, activeChainIndex, chains]);
+  // 重置预览
+  const handleReset = useCallback(() => {
+    clearAllTimers();
+    setActiveComponents([]);
+    setDismissedComponents(new Set());
+    setPhase("template");
+    // 重新启动自动触发
+    startAutoTriggers();
+  }, [clearAllTimers]);
 
-  // 自动播放逻辑
-  useEffect(() => {
-    if (!isPlaying) return;
-    const timer = setInterval(() => {
-      if (canPlayNext) {
-        setActiveStepIndex((i) => i + 1);
-      } else if (activeChainIndex < chains.length - 1) {
-        setActiveChainIndex((i) => i + 1);
-        setActiveStepIndex(0);
-      } else {
-        // 播放完毕，停止
-        setIsPlaying(false);
+  // 启动自动触发逻辑
+  const startAutoTriggers = useCallback(() => {
+    clearAllTimers();
+    const rootLinks = enabledLinks.filter((l) => l.parentId === "main");
+    rootLinks.forEach((link) => {
+      const rule = TRIGGER_RULES[link.triggerRule];
+      if (rule && rule.autoDelay > 0) {
+        const actualDelay = link.triggerRule === "show_time" && link.triggerTime
+          ? link.triggerTime * 1000
+          : rule.autoDelay;
+        const timer = setTimeout(() => {
+          triggerComponent(link);
+        }, actualDelay);
+        triggerTimersRef.current.set(link.id, timer);
       }
-    }, 1500);
-    return () => clearInterval(timer);
-  }, [isPlaying, canPlayNext, activeChainIndex, chains.length]);
+    });
+  }, [enabledLinks]);
 
-  // 重置
-  const handleReset = () => {
-    setActiveChainIndex(0);
-    setActiveStepIndex(0);
-    setIsPlaying(false);
-  };
+  // 触发组件弹出
+  const triggerComponent = useCallback((link: ComponentLinkConfig) => {
+    setActiveComponents((prev) => {
+      if (prev.find((l) => l.id === link.id)) return prev;
+      return [...prev, link];
+    });
+    setPhase("component");
+  }, []);
 
-  // 当链路改变时重置步骤
+  // 处理关闭按钮点击（click_close 类型触发）
+  const handleCloseClick = useCallback(() => {
+    const clickCloseLinks = enabledLinks.filter(
+      (l) => l.triggerRule === "click_close" && l.parentId === "main" && !dismissedComponents.has(l.id)
+    );
+    clickCloseLinks.forEach((link) => {
+      triggerComponent(link);
+    });
+  }, [enabledLinks, dismissedComponents, triggerComponent]);
+
+  // 关闭组件弹出
+  const dismissComponent = useCallback((linkId: string) => {
+    setDismissedComponents((prev) => new Set(prev).add(linkId));
+    setActiveComponents((prev) => prev.filter((l) => l.id !== linkId));
+    // 触发 back_from_media 类型的子组件
+    const backLinks = enabledLinks.filter(
+      (l) => l.triggerRule === "back_from_media" && l.parentId === linkId && !dismissedComponents.has(l.id)
+    );
+    backLinks.forEach((link) => {
+      const delay = TRIGGER_RULES[link.triggerRule].autoDelay;
+      setTimeout(() => triggerComponent(link), delay);
+    });
+    if (activeComponents.length <= 1) {
+      setPhase("template");
+    }
+  }, [enabledLinks, dismissedComponents, triggerComponent, activeComponents.length]);
+
+  // 初始启动
   useEffect(() => {
-    setActiveStepIndex(0);
-  }, [activeChainIndex]);
+    startAutoTriggers();
+    return () => clearAllTimers();
+  }, []);
 
-  // 当前展示的步骤
-  const visibleSteps = currentChain.slice(0, activeStepIndex + 1);
-  const currentStep = currentChain[activeStepIndex];
+  // 获取当前最顶层的弹出组件
+  const topComponent = activeComponents.length > 0
+    ? activeComponents[activeComponents.length - 1]
+    : null;
+
+  // 计算链路描述
+  const getChainDescription = () => {
+    if (activeComponents.length === 0) {
+      const pendingRoots = enabledLinks.filter((l) => l.parentId === "main");
+      if (pendingRoots.length === 0) return "模版展示中";
+      const next = pendingRoots[0];
+      const rule = TRIGGER_RULES[next.triggerRule];
+      return `模版展示 → ${rule.label}后弹出「${next.componentName}」`;
+    }
+    const chain = activeComponents.map((l) => l.componentName).join(" → ");
+    return `模版 → ${chain}`;
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-      <div className="relative w-full max-w-3xl max-h-[95vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        {/* 顶部栏 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">全屏预览</h3>
-            <p className="text-sm text-gray-500 mt-0.5">
-              模版预览 → 规则触发 → 组件预览 · {templateName}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
+      <div className="relative w-full max-w-md mx-auto">
+        {/* 手机框架 */}
+        <div
+          className="relative mx-auto bg-gray-900 rounded-[3rem] p-2 shadow-2xl"
+          style={{ width: "270px", height: "540px" }}
+        >
+          <div className="relative w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
+            {/* 刘海 */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-gray-900 rounded-b-2xl z-10" />
 
-        {/* 主内容区 */}
-        <div className="flex-1 overflow-auto p-6">
-          {!hasLinks ? (
-            /* 无关联组件 */
-            <div className="flex flex-col items-center justify-center py-12">
-              <PhoneFrame>
-                <PhoneTemplatePreview templateType={templateType} />
-              </PhoneFrame>
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500">暂无关联组件</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  添加组件后可预览完整的广告互动链路
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex gap-8">
-              {/* 左侧：手机预览 */}
-              <div className="flex-shrink-0 flex flex-col items-center">
-                <PhoneFrame>
-                  {/* 根据当前步骤显示不同内容 */}
-                  {currentStep?.type === "template" && (
-                    <PhoneTemplatePreview templateType={templateType} />
-                  )}
-                  {currentStep?.type === "trigger" && (
-                    <div className="w-full h-full bg-gray-900/80 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-amber-100 flex items-center justify-center">
-                          <span className="text-amber-600">
-                            {currentStep.triggerRule
-                              ? TRIGGER_RULES[currentStep.triggerRule]?.icon
-                              : <Zap className="w-5 h-5" />}
-                          </span>
-                        </div>
-                        <p className="text-white text-xs font-medium">{currentStep.name}</p>
-                        {currentStep.subtitle && (
-                          <p className="text-white/60 text-[10px] mt-1">{currentStep.subtitle}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {currentStep?.type === "component" && currentStep.preview && (
-                    <div className="w-full h-full bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
-                      <div className="w-full">
-                        <img
-                          src={currentStep.preview}
-                          alt={currentStep.name}
-                          className="w-full rounded-lg shadow-lg"
-                        />
-                        <p className="text-center text-[9px] text-gray-500 mt-2 truncate">
-                          {currentStep.name}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </PhoneFrame>
-
-                {/* 手机底部步骤提示 */}
-                <div className="mt-4 text-center">
-                  <p className="text-xs text-gray-500">
-                    {currentStep?.type === "template" && "Step 1 · 模版展示"}
-                    {currentStep?.type === "trigger" && "Step 2 · 规则触发"}
-                    {currentStep?.type === "component" && "Step 3 · 组件弹出"}
-                  </p>
-                </div>
-              </div>
-
-              {/* 右侧：交互链路流程 */}
-              <div className="flex-1 min-w-0">
-                {/* 链路选择 Tab */}
-                {hasMultipleChains && (
-                  <div className="flex gap-2 mb-5">
-                    {chains.map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setActiveChainIndex(idx)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          idx === activeChainIndex
-                            ? "bg-blue-500 text-white shadow-sm"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        链路 {idx + 1}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* 流程步骤展示 */}
-                <div className="flex flex-col items-center">
-                  {visibleSteps.map((step, idx) => {
-                    const isActive = idx === activeStepIndex;
-                    const isPast = idx < activeStepIndex;
-
-                    return (
-                      <React.Fragment key={step.id}>
-                        {/* 节点卡片 */}
-                        {step.type === "template" && (
-                          <div
-                            className={`w-full max-w-xs rounded-xl border-2 p-3 transition-all duration-300 ${
-                              isActive
-                                ? "border-blue-400 bg-blue-50 shadow-md shadow-blue-100"
-                                : isPast
-                                  ? "border-gray-200 bg-gray-50 opacity-70"
-                                  : "border-gray-200 bg-white"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0">
-                                <Play className="w-5 h-5 text-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 truncate">
-                                  {step.name}
-                                </p>
-                                <p className="text-xs text-gray-500">广告模版展示</p>
-                              </div>
-                              {isActive && (
-                                <span className="px-2 py-0.5 bg-blue-500 text-white text-[10px] rounded-full font-medium">
-                                  当前
-                                </span>
-                              )}
-                              {isPast && (
-                                <span className="text-green-500 text-xs">✓</span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {step.type === "trigger" && (
-                          <div className="my-1">
-                            <TriggerAnimation step={step} />
-                          </div>
-                        )}
-
-                        {step.type === "component" && (
-                          <div
-                            className={`w-full max-w-xs rounded-xl border-2 p-3 transition-all duration-300 ${
-                              isActive
-                                ? "border-purple-400 bg-purple-50 shadow-md shadow-purple-100"
-                                : isPast
-                                  ? "border-gray-200 bg-gray-50 opacity-70"
-                                  : "border-gray-200 bg-white"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
-                                {step.preview ? (
-                                  <img
-                                    src={step.preview}
-                                    alt={step.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <Zap className="w-4 h-4 text-gray-400" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 truncate">
-                                  {step.name}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {step.componentType || "组件"}弹出
-                                </p>
-                              </div>
-                              {isActive && (
-                                <span className="px-2 py-0.5 bg-purple-500 text-white text-[10px] rounded-full font-medium">
-                                  当前
-                                </span>
-                              )}
-                              {isPast && (
-                                <span className="text-green-500 text-xs">✓</span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-
-                  {/* 未展示的下一步预览 */}
-                  {activeStepIndex < totalSteps - 1 && (
-                    <div className="mt-2 flex flex-col items-center">
-                      <div className="w-px h-3 bg-gray-200" />
-                      <div className="w-full max-w-xs rounded-xl border-2 border-dashed border-gray-200 p-3 opacity-40">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                            <ChevronRight className="w-4 h-4 text-gray-400" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-400">
-                              {currentChain[activeStepIndex + 1]?.type === "trigger"
-                                ? "触发规则..."
-                                : currentChain[activeStepIndex + 1]?.type === "component"
-                                  ? `${currentChain[activeStepIndex + 1]?.name || "组件"}...`
-                                  : "下一步..."}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 底部控制栏 */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-          {/* 左侧：步骤指示 */}
-          <div className="flex items-center gap-1">
-            {currentChain.map((step, idx) => (
-              <div
-                key={step.id}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  idx === activeStepIndex
-                    ? step.type === "template"
-                      ? "bg-blue-500 w-4"
-                      : step.type === "trigger"
-                        ? "bg-amber-500 w-4"
-                        : "bg-purple-500 w-4"
-                    : idx < activeStepIndex
-                      ? "bg-gray-400"
-                      : "bg-gray-200"
-                }`}
+            {/* 内容区 */}
+            <div className="relative w-full h-full overflow-hidden">
+              {/* 底层：模版展示 */}
+              <PhoneTemplatePreview
+                templateType={templateType}
+                onCloseClick={handleCloseClick}
               />
-            ))}
+
+              {/* 上层：组件弹出 */}
+              {activeComponents.map((link) => (
+                <ComponentPopup
+                  key={link.id}
+                  link={link}
+                  onDismiss={() => dismissComponent(link.id)}
+                  onChildTrigger={triggerComponent}
+                />
+              ))}
+            </div>
           </div>
 
-          {/* 中间：控制按钮 */}
-          <div className="flex items-center gap-2">
+          {/* 侧边按钮 */}
+          <div className="absolute -right-2 top-32 flex flex-col gap-2">
+            <div className="w-1 h-8 bg-gray-700 rounded" />
+            <div className="w-1 h-12 bg-gray-700 rounded" />
+          </div>
+          <div className="absolute -left-2 top-28 flex flex-col gap-2">
+            <div className="w-1 h-10 bg-gray-700 rounded" />
+          </div>
+        </div>
+
+        {/* 手机上方：关闭按钮 */}
+        <button
+          onClick={onClose}
+          className="absolute -top-12 right-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* 手机下方：操作区 */}
+        <div className="mt-6 text-center space-y-3">
+          {/* 链路描述 */}
+          <p className="text-white/70 text-xs">{getChainDescription()}</p>
+
+          {/* 控制按钮 */}
+          <div className="flex items-center justify-center gap-3">
             <button
               onClick={handleReset}
-              className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
-              title="重置"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/80 text-xs transition-colors"
             >
-              <RotateCcw className="w-4 h-4 text-gray-600" />
-            </button>
-            <button
-              onClick={playPrev}
-              disabled={!canPlayPrev && activeChainIndex === 0}
-              className="p-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              title="上一步"
-            >
-              <ChevronRight className="w-4 h-4 text-gray-600 rotate-180" />
-            </button>
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm"
-              title={isPlaying ? "暂停" : "播放"}
-            >
-              {isPlaying ? (
-                <div className="flex items-center gap-0.5">
-                  <div className="w-1 h-3 bg-white rounded-sm" />
-                  <div className="w-1 h-3 bg-white rounded-sm" />
-                </div>
-              ) : (
-                <Play className="w-4 h-4 ml-0.5" />
-              )}
-            </button>
-            <button
-              onClick={playNext}
-              disabled={!canPlayNext && activeChainIndex >= chains.length - 1}
-              className="p-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              title="下一步"
-            >
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+              <RotateCcw className="w-3.5 h-3.5" />
+              重置
             </button>
           </div>
 
-          {/* 右侧：步骤文字 */}
-          <div className="text-xs text-gray-500">
-            {activeStepIndex + 1}/{totalSteps}
+          {/* 交互提示 */}
+          <div className="space-y-1">
+            {enabledLinks.filter((l) => l.parentId === "main").map((link) => {
+              const rule = TRIGGER_RULES[link.triggerRule];
+              const isAuto = rule.autoDelay > 0;
+              const isTriggered = activeComponents.some((c) => c.id === link.id) || dismissedComponents.has(link.id);
+              return (
+                <div
+                  key={link.id}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] mx-0.5 ${
+                    isTriggered
+                      ? "bg-green-500/20 text-green-300"
+                      : isAuto
+                        ? "bg-blue-500/20 text-blue-300"
+                        : "bg-amber-500/20 text-amber-300"
+                  }`}
+                >
+                  {isTriggered ? (
+                    <span className="text-green-400">✓</span>
+                  ) : isAuto ? (
+                    <Clock className="w-3 h-3" />
+                  ) : (
+                    <MousePointer className="w-3 h-3" />
+                  )}
+                  <span>
+                    {isTriggered
+                      ? `已触发「${link.componentName}」`
+                      : isAuto
+                        ? `${rule.label}后 → ${link.componentName}`
+                        : `${rule.label} → ${link.componentName}`}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
