@@ -64,20 +64,11 @@ export function PopupRedpacketTemplate({
   onButtonClick,
 }: PopupRedpacketTemplateProps) {
   const finalConfig: PopupRedpacketConfig = {
-    rewardType: "cash",
-    cashAmount: "88.88",
-    cashAmountMacro: "",
-    rewardImageUrl: "",
-    rewardImageMacro: "",
-    specialNote: "实际奖品以APP为准",
-    specialNoteMacro: "",
-    redpacketImageUrl: "",
-    redpacketImageMacro: "",
-    landingPageUrl: "",
-    landingPageMacro: "",
-    defaultLandingPageUrl: "",
-    componentName: "弹窗红包",
     ...config,
+    // 确保必填字段有默认值
+    rewardType: config?.rewardType ?? "cash",
+    specialNote: config?.specialNote ?? "实际奖品以APP为准",
+    componentName: config?.componentName ?? "弹窗红包",
   };
 
   // 状态管理

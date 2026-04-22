@@ -120,7 +120,10 @@ export function CouponTemplate({
     if (validFrom) {
       return `${formatDate(validFrom)}起`;
     }
-    return `至${formatDate(validTo)}`;
+    if (validTo) {
+      return `至${formatDate(validTo)}`;
+    }
+    return "";
   };
 
   useEffect(() => {

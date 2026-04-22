@@ -89,21 +89,16 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
   
   // 当前编辑的组件预览配置（用于组件列表实时预览）
-  const [editingPreviewConfig, setEditingPreviewConfig] = useState<Record<string, Record<string, unknown>>>({});
+  const [editingPreviewConfig, setEditingPreviewConfigState] = useState<Record<string, Record<string, unknown>>>({});
+  
+  // 包装 setEditingPreviewConfig 以匹配接口
+  const setEditingPreviewConfig = useCallback((type: string, config: Record<string, unknown>) => {
+    setEditingPreviewConfigState(prev => ({ ...prev, [type]: config }));
+  }, []);
   
   // 数据缓存，避免重复加载
   const [lastLoadTime, setLastLoadTime] = useState<number>(0);
   const CACHE_DURATION = 5000; // 5秒缓存
-
-  // 检查 Supabase 是否可用
-  const isSupabaseAvailable = useCallback((): boolean => {
-    try {
-      getSupabaseClient();
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
 
   // 加载数据 - 添加缓存机制
   const loadComponents = useCallback(async (forceRefresh = false) => {
@@ -305,7 +300,7 @@ export function ComponentProvider({ children }: { children: React.ReactNode }) {
     setComponents(prev => {
       const updated = prev.map(item =>
         item.id === id
-          ? { ...item, status: newStatus }
+          ? { ...item, status: newStatus as ComponentStatus }
           : item
       );
       return updated;

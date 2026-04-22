@@ -129,6 +129,42 @@ function SectionCollapse({
   );
 }
 
+// 图片上传专用ModeToggle
+function UploadModeToggle({
+  value,
+  onChange,
+}: {
+  value: "upload" | "macro";
+  onChange: (v: "upload" | "macro") => void;
+}) {
+  return (
+    <div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
+      <button
+        onClick={() => onChange("upload")}
+        className={cn(
+          "px-3 py-1 text-xs font-medium rounded-md transition-all",
+          value === "upload"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "text-gray-500 hover:text-gray-700"
+        )}
+      >
+        上传图片
+      </button>
+      <button
+        onClick={() => onChange("macro")}
+        className={cn(
+          "px-3 py-1 text-xs font-medium rounded-md transition-all",
+          value === "macro"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "text-gray-500 hover:text-gray-700"
+        )}
+      >
+        图片宏
+      </button>
+    </div>
+  );
+}
+
 // 图片上传组件
 function ImageUpload({
   value,
@@ -200,7 +236,7 @@ function ImageUpload({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-700">{title}</span>
-        <ModeToggle value={mode} onChange={onModeChange} />
+        <UploadModeToggle value={mode} onChange={onModeChange} />
       </div>
 
       {mode === "upload" ? (
@@ -268,7 +304,7 @@ function ImageUpload({
             onChange={(e) => onMacroChange(e.target.value)}
             className="text-sm"
           />
-          <p className="text-xs text-gray-400">支持 ${变量名} 格式的宏变量</p>
+          <p className="text-xs text-gray-400">支持 ${'{变量名}'} 格式的宏变量</p>
         </div>
       )}
 
@@ -661,4 +697,3 @@ function PreviewWrapper({
 }
 
 export { PopupRedpacketConfigPanel as default };
-export type { PopupRedpacketConfig };

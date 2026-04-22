@@ -8,11 +8,18 @@ import { Button } from "@/components/ui/button";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
+import { VoteTemplateConfig } from "@/components/vote-template";
+import { ImageTemplateConfig } from "@/components/image-template";
+import { EcommerceTemplateConfig } from "@/components/ecommerce-template";
+import { CouponTemplateConfig } from "@/components/coupon-template";
+import { PromotionTemplateConfig } from "@/components/promotion-template";
 
 type ComponentType = "dual_button" | "vote" | "image" | "ecommerce" | "coupon" | "promotion_card" | "game_gift" | "redpacket_rain";
 
+type AllConfigTypes = AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig;
+
 interface ComponentConfig {
-  defaultConfig: AdTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig;
+  defaultConfig: AllConfigTypes;
   name: string;
   description: string;
 }
@@ -37,7 +44,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       },
       action: "open",
       defaultLandingPageUrl: "",
-    },
+    } as AdTemplateConfig,
     name: "双按钮",
     description: "配置主副标题和两个按钮的跳转链接",
   },
@@ -46,11 +53,12 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       title: "限时特惠活动",
       subtitle: "新用户首单立减50元",
       options: [
-        { id: "1", buttonText: "选项A", jumpUrl: "" },
-        { id: "2", buttonText: "选项B", jumpUrl: "" },
+        { id: "1", buttonText: "选项A" },
+        { id: "2", buttonText: "选项B" },
       ],
+      action: "jump",
       defaultLandingPageUrl: "",
-    },
+    } as VoteTemplateConfig,
     name: "投票",
     description: "配置标题、副标题和投票选项",
   },
@@ -58,7 +66,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
     defaultConfig: {
       images: [{ id: "1", imageUrl: "https://picsum.photos/640/360" }],
       defaultLandingPageUrl: "",
-    },
+    } as ImageTemplateConfig,
     name: "图片",
     description: "配置图片内容",
   },
@@ -70,7 +78,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       imageUrl: "",
       landingPageUrl: "",
       defaultLandingPageUrl: "",
-    },
+    } as EcommerceTemplateConfig,
     name: "电商",
     description: "配置商品图片、标题和购买按钮",
   },
@@ -84,7 +92,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       validTo: "2024-12-31",
       landingPageUrl: "",
       defaultLandingPageUrl: "",
-    },
+    } as CouponTemplateConfig,
     name: "优惠券",
     description: "配置优惠券信息",
   },
@@ -99,7 +107,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       buttonText: "立即下载",
       landingPageUrl: "",
       defaultLandingPageUrl: "",
-    },
+    } as PromotionTemplateConfig,
     name: "推广卡片",
     description: "配置图标、标题、推广卖点和行动号召",
   },
@@ -114,7 +122,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       downloadUrl: "",
       giftCode: "ABCD123456",
       defaultLandingPageUrl: "",
-    },
+    } as GameGiftTemplateConfig,
     name: "游戏礼包码",
     description: "配置应用图片、名称、描述和下载链接",
   },
@@ -136,7 +144,7 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
       landingPageUrl: "",
       landingPageMacro: "",
       defaultLandingPageUrl: "",
-    },
+    } as RedpacketRainTemplateConfig,
     name: "红包雨",
     description: "红包飘落互动，点击领取奖品",
   },

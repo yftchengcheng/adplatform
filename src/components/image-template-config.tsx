@@ -279,7 +279,6 @@ function ImageItemEditor({
           <ImageUpload
             value={image.imageUrl || ""}
             onChange={(url) => onChange({ ...image, imageUrl: url, imageMacro: undefined })}
-            label="上传图片"
             maxSize={1}
             aspectRatio="16:9"
           />

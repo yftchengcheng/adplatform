@@ -140,8 +140,8 @@ export function ComponentList() {
 
     // 排序
     data.sort((a, b) => {
-      const aValue = a[sortField as keyof AdComponent];
-      const bValue = b[sortField as keyof AdComponent];
+      const aValue = (a as unknown as Record<string, unknown>)[sortField];
+      const bValue = (b as unknown as Record<string, unknown>)[sortField];
       if (aValue === undefined || bValue === undefined) return 0;
       if (sortOrder === "asc") {
         return String(aValue).localeCompare(String(bValue));
@@ -320,7 +320,6 @@ export function ComponentList() {
       flip_redpacket: "翻红包",
       flip_treasure: "翻宝箱",
       treasure_rain: "宝箱雨",
-      treasure_rain: "宝箱雨",
       scratch_card: "刮刮卡",
       smash_egg: "砸蛋",
       popup_redpacket: "弹窗(红包)",
@@ -425,7 +424,10 @@ export function ComponentList() {
               <h3 className="text-lg font-medium text-gray-900 mb-4">标准模板</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {/* 静态开屏 */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/static_splash")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-md p-2">
                       <div className="w-8 h-10 bg-gray-200 rounded"></div>
@@ -436,7 +438,10 @@ export function ComponentList() {
                 </div>
 
                 {/* 视频开屏 */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/video_splash")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-md p-2 flex flex-col items-center">
                       <div className="w-8 h-10 bg-gray-200 rounded mb-1"></div>
@@ -450,7 +455,10 @@ export function ComponentList() {
                 </div>
 
                 {/* 插屏-半屏 */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/interstitial_half")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-lg p-2 w-[60%]">
                       <div className="w-full h-6 bg-green-200 rounded mb-1"></div>
@@ -462,7 +470,10 @@ export function ComponentList() {
                 </div>
 
                 {/* 插屏-全屏 */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/interstitial_full")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-lg p-2">
                       <div className="w-10 h-12 bg-orange-200 rounded"></div>
@@ -473,7 +484,10 @@ export function ComponentList() {
                 </div>
 
                 {/* 横幅 */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/banner")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-md px-3 py-1">
                       <div className="w-16 h-4 bg-red-200 rounded"></div>
@@ -484,7 +498,10 @@ export function ComponentList() {
                 </div>
 
                 {/* 原生（信息流） */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/native")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-md p-2 w-[70%]">
                       <div className="flex gap-2">
@@ -501,7 +518,10 @@ export function ComponentList() {
                 </div>
 
                 {/* 激励视频 */}
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                <div 
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => router.push("/sdk/rewarded_video")}
+                >
                   <div className="w-full aspect-video bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
                     <div className="bg-white rounded shadow-md p-2 flex flex-col items-center">
                       <div className="w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center mb-1">
@@ -734,19 +754,6 @@ export function ComponentList() {
                     <TableCell>
                       <div>
                         <span className="font-medium text-gray-900">{component.name}</span>
-                        {component.tags && component.tags.length > 0 && (
-                          <div className="flex gap-1 mt-1">
-                            {component.tags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="outline"
-                                className="text-xs px-1.5 py-0"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </TableCell>
                     <TableCell>{renderCategory(component.category)}</TableCell>
@@ -986,7 +993,7 @@ export function ComponentList() {
                         />
                       ) : previewComponent?.type === "popup_redpacket" ? (
                         <PopupRedpacketTemplate
-                          config={editingPreviewConfig["popup_redpacket"] as PopupRedpacketConfig || previewComponent.config as unknown as PopupRedpacketConfig}
+                          config={(editingPreviewConfig["popup_redpacket"] || previewComponent.config) as unknown as PopupRedpacketConfig}
                           isOpen={true}
                           previewMode={true}
                           onClose={() => setPreviewComponent(null)}

@@ -222,13 +222,14 @@ function ModeToggle({
 
 // Character counter
 function CharCounter({
-  current,
+  value,
   max,
 }: {
-  current: number;
+  value: string;
   max: number;
 }) {
-  const isOverLimit = current > max;
+  const width = getStringWidth(value);
+  const isOverLimit = width > max;
   return (
     <span
       className={cn(
@@ -236,7 +237,7 @@ function CharCounter({
         isOverLimit ? "text-red-500" : "text-gray-400"
       )}
     >
-      {current}/{max}
+      {width}/{max}
     </span>
   );
 }
@@ -399,7 +400,7 @@ export function VoteTemplateConfigPanel({
                   <label className="text-xs text-gray-500">
                     主标题 <span className="text-red-500">*</span>
                   </label>
-                  <CharCounter current={config.title?.length || 0} max={24} />
+                  <CharCounter value={config.title || ""} max={24} />
                 </div>
                 <div className="flex gap-2">
                   <Input
@@ -681,10 +682,9 @@ export function VoteTemplateDemo() {
   const [config, setConfig] = useState<VoteTemplateConfig>({
     title: "请选择您的偏好",
     subtitle: "感谢您的参与，点击选择您喜欢的选项",
-    clickResultText: "投票成功，感谢您的参与！",
     options: [
-      { id: "option_1", text: "选项A", voteCount: 120, buttonText: "A" },
-      { id: "option_2", text: "选项B", voteCount: 80, buttonText: "B" },
+      { id: "option_1", buttonText: "选项A" },
+      { id: "option_2", buttonText: "选项B" },
     ],
     action: "jump",
     landingPageUrl: "",

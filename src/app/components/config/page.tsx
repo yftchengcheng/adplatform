@@ -288,14 +288,14 @@ function ConfigContent() {
   const [config, setConfig] = useState<AllConfigTypes>(() => {
     // 优先使用编辑组件的配置
     if (editingComponent?.config) {
-      return editingComponent.config as AllConfigTypes;
+      return editingComponent.config as unknown as AllConfigTypes;
     }
     // 其次使用sessionStorage中的配置（仅客户端）
     if (typeof window !== "undefined") {
       const saved = sessionStorage.getItem("component_config");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          return JSON.parse(saved) as unknown as AllConfigTypes;
         } catch {
           // ignore parse errors
         }
@@ -344,7 +344,7 @@ function ConfigContent() {
     setConfig(newConfig);
     // 同步更新到全局预览配置（用于组件列表实时预览）
     if (type) {
-      setEditingPreviewConfig(type, newConfig as Record<string, unknown>);
+      setEditingPreviewConfig(type, newConfig as unknown as Record<string, unknown>);
     }
     try {
       const cleanConfig = deepClone(newConfig);
@@ -561,7 +561,6 @@ function ConfigContent() {
                 config={config as FlipCardConfig}
                 onChange={handleConfigChange}
                 onSave={handleSave}
-                onCancel={handleCancel}
                 macroVariables={(config as FlipCardConfig).macroVariables}
               />
             ) : isTreasureboxRainComponent ? (
@@ -574,21 +573,21 @@ function ConfigContent() {
             ) : isSmashEggComponent ? (
               <SmashEggTemplateConfigPanel
                 config={config as SmashEggConfig}
-                onChange={handleConfigChange}
+                onChange={(c) => handleConfigChange(c as unknown as AllConfigTypes)}
                 onSave={handleSave}
                 onCancel={handleCancel}
               />
             ) : isScratchCardComponent ? (
               <ScratchCardTemplateConfigPanel
                 config={config as ScratchCardConfig}
-                onChange={handleConfigChange}
+                onChange={(c) => handleConfigChange(c as unknown as AllConfigTypes)}
                 onSave={handleSave}
                 onCancel={handleCancel}
               />
             ) : isPopupRedpacketComponent ? (
               <PopupRedpacketConfigPanel
                 config={config as PopupRedpacketConfig}
-                onChange={handleConfigChange}
+                onChange={(c) => handleConfigChange(c as unknown as AllConfigTypes)}
                 onSave={handleSave}
                 onCancel={handleCancel}
               />

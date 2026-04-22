@@ -24,10 +24,8 @@ export async function POST(request: NextRequest) {
     });
 
     // 并行执行查询和超时
-    const response = await Promise.race([
-      client.fetch(url, customHeaders),
-      timeoutPromise
-    ]) as ReturnType<typeof client.fetch>;
+    const responsePromise = client.fetch(url);
+    const response = await Promise.race([responsePromise, timeoutPromise]);
     
     return NextResponse.json({
       success: response.status_code === 0,
