@@ -292,32 +292,32 @@ function NativeStyle() {
 
 // ============================================
 // 6. 横幅广告 (Banner)
-// 尺寸：320×50 dp 或 320×100 dp（大横幅）
+// 尺寸：320×50 dp
 // 特点：电商类应用、橙色按钮
 // ============================================
 function BannerStyle() {
   return (
     <div className="relative w-full h-full bg-[#F8F9FA] border-t border-gray-200 flex items-center">
-      <div className="flex items-center gap-2 px-2 w-full">
+      <div className="flex items-center gap-1.5 px-1.5 w-full">
         {/* 应用图标 */}
-        <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-base">🛒</span>
+        <div className="w-7 h-7 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <span className="text-white text-[10px]">🛒</span>
         </div>
 
         {/* 文字内容 */}
         <div className="flex-1 min-w-0">
-          <h4 className="text-xs font-medium text-gray-800 truncate">购物App - 限时秒杀</h4>
-          <p className="text-[10px] text-gray-500 truncate">全场满199减30</p>
+          <h4 className="text-[10px] font-medium text-gray-800 truncate leading-tight">购物App - 限时秒杀</h4>
+          <p className="text-[9px] text-gray-500 truncate leading-tight">全场满199减30</p>
         </div>
 
         {/* 查看按钮 */}
-        <button className="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-md font-medium flex-shrink-0">
+        <button className="px-2 py-1 bg-orange-500 text-white text-[9px] rounded-md font-medium flex-shrink-0">
           查看
         </button>
 
         {/* 关闭按钮 */}
-        <button className="w-5 h-5 text-gray-400 flex items-center justify-center flex-shrink-0">
-          <span className="text-base leading-none">×</span>
+        <button className="w-4 h-4 text-gray-400 flex items-center justify-center flex-shrink-0">
+          <span className="text-xs leading-none">×</span>
         </button>
       </div>
     </div>
@@ -454,9 +454,9 @@ export const SDK_TEMPLATE_INFO_STYLES: Record<SDKTemplateType, {
   },
   banner: { 
     name: "横幅", 
-    desc: "固定在屏幕底部的横幅广告，320×100",
-    size: "320×100",
-    ratio: "16:5"
+    desc: "固定在屏幕底部的横幅广告，320×50",
+    size: "320×50",
+    ratio: "32:5"
   },
   native: { 
     name: "原生信息流", 
@@ -509,12 +509,12 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
             {/* 手机外框 */}
             <div className={cn(
               "bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl",
-              activeTemplate === "banner" ? "w-[240px]" : 
+              activeTemplate === "banner" ? "w-[200px]" : 
               activeTemplate === "native" ? "w-[200px]" : "w-[180px]"
             )}>
               <div className={cn(
                 "bg-white rounded-[1.5rem] overflow-hidden relative",
-                activeTemplate === "banner" ? "h-[50px]" : 
+                activeTemplate === "banner" ? "h-[32px]" : 
                 activeTemplate === "native" ? "h-[60px]" : "h-[320px]"
               )}>
                 {/* 状态栏 */}
@@ -577,7 +577,7 @@ export function SDKTemplateStyleCard({
   const content = (
     <div className={cn(
       "overflow-hidden",
-      type === "banner" ? "h-[42px]" : 
+      type === "banner" ? "h-[28px]" : 
       type === "native" ? "h-[48px]" : "h-[120px]"
     )}>
       <TemplateComponent />
@@ -595,12 +595,12 @@ export function SDKTemplateStyleCard({
   return (
     <div className={cn(
       "bg-gray-900 rounded-xl p-1 shadow-lg",
-      type === "banner" ? "w-[160px]" : 
+      type === "banner" ? "w-[130px]" : 
       type === "native" ? "w-[120px]" : "w-[72px]"
     )}>
       <div className={cn(
         "bg-white rounded-lg overflow-hidden relative",
-        type === "banner" ? "h-[36px]" : 
+        type === "banner" ? "h-[26px]" : 
         type === "native" ? "h-[44px]" : "h-[108px]"
       )}>
         {/* 状态栏 */}
