@@ -228,6 +228,16 @@ export function FullscreenPreviewModal({
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
+
+                {/* 关闭按钮 - 定位在广告素材右上角 */}
+                {["banner", "interstitial_half", "native"].includes(templateType) && (
+                  <button
+                    onClick={onClose}
+                    className="absolute top-1 right-1 w-4 h-4 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                  >
+                    <X className="w-2 h-2" />
+                  </button>
+                )}
               </div>
 
               {/* 底部渐变遮罩 */}
@@ -245,13 +255,15 @@ export function FullscreenPreviewModal({
                 </button>
               )}
 
-              {/* 关闭按钮 */}
-              <button
-                onClick={onClose}
-                className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              {/* 关闭按钮 - 非特殊类型显示在手机框架左上角 */}
+              {!["banner", "interstitial_half", "native"].includes(templateType) && (
+                <button
+                  onClick={onClose}
+                  className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
 
               {/* 底部文字 */}
               <div className="absolute bottom-4 left-0 right-0 text-center">
