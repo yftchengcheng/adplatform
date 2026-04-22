@@ -23,6 +23,80 @@ import { Input } from "@/components/ui/input";
 import { useComponents } from "@/contexts/component-context";
 import { RealAdPreview } from "./real-ad-preview";
 
+// 获取触发规则图标（组件外定义，供 InteractionFlowChart 和 SDKTemplateEdit 共用）
+function getTriggerRuleIcon(rule: TriggerRule): React.ReactNode {
+  return TRIGGER_RULES[rule]?.icon || <Zap className="w-4 h-4" />;
+}
+
+// 交互链路节点类型
+interface FlowNode {
+  id: string;
+  name: string;
+  type: "template" | "component";
+  subtitle?: string;
+  preview?: string;
+  status?: "enabled" | "disabled";
+  triggerRule?: TriggerRule;
+  triggerTime?: number;
+  children: FlowNode[];
+}
+
+// 构建交互链路树
+function buildFlowTree(
+  templateType: SDKTemplateType,
+  templateName: string,
+  links: ComponentLinkConfig[]
+): FlowNode {
+  const info = SDK_TEMPLATE_INFO[templateType];
+  const size = SDK_TEMPLATE_SIZES[templateType];
+
+  const root: FlowNode = {
+    id: "main",
+    name: templateName,
+    type: "template",
+    subtitle: `${size.width}×${size.height} · ${size.ratio}`,
+    children: [],
+  };
+
+  // 找出直接子节点（parentId === "main"）
+  const linkMap = new Map<string, ComponentLinkConfig>();
+  links.forEach((link) => linkMap.set(link.id, link));
+
+  const nodeMap = new Map<string, FlowNode>();
+
+  // 递归构建子节点
+  function buildNode(link: ComponentLinkConfig): FlowNode {
+    const triggerLabel = TRIGGER_RULES[link.triggerRule]?.label || link.triggerRule;
+    const node: FlowNode = {
+      id: link.id,
+      name: link.componentName,
+      type: "component",
+      subtitle: `${triggerLabel}${link.triggerRule === "show_time" ? ` ${link.triggerTime}s` : ""}`,
+      preview: link.componentPreview,
+      status: link.status,
+      triggerRule: link.triggerRule,
+      triggerTime: link.triggerTime,
+      children: [],
+    };
+    // 找到以此 link 为父级的子 links
+    links
+      .filter((l) => l.parentId === link.id)
+      .forEach((childLink) => {
+        node.children.push(buildNode(childLink));
+      });
+    return node;
+  }
+
+  // 先添加直接挂在主素材下的组件
+  links
+    .filter((l) => l.parentId === "main")
+    .forEach((link) => {
+      root.children.push(buildNode(link));
+    });
+
+  return root;
+}
+
 // SDK模板类型
 type SDKTemplateType = 
   | "static_splash"      // 静态开屏
@@ -169,6 +243,167 @@ function getComponentPreview(componentType: string, config?: Record<string, unkn
 // 获取组件类型中文名称
 function getComponentTypeName(componentType: string): string {
   return COMPONENT_TYPE_NAMES[componentType] || componentType;
+}
+
+// 交互链路流程图组件
+function InteractionFlowChart({
+  templateType,
+  templateName,
+  componentLinks,
+}: {
+  templateType: SDKTemplateType;
+  templateName: string;
+  componentLinks: ComponentLinkConfig[];
+}) {
+  const tree = buildFlowTree(templateType, templateName, componentLinks);
+
+  // 获取触发规则对应的颜色和图标
+  const getTriggerStyle = (rule?: TriggerRule) => {
+    const styles: Record<string, { color: string; bg: string; border: string }> = {
+      video_complete: { color: "text-green-700", bg: "bg-green-50", border: "border-green-200" },
+      show_time: { color: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200" },
+      click_close: { color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200" },
+      back_from_media: { color: "text-purple-700", bg: "bg-purple-50", border: "border-purple-200" },
+      click_other_ad: { color: "text-pink-700", bg: "bg-pink-50", border: "border-pink-200" },
+      in_app_interaction: { color: "text-teal-700", bg: "bg-teal-50", border: "border-teal-200" },
+    };
+    return styles[rule || "show_time"] || styles.show_time;
+  };
+
+  // 渲染节点卡片
+  const renderNode = (node: FlowNode, depth: number = 0) => {
+    const isTemplate = node.type === "template";
+    const isDisabled = node.status === "disabled";
+    const triggerStyle = getTriggerStyle(node.triggerRule);
+
+    return (
+      <div key={node.id} className="flex flex-col items-center">
+        {/* 节点卡片 */}
+        <div
+          className={`
+            relative rounded-lg border-2 px-4 py-3 min-w-[160px] max-w-[220px] transition-all
+            ${isTemplate
+              ? "bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 shadow-md shadow-blue-200"
+              : isDisabled
+                ? "bg-gray-50 border-gray-200 opacity-50"
+                : "bg-white border-gray-200 shadow-sm hover:shadow-md"
+            }
+          `}
+        >
+          {/* 顶部：预览图+名称 */}
+          <div className="flex items-center gap-2.5">
+            {node.preview && !isTemplate ? (
+              <div className="w-9 h-9 rounded bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-100">
+                <img src={node.preview} alt={node.name} className="w-full h-full object-cover" />
+              </div>
+            ) : isTemplate ? (
+              <div className="w-9 h-9 rounded bg-white/20 flex items-center justify-center flex-shrink-0">
+                <Play className="w-4 h-4 text-white" />
+              </div>
+            ) : null}
+            <div className="min-w-0 flex-1">
+              <div
+                className={`text-sm font-semibold truncate ${
+                  isTemplate ? "text-white" : isDisabled ? "text-gray-400" : "text-gray-900"
+                }`}
+              >
+                {node.name}
+              </div>
+              {node.subtitle && (
+                <div
+                  className={`text-xs mt-0.5 truncate ${
+                    isTemplate ? "text-blue-100" : isDisabled ? "text-gray-300" : "text-gray-500"
+                  }`}
+                >
+                  {node.subtitle}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 状态标签 */}
+          {!isTemplate && node.triggerRule && (
+            <div className="mt-2 flex items-center gap-1.5">
+              <span
+                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${triggerStyle.color} ${triggerStyle.bg} border ${triggerStyle.border}`}
+              >
+                {getTriggerRuleIcon(node.triggerRule)}
+                {TRIGGER_RULES[node.triggerRule]?.label}
+              </span>
+              {node.triggerRule === "show_time" && node.triggerTime && (
+                <span className="text-[10px] text-gray-400">{node.triggerTime}s</span>
+              )}
+            </div>
+          )}
+
+          {/* 禁用标签 */}
+          {isDisabled && (
+            <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-gray-400 text-white text-[9px] rounded-full">
+              已禁用
+            </div>
+          )}
+        </div>
+
+        {/* 子节点 */}
+        {node.children.length > 0 && (
+          <div className="flex flex-col items-center mt-0">
+            {/* 连接线（竖线） */}
+            <div className="w-px h-5 bg-gray-300" />
+            {/* 横向分支 */}
+            {node.children.length === 1 ? (
+              <div className="flex flex-col items-center">
+                <div className="w-px h-4 bg-gray-300" />
+                {renderNode(node.children[0], depth + 1)}
+              </div>
+            ) : (
+              <div className="relative">
+                {/* 横线连接 */}
+                <div
+                  className="absolute top-0 bg-gray-300"
+                  style={{
+                    left: `${(0.5 / node.children.length) * 100}%`,
+                    right: `${(0.5 / node.children.length) * 100}%`,
+                    height: "1px",
+                  }}
+                />
+                <div className="flex gap-6">
+                  {node.children.map((child, idx) => (
+                    <div key={child.id} className="flex flex-col items-center">
+                      {/* 竖线连接到横线 */}
+                      <div className="w-px h-4 bg-gray-300" />
+                      {/* 箭头 */}
+                      <svg width="12" height="8" className="text-gray-300">
+                        <polygon points="6,8 0,0 12,0" fill="currentColor" />
+                      </svg>
+                      {renderNode(child, depth + 1)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-gray-50 rounded-lg overflow-auto p-6" style={{ minHeight: "400px" }}>
+      {componentLinks.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <Zap className="w-7 h-7 text-gray-300" />
+          </div>
+          <p className="text-sm font-medium text-gray-500">暂无交互链路</p>
+          <p className="text-xs mt-1">添加组件后将自动生成交互链路图</p>
+        </div>
+      ) : (
+        <div className="flex justify-center">
+          {renderNode(tree)}
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface SDKTemplateEditProps {
@@ -340,11 +575,6 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
       }
       return link;
     }));
-  };
-
-  // 获取触发规则图标
-  const getTriggerRuleIcon = (rule: TriggerRule) => {
-    return TRIGGER_RULES[rule]?.icon || <Zap className="w-4 h-4" />;
   };
 
   // 渲染触发规则选择器
@@ -569,23 +799,23 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
             {/* 广告互动链路示意图 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-900">真实预览</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-medium text-gray-900">广告互动链路示意图</h3>
+                  <span className="text-xs text-gray-400">展示模版与组件的交互关系</span>
+                </div>
                 <button
                   onClick={() => setShowFullscreenPreview(true)}
                   className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1"
                 >
                   <Eye className="w-3 h-3" />
-                  全屏预览
+                  全屏查看
                 </button>
               </div>
-              <div className="bg-gray-50 rounded-lg overflow-hidden" style={{ height: '480px' }}>
-                {/* 使用真实预览组件 */}
-                <RealAdPreview
-                  templateType={type}
-                  templateName={info.name}
-                  componentLinks={componentLinks}
-                />
-              </div>
+              <InteractionFlowChart
+                templateType={type}
+                templateName={info.name}
+                componentLinks={componentLinks}
+              />
             </div>
 
             {/* 组件预览 */}
@@ -840,13 +1070,29 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
 
       {/* 全屏预览弹窗 */}
       {showFullscreenPreview && (
-        <RealAdPreview
-          templateType={type}
-          templateName={info.name}
-          componentLinks={componentLinks}
-          isFullscreen={true}
-          onClose={() => setShowFullscreenPreview(false)}
-        />
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="px-5 pt-5 pb-4 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">广告互动链路示意图</h3>
+                <p className="text-sm text-gray-500 mt-0.5">{info.name} · 模版与组件交互关系</p>
+              </div>
+              <button
+                onClick={() => setShowFullscreenPreview(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6 overflow-auto max-h-[70vh]">
+              <InteractionFlowChart
+                templateType={type}
+                templateName={info.name}
+                componentLinks={componentLinks}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

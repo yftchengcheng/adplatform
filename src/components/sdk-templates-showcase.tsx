@@ -327,7 +327,6 @@ function RewardedVideoStyle() {
       <div className="absolute inset-0">
         <video 
           src={DEFAULT_IMAGES.rewarded_video} 
-          alt="激励视频"
           className="w-full h-full object-cover"
           muted
           loop
@@ -441,7 +440,7 @@ function RewardedVideoStyle() {
 }
 
 // 模板样式映射
-const TEMPLATE_STYLES: Record<SDKTemplateType, () => JSX.Element> = {
+const TEMPLATE_STYLES: Record<SDKTemplateType, () => React.ReactElement> = {
   static_splash: StaticSplashStyle,
   video_splash: VideoSplashStyle,
   interstitial_half: InterstitialHalfStyle,
@@ -832,4 +831,4 @@ export function SDKTemplateStyleCard({
   );
 }
 
-export { TEMPLATE_STYLES, SDK_TEMPLATE_INFO_STYLES, DEFAULT_IMAGES };
+export { TEMPLATE_STYLES, DEFAULT_IMAGES };
