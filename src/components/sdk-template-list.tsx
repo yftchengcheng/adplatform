@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { 
   ChevronLeft, 
   Search, 
@@ -10,9 +10,7 @@ import {
   Trash2, 
   Edit, 
   Play, 
-  Pause,
-  MoreHorizontal,
-  X
+  Pause
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,22 +119,17 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleBack}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{info.name}</h1>
-                <p className="text-sm text-gray-500 mt-0.5">{info.desc}</p>
-              </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">{info.name}</h1>
+              <p className="text-sm text-gray-500 mt-0.5">{info.desc}</p>
             </div>
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              创建模板
-            </Button>
           </div>
         </div>
       </header>
