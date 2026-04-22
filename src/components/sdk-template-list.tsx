@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AdInteractionPreview } from "./ad-interaction-preview";
+import { RealAdPreview } from "./real-ad-preview";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -215,7 +215,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden">
-                      <AdInteractionPreview
+                      <RealAdPreview
                         templateType={type}
                         templateName={item.name}
                       />

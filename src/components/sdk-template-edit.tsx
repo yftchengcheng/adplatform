@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useComponents } from "@/contexts/component-context";
-import { AdInteractionPreview } from "./ad-interaction-preview";
+import { RealAdPreview } from "./real-ad-preview";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -204,6 +204,9 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   // 选择上一级弹窗
   const [showParentPicker, setShowParentPicker] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<SelectableComponent | null>(null);
+
+  // 全屏预览
+  const [showFullscreenPreview, setShowFullscreenPreview] = useState(false);
 
   // 上一级选项类型
   interface ParentOption {
@@ -565,10 +568,19 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
           <div className="space-y-4">
             {/* 广告互动链路示意图 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-4">广告互动链路示意图</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-gray-900">真实预览</h3>
+                <button
+                  onClick={() => setShowFullscreenPreview(true)}
+                  className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                >
+                  <Eye className="w-3 h-3" />
+                  全屏预览
+                </button>
+              </div>
               <div className="bg-gray-50 rounded-lg overflow-hidden" style={{ height: '480px' }}>
-                {/* 使用广告互动链路预览组件 */}
-                <AdInteractionPreview
+                {/* 使用真实预览组件 */}
+                <RealAdPreview
                   templateType={type}
                   templateName={info.name}
                   componentLinks={componentLinks}
@@ -824,6 +836,17 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 全屏预览弹窗 */}
+      {showFullscreenPreview && (
+        <RealAdPreview
+          templateType={type}
+          templateName={info.name}
+          componentLinks={componentLinks}
+          isFullscreen={true}
+          onClose={() => setShowFullscreenPreview(false)}
+        />
       )}
     </div>
   );
