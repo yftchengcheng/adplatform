@@ -39,8 +39,8 @@ const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }>
 
 // SDK模板尺寸配置
 const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: number; ratio: string }> = {
-  static_splash: { width: 540, height: 960, ratio: "9:16" },     // 9:16
-  video_splash: { width: 540, height: 960, ratio: "9:16" },      // 9:16
+  static_splash: { width: 1080, height: 1920, ratio: "9:16" },     // 9:16
+  video_splash: { width: 1080, height: 1920, ratio: "9:16" },      // 9:16
   interstitial_half: { width: 600, height: 500, ratio: "6:5" },
   interstitial_full: { width: 1080, height: 1920, ratio: "9:16" },
   banner: { width: 1080, height: 120, ratio: "9:1" },
