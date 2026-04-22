@@ -241,8 +241,19 @@ export function FullscreenPreviewModal({
           <div 
             className="bg-white rounded-xl overflow-hidden relative shadow-2xl"
             style={{ 
-              width: templateType === "banner" ? "320px" : 
-                     templateType === "interstitial_half" ? "300px" : "100%"
+              // 根据类型设置合适的尺寸
+              ...(templateType === "banner" && { 
+                width: "320px", 
+                height: "50px" 
+              }),
+              ...(templateType === "interstitial_half" && { 
+                width: "300px",
+                aspectRatio: "6/5"
+              }),
+              ...(templateType === "native" && { 
+                width: "270px",
+                aspectRatio: "27/10"
+              })
             }}
           >
             {renderContent()}
