@@ -77,6 +77,7 @@ import { ScratchCardConfig, defaultScratchCardConfig } from "@/components/scratc
 import { ScratchCardTemplate as ScratchCardTemplateDefault } from "@/components/scratch-card-template";
 import { PopupRedpacketConfig } from "@/components/popup-redpacket-config";
 import PopupRedpacketTemplate from "@/components/popup-redpacket-template";
+import { SDKTemplateStyleCard } from "@/components/sdk-templates-showcase";
 
 import { useRouter } from "next/navigation";
 
@@ -403,6 +404,22 @@ export function ComponentList() {
       <main className="max-w-7xl mx-auto px-6 py-6">
         {navView === "sdk" ? (
           <div className="space-y-6">
+            {/* 模板样式入口 */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold mb-1">SDK模板样式</h2>
+                  <p className="text-white/80 text-sm">查看7种SDK标准模板的设计规范和视觉样式</p>
+                </div>
+                <button
+                  onClick={() => router.push("/sdk/templates")}
+                  className="px-6 py-3 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+                >
+                  查看样式规范
+                </button>
+              </div>
+            </div>
+
             {/* 搜索栏 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex flex-wrap items-center gap-4">
@@ -428,10 +445,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/static_splash")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-md p-2">
-                      <div className="w-8 h-10 bg-gray-200 rounded"></div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="static_splash" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">静态开屏</h4>
                   <p className="text-xs text-gray-500">静态图片展示，应用启动时展示品牌广告</p>
@@ -442,13 +457,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/video_splash")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-md p-2 flex flex-col items-center">
-                      <div className="w-8 h-10 bg-gray-200 rounded mb-1"></div>
-                      <div className="w-4 h-4 bg-purple-300 rounded-full flex items-center justify-center">
-                        <div className="w-0 h-0 border-l-4 border-l-white border-y-2 border-y-transparent"></div>
-                      </div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="video_splash" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">视频开屏</h4>
                   <p className="text-xs text-gray-500">视频素材播放，应用启动时自动播放</p>
@@ -459,11 +469,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/interstitial_half")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-lg p-2 w-[60%]">
-                      <div className="w-full h-6 bg-green-200 rounded mb-1"></div>
-                      <div className="w-full h-3 bg-gray-200 rounded"></div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="interstitial_half" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">插屏-半屏</h4>
                   <p className="text-xs text-gray-500">半屏展示，覆盖部分屏幕，不影响主流程</p>
@@ -474,10 +481,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/interstitial_full")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-lg p-2">
-                      <div className="w-10 h-12 bg-orange-200 rounded"></div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="interstitial_full" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">插屏-全屏</h4>
                   <p className="text-xs text-gray-500">全屏展示，强制用户观看广告</p>
@@ -488,10 +493,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/banner")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-md px-3 py-1">
-                      <div className="w-16 h-4 bg-red-200 rounded"></div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="banner" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">横幅</h4>
                   <p className="text-xs text-gray-500">顶部或底部横幅，持续展示品牌信息</p>
@@ -502,16 +505,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/native")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-md p-2 w-[70%]">
-                      <div className="flex gap-2">
-                        <div className="w-8 h-8 bg-teal-200 rounded"></div>
-                        <div className="flex-1">
-                          <div className="w-full h-2 bg-gray-200 rounded mb-1"></div>
-                          <div className="w-[80%] h-2 bg-gray-200 rounded"></div>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="native" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">原生（信息流）</h4>
                   <p className="text-xs text-gray-500">融入内容的原生广告，不打断用户体验</p>
@@ -522,13 +517,8 @@ export function ComponentList() {
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => router.push("/sdk/rewarded_video")}
                 >
-                  <div className="w-full aspect-video bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                    <div className="bg-white rounded shadow-md p-2 flex flex-col items-center">
-                      <div className="w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center mb-1">
-                        <div className="w-0 h-0 border-l-4 border-l-white border-y-2 border-y-transparent"></div>
-                      </div>
-                      <div className="w-10 h-2 bg-gray-200 rounded"></div>
-                    </div>
+                  <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+                    <SDKTemplateStyleCard type="rewarded_video" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">激励视频</h4>
                   <p className="text-xs text-gray-500">用户主动观看，获取对应奖励</p>
