@@ -102,13 +102,13 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/sdk/templates - 创建SDK模板
+// POST /api/sdk/templates - 创建SDK模板或克隆
 export async function POST(request: NextRequest) {
   const client = getSupabaseClient();
 
   try {
     const body = await request.json();
-    const { type, name, format, adSlot, width, height, ratio } = body;
+    const { type, name, format, adSlot, width, height, ratio, cloneFrom } = body;
 
     if (!type || !name) {
       return NextResponse.json(
@@ -120,11 +120,16 @@ export async function POST(request: NextRequest) {
     const id = `sdk_${type}_${Date.now()}`;
     const size = SDK_TEMPLATE_SIZES[type as SDKTemplateType] || { width: 0, height: 0, ratio: "" };
 
+    // 如果是克隆，生成新的 ad_slot
+    const newAdSlot = cloneFrom 
+      ? `${adSlot}_copy_${Date.now()}`
+      : adSlot;
+
     const newTemplate = {
       id,
       type,
       name,
-      ad_slot: adSlot || null,
+      ad_slot: newAdSlot || null,
       format: format || null,
       width: width || size.width,
       height: height || size.height,
@@ -132,6 +137,7 @@ export async function POST(request: NextRequest) {
       status: "enabled",
       creator: "用户",
       linked_component_count: 0,
+      create_time: new Date().toISOString(),
     };
 
     const { data, error } = await client

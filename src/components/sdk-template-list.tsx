@@ -153,13 +153,47 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   };
 
   // 复制ID
-  const handleCopy = async (id: string) => {
+  const handleCopyId = async (id: string) => {
     try {
       await navigator.clipboard.writeText(id);
       // 可以添加一个提示
-      alert("已复制模板ID: " + id);
+      toast.success("已复制模板ID");
     } catch (err) {
       console.error("Failed to copy:", err);
+      toast.error("复制失败");
+    }
+  };
+
+  // 克隆模板
+  const handleClone = async (item: SDKTemplate) => {
+    try {
+      const response = await fetch("/api/sdk/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cloneFrom: item.id,
+          type: item.type,
+          name: `${item.name} (副本)`,
+          format: item.format,
+          adSlot: item.ad_slot,
+          width: item.width,
+          height: item.height,
+          ratio: item.ratio,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        // 将新克隆的数据添加到列表开头
+        setTemplates([result.data, ...templates]);
+        toast.success("克隆成功");
+      } else {
+        toast.error(result.error || "克隆失败");
+      }
+    } catch (err) {
+      console.error("Failed to clone:", err);
+      toast.error("克隆失败");
     }
   };
 
@@ -393,10 +427,10 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                         </button>
                         <button 
                           className="p-1.5 hover:bg-gray-100 rounded" 
-                          title="复制"
-                          onClick={() => handleCopy(item.id)}
+                          title="克隆"
+                          onClick={() => handleClone(item)}
                         >
-                          <Copy className="w-4 h-4 text-gray-500" />
+                          <Copy className="w-4 h-4 text-green-500" />
                         </button>
                         <button 
                           className="p-1.5 hover:bg-gray-100 rounded" 
