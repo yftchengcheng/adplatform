@@ -93,6 +93,13 @@ export function RealAdPreview({
         <div className="absolute bottom-0 left-0 right-0">
           <img src={defaultImage} alt={displayName} className="w-full h-auto" />
         </div>
+        {/* 关闭按钮 */}
+        <button
+          onClick={(e) => { e.stopPropagation(); }}
+          className="absolute top-0.5 right-0.5 w-3 h-3 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70"
+        >
+          <span className="text-white/80 text-[8px] leading-none">x</span>
+        </button>
       </div>
     );
   }
@@ -133,7 +140,16 @@ export function RealAdPreview({
           <div className="p-1 space-y-0.5">
             <div className="h-1 bg-gray-200 rounded w-3/4" />
             <div className="h-3 bg-gray-200 rounded" />
-            <img src={defaultImage} alt={displayName} className="w-full h-auto rounded shadow-sm" />
+            <div className="relative">
+              <img src={defaultImage} alt={displayName} className="w-full h-auto rounded shadow-sm" />
+              {/* 关闭按钮 */}
+              <button
+                onClick={(e) => { e.stopPropagation(); }}
+                className="absolute top-0.5 right-0.5 w-3 h-3 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70"
+              >
+                <span className="text-white/80 text-[8px] leading-none">x</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -258,6 +274,13 @@ export function FullscreenPreviewModal({
                   <div className="absolute bottom-6 left-0 right-0">
                     <img src={defaultImage} alt={displayName} className="w-full h-auto" />
                   </div>
+                  {/* 关闭按钮 */}
+                  <button
+                    onClick={onClose}
+                    className="absolute top-8 right-3 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                  >
+                    <span className="text-white/80 text-xs leading-none">x</span>
+                  </button>
                 </>
               )}
 
@@ -291,8 +314,15 @@ export function FullscreenPreviewModal({
                     <div className="h-4 bg-gray-200 rounded w-3/4" />
                     <div className="h-16 bg-gray-200 rounded" />
                     {/* 原生广告卡片 */}
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-lg shadow-sm overflow-hidden relative">
                       <img src={defaultImage} alt={displayName} className="w-full h-auto" />
+                      {/* 关闭按钮 */}
+                      <button
+                        onClick={onClose}
+                        className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                      >
+                        <span className="text-white/80 text-xs leading-none">x</span>
+                      </button>
                     </div>
                     <div className="h-4 bg-gray-200 rounded w-2/3" />
                     <div className="h-16 bg-gray-200 rounded" />

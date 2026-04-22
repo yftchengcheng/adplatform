@@ -490,6 +490,13 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
                     <div className="absolute bottom-6 left-0 right-0">
                       <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
                     </div>
+                    {/* 关闭按钮 */}
+                    <button
+                      onClick={() => {}}
+                      className="absolute top-8 right-3 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                    >
+                      <span className="text-white/80 text-xs leading-none">x</span>
+                    </button>
                   </>
                 )}
 
@@ -516,8 +523,15 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
                     <div className="p-3 space-y-3">
                       <div className="h-4 bg-gray-200 rounded w-3/4" />
                       <div className="h-16 bg-gray-200 rounded" />
-                      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                      <div className="bg-white rounded-lg shadow-sm overflow-hidden relative">
                         <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
+                        {/* 关闭按钮 */}
+                        <button
+                          onClick={() => {}}
+                          className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                        >
+                          <span className="text-white/80 text-xs leading-none">x</span>
+                        </button>
                       </div>
                       <div className="h-4 bg-gray-200 rounded w-2/3" />
                       <div className="h-16 bg-gray-200 rounded" />
@@ -631,6 +645,13 @@ export function SDKTemplateStyleCard({
           <div className="absolute bottom-0 left-0 right-0">
             <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto" />
           </div>
+          {/* 关闭按钮 */}
+          <button
+            onClick={() => {}}
+            className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-black/50 rounded-full flex items-center justify-center"
+          >
+            <span className="text-white/80 text-[6px] leading-none">x</span>
+          </button>
         </div>
       </div>
     );
@@ -658,7 +679,16 @@ export function SDKTemplateStyleCard({
           <div className="p-0.5 space-y-0.5">
             <div className="h-1 bg-gray-200 rounded w-3/4" />
             <div className="h-2 bg-gray-200 rounded" />
-            <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto rounded shadow-sm" />
+            <div className="relative">
+              <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto rounded shadow-sm" />
+              {/* 关闭按钮 */}
+              <button
+                onClick={() => {}}
+                className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-black/50 rounded-full flex items-center justify-center"
+              >
+                <span className="text-white/80 text-[6px] leading-none">x</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
