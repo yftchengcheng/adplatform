@@ -61,21 +61,86 @@ export function RealAdPreview({
   onClick,
 }: RealAdPreviewProps) {
   const defaultImage = DEFAULT_IMAGES[templateType];
-  const templateSize = SDK_TEMPLATE_SIZES[templateType] || { width: 540, height: 960 };
   const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
 
-  // 固定的手机框架尺寸（统一使用标准手机比例）
-  const phoneWidth = "270px";
-  const phoneHeight = "540px";
+  // 横幅广告：在手机底部展示
+  if (templateType === "banner") {
+    return (
+      <div 
+        className={cn(
+          "relative w-full h-full overflow-hidden cursor-pointer",
+          onClick && "hover:opacity-90 transition-opacity",
+          className
+        )}
+        onClick={onClick}
+      >
+        {/* 模拟应用内容背景 */}
+        <div className="absolute inset-0 bg-gray-100">
+          <div className="h-3 bg-white flex items-center px-1">
+            <span className="text-[4px] text-gray-900">9:41</span>
+          </div>
+          <div className="p-1 space-y-0.5">
+            <div className="h-1 bg-gray-200 rounded w-3/4" />
+            <div className="h-1 bg-gray-200 rounded w-1/2" />
+            <div className="h-4 bg-gray-200 rounded" />
+            <div className="h-1 bg-gray-200 rounded w-2/3" />
+            <div className="h-4 bg-gray-200 rounded" />
+            <div className="h-1 bg-gray-200 rounded w-4/5" />
+          </div>
+        </div>
+        {/* 横幅广告 - 固定在底部 */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <img src={defaultImage} alt={displayName} className="w-full h-auto" />
+        </div>
+      </div>
+    );
+  }
 
-  // 计算缩放比例以适应容器
-  const scaleToFit = (containerWidth: number, containerHeight: number) => {
-    const scaleX = containerWidth / templateSize.width;
-    const scaleY = containerHeight / templateSize.height;
-    return Math.min(scaleX, scaleY, 1);
-  };
+  // 插屏半屏：居中弹窗展示
+  if (templateType === "interstitial_half") {
+    return (
+      <div 
+        className={cn(
+          "relative w-full h-full overflow-hidden cursor-pointer",
+          onClick && "hover:opacity-90 transition-opacity",
+          className
+        )}
+        onClick={onClick}
+      >
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+          <img src={defaultImage} alt={displayName} className="w-[80%] h-auto rounded shadow-lg" />
+        </div>
+      </div>
+    );
+  }
 
+  // 原生信息流：在内容流中展示
+  if (templateType === "native") {
+    return (
+      <div 
+        className={cn(
+          "relative w-full h-full overflow-hidden cursor-pointer",
+          onClick && "hover:opacity-90 transition-opacity",
+          className
+        )}
+        onClick={onClick}
+      >
+        <div className="absolute inset-0 bg-gray-50">
+          <div className="h-3 bg-white flex items-center px-1">
+            <span className="text-[4px] text-gray-900">9:41</span>
+          </div>
+          <div className="p-1 space-y-0.5">
+            <div className="h-1 bg-gray-200 rounded w-3/4" />
+            <div className="h-3 bg-gray-200 rounded" />
+            <img src={defaultImage} alt={displayName} className="w-full h-auto rounded shadow-sm" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 全屏类型：填满整个区域
   return (
     <div 
       className={cn(
@@ -85,7 +150,6 @@ export function RealAdPreview({
       )}
       onClick={onClick}
     >
-      {/* 图片或视频 */}
       {isVideoType ? (
         <video
           src={defaultImage}
@@ -101,16 +165,10 @@ export function RealAdPreview({
           className="absolute inset-0 w-full h-full object-cover"
         />
       )}
-
-      {/* 底部遮罩 */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-
-      {/* 模板名称 */}
       <div className="absolute bottom-1 left-1 right-1">
         <p className="text-white text-[8px] font-medium truncate">{displayName}</p>
       </div>
-
-      {/* 点击提示 */}
       {onClick && (
         <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
           <span className="text-white text-xs bg-black/50 px-2 py-1 rounded">点击查看</span>
@@ -139,37 +197,28 @@ export function FullscreenPreviewModal({
   const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
 
-  // 固定的手机框架尺寸（统一使用标准手机比例）
   const phoneWidth = "270px";
   const phoneHeight = "540px";
 
-  // 倒计时状态
   const [countdown, setCountdown] = useState(5);
 
-  // 重置倒计时
   const resetCountdown = useCallback(() => {
     setCountdown(5);
   }, []);
 
-  // 倒计时逻辑
   useEffect(() => {
     if (!isOpen) return;
-
     resetCountdown();
-
     const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          return 0;
-        }
-        return prev - 1;
-      });
+      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [isOpen, resetCountdown]);
 
   if (!isOpen) return null;
+
+  // 判断是否为特殊类型（需要场景化展示）
+  const isSpecialType = templateType === "banner" || templateType === "interstitial_half" || templateType === "native";
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
@@ -179,97 +228,121 @@ export function FullscreenPreviewModal({
           className="relative mx-auto bg-gray-900 rounded-[3rem] p-2 shadow-2xl"
           style={{ width: phoneWidth, height: phoneHeight }}
         >
-          {/* 手机外边框 */}
           <div className="relative w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
             {/* 刘海区域 */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-gray-900 rounded-b-2xl z-10" />
 
             {/* 内容区域 */}
-            <div 
-              className="relative w-full h-full flex items-center justify-center overflow-hidden bg-gray-100"
-            >
-              {/* 广告内容 - 根据类型设置不同尺寸 */}
-              <div 
-                className="relative overflow-hidden shadow-lg"
-                style={{ 
-                  // 根据类型设置显示尺寸（保持原始比例）
-                  ...(templateType === "banner" && { 
-                    width: "160px",
-                    height: "25px"
-                  }),
-                  ...(templateType === "interstitial_half" && { 
-                    width: "150px",
-                    height: "180px"
-                  }),
-                  ...(templateType === "native" && { 
-                    width: "180px",
-                    height: "100px"
-                  }),
-                  // 其他类型填满内容区
-                  ...(!["banner", "interstitial_half", "native"].includes(templateType) && {
-                    width: "100%",
-                    height: "100%"
-                  })
-                }}
-              >
-                {isVideoType ? (
-                  <video
-                    src={defaultImage}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    muted
-                    loop
-                    playsInline
-                    autoPlay
-                  />
-                ) : (
-                  <img
-                    src={defaultImage}
-                    alt={displayName}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                )}
+            <div className="relative w-full h-full overflow-hidden bg-gray-100">
+              {/* 横幅广告 - 手机底部展示 */}
+              {templateType === "banner" && (
+                <>
+                  <div className="absolute inset-0 bg-gray-50">
+                    <div className="h-8 bg-white flex items-center justify-between px-4 pt-2">
+                      <span className="text-[10px] text-gray-900 font-medium">9:41</span>
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                        <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                        <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                      </div>
+                    </div>
+                    <div className="p-3 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-1/2" />
+                      <div className="h-16 bg-gray-200 rounded" />
+                      <div className="h-4 bg-gray-200 rounded w-2/3" />
+                      <div className="h-16 bg-gray-200 rounded" />
+                      <div className="h-4 bg-gray-200 rounded w-4/5" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-6 left-0 right-0">
+                    <img src={defaultImage} alt={displayName} className="w-full h-auto" />
+                  </div>
+                </>
+              )}
 
-                {/* 关闭按钮 - 定位在广告素材右上角 */}
-                {["banner", "interstitial_half", "native"].includes(templateType) && (
+              {/* 插屏半屏 - 居中弹窗 */}
+              {templateType === "interstitial_half" && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="relative w-[75%] overflow-hidden rounded-lg shadow-xl">
+                    <img src={defaultImage} alt={displayName} className="w-full h-auto" />
+                    <button
+                      onClick={onClose}
+                      className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 原生信息流 - 在内容流中展示 */}
+              {templateType === "native" && (
+                <div className="absolute inset-0 bg-gray-50">
+                  <div className="h-8 bg-white flex items-center justify-between px-4 pt-2">
+                    <span className="text-[10px] text-gray-900 font-medium">9:41</span>
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                      <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                      <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="p-3 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-16 bg-gray-200 rounded" />
+                    {/* 原生广告卡片 */}
+                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                      <img src={defaultImage} alt={displayName} className="w-full h-auto" />
+                    </div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                    <div className="h-16 bg-gray-200 rounded" />
+                  </div>
+                </div>
+              )}
+
+              {/* 全屏类型 - 填满整个内容区 */}
+              {!isSpecialType && (
+                <>
+                  {isVideoType ? (
+                    <video
+                      src={defaultImage}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                    />
+                  ) : (
+                    <img
+                      src={defaultImage}
+                      alt={displayName}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+                  {/* 跳过按钮 - 只对静态开屏和视频开屏显示 */}
+                  {!["interstitial_full", "rewarded_video"].includes(templateType) && (
+                    <button
+                      onClick={onClose}
+                      className="absolute top-8 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
+                    >
+                      <span className="text-white/80 text-xs">
+                        {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
+                      </span>
+                    </button>
+                  )}
                   <button
                     onClick={onClose}
-                    className="absolute top-1 right-1 w-4 h-4 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                    className="absolute top-8 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
                   >
-                    <X className="w-2 h-2" />
+                    <X className="w-4 h-4" />
                   </button>
-                )}
-              </div>
-
-              {/* 底部渐变遮罩 */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-
-              {/* 跳过按钮 - 只对静态开屏和视频开屏显示 */}
-              {!["banner", "interstitial_half", "interstitial_full", "native", "rewarded_video"].includes(templateType) && (
-                <button
-                  onClick={onClose}
-                  className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
-                >
-                  <span className="text-white/80 text-xs">
-                    {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
-                  </span>
-                </button>
+                  <div className="absolute bottom-8 left-0 right-0 text-center">
+                    <h2 className="text-lg font-bold text-white">{displayName}</h2>
+                    <p className="text-xs text-white/80 mt-1">点击查看详情</p>
+                  </div>
+                </>
               )}
-
-              {/* 关闭按钮 - 非特殊类型显示在手机框架左上角 */}
-              {!["banner", "interstitial_half", "native"].includes(templateType) && (
-                <button
-                  onClick={onClose}
-                  className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-
-              {/* 底部文字 */}
-              <div className="absolute bottom-4 left-0 right-0 text-center">
-                <h2 className="text-lg font-bold text-white">{displayName}</h2>
-                <p className="text-xs text-white/80 mt-1">点击查看详情</p>
-              </div>
             </div>
           </div>
 

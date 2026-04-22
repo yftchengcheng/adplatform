@@ -457,30 +457,107 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
       {/* 样式展示区域 - 与RealAdPreview保持完全一致 */}
       <div className="flex-1 flex items-center justify-center p-4 bg-gray-100 overflow-auto">
         <div className="flex flex-col items-center gap-4">
-          {/* 手机框架 - 与RealAdPreview一致：270px × 540px */}
-          <div className="relative bg-gray-900 w-[270px] h-[540px] rounded-2xl p-3 shadow-2xl">
-            {/* 手机听筒 */}
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 w-20 h-1 bg-gray-700 rounded-full" />
-            
-            {/* 内容区域 */}
-            <div className="relative w-full h-full bg-gray-900 overflow-hidden rounded-xl mt-4">
-              {/* 图片或视频 */}
-              {isVideoType ? (
-                <video
-                  src={DEFAULT_IMAGES[activeTemplate]}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                />
-              ) : (
-                <img
-                  src={DEFAULT_IMAGES[activeTemplate]}
-                  alt={templateInfo.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              )}
+          {/* 手机框架 - 与RealAdPreview一致：270px x 540px */}
+          <div className="relative bg-gray-900 w-[270px] h-[540px] rounded-[3rem] p-2 shadow-2xl">
+            {/* 手机外边框 */}
+            <div className="relative w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
+              {/* 刘海区域 */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-gray-900 rounded-b-2xl z-10" />
+
+              {/* 内容区域 */}
+              <div className="relative w-full h-full overflow-hidden bg-gray-100">
+                {/* 横幅广告 - 手机底部展示 */}
+                {activeTemplate === "banner" && (
+                  <>
+                    <div className="absolute inset-0 bg-gray-50">
+                      <div className="h-8 bg-white flex items-center justify-between px-4 pt-2">
+                        <span className="text-[10px] text-gray-900 font-medium">9:41</span>
+                        <div className="flex gap-1">
+                          <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                          <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                          <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                        </div>
+                      </div>
+                      <div className="p-3 space-y-3">
+                        <div className="h-4 bg-gray-200 rounded w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded w-1/2" />
+                        <div className="h-16 bg-gray-200 rounded" />
+                        <div className="h-4 bg-gray-200 rounded w-2/3" />
+                        <div className="h-16 bg-gray-200 rounded" />
+                        <div className="h-4 bg-gray-200 rounded w-4/5" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-6 left-0 right-0">
+                      <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
+                    </div>
+                  </>
+                )}
+
+                {/* 插屏半屏 - 居中弹窗 */}
+                {activeTemplate === "interstitial_half" && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="w-[75%] overflow-hidden rounded-lg shadow-xl">
+                      <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
+                    </div>
+                  </div>
+                )}
+
+                {/* 原生信息流 - 在内容流中展示 */}
+                {activeTemplate === "native" && (
+                  <div className="absolute inset-0 bg-gray-50">
+                    <div className="h-8 bg-white flex items-center justify-between px-4 pt-2">
+                      <span className="text-[10px] text-gray-900 font-medium">9:41</span>
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                        <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                        <div className="w-1.5 h-2.5 bg-gray-900 rounded-full" />
+                      </div>
+                    </div>
+                    <div className="p-3 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-16 bg-gray-200 rounded" />
+                      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
+                      </div>
+                      <div className="h-4 bg-gray-200 rounded w-2/3" />
+                      <div className="h-16 bg-gray-200 rounded" />
+                    </div>
+                  </div>
+                )}
+
+                {/* 全屏类型 - 填满整个内容区 */}
+                {!["banner", "interstitial_half", "native"].includes(activeTemplate) && (
+                  <>
+                    {isVideoType ? (
+                      <video
+                        src={DEFAULT_IMAGES[activeTemplate]}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
+                    ) : (
+                      <img
+                        src={DEFAULT_IMAGES[activeTemplate]}
+                        alt={templateInfo.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* 右侧按钮 */}
+            <div className="absolute -right-2 top-32 flex flex-col gap-2">
+              <div className="w-1 h-8 bg-gray-700 rounded" />
+              <div className="w-1 h-12 bg-gray-700 rounded" />
+            </div>
+            {/* 左侧按钮 */}
+            <div className="absolute -left-2 top-28 flex flex-col gap-2">
+              <div className="w-1 h-10 bg-gray-700 rounded" />
             </div>
           </div>
 
@@ -509,10 +586,6 @@ export function SDKTemplateStyleCard({
   const templateInfo = SDK_TEMPLATE_INFO_STYLES[type];
   const isVideoType = type === "video_splash" || type === "rewarded_video";
 
-  // 与RealAdPreview保持一致的尺寸
-  const phoneWidth = "w-[68px]";
-  const phoneHeight = "h-[136px]";
-
   if (!showFrame) {
     return (
       <div className={cn("rounded-lg overflow-hidden relative bg-gray-900", className)}>
@@ -536,17 +609,66 @@ export function SDKTemplateStyleCard({
     );
   }
 
+  // 横幅广告：在手机底部展示
+  if (type === "banner") {
+    return (
+      <div className={cn("bg-gray-900 rounded-xl p-1 shadow-lg", "w-[80px] h-[144px]", className)}>
+        <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-100">
+          {/* 模拟应用内容 */}
+          <div className="absolute inset-0 bg-gray-50">
+            <div className="h-2 bg-white flex items-center px-1">
+              <span className="text-[4px] text-gray-900">9:41</span>
+            </div>
+            <div className="p-0.5 space-y-0.5">
+              <div className="h-1 bg-gray-200 rounded w-3/4" />
+              <div className="h-1 bg-gray-200 rounded w-1/2" />
+              <div className="h-3 bg-gray-200 rounded" />
+              <div className="h-1 bg-gray-200 rounded w-2/3" />
+              <div className="h-3 bg-gray-200 rounded" />
+            </div>
+          </div>
+          {/* 横幅广告 - 固定在底部 */}
+          <div className="absolute bottom-0 left-0 right-0">
+            <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 插屏半屏：居中弹窗展示
+  if (type === "interstitial_half") {
+    return (
+      <div className={cn("bg-gray-900 rounded-xl p-1 shadow-lg", "w-[80px] h-[144px]", className)}>
+        <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/30 flex items-center justify-center">
+          <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-[80%] h-auto rounded shadow-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  // 原生信息流：在内容流中展示
+  if (type === "native") {
+    return (
+      <div className={cn("bg-gray-900 rounded-xl p-1 shadow-lg", "w-[80px] h-[144px]", className)}>
+        <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
+          <div className="h-2 bg-white flex items-center px-1">
+            <span className="text-[4px] text-gray-900">9:41</span>
+          </div>
+          <div className="p-0.5 space-y-0.5">
+            <div className="h-1 bg-gray-200 rounded w-3/4" />
+            <div className="h-2 bg-gray-200 rounded" />
+            <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto rounded shadow-sm" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 全屏类型：填满整个手机框架
   return (
-    <div className={cn(
-      "bg-gray-900 rounded-lg p-0.5 shadow-lg flex items-center justify-center",
-      phoneWidth,
-      phoneHeight
-    )}>
-      {/* 手机外框 */}
-      <div className={cn(
-        "bg-gray-900 rounded overflow-hidden relative w-full h-full",
-      )}>
-        {/* 内容区域 - 与RealAdPreview保持一致 */}
+    <div className={cn("bg-gray-900 rounded-xl p-1 shadow-lg", "w-[80px] h-[144px]", className)}>
+      <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-900">
         {isVideoType ? (
           <video
             src={DEFAULT_IMAGES[type]}
@@ -563,6 +685,10 @@ export function SDKTemplateStyleCard({
             className="absolute inset-0 w-full h-full object-cover"
           />
         )}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-0.5 left-0.5 right-0.5">
+          <p className="text-white text-[5px] font-medium truncate">{templateInfo.name}</p>
+        </div>
       </div>
     </div>
   );
