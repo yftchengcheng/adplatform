@@ -186,25 +186,49 @@ export function FullscreenPreviewModal({
 
             {/* 内容区域 */}
             <div 
-              className="relative w-full h-full overflow-hidden"
-              style={{ aspectRatio: `${templateSize.width}/${templateSize.height}` }}
+              className="relative w-full h-full flex items-center justify-center overflow-hidden bg-gray-100"
             >
-              {isVideoType ? (
-                <video
-                  src={defaultImage}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                />
-              ) : (
-                <img
-                  src={defaultImage}
-                  alt={displayName}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              )}
+              {/* 广告内容 - 根据类型设置不同尺寸 */}
+              <div 
+                className="relative overflow-hidden shadow-lg"
+                style={{ 
+                  // 根据类型设置显示尺寸（保持原始比例）
+                  ...(templateType === "banner" && { 
+                    width: "160px",
+                    height: "25px"
+                  }),
+                  ...(templateType === "interstitial_half" && { 
+                    width: "150px",
+                    height: "180px"
+                  }),
+                  ...(templateType === "native" && { 
+                    width: "180px",
+                    height: "100px"
+                  }),
+                  // 其他类型填满内容区
+                  ...(!["banner", "interstitial_half", "native"].includes(templateType) && {
+                    width: "100%",
+                    height: "100%"
+                  })
+                }}
+              >
+                {isVideoType ? (
+                  <video
+                    src={defaultImage}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                  />
+                ) : (
+                  <img
+                    src={defaultImage}
+                    alt={displayName}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+              </div>
 
               {/* 底部渐变遮罩 */}
               <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
