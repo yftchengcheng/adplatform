@@ -82,89 +82,96 @@ export default function SDKPage() {
         {/* 标准模板 */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">标准模板</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* 静态开屏 */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/static_splash")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="static_splash" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">静态开屏</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">静态开屏</h4>
               <p className="text-xs text-gray-500">静态图片展示，应用启动时展示品牌广告</p>
+              <p className="text-[10px] text-gray-400 mt-2">1080×1920 · 9:16</p>
             </div>
 
             {/* 视频开屏 */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/video_splash")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="video_splash" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">视频开屏</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">视频开屏</h4>
               <p className="text-xs text-gray-500">视频素材播放，应用启动时自动播放</p>
+              <p className="text-[10px] text-gray-400 mt-2">1080×1920 · 9:16</p>
             </div>
 
             {/* 插屏-半屏 */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/interstitial_half")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="interstitial_half" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">插屏-半屏</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">插屏-半屏</h4>
               <p className="text-xs text-gray-500">半屏展示，覆盖部分屏幕，不影响主流程</p>
+              <p className="text-[10px] text-gray-400 mt-2">1080×1920 · 5:4</p>
             </div>
 
             {/* 插屏-全屏 */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/interstitial_full")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="interstitial_full" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">插屏-全屏</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">插屏-全屏</h4>
               <p className="text-xs text-gray-500">全屏展示，强制用户观看广告</p>
+              <p className="text-[10px] text-gray-400 mt-2">1080×1920 · 9:16</p>
             </div>
 
             {/* 横幅 */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/banner")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="banner" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">横幅</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">横幅</h4>
               <p className="text-xs text-gray-500">顶部或底部横幅，持续展示品牌信息</p>
+              <p className="text-[10px] text-gray-400 mt-2">320×50 · 32:5</p>
             </div>
 
             {/* 原生（信息流） */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/native")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="native" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">原生（信息流）</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">原生（信息流）</h4>
               <p className="text-xs text-gray-500">融入内容的原生广告，不打断用户体验</p>
+              <p className="text-[10px] text-gray-400 mt-2">自适应</p>
             </div>
 
             {/* 激励视频 */}
             <div 
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer group bg-gradient-to-b from-gray-50 to-white"
               onClick={() => router.push("/sdk/rewarded_video")}
             >
-              <div className="w-full h-40 flex items-center justify-center mb-3 overflow-hidden">
+              <div className="w-full h-48 flex items-center justify-center mb-4">
                 <SDKTemplateStyleCard type="rewarded_video" />
               </div>
-              <h4 className="font-medium text-gray-900 mb-1">激励视频</h4>
+              <h4 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">激励视频</h4>
               <p className="text-xs text-gray-500">用户主动观看，获取对应奖励</p>
+              <p className="text-[10px] text-gray-400 mt-2">1080×1920 · 9:16</p>
             </div>
           </div>
         </div>
