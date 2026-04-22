@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useComponents } from "@/contexts/component-context";
 import { RealAdPreview } from "./real-ad-preview";
+import { InteractionPreview } from "./interaction-preview";
 
 // 获取触发规则图标（组件外定义，供 InteractionFlowChart 和 SDKTemplateEdit 共用）
 function getTriggerRuleIcon(rule: TriggerRule): React.ReactNode {
@@ -830,7 +831,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1"
                 >
                   <Eye className="w-3 h-3" />
-                  全屏查看
+                  全屏预览
                 </button>
               </div>
               <InteractionFlowChart
@@ -1083,29 +1084,12 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
 
       {/* 全屏预览弹窗 */}
       {showFullscreenPreview && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="px-5 pt-5 pb-4 border-b border-gray-200 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">广告互动链路示意图</h3>
-                <p className="text-sm text-gray-500 mt-0.5">{info.name} · 模版与组件交互关系</p>
-              </div>
-              <button
-                onClick={() => setShowFullscreenPreview(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <div className="p-6 overflow-auto max-h-[70vh]">
-              <InteractionFlowChart
-                templateType={type}
-                templateName={info.name}
-                componentLinks={componentLinks}
-              />
-            </div>
-          </div>
-        </div>
+        <InteractionPreview
+          templateType={type}
+          templateName={info.name}
+          componentLinks={componentLinks}
+          onClose={() => setShowFullscreenPreview(false)}
+        />
       )}
     </div>
   );
