@@ -381,12 +381,6 @@ export function ComponentList() {
               >
                 SDK模板
               </Link>
-              <Link href="/components/create">
-                <Button className="bg-blue-500 hover:bg-blue-600">
-                  <Plus className="w-4 h-4 mr-2" />
-                  创建
-                </Button>
-              </Link>
             </nav>
           </div>
         </div>
@@ -468,8 +462,14 @@ export function ComponentList() {
               </div>
             </div>
 
-            {/* Right: Batch Actions */}
+            {/* Right: Create & Batch Actions */}
             <div className="flex items-center gap-2 ml-auto">
+              <Link href="/components/create">
+                <Button className="bg-blue-500 hover:bg-blue-600">
+                  <Plus className="w-4 h-4 mr-2" />
+                  创建
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 size="sm"
