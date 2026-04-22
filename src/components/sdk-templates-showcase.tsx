@@ -325,10 +325,14 @@ function RewardedVideoStyle() {
     <div className="relative w-full h-full overflow-hidden">
       {/* 视频内容背景 */}
       <div className="absolute inset-0">
-        <img 
+        <video 
           src={DEFAULT_IMAGES.rewarded_video} 
           alt="激励视频"
           className="w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          autoPlay
         />
         {/* 底部渐变 */}
         <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
