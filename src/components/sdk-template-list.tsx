@@ -79,7 +79,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [data] = useState(() => generateMockData(type, 12));
+  const [data] = useState(() => generateMockData(type, 1));
 
   const info = SDK_TEMPLATE_INFO[type];
 
