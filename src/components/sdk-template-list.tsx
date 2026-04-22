@@ -246,7 +246,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
 
   // 返回SDK模版页面
   const handleBack = () => {
-    router.push("/");
+    router.push("/sdk/templates");
   };
 
   return (
