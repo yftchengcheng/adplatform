@@ -428,7 +428,9 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     id: comp.id,
     name: comp.name,
     type: comp.type,
+    category: comp.category,
     preview: getComponentPreview(comp.type, comp.config),
+    config: comp.config,
   }));
 
   // 选择组件弹窗
@@ -490,7 +492,9 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     id: string;
     name: string;
     type: string;
+    category: "static" | "animation";
     preview: string;
+    config?: Record<string, unknown>;
   }
   const handleSelectComponent = (component: SelectableComponent) => {
     setSelectedComponent(component);
@@ -542,7 +546,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         componentType: getComponentTypeName(selectedComponent.type),
         componentTypeKey: selectedComponent.type,
         componentPreview: selectedComponent.preview,
-        componentConfig: components.find(c => c.id === selectedComponent.id)?.config,
+        componentConfig: selectedComponent.config,
         triggerRule: autoRule,
         triggerTime: autoRule === "show_time" ? 5 : undefined,
         parentId: parent.id,
@@ -823,8 +827,10 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               setSelectedComponent({
                                 id: link.componentId,
                                 name: link.componentName,
-                                type: link.componentType,
-                                preview: link.componentPreview
+                                type: link.componentTypeKey,
+                                category: "animation" as const,
+                                preview: link.componentPreview,
+                                config: link.componentConfig,
                               });
                               setEditingLinkId(link.id);
                               setShowParentPicker(true);
@@ -942,16 +948,20 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   {availableComponents.map((comp) => (
                     <div 
                       key={comp.id}
-                      className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
+                      className="w-20 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
                       onClick={() => {
                         handleSelectComponent(comp);
                       }}
+                      title={`${comp.name}（${getComponentTypeName(comp.type)}）`}
                     >
-                      <img 
-                        src={comp.preview}
-                        alt={comp.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="h-12 overflow-hidden">
+                        <img 
+                          src={comp.preview}
+                          alt={comp.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-[9px] text-gray-500 px-1 py-0.5 truncate">{comp.name}</p>
                     </div>
                   ))}
                 </div>
@@ -1018,7 +1028,11 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">{comp.type}</span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-xs text-gray-500">{getComponentTypeName(comp.type)}</span>
+                            <span className="text-[10px] text-gray-400">·</span>
+                            <span className="text-[10px] text-gray-400">{comp.category === "animation" ? "动画" : "静态"}</span>
+                          </div>
                         </div>
                       </div>
                     );
