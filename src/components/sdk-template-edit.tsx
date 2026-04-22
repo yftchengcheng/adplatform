@@ -201,6 +201,37 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   const [showTimeDialog, setShowTimeDialog] = useState<string | null>(null);
   const [timeValue, setTimeValue] = useState(5);
 
+  // 选择上一级弹窗
+  const [showParentPicker, setShowParentPicker] = useState(false);
+  const [selectedComponent, setSelectedComponent] = useState<SelectableComponent | null>(null);
+
+  // 上一级选项类型
+  interface ParentOption {
+    id: string;
+    name: string;
+    type: "main" | "component";
+    preview?: string;
+  }
+
+  // 获取上一级选项列表
+  const getParentOptions = (): ParentOption[] => {
+    const options: ParentOption[] = [
+      { id: "main", name: "主素材", type: "main" }
+    ];
+    // 添加已配置的组件
+    componentLinks
+      .filter(link => link.status === "enabled")
+      .forEach(link => {
+        options.push({
+          id: link.id,
+          name: link.componentName,
+          type: "component",
+          preview: link.componentPreview
+        });
+      });
+    return options;
+  };
+
   // 返回列表
   const handleBack = () => {
     router.push(`/sdk/${type}`);
@@ -209,10 +240,11 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   // 添加组件关联
   const handleAddComponent = () => {
     setShowComponentPicker(true);
+    setSelectedComponent(null);
     setEditingLinkId(null);
   };
 
-  // 选择组件
+  // 选择组件（打开上一级选择）
   interface SelectableComponent {
     id: string;
     name: string;
@@ -220,20 +252,52 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     preview: string;
   }
   const handleSelectComponent = (component: SelectableComponent) => {
-    const newLink: ComponentLinkConfig = {
-      id: `link_${Date.now()}`,
-      componentId: component.id,
-      componentName: component.name,
-      componentType: getComponentTypeName(component.type),
-      componentPreview: component.preview,
-      triggerRule: "show_time",
-      triggerTime: 5,
-      parentId: "main",
-      parentName: "主素材",
-      status: "enabled"
-    };
-    setComponentLinks(prev => [...prev, newLink]);
+    setSelectedComponent(component);
     setShowComponentPicker(false);
+    setShowParentPicker(true);
+  };
+
+  // 选择上一级后添加/修改组件
+  const handleSelectParent = (parent: ParentOption) => {
+    if (editingLinkId) {
+      // 编辑模式：修改已有组件的上一级
+      setComponentLinks(prev => prev.map(link => {
+        if (link.id === editingLinkId) {
+          return { ...link, parentId: parent.id, parentName: parent.name };
+        }
+        return link;
+      }));
+      setShowParentPicker(false);
+      setSelectedComponent(null);
+      setEditingLinkId(null);
+    } else if (selectedComponent) {
+      // 新增模式：添加新组件
+      const newLink: ComponentLinkConfig = {
+        id: `link_${Date.now()}`,
+        componentId: selectedComponent.id,
+        componentName: selectedComponent.name,
+        componentType: getComponentTypeName(selectedComponent.type),
+        componentPreview: selectedComponent.preview,
+        triggerRule: "show_time",
+        triggerTime: 5,
+        parentId: parent.id,
+        parentName: parent.name,
+        status: "enabled"
+      };
+      setComponentLinks(prev => [...prev, newLink]);
+      setShowParentPicker(false);
+      setSelectedComponent(null);
+    }
+  };
+
+  // 修改组件的上一级
+  const handleChangeParent = (linkId: string, parent: ParentOption) => {
+    setComponentLinks(prev => prev.map(link => {
+      if (link.id === linkId) {
+        return { ...link, parentId: parent.id, parentName: parent.name };
+      }
+      return link;
+    }));
   };
 
   // 更新触发规则
@@ -416,9 +480,25 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               {link.componentType}
                             </span>
                           </div>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            上一级：{link.parentName}
-                          </p>
+                          <button
+                            onClick={() => {
+                              setSelectedComponent({
+                                id: link.componentId,
+                                name: link.componentName,
+                                type: link.componentType,
+                                preview: link.componentPreview
+                              });
+                              setEditingLinkId(link.id);
+                              setShowParentPicker(true);
+                            }}
+                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+                          >
+                            <span className="text-gray-500">上一级：</span>
+                            <span className="font-medium">{link.parentName}</span>
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
                         </div>
                         <div className="flex items-center gap-1">
                           <button
@@ -607,6 +687,87 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   })}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 选择上一级弹窗 */}
+      {showParentPicker && selectedComponent && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
+            <div className="px-5 pt-5 pb-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">选择上一级</h3>
+                <button
+                  onClick={() => {
+                    setShowParentPicker(false);
+                    setSelectedComponent(null);
+                  }}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">请选择触发该组件的上一级</p>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              {/* 已选组件预览 */}
+              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
+                  <img 
+                    src={selectedComponent.preview}
+                    alt={selectedComponent.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-900 block">
+                    {selectedComponent.name}
+                  </span>
+                  <span className="text-xs text-gray-500">{selectedComponent.type}</span>
+                </div>
+              </div>
+              
+              {/* 上一级选项 */}
+              <div className="space-y-2">
+                {getParentOptions().map((parent) => (
+                  <div
+                    key={parent.id}
+                    onClick={() => handleSelectParent(parent)}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
+                  >
+                    <div className={`w-12 h-10 rounded flex items-center justify-center flex-shrink-0 ${
+                      parent.type === "main" 
+                        ? "bg-gradient-to-br from-blue-100 to-blue-200" 
+                        : "bg-gradient-to-br from-purple-100 to-purple-200"
+                    }`}>
+                      {parent.type === "main" ? (
+                        <span className="text-xs font-medium text-blue-700">主素材</span>
+                      ) : (
+                        parent.preview ? (
+                          <img 
+                            src={parent.preview}
+                            alt={parent.name}
+                            className="w-full h-full object-cover rounded"
+                          />
+                        ) : (
+                          <span className="text-xs font-medium text-purple-700">组件</span>
+                        )
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-gray-900 block">
+                        {parent.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {parent.type === "main" ? "广告主素材" : "已添加的组件"}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
