@@ -14,7 +14,7 @@ export default function SDKTemplatesStylePage() {
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/">
+              <Link href="/sdk">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <ChevronLeft className="w-4 h-4" />
                   返回
