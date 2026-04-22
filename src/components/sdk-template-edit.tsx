@@ -577,25 +577,47 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     }));
   };
 
+  // 获取同级已使用的触发规则
+  const getSiblingUsedRules = (linkId: string, parentId: string): Set<TriggerRule> => {
+    const usedRules = new Set<TriggerRule>();
+    componentLinks.forEach(l => {
+      if (l.parentId === parentId && l.id !== linkId && l.status === "enabled") {
+        usedRules.add(l.triggerRule);
+      }
+    });
+    return usedRules;
+  };
+
   // 渲染触发规则选择器
-  const renderTriggerRuleSelector = (link: ComponentLinkConfig) => (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {(Object.keys(TRIGGER_RULES) as TriggerRule[]).map(rule => (
-        <button
-          key={rule}
-          onClick={() => handleUpdateTriggerRule(link.id, rule)}
-          className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-all ${
-            link.triggerRule === rule 
-              ? "bg-blue-100 text-blue-700 border border-blue-300" 
-              : "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200"
-          }`}
-        >
-          {getTriggerRuleIcon(rule)}
-          <span>{TRIGGER_RULES[rule].label}</span>
-        </button>
-      ))}
-    </div>
-  );
+  const renderTriggerRuleSelector = (link: ComponentLinkConfig) => {
+    const siblingUsedRules = getSiblingUsedRules(link.id, link.parentId || "main");
+    return (
+      <div className="flex flex-wrap gap-2 mt-2">
+        {(Object.keys(TRIGGER_RULES) as TriggerRule[]).map(rule => {
+          const isSelected = link.triggerRule === rule;
+          const isUsedBySibling = siblingUsedRules.has(rule);
+          const isDisabled = isUsedBySibling && !isSelected;
+          return (
+            <button
+              key={rule}
+              onClick={() => !isDisabled && handleUpdateTriggerRule(link.id, rule)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-all ${
+                isSelected
+                  ? "bg-blue-100 text-blue-700 border border-blue-300"
+                  : isDisabled
+                    ? "bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed line-through"
+                    : "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200"
+              }`}
+              title={isDisabled ? `该规则已被同级组件使用` : TRIGGER_RULES[rule].desc}
+            >
+              {getTriggerRuleIcon(rule)}
+              <span>{TRIGGER_RULES[rule].label}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -839,9 +861,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                       key={comp.id}
                       className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
                       onClick={() => {
-                        if (!componentLinks.find(l => l.componentId === comp.id)) {
-                          handleSelectComponent(comp);
-                        }
+                        handleSelectComponent(comp);
                       }}
                     >
                       <img 
@@ -890,16 +910,12 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
               ) : (
                 <div className="space-y-2">
                   {availableComponents.map((comp) => {
-                    const isLinked = componentLinks.some(l => l.componentId === comp.id);
+                    const linkedCount = componentLinks.filter(l => l.componentId === comp.id).length;
                     return (
                       <div
                         key={comp.id}
-                        onClick={() => !isLinked && handleSelectComponent(comp)}
-                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                          isLinked
-                            ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-50"
-                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
-                        }`}
+                        onClick={() => handleSelectComponent(comp)}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
                       >
                         <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
                           <img 
@@ -913,17 +929,14 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                             <span className="text-sm font-medium text-gray-900">
                               {comp.name}
                             </span>
-                            {isLinked && (
-                              <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-xs rounded">
-                                已关联
+                            {linkedCount > 0 && (
+                              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded">
+                                已关联{linkedCount}次
                               </span>
                             )}
                           </div>
                           <span className="text-xs text-gray-500">{comp.type}</span>
                         </div>
-                        {isLinked && (
-                          <span className="text-xs text-gray-400">不可重复添加</span>
-                        )}
                       </div>
                     );
                   })}
