@@ -32,42 +32,36 @@ const DEFAULT_IMAGES: Record<SDKTemplateType, string> = {
 // ============================================
 function StaticSplashStyle() {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-sky-200 via-blue-100 to-sky-300 overflow-hidden">
-      {/* 背景图片 */}
+    <div className="relative w-full h-full overflow-hidden">
+      {/* 背景图片 - 按9:16比例填满 */}
       <div className="absolute inset-0">
         <img 
           src={DEFAULT_IMAGES.static_splash} 
           alt="静态开屏"
           className="w-full h-full object-cover"
         />
-        {/* 底部渐变遮罩，确保底部内容可读 */}
+        {/* 底部渐变遮罩 */}
         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
       {/* 左上角：App Logo */}
-      <div className="absolute top-10 left-4 w-10 h-10 bg-white/40 backdrop-blur-sm rounded-xl flex items-center justify-center">
-        <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg" />
+      <div className="absolute top-1 left-0.5 w-2.5 h-2.5 bg-white/40 rounded flex items-center justify-center">
+        <div className="w-1.5 h-1.5 bg-gradient-to-br from-blue-400 to-blue-600 rounded-sm" />
       </div>
 
       {/* 右上角：跳过按钮 */}
-      <div className="absolute top-10 right-4 px-3 py-1.5 bg-white/30 backdrop-blur-sm rounded-full">
-        <span className="text-white/90 text-xs font-light tracking-wide">跳过 5s</span>
+      <div className="absolute top-1 right-0.5 px-1 py-0.5 bg-white/30 rounded text-white text-[6px]">
+        跳过 5s
       </div>
 
       {/* 底部：标题和按钮 */}
-      <div className="absolute bottom-16 left-0 right-0 text-center px-4">
-        {/* 主标题 */}
-        <h2 className="text-2xl font-bold text-white tracking-wide drop-shadow-lg">大连五一游</h2>
-        {/* 副标题 */}
-        <p className="text-sm text-white/90 mt-1 drop-shadow">浪漫滨城 欢乐假期</p>
-        {/* 金色胶囊按钮 */}
-        <button className="mt-4 px-8 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-full shadow-lg text-sm font-medium">
+      <div className="absolute bottom-3 left-0 right-0 text-center px-1">
+        <h2 className="text-[8px] font-bold text-white drop-shadow">大连五一游</h2>
+        <p className="text-[6px] text-white/90 mt-0.5">浪漫滨城</p>
+        <button className="mt-1 px-2 py-0.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-full text-[6px]">
           查看详情
         </button>
       </div>
-
-      {/* 底部：导航指示器 */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-8 h-1 bg-white/50 rounded-full" />
     </div>
   );
 }
@@ -79,7 +73,7 @@ function StaticSplashStyle() {
 // ============================================
 function VideoSplashStyle() {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden">
       {/* 背景图片 */}
       <div className="absolute inset-0">
         <img 
@@ -88,34 +82,29 @@ function VideoSplashStyle() {
           className="w-full h-full object-cover opacity-80"
         />
         {/* 顶部渐变遮罩 */}
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-5 bg-gradient-to-b from-black/50 to-transparent" />
         {/* 底部渐变遮罩 */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
       </div>
 
       {/* 左上角：App Logo */}
-      <div className="absolute top-10 left-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-        <div className="w-6 h-6 bg-white/80 rounded-lg" />
+      <div className="absolute top-1 left-0.5 w-2.5 h-2.5 bg-white/20 rounded flex items-center justify-center">
+        <div className="w-1.5 h-1.5 bg-white/80 rounded-sm" />
       </div>
 
       {/* 右上角：跳过按钮 */}
-      <div className="absolute top-10 right-4 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-        <span className="text-white/80 text-xs">跳过 5s | 静音</span>
+      <div className="absolute top-1 right-0.5 px-1 py-0.5 bg-white/20 rounded text-white text-[6px]">
+        跳过 5s
       </div>
 
-      {/* 底部：滑动引导条 */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-        <div className="flex gap-1.5">
-          <div className="w-5 h-0.5 bg-white/60 rounded" />
-          <div className="w-5 h-0.5 bg-white/60 rounded" />
-          <div className="w-5 h-0.5 bg-white/60 rounded" />
+      {/* 底部：滑动引导 */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <div className="flex gap-0.5">
+          <div className="w-1.5 h-0.5 bg-white/60 rounded" />
+          <div className="w-1.5 h-0.5 bg-white/60 rounded" />
+          <div className="w-1.5 h-0.5 bg-white/60 rounded" />
         </div>
-        <span className="text-white/50 text-xs mt-1">上滑</span>
-      </div>
-
-      {/* 右下角：查看详情按钮 */}
-      <div className="absolute bottom-12 right-4 px-4 py-2 bg-white rounded-lg shadow-lg">
-        <span className="text-gray-800 text-xs font-medium">查看详情 &gt;</span>
+        <span className="text-white/50 text-[5px] mt-0.5">上滑</span>
       </div>
     </div>
   );
@@ -170,7 +159,7 @@ function InterstitialHalfStyle() {
 // ============================================
 function InterstitialFullStyle() {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden">
       {/* 背景图片 */}
       <div className="absolute inset-0">
         <img 
@@ -182,44 +171,28 @@ function InterstitialFullStyle() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
       </div>
 
-      {/* 顶部状态栏 */}
-      <div className="absolute top-0 left-0 right-0 h-8 bg-black/20 flex items-center justify-between px-4">
-        <span className="text-white/80 text-[10px]">9:41</span>
-        <div className="flex gap-1">
-          <div className="w-1 h-1.5 bg-white/80 rounded-full" />
-          <div className="w-1 h-1.5 bg-white/80 rounded-full" />
-          <div className="w-1 h-1.5 bg-white/80 rounded-full" />
-        </div>
-      </div>
-
       {/* 中央内容叠加 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {/* 标题 */}
-        <h2 className="text-xl font-bold text-white text-center drop-shadow-lg px-4">大连五一游</h2>
+        <h2 className="text-[10px] font-bold text-white text-center drop-shadow px-2">大连五一游</h2>
         {/* 描述文字 */}
-        <p className="mt-2 text-xs text-white/90 text-center px-8 drop-shadow">
-          浪漫滨城 五一等你来
-        </p>
+        <p className="mt-1 text-[6px] text-white/90 text-center px-3">浪漫滨城 五一等你来</p>
 
-        {/* 评分和下载次数 */}
-        <div className="mt-4 flex items-center gap-2">
-          <span className="text-amber-400 text-sm">★★★★★</span>
-          <span className="text-white/60 text-xs">2024.05.01-05.07</span>
+        {/* 评分 */}
+        <div className="mt-1 flex items-center gap-1">
+          <span className="text-amber-400 text-[7px]">★★★★★</span>
         </div>
 
-        {/* 巨型渐变按钮 */}
-        <button className="absolute bottom-20 left-4 right-4 py-3.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-lg text-sm font-bold">
-          立即查看（99MB）
+        {/* 按钮 */}
+        <button className="absolute bottom-2 left-2 right-2 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded text-[6px] font-bold">
+          立即查看
         </button>
       </div>
 
       {/* 底部信息 */}
-      <div className="absolute bottom-6 right-4 text-[10px] text-white/30">
+      <div className="absolute bottom-0.5 right-1 text-[5px] text-white/30">
         广告
       </div>
-
-      {/* Home指示器 */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-white/30 rounded-full" />
     </div>
   );
 }
@@ -331,7 +304,7 @@ function RewardedVideoStyle() {
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-sky-200 via-green-200 to-green-300 overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden">
       {/* 背景图片 */}
       <div className="absolute inset-0">
         <img 
@@ -344,44 +317,37 @@ function RewardedVideoStyle() {
       </div>
 
       {/* 顶部：金色奖励横幅 */}
-      <div className="absolute top-12 left-4 right-4">
-        <div className="bg-gradient-to-r from-amber-400 to-amber-500 text-white text-center py-2 px-4 rounded-lg shadow-lg">
-          <span className="text-sm font-bold">观看视频以领取双倍金币奖励</span>
+      <div className="absolute top-1 left-1 right-1">
+        <div className="bg-gradient-to-r from-amber-400 to-amber-500 text-white text-center py-0.5 px-1 rounded text-[5px]">
+          观看视频领取双倍金币
         </div>
       </div>
 
       {/* 右下角：倒计时角标 */}
-      <div className="absolute bottom-28 right-3 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg shadow">
-        <span className="text-sm font-medium text-gray-800">{Math.max(0, Math.floor((100 - progress) / 6.7))}s后可领取</span>
+      <div className="absolute bottom-3 right-0.5 px-1 py-0.5 bg-white/90 rounded text-[6px]">
+        {Math.max(0, Math.floor((100 - progress) / 6.7))}s
       </div>
 
       {/* 底部：进度条 */}
-      <div className="absolute bottom-16 left-4 right-4">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">💎</span>
-          <div className="flex-1 h-2 bg-white/60 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-200"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <span className="text-sm font-bold text-white">{progress}%</span>
+      <div className="absolute bottom-2 left-1 right-1 flex items-center gap-1">
+        <span className="text-[8px]">💎</span>
+        <div className="flex-1 h-1 bg-white/60 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-200"
+            style={{ width: `${progress}%` }}
+          />
         </div>
+        <span className="text-[6px] text-white font-bold">{progress}%</span>
       </div>
 
       {/* 视频结束画面 */}
       {progress >= 100 && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <button className="px-8 py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-2xl shadow-xl text-base font-bold">
-            点击屏幕领取奖励
+          <button className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded text-[7px] font-bold">
+            点击领取奖励
           </button>
         </div>
       )}
-
-      {/* 状态栏 */}
-      <div className="absolute top-0 left-0 right-0 h-6 bg-black/10 flex items-center justify-between px-3">
-        <span className="text-white/70 text-[9px]">9:41</span>
-      </div>
     </div>
   );
 }
