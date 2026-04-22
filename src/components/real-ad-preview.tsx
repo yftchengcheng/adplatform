@@ -233,15 +233,17 @@ export function FullscreenPreviewModal({
               {/* 底部渐变遮罩 */}
               <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
 
-              {/* 跳过按钮 */}
-              <button
-                onClick={onClose}
-                className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
-              >
-                <span className="text-white/80 text-xs">
-                  {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
-                </span>
-              </button>
+              {/* 跳过按钮 - 只对静态开屏和视频开屏显示 */}
+              {!["banner", "interstitial_half", "interstitial_full", "native", "rewarded_video"].includes(templateType) && (
+                <button
+                  onClick={onClose}
+                  className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
+                >
+                  <span className="text-white/80 text-xs">
+                    {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
+                  </span>
+                </button>
+              )}
 
               {/* 关闭按钮 */}
               <button
