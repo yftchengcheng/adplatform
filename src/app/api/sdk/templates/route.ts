@@ -78,9 +78,10 @@ export async function GET(request: NextRequest) {
         };
       });
 
+      // 使用 upsert 处理可能的重复键
       const { data: insertedData, error: insertError } = await client
         .from("sdk_templates")
-        .insert(initialTemplates)
+        .upsert(initialTemplates, { onConflict: "id" })
         .select();
 
       if (insertError) {
