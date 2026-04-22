@@ -403,38 +403,158 @@ export function ComponentList() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-6">
         {navView === "sdk" ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8">
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
+          <div className="space-y-6">
+            {/* 搜索栏 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex-1 min-w-[200px]">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="搜索标准模板..."
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">SDK模板</h3>
-              <p className="text-gray-500 text-center max-w-md mb-8">
-                SDK模板是一系列可集成的代码模板，帮助您快速将组件功能集成到您的应用中。
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
-                    <span className="text-orange-600 font-bold">JS</span>
+            </div>
+
+            {/* 标准模板 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">标准模板</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* 静态开屏 */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-md p-2">
+                      <div className="w-8 h-10 bg-gray-200 rounded"></div>
+                    </div>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">JavaScript SDK</h4>
-                  <p className="text-sm text-gray-500">适用于Web应用的JavaScript集成包</p>
+                  <h4 className="font-medium text-gray-900 mb-1">静态开屏</h4>
+                  <p className="text-xs text-gray-500">静态图片展示，应用启动时展示品牌广告</p>
+                </div>
+
+                {/* 视频开屏 */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-md p-2 flex flex-col items-center">
+                      <div className="w-8 h-10 bg-gray-200 rounded mb-1"></div>
+                      <div className="w-4 h-4 bg-purple-300 rounded-full flex items-center justify-center">
+                        <div className="w-0 h-0 border-l-4 border-l-white border-y-2 border-y-transparent"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">视频开屏</h4>
+                  <p className="text-xs text-gray-500">视频素材播放，应用启动时自动播放</p>
+                </div>
+
+                {/* 插屏-半屏 */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-lg p-2 w-[60%]">
+                      <div className="w-full h-6 bg-green-200 rounded mb-1"></div>
+                      <div className="w-full h-3 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">插屏-半屏</h4>
+                  <p className="text-xs text-gray-500">半屏展示，覆盖部分屏幕，不影响主流程</p>
+                </div>
+
+                {/* 插屏-全屏 */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-lg p-2">
+                      <div className="w-10 h-12 bg-orange-200 rounded"></div>
+                    </div>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">插屏-全屏</h4>
+                  <p className="text-xs text-gray-500">全屏展示，强制用户观看广告</p>
+                </div>
+
+                {/* 横幅 */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-md px-3 py-1">
+                      <div className="w-16 h-4 bg-red-200 rounded"></div>
+                    </div>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">横幅</h4>
+                  <p className="text-xs text-gray-500">顶部或底部横幅，持续展示品牌信息</p>
+                </div>
+
+                {/* 原生（信息流） */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-md p-2 w-[70%]">
+                      <div className="flex gap-2">
+                        <div className="w-8 h-8 bg-teal-200 rounded"></div>
+                        <div className="flex-1">
+                          <div className="w-full h-2 bg-gray-200 rounded mb-1"></div>
+                          <div className="w-[80%] h-2 bg-gray-200 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">原生（信息流）</h4>
+                  <p className="text-xs text-gray-500">融入内容的原生广告，不打断用户体验</p>
+                </div>
+
+                {/* 激励视频 */}
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
+                  <div className="w-full aspect-video bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                    <div className="bg-white rounded shadow-md p-2 flex flex-col items-center">
+                      <div className="w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center mb-1">
+                        <div className="w-0 h-0 border-l-4 border-l-white border-y-2 border-y-transparent"></div>
+                      </div>
+                      <div className="w-10 h-2 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">激励视频</h4>
+                  <p className="text-xs text-gray-500">用户主动观看，获取对应奖励</p>
+                </div>
+              </div>
+            </div>
+
+            {/* SDK平台 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">SDK下载</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <span className="text-orange-600 font-bold text-sm">JS</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">JavaScript SDK</h4>
+                      <p className="text-xs text-gray-500">Web应用</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500">支持React、Vue等主流框架，快速集成广告组件</p>
                 </div>
                 <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                    <span className="text-blue-600 font-bold">iOS</span>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <span className="text-blue-600 font-bold text-sm">iOS</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">iOS SDK</h4>
+                      <p className="text-xs text-gray-500">原生应用</p>
+                    </div>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">iOS SDK</h4>
-                  <p className="text-sm text-gray-500">适用于iOS应用的原生集成包</p>
+                  <p className="text-sm text-gray-500">支持Swift和Objective-C，适配iPhone和iPad设备</p>
                 </div>
                 <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
-                    <span className="text-green-600 font-bold">A</span>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-green-600 font-bold text-sm">A</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">Android SDK</h4>
+                      <p className="text-xs text-gray-500">原生应用</p>
+                    </div>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">Android SDK</h4>
-                  <p className="text-sm text-gray-500">适用于Android应用的原生集成包</p>
+                  <p className="text-sm text-gray-500">支持Java和Kotlin，兼容各类Android设备</p>
                 </div>
               </div>
             </div>
