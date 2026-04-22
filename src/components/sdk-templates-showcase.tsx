@@ -16,13 +16,13 @@ type SDKTemplateType =
 
 // 默认图片URL
 const DEFAULT_IMAGES: Record<SDKTemplateType, string> = {
-  static_splash: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E9%9D%99%E6%80%81%E5%BC%80%E5%B1%8F.png&nonce=75f52b3b-8301-46f6-aead-6bfa0ceeb080&project_id=7628071345674895423&sign=e29040bd10a4501b325c3e84721d6bab1eb4ec2f5e28a6d7ad9e669dddd42b6b",
-  video_splash: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E8%A7%86%E9%A2%91%E5%BC%80%E5%B1%8F.mp4&nonce=97d1e2bf-2958-470f-8400-be5f4b45ee72&project_id=7628071345674895423&sign=0c93fff74d3cb45fef06eb6bed7e195f7c58dd7c4bad716ec19282f5a108903a",
-  interstitial_half: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%8F%92%E5%B1%8F-%E5%8D%8A%E5%B1%8F.png&nonce=4714e042-8d12-4497-ac5b-9297adeed1b6&project_id=7628071345674895423&sign=f54b47fd7755e4825f4bda7c503f536da59fa5cada4faefed2bface3cdbfc2e0",
-  interstitial_full: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%8F%92%E5%B1%8F-%E5%85%A8%E5%B1%8F.png&nonce=94e1d76b-3536-4739-ae83-8f1e928cf361&project_id=7628071345674895423&sign=c3c1205b71886860de92f7378343d5fe9989572f3961446045cb9963a9a2f10c",
-  banner: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%A8%AA%E5%B9%85.png&nonce=88afd256-378f-4016-a603-98eeeef852d8&project_id=7628071345674895423&sign=6174036e694310520f103aa1739725d804aaf7e1e3d60fc49692c8b7e16cbb6a",
-  native: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E5%8E%9F%E7%94%9F%EF%BC%88%E4%BF%A1%E6%81%AF%E6%B5%81%EF%BC%89.png&nonce=0fb3ead2-fee1-4120-8bde-cd9908671a6f&project_id=7628071345674895423&sign=55e5301e475021854b5224ce02acaa81f97d06ebc78c7f7663783a70387ae188",
-  rewarded_video: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%BF%80%E5%8A%B1%E8%A7%86%E9%A2%91.mp4&nonce=55ea299f-b88f-4868-bafe-fea3ba59ec67&project_id=7628071345674895423&sign=0b73f64cd14b78c5f5484a685a3e97458148d3209706640678527a9017309a25",
+  static_splash: "/static-splash.png",
+  video_splash: "/video-splash.mp4",
+  interstitial_half: "/interstitial-half.png",
+  interstitial_full: "/interstitial-full.png",
+  banner: "/banner.png",
+  native: "/native.png",
+  rewarded_video: "/rewarded-video.mp4",
 };
 
 // ============================================

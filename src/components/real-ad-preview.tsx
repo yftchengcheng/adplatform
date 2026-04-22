@@ -1,9 +1,30 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { X, Play, Pause, ChevronDown, ChevronUp, ZoomIn } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { X, Play, Pause } from "lucide-react";
 import { useComponents } from "@/contexts/component-context";
 import { cn } from "@/lib/utils";
+
+// SDK模板类型
+type SDKTemplateType = 
+  | "static_splash"
+  | "video_splash"
+  | "interstitial_half"
+  | "interstitial_full"
+  | "banner"
+  | "native"
+  | "rewarded_video";
+
+// 默认图片URL
+const DEFAULT_IMAGES: Record<string, string> = {
+  static_splash: "/static-splash.png",
+  video_splash: "/video-splash.mp4",
+  interstitial_half: "/interstitial-half.png",
+  interstitial_full: "/interstitial-full.png",
+  banner: "/banner.png",
+  native: "/native.png",
+  rewarded_video: "/rewarded-video.mp4",
+};
 
 // 组件关联配置
 interface ComponentLinkConfig {
@@ -41,13 +62,13 @@ const SDK_TEMPLATE_NAMES: Record<string, string> = {
 
 // SDK模板尺寸
 const SDK_TEMPLATE_SIZES: Record<string, { width: number; height: number; ratio: string }> = {
-  static_splash: { width: 540, height: 960, ratio: "9:16" },
-  video_splash: { width: 540, height: 960, ratio: "9:16" },
-  interstitial_half: { width: 540, height: 450, ratio: "6:5" },
-  interstitial_full: { width: 540, height: 960, ratio: "9:16" },
-  banner: { width: 640, height: 100, ratio: "32:5" },
-  native: { width: 540, height: 450, ratio: "6:5" },
-  rewarded_video: { width: 540, height: 960, ratio: "9:16" },
+  static_splash: { width: 1080, height: 1920, ratio: "9:16" },
+  video_splash: { width: 1080, height: 1920, ratio: "9:16" },
+  interstitial_half: { width: 600, height: 500, ratio: "6:5" },
+  interstitial_full: { width: 1080, height: 1920, ratio: "9:16" },
+  banner: { width: 320, height: 50, ratio: "32:5" },
+  native: { width: 540, height: 200, ratio: "6:5" },
+  rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
 };
 
 interface RealAdPreviewProps {
@@ -72,17 +93,21 @@ export function RealAdPreview({
   const [showComponentOverlay, setShowComponentOverlay] = useState(false);
   const [currentTriggeredComponent, setCurrentTriggeredComponent] = useState<ComponentLinkConfig | null>(null);
   const [isVideoComplete, setIsVideoComplete] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
+  const defaultImage = DEFAULT_IMAGES[templateType];
+  const templateSize = SDK_TEMPLATE_SIZES[templateType] || { width: 540, height: 960, ratio: "9:16" };
+  const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
 
   // 获取关联组件的详细信息
   const getLinkedComponents = useCallback(() => {
     return componentLinks
       .filter(link => link.status === "enabled")
       .map(link => {
-        // 优先使用传入的配置
         if (link.componentName && link.componentType) {
           return { ...link, config: link.config || {} };
         }
-        // 否则从组件列表中查找
         const comp = components.find(c => c.id === link.componentId);
         if (comp) {
           return {
@@ -98,8 +123,17 @@ export function RealAdPreview({
   }, [componentLinks, components]);
 
   const linkedComponents = getLinkedComponents();
-  const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
-  const templateSize = SDK_TEMPLATE_SIZES[templateType] || { width: 540, height: 960, ratio: "9:16" };
+
+  // 视频播放控制
+  useEffect(() => {
+    if (!videoRef.current) return;
+    
+    if (isPlaying && isVideoType) {
+      videoRef.current.play().catch(() => {});
+    } else {
+      videoRef.current.pause();
+    }
+  }, [isPlaying, isVideoType]);
 
   // 计时器效果
   useEffect(() => {
@@ -109,16 +143,13 @@ export function RealAdPreview({
       setShowTime(prev => {
         const newTime = prev + 0.1;
         
-        // 检查触发规则
         linkedComponents.forEach(comp => {
           if (triggeredComponents.has(comp.id)) return;
           
-          // 出现时间触发
           if (comp.triggerRule === "show_time" && comp.triggerTime && newTime >= comp.triggerTime) {
             setTriggeredComponents(prev => new Set([...prev, comp.id]));
           }
           
-          // 视频播放完毕触发（模拟5秒）
           if (comp.triggerRule === "video_complete" && newTime >= 5) {
             setIsVideoComplete(true);
             setTriggeredComponents(prev => new Set([...prev, comp.id]));
@@ -150,18 +181,16 @@ export function RealAdPreview({
     setShowComponentOverlay(false);
     setCurrentTriggeredComponent(null);
     setIsVideoComplete(false);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+    }
   };
 
   // 点击触发组件
   const handleTriggerComponent = (comp: ComponentLinkConfig & { config: Record<string, unknown> }) => {
-    const rule = TRIGGER_RULE_LABELS[comp.triggerRule];
-    
-    // 如果是点击关闭按钮，先关闭再显示
     if (comp.triggerRule === "click_close") {
       setIsPlaying(false);
     }
-    
-    // 显示组件
     setCurrentTriggeredComponent(comp);
     setShowComponentOverlay(true);
   };
@@ -174,30 +203,39 @@ export function RealAdPreview({
 
   // 根据模板类型渲染主素材
   const renderMainMaterial = () => {
-    const isVideo = templateType === "video_splash" || templateType === "rewarded_video";
-    
     return (
       <div 
-        className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden"
+        className="relative w-full h-full overflow-hidden"
         style={{ aspectRatio: `${templateSize.width}/${templateSize.height}` }}
       >
-        {/* 主素材内容 */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white/60">
-            <div className="w-24 h-32 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-xl mx-auto mb-3 flex items-center justify-center">
-              {isVideo ? (
-                <Play className="w-12 h-12" />
-              ) : (
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl" />
-              )}
-            </div>
-            <p className="text-sm">{displayName}</p>
-            <p className="text-xs text-white/40 mt-1">{templateSize.width}×{templateSize.height}</p>
-          </div>
+        {/* 背景图片或视频 */}
+        {isVideoType ? (
+          <video
+            ref={videoRef}
+            src={defaultImage}
+            className="absolute inset-0 w-full h-full object-cover"
+            muted
+            loop
+            playsInline
+          />
+        ) : (
+          <img
+            src={defaultImage}
+            alt={displayName}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+
+        {/* 底部渐变遮罩 */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+
+        {/* 跳过按钮 */}
+        <div className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full">
+          <span className="text-white/80 text-xs">跳过 5s</span>
         </div>
 
         {/* 视频进度条 */}
-        {isVideo && isPlaying && (
+        {isVideoType && isPlaying && (
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
             <div 
               className="h-full bg-blue-500 transition-all"
@@ -206,11 +244,10 @@ export function RealAdPreview({
           </div>
         )}
 
-        {/* 关闭按钮（可选） */}
+        {/* 关闭按钮 */}
         {isPlaying && (
           <button 
             onClick={() => {
-              // 模拟点击关闭
               linkedComponents
                 .filter(c => c.triggerRule === "click_close")
                 .forEach(c => handleTriggerComponent(c));
@@ -218,7 +255,7 @@ export function RealAdPreview({
                 handleReset();
               }
             }}
-            className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+            className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
           >
             <X className="w-4 h-4" />
           </button>
@@ -230,7 +267,7 @@ export function RealAdPreview({
             {linkedComponents
               .filter(c => triggeredComponents.has(c.id))
               .slice(0, 3)
-              .map((c, i) => (
+              .map((c) => (
                 <div 
                   key={c.id}
                   className="px-2 py-1 bg-purple-500/90 rounded text-xs text-white flex items-center gap-1"
@@ -239,11 +276,6 @@ export function RealAdPreview({
                   <span>{c.componentName.slice(0, 4)}</span>
                 </div>
               ))}
-            {triggeredComponents.size > 3 && (
-              <div className="px-2 py-1 bg-gray-500/90 rounded text-xs text-white">
-                +{triggeredComponents.size - 3}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -257,7 +289,6 @@ export function RealAdPreview({
     return (
       <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
         <div className="bg-white rounded-xl overflow-hidden max-w-[90%] max-h-[90%] shadow-2xl">
-          {/* 组件内容（简化版） */}
           <div className="w-40 h-32 bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center">
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
@@ -272,7 +303,6 @@ export function RealAdPreview({
             </div>
           </div>
           
-          {/* 关闭按钮 */}
           <button
             onClick={handleCloseComponentOverlay}
             className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white"
@@ -290,195 +320,71 @@ export function RealAdPreview({
       return (
         <button
           onClick={handleStartSimulation}
-          className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
+          className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
         >
+          <Play className="w-4 h-4" />
           开始模拟
         </button>
       );
     }
 
     return (
-      <div className="space-y-2">
-        {/* 计时器 */}
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">时间</span>
-          <span className="font-medium text-gray-700">{showTime.toFixed(1)}s</span>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-600">已播放</span>
+          <span className="font-medium text-gray-900">{showTime.toFixed(1)}s</span>
         </div>
-
-        {/* 已触发组件列表 */}
-        <div className="space-y-1">
-          <span className="text-xs text-gray-500">已触发 ({triggeredComponents.size}/{linkedComponents.length})</span>
-          {linkedComponents.length === 0 ? (
-            <p className="text-xs text-gray-400 italic">暂无关联组件</p>
-          ) : (
-            linkedComponents.map(comp => {
-              const isTriggered = triggeredComponents.has(comp.id);
-              const rule = TRIGGER_RULE_LABELS[comp.triggerRule];
-              
-              return (
-                <button
-                  key={comp.id}
-                  onClick={() => isTriggered && handleTriggerComponent(comp)}
-                  disabled={!isTriggered}
-                  className={cn(
-                    "w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
-                    isTriggered 
-                      ? "bg-purple-50 border border-purple-200 hover:bg-purple-100 cursor-pointer" 
-                      : "bg-gray-50 border border-gray-200 opacity-50"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span>{rule?.icon}</span>
-                      <span className={isTriggered ? "text-purple-700" : "text-gray-500"}>
-                        {comp.componentName}
-                      </span>
-                    </div>
-                    {isTriggered && <span className="text-purple-500">点击查看</span>}
-                  </div>
-                  <div className="mt-1 text-gray-400">
-                    {rule?.label}
-                    {comp.triggerRule === "show_time" && comp.triggerTime && ` · ${comp.triggerTime}s`}
-                    {comp.triggerRule === "video_complete" && " · 5s"}
-                  </div>
-                </button>
-              );
-            })
-          )}
-        </div>
-
-        {/* 控制按钮 */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isPlaying ? "暂停" : "继续"}
+          </button>
           <button
             onClick={handleReset}
-            className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-medium transition-colors"
+            className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
           >
             重置
           </button>
-          {isVideoComplete && (
-            <button
-              onClick={() => {
-                linkedComponents
-                  .filter(c => c.triggerRule === "video_complete" && triggeredComponents.has(c.id))
-                  .forEach(c => handleTriggerComponent(c));
-              }}
-              className="flex-1 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium transition-colors"
-            >
-              查看组件
-            </button>
-          )}
         </div>
       </div>
     );
   };
 
-  // 全屏预览
-  if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 z-[100] bg-black flex flex-col">
-        {/* 顶部工具栏 */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-900">
-          <h3 className="text-white font-medium">{displayName} - 真实预览</h3>
-          <button
-            onClick={onClose}
-            className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-        </div>
-
-        {/* 预览内容 */}
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-[320px] h-[600px] bg-gray-900 rounded-[2rem] p-2 shadow-2xl">
-            <div className="w-full h-full bg-white rounded-[1.8rem] overflow-hidden relative">
-              {/* 状态栏 */}
-              <div className="h-8 bg-white flex items-end justify-between px-5 pb-0.5">
-                <span className="text-[10px] font-medium text-gray-900">9:41</span>
-                <div className="flex items-center gap-0.5">
-                  <div className="w-1 h-1.5 bg-gray-900 rounded-full" />
-                  <div className="w-1 h-1.5 bg-gray-900 rounded-full" />
-                  <div className="w-1 h-1.5 bg-gray-900 rounded-full" />
-                  <div className="w-1 h-1.5 bg-gray-900 rounded-full" />
-                </div>
-              </div>
-
-              {/* 主素材 */}
-              <div className="flex-1 bg-gray-100 relative overflow-hidden">
-                {renderMainMaterial()}
-                {renderComponentOverlay()}
-              </div>
-
-              {/* 主页指示器 */}
-              <div className="h-6 bg-white flex items-center justify-center">
-                <div className="w-24 h-0.5 bg-gray-300 rounded-full" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 底部控制面板 */}
-        <div className="bg-gray-900 p-4">
-          <div className="max-w-md mx-auto">
-            {renderTriggerPanel()}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 紧凑预览（编辑页面使用）
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex flex-col">
-      {/* 手机框架 */}
-      <div className="flex-1 flex items-center justify-center p-2">
-        <div 
-          className="bg-gray-900 rounded-xl overflow-hidden shadow-lg"
-          style={{ width: '120px', height: '200px' }}
-        >
-          <div className="w-full h-full bg-white rounded-lg overflow-hidden relative">
-            {/* 简化状态栏 */}
-            <div className="h-3 bg-white flex items-center justify-between px-2">
-              <span className="text-[6px] text-gray-900">9:41</span>
-              <div className="flex gap-0.5">
-                <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-              </div>
-            </div>
+    <div className={cn(
+      "relative bg-white rounded-lg overflow-hidden",
+      isFullscreen ? "w-full h-full" : "w-full"
+    )}>
+      {/* 主素材 */}
+      <div className={cn(
+        "relative bg-gray-900",
+        isFullscreen ? "w-full h-full" : "aspect-[9/16] max-h-[400px]"
+      )}>
+        {renderMainMaterial()}
+        {renderComponentOverlay()}
+      </div>
 
-            {/* 主素材 */}
-            <div className="flex-1 relative overflow-hidden">
-              {renderMainMaterial()}
-              {renderComponentOverlay()}
-            </div>
-          </div>
+      {/* 控制面板 */}
+      {!isFullscreen && (
+        <div className="p-3 bg-gray-50 border-t border-gray-100">
+          {renderTriggerPanel()}
         </div>
-      </div>
+      )}
 
-      {/* 触发信息 */}
-      <div className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 p-2">
-        {linkedComponents.length === 0 ? (
-          <p className="text-[10px] text-gray-400 text-center">暂无关联组件</p>
-        ) : (
-          <div className="flex items-center justify-center gap-1 flex-wrap">
-            {linkedComponents.slice(0, 3).map(comp => {
-              const rule = TRIGGER_RULE_LABELS[comp.triggerRule];
-              return (
-                <span 
-                  key={comp.id}
-                  className="px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded text-[9px]"
-                >
-                  {rule?.icon} {comp.componentName.slice(0, 4)}
-                </span>
-              );
-            })}
-            {linkedComponents.length > 3 && (
-              <span className="text-[9px] text-gray-500">+{linkedComponents.length - 3}</span>
-            )}
-          </div>
-        )}
-      </div>
+      {/* 关闭按钮（可选） */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 z-10"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
     </div>
   );
 }
 
-// 兼容旧的 AdInteractionPreview 名称
-export { RealAdPreview as AdInteractionPreview };
+export default RealAdPreview;
