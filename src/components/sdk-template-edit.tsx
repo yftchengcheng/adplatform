@@ -499,26 +499,48 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   // 选择上一级后添加/修改组件
   const handleSelectParent = (parent: ParentOption) => {
     if (editingLinkId) {
-      // 编辑模式：修改已有组件的上一级
-      setComponentLinks(prev => prev.map(link => {
-        if (link.id === editingLinkId) {
-          return { ...link, parentId: parent.id, parentName: parent.name };
+      // 编辑模式：修改已有组件的上一级，校验新父级的规则冲突
+      setComponentLinks(prev => {
+        const target = prev.find(l => l.id === editingLinkId);
+        if (!target) return prev;
+        const parentId = parent.id;
+        const siblingUsed = new Set<TriggerRule>();
+        prev.forEach(l => {
+          if (l.parentId === parentId && l.id !== editingLinkId && l.status === "enabled") {
+            siblingUsed.add(l.triggerRule);
+          }
+        });
+        let newRule = target.triggerRule;
+        let newTime = target.triggerTime;
+        if (siblingUsed.has(target.triggerRule)) {
+          const allRules = Object.keys(TRIGGER_RULES) as TriggerRule[];
+          const available = allRules.find(r => !siblingUsed.has(r));
+          if (available) {
+            newRule = available;
+            newTime = available === "show_time" ? 5 : undefined;
+          }
         }
-        return link;
-      }));
+        return prev.map(link => {
+          if (link.id === editingLinkId) {
+            return { ...link, parentId: parent.id, parentName: parent.name, triggerRule: newRule, triggerTime: newTime };
+          }
+          return link;
+        });
+      });
       setShowParentPicker(false);
       setSelectedComponent(null);
       setEditingLinkId(null);
     } else if (selectedComponent) {
-      // 新增模式：添加新组件
+      // 新增模式：添加新组件，自动选择第一个同级可用的触发规则
+      const autoRule = getFirstAvailableRule(parent.id);
       const newLink: ComponentLinkConfig = {
         id: `link_${Date.now()}`,
         componentId: selectedComponent.id,
         componentName: selectedComponent.name,
         componentType: getComponentTypeName(selectedComponent.type),
         componentPreview: selectedComponent.preview,
-        triggerRule: "show_time",
-        triggerTime: 5,
+        triggerRule: autoRule,
+        triggerTime: autoRule === "show_time" ? 5 : undefined,
         parentId: parent.id,
         parentName: parent.name,
         status: "enabled"
@@ -539,14 +561,27 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     }));
   };
 
-  // 更新触发规则
+  // 更新触发规则（带同级唯一性校验）
   const handleUpdateTriggerRule = (linkId: string, rule: TriggerRule) => {
-    setComponentLinks(prev => prev.map(link => {
-      if (link.id === linkId) {
-        return { ...link, triggerRule: rule };
-      }
-      return link;
-    }));
+    setComponentLinks(prev => {
+      const target = prev.find(l => l.id === linkId);
+      if (!target) return prev;
+      // 校验同级唯一性
+      const parentId = target.parentId || "main";
+      const siblingUsed = new Set<TriggerRule>();
+      prev.forEach(l => {
+        if (l.parentId === parentId && l.id !== linkId && l.status === "enabled") {
+          siblingUsed.add(l.triggerRule);
+        }
+      });
+      if (siblingUsed.has(rule)) return prev; // 规则已被使用，不更新
+      return prev.map(link => {
+        if (link.id === linkId) {
+          return { ...link, triggerRule: rule, triggerTime: rule === "show_time" ? (link.triggerTime || 5) : undefined };
+        }
+        return link;
+      });
+    });
   };
 
   // 更新触发时间
@@ -565,17 +600,47 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     setComponentLinks(prev => prev.filter(link => link.id !== linkId));
   };
 
-  // 切换组件状态
+  // 切换组件状态（启用时校验同级规则冲突）
   const handleToggleStatus = (linkId: string) => {
-    setComponentLinks(prev => prev.map(link => {
-      if (link.id === linkId) {
-        return { 
-          ...link, 
-          status: link.status === "enabled" ? "disabled" : "enabled" 
-        };
+    setComponentLinks(prev => {
+      const target = prev.find(l => l.id === linkId);
+      if (!target) return prev;
+      if (target.status === "disabled") {
+        // 启用时校验同级规则冲突
+        const parentId = target.parentId || "main";
+        const siblingUsed = new Set<TriggerRule>();
+        prev.forEach(l => {
+          if (l.parentId === parentId && l.id !== linkId && l.status === "enabled") {
+            siblingUsed.add(l.triggerRule);
+          }
+        });
+        // 如果当前规则已被同级使用，自动切换到第一个可用规则
+        let newRule = target.triggerRule;
+        let newTime = target.triggerTime;
+        if (siblingUsed.has(target.triggerRule)) {
+          const allRules = Object.keys(TRIGGER_RULES) as TriggerRule[];
+          const available = allRules.find(r => !siblingUsed.has(r));
+          if (available) {
+            newRule = available;
+            newTime = available === "show_time" ? 5 : undefined;
+          }
+        }
+        return prev.map(link => {
+          if (link.id === linkId) {
+            return { ...link, status: "enabled", triggerRule: newRule, triggerTime: newTime };
+          }
+          return link;
+        });
+      } else {
+        // 禁用无需校验
+        return prev.map(link => {
+          if (link.id === linkId) {
+            return { ...link, status: "disabled" };
+          }
+          return link;
+        });
       }
-      return link;
-    }));
+    });
   };
 
   // 获取同级已使用的触发规则
@@ -587,6 +652,19 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
       }
     });
     return usedRules;
+  };
+
+  // 获取同级第一个可用的触发规则（用于新增组件时自动选择）
+  const getFirstAvailableRule = (parentId: string): TriggerRule => {
+    const usedRules = new Set<TriggerRule>();
+    componentLinks.forEach(l => {
+      if (l.parentId === parentId && l.status === "enabled") {
+        usedRules.add(l.triggerRule);
+      }
+    });
+    const allRules = Object.keys(TRIGGER_RULES) as TriggerRule[];
+    const available = allRules.find(r => !usedRules.has(r));
+    return available || "show_time";
   };
 
   // 渲染触发规则选择器
