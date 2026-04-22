@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/toast";
 import { 
   ChevronLeft, 
   Search, 
@@ -73,6 +74,7 @@ interface SDKTemplateListProps {
 
 export function SDKTemplateList({ type }: SDKTemplateListProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [data, setData] = useState<SDKTemplate[]>([]);
@@ -157,10 +159,10 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
     try {
       await navigator.clipboard.writeText(id);
       // 可以添加一个提示
-      toast.success("已复制模板ID");
+      showToast("已复制模板ID", "success");
     } catch (err) {
       console.error("Failed to copy:", err);
-      toast.error("复制失败");
+      showToast("复制失败", "error");
     }
   };
 
@@ -187,13 +189,13 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
       if (result.success && result.data) {
         // 将新克隆的数据添加到列表开头
         setData([result.data, ...data]);
-        toast.success("克隆成功");
+        showToast("克隆成功", "success");
       } else {
-        toast.error(result.error || "克隆失败");
+        showToast(result.error || "克隆失败", "error");
       }
     } catch (err) {
       console.error("Failed to clone:", err);
-      toast.error("克隆失败");
+      showToast("克隆失败", "error");
     }
   };
 
