@@ -1,94 +1,49 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { 
-  ChevronLeft, 
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Plus,
   X,
   Eye,
-  Play,
-  MousePointer,
-  RotateCcw,
-  Hand,
-  Zap,
-  Clock,
+  Loader2,
+  Check,
+  Image as ImageIcon,
   Trash2,
-  ImageIcon,
-  Loader2
+  GripVertical,
+  Upload,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useComponents } from "@/contexts/component-context";
 import { AdInteractionPreview } from "./ad-interaction-preview";
+import { ComponentPickerModal } from "./component-picker-modal";
+import { Select } from "@/components/ui/select";
+
+// 触发规则选项
+const TRIGGER_RULES = [
+  { value: "video_complete", label: "视频播放完毕", timeLabel: "无需设置" },
+  { value: "show_time", label: "展示X秒后", timeLabel: "单位：秒" },
+  { value: "click_close", label: "点击关闭按钮", timeLabel: "无需设置" },
+  { value: "back_from_media", label: "从素材页返回", timeLabel: "无需设置" },
+  { value: "click_other_ad", label: "点击其他广告", timeLabel: "无需设置" },
+  { value: "in_app_interaction", label: "App内交互", timeLabel: "单位：次数" },
+];
 
 // SDK模板类型
 type SDKTemplateType = 
-  | "static_splash"      // 静态开屏
-  | "video_splash"        // 视频开屏
-  | "interstitial_half"   // 插屏-半屏
-  | "interstitial_full"   // 插屏-全屏
-  | "banner"              // 横幅
-  | "native"              // 原生（信息流）
-  | "rewarded_video";     // 激励视频
-
-// 触发规则类型
-type TriggerRule = 
-  | "video_complete"      // 视频播放完毕
-  | "show_time"           // 出现时间
-  | "click_close"         // 点击广告关闭按钮
-  | "back_from_media"     // 跳转后返回媒体
-  | "click_other_ad"      // 点击其他(匿名)广告
-  | "in_app_interaction"; // 应用内非广告互动
-
-// 触发规则配置
-const TRIGGER_RULES: Record<TriggerRule, { label: string; icon: React.ReactNode; desc: string }> = {
-  video_complete: {
-    label: "视频播放完毕",
-    icon: <Play className="w-4 h-4" />,
-    desc: "视频广告播放完毕，即组件弹出展示"
-  },
-  show_time: {
-    label: "出现时间",
-    icon: <Clock className="w-4 h-4" />,
-    desc: "广告展示指定时间后组件弹出"
-  },
-  click_close: {
-    label: "点击关闭按钮",
-    icon: <X className="w-4 h-4" />,
-    desc: "点击广告关闭按钮后触发组件展示"
-  },
-  back_from_media: {
-    label: "跳转后返回",
-    icon: <RotateCcw className="w-4 h-4" />,
-    desc: "跳转后返回媒体时触发组件展示"
-  },
-  click_other_ad: {
-    label: "点击其他广告",
-    icon: <MousePointer className="w-4 h-4" />,
-    desc: "点击其他(匿名)广告后触发"
-  },
-  in_app_interaction: {
-    label: "应用内互动",
-    icon: <Hand className="w-4 h-4" />,
-    desc: "应用内非广告互动，如滑动、点击文章等"
-  }
-};
-
-// 组件关联配置
-interface ComponentLinkConfig {
-  id: string;
-  componentId: string;        // 关联的组件ID
-  componentName: string;      // 关联的组件名称
-  componentType: string;      // 组件类型
-  componentPreview: string;    // 组件预览图
-  triggerRule: TriggerRule;    // 触发规则
-  triggerTime?: number;       // 触发时间（秒），仅show_time类型使用
-  parentId?: string;          // 上一级ID（主素材或已添加的组件）
-  parentName?: string;        // 上一级名称
-  status: "enabled" | "disabled";
-}
+  | "static_splash"      
+  | "video_splash"       
+  | "interstitial_half"   
+  | "interstitial_full"   
+  | "banner"             
+  | "native"             
+  | "rewarded_video";    
 
 // SDK模板信息
 const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }> = {
@@ -101,7 +56,7 @@ const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }>
   rewarded_video: { name: "激励视频", desc: "用户主动观看获取奖励" },
 };
 
-// 模版尺寸配置
+// SDK模板尺寸配置
 const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: number; ratio: string }> = {
   static_splash: { width: 540, height: 960, ratio: "9:16" },
   video_splash: { width: 540, height: 960, ratio: "9:16" },
@@ -112,63 +67,27 @@ const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: numbe
   rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
 };
 
-// 组件类型对应的中文名称
-const COMPONENT_TYPE_NAMES: Record<string, string> = {
-  redpacket_rain: "红包雨",
-  flip_card: "翻卡",
-  flip_redpacket: "翻红包",
-  flip_treasure: "翻宝箱",
-  treasure_rain: "宝箱雨",
-  scratch_card: "刮刮卡",
-  smash_egg: "砸蛋",
-  popup_redpacket: "弹窗红包",
-  dual_button: "双按钮",
-  vote: "投票磁贴",
-  image: "图片磁贴",
-  ecommerce: "电商磁贴",
-  coupon: "优惠券磁贴",
-  promotion_card: "推广卡片",
-  game_gift: "游戏礼包码",
-};
-
-// 获取组件预览图
-function getComponentPreview(componentType: string, config?: Record<string, unknown>): string {
-  // 根据组件类型和配置获取预览图
-  if (config) {
-    // 优先使用配置的预览图
-    if (config.previewUrl) return config.previewUrl as string;
-    if (config.imageUrl) return config.imageUrl as string;
-    if (config.redpacketImageUrl) return config.redpacketImageUrl as string;
-    // 电商磁贴
-    if ((config as { imageUrl?: string }).imageUrl) {
-      return (config as { imageUrl: string }).imageUrl;
-    }
-  }
-  // 使用组件类型生成默认预览图
-  const seedMap: Record<string, string> = {
-    redpacket_rain: "redpacket",
-    flip_card: "flipcard",
-    flip_redpacket: "flipred",
-    flip_treasure: "fliptreasure",
-    treasure_rain: "treasure",
-    scratch_card: "scratch",
-    smash_egg: "smash",
-    popup_redpacket: "popup",
-    dual_button: "dualbtn",
-    vote: "vote",
-    image: "image",
-    ecommerce: "ecom",
-    coupon: "coupon",
-    promotion_card: "promo",
-    game_gift: "game",
-  };
-  const seed = seedMap[componentType] || componentType;
-  return `https://picsum.photos/seed/${seed}/120/80`;
+// 组件关联配置
+interface ComponentLinkConfig {
+  id: string;
+  componentId: string;
+  componentName: string;
+  componentType: string;
+  componentPreview: string;
+  parentId: string;
+  parentName: string;
+  triggerRule: string;
+  triggerTime?: number;
+  status: string;
 }
 
-// 获取组件类型中文名称
-function getComponentTypeName(componentType: string): string {
-  return COMPONENT_TYPE_NAMES[componentType] || componentType;
+// 模板配置
+interface TemplateConfig {
+  id?: string;
+  name: string;
+  type: string;
+  adSlot: string;
+  componentLinks: ComponentLinkConfig[];
 }
 
 interface SDKTemplateEditProps {
@@ -178,191 +97,220 @@ interface SDKTemplateEditProps {
 
 export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   const router = useRouter();
-  const { components, loading } = useComponents();
-  const info = SDK_TEMPLATE_INFO[type];
-  const sizeConfig = SDK_TEMPLATE_SIZES[type];
-  
-  // 组件关联配置列表（初始为空）
-  const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([]);
-  
-  // 将组件列表转换为选择器需要的格式
-  const availableComponents = components.map(comp => ({
-    id: comp.id,
-    name: comp.name,
-    type: comp.type,
-    preview: getComponentPreview(comp.type, comp.config),
-  }));
+  const searchParams = useSearchParams();
+  const isCopy = searchParams.get("action") === "copy";
+  const { components, loading: componentsLoading } = useComponents();
 
-  // 选择组件弹窗
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(!!templateId);
+  const [saving, setSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const info = SDK_TEMPLATE_INFO[type];
+  const sizeInfo = SDK_TEMPLATE_SIZES[type];
+
+  // 配置数据
+  const [config, setConfig] = useState<TemplateConfig>({
+    name: "",
+    type,
+    adSlot: "",
+    componentLinks: [],
+  });
+
+  // 组件选择弹窗
   const [showComponentPicker, setShowComponentPicker] = useState(false);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
-  
-  // 触发时间弹窗
-  const [showTimeDialog, setShowTimeDialog] = useState<string | null>(null);
-  const [timeValue, setTimeValue] = useState(5);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(["basic", "components"])
+  );
 
-  // 选择上一级弹窗
-  const [showParentPicker, setShowParentPicker] = useState(false);
-  const [selectedComponent, setSelectedComponent] = useState<SelectableComponent | null>(null);
+  // 可选的父级选项
+  const getParentOptions = useCallback(() => {
+    const options: { id: string; name: string }[] = [];
+    
+    // 主素材
+    options.push({
+      id: "main_material",
+      name: `${info.name}主素材`,
+    });
 
-  // 上一级选项类型
-  interface ParentOption {
-    id: string;
-    name: string;
-    type: "main" | "component";
-    preview?: string;
-  }
-
-  // 获取上一级选项列表
-  const getParentOptions = (): ParentOption[] => {
-    const options: ParentOption[] = [
-      { id: "main", name: "主素材", type: "main" }
-    ];
-    // 添加已配置的组件
-    componentLinks
-      .filter(link => link.status === "enabled")
-      .forEach(link => {
-        options.push({
-          id: link.id,
-          name: link.componentName,
-          type: "component",
-          preview: link.componentPreview
-        });
+    // 已添加的组件
+    config.componentLinks.forEach((link) => {
+      options.push({
+        id: link.componentId,
+        name: link.componentName,
       });
+    });
+
     return options;
+  }, [config.componentLinks, info.name]);
+
+  // 获取组件预览图
+  const getComponentPreview = (componentId: string): string => {
+    const component = components.find((c) => c.id === componentId);
+    if (!component?.config) return "";
+    
+    const cfg = component.config as any;
+    if (cfg.previewUrl) return cfg.previewUrl;
+    if (cfg.imageUrl) return cfg.imageUrl;
+    if (cfg.images?.[0]?.imageUrl) return cfg.images[0].imageUrl;
+    if (cfg.redpacketImageUrl) return cfg.redpacketImageUrl;
+    if (cfg.logoUrl) return cfg.logoUrl;
+    
+    return "";
   };
 
-  // 返回列表
+  // 加载模板数据
+  useEffect(() => {
+    if (templateId) {
+      const fetchTemplate = async () => {
+        setInitialLoading(true);
+        try {
+          const response = await fetch(`/api/sdk/${type}/${templateId}`);
+          const result = await response.json();
+          if (result.success && result.data) {
+            const data = result.data;
+            setConfig({
+              id: isCopy ? undefined : data.id,
+              name: isCopy ? `${data.name} (副本)` : data.name,
+              type: data.type,
+              adSlot: data.adSlot || "",
+              componentLinks: data.componentLinks || [],
+            });
+          }
+        } catch (error) {
+          console.error("加载模板失败:", error);
+        } finally {
+          setInitialLoading(false);
+        }
+      };
+      fetchTemplate();
+    }
+  }, [templateId, type, isCopy]);
+
+  // 切换折叠
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  // 添加组件
+  const handleAddComponent = (componentId: string) => {
+    const component = components.find((c) => c.id === componentId);
+    if (!component) return;
+
+    const newLink: ComponentLinkConfig = {
+      id: `link_${Date.now()}`,
+      componentId: component.id,
+      componentName: component.name,
+      componentType: component.type,
+      componentPreview: getComponentPreview(componentId),
+      parentId: "main_material",
+      parentName: `${info.name}主素材`,
+      triggerRule: TRIGGER_RULES[0].value,
+      triggerTime: undefined,
+      status: "enabled",
+    };
+
+    setConfig((prev) => ({
+      ...prev,
+      componentLinks: [...prev.componentLinks, newLink],
+    }));
+    setShowComponentPicker(false);
+    setEditingLinkId(null);
+  };
+
+  // 移除组件
+  const handleRemoveComponent = (linkId: string) => {
+    setConfig((prev) => ({
+      ...prev,
+      componentLinks: prev.componentLinks.filter((l) => l.id !== linkId),
+    }));
+  };
+
+  // 更新组件关联
+  const handleUpdateLink = (linkId: string, updates: Partial<ComponentLinkConfig>) => {
+    setConfig((prev) => ({
+      ...prev,
+      componentLinks: prev.componentLinks.map((l) =>
+        l.id === linkId ? { ...l, ...updates } : l
+      ),
+    }));
+  };
+
+  // 保存
+  const handleSave = async () => {
+    if (!config.name.trim()) {
+      alert("请输入模板名称");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = {
+        name: config.name,
+        adSlot: config.adSlot,
+        componentLinks: config.componentLinks,
+      };
+
+      let response;
+      if (templateId && !isCopy) {
+        // 更新
+        response = await fetch(`/api/sdk/${type}/${templateId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // 创建
+        response = await fetch(`/api/sdk`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        alert("保存成功");
+        router.push(`/sdk/${type}`);
+      } else {
+        alert(result.error || "保存失败");
+      }
+    } catch (error) {
+      console.error("保存失败:", error);
+      alert("保存失败");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 返回
   const handleBack = () => {
     router.push(`/sdk/${type}`);
   };
 
-  // 添加组件关联
-  const handleAddComponent = () => {
-    setShowComponentPicker(true);
-    setSelectedComponent(null);
-    setEditingLinkId(null);
+  // 切换预览
+  const togglePreview = () => {
+    setShowPreview(!showPreview);
   };
 
-  // 选择组件（打开上一级选择）
-  interface SelectableComponent {
-    id: string;
-    name: string;
-    type: string;
-    preview: string;
+  if (initialLoading || componentsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-500">加载中...</p>
+        </div>
+      </div>
+    );
   }
-  const handleSelectComponent = (component: SelectableComponent) => {
-    setSelectedComponent(component);
-    setShowComponentPicker(false);
-    setShowParentPicker(true);
-  };
-
-  // 选择上一级后添加/修改组件
-  const handleSelectParent = (parent: ParentOption) => {
-    if (editingLinkId) {
-      // 编辑模式：修改已有组件的上一级
-      setComponentLinks(prev => prev.map(link => {
-        if (link.id === editingLinkId) {
-          return { ...link, parentId: parent.id, parentName: parent.name };
-        }
-        return link;
-      }));
-      setShowParentPicker(false);
-      setSelectedComponent(null);
-      setEditingLinkId(null);
-    } else if (selectedComponent) {
-      // 新增模式：添加新组件
-      const newLink: ComponentLinkConfig = {
-        id: `link_${Date.now()}`,
-        componentId: selectedComponent.id,
-        componentName: selectedComponent.name,
-        componentType: getComponentTypeName(selectedComponent.type),
-        componentPreview: selectedComponent.preview,
-        triggerRule: "show_time",
-        triggerTime: 5,
-        parentId: parent.id,
-        parentName: parent.name,
-        status: "enabled"
-      };
-      setComponentLinks(prev => [...prev, newLink]);
-      setShowParentPicker(false);
-      setSelectedComponent(null);
-    }
-  };
-
-  // 修改组件的上一级
-  const handleChangeParent = (linkId: string, parent: ParentOption) => {
-    setComponentLinks(prev => prev.map(link => {
-      if (link.id === linkId) {
-        return { ...link, parentId: parent.id, parentName: parent.name };
-      }
-      return link;
-    }));
-  };
-
-  // 更新触发规则
-  const handleUpdateTriggerRule = (linkId: string, rule: TriggerRule) => {
-    setComponentLinks(prev => prev.map(link => {
-      if (link.id === linkId) {
-        return { ...link, triggerRule: rule };
-      }
-      return link;
-    }));
-  };
-
-  // 更新触发时间
-  const handleUpdateTriggerTime = (linkId: string) => {
-    setComponentLinks(prev => prev.map(link => {
-      if (link.id === linkId) {
-        return { ...link, triggerTime: timeValue };
-      }
-      return link;
-    }));
-    setShowTimeDialog(null);
-  };
-
-  // 删除组件关联
-  const handleDeleteLink = (linkId: string) => {
-    setComponentLinks(prev => prev.filter(link => link.id !== linkId));
-  };
-
-  // 切换组件状态
-  const handleToggleStatus = (linkId: string) => {
-    setComponentLinks(prev => prev.map(link => {
-      if (link.id === linkId) {
-        return { 
-          ...link, 
-          status: link.status === "enabled" ? "disabled" : "enabled" 
-        };
-      }
-      return link;
-    }));
-  };
-
-  // 获取触发规则图标
-  const getTriggerRuleIcon = (rule: TriggerRule) => {
-    return TRIGGER_RULES[rule]?.icon || <Zap className="w-4 h-4" />;
-  };
-
-  // 渲染触发规则选择器
-  const renderTriggerRuleSelector = (link: ComponentLinkConfig) => (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {(Object.keys(TRIGGER_RULES) as TriggerRule[]).map(rule => (
-        <button
-          key={rule}
-          onClick={() => handleUpdateTriggerRule(link.id, rule)}
-          className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-all ${
-            link.triggerRule === rule 
-              ? "bg-blue-100 text-blue-700 border border-blue-300" 
-              : "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200"
-          }`}
-        >
-          {getTriggerRuleIcon(rule)}
-          <span>{TRIGGER_RULES[rule].label}</span>
-        </button>
-      ))}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -378,452 +326,285 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">编辑模板</h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  {info.name} · {sizeConfig.width}×{sizeConfig.height} · {sizeConfig.ratio}
-                </p>
+                <h1 className="text-xl font-bold text-gray-900">
+                  {templateId ? (isCopy ? "复制模板" : "编辑模板") : "创建模板"}
+                </h1>
+                <p className="text-sm text-gray-500 mt-0.5">{info.name}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={handleBack}>
-                取消
+              <Button
+                variant="outline"
+                onClick={togglePreview}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {showPreview ? "隐藏预览" : "预览"}
               </Button>
-              <Button className="bg-blue-500 hover:bg-blue-600">
-                保存
+              <Button
+                className="bg-blue-500 hover:bg-blue-600"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    保存中...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    保存
+                  </>
+                )}
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 左侧：配置面板 */}
-          <div className="space-y-4">
-            {/* 基础配置 */}
+        <div className="flex gap-6">
+          {/* 左侧表单 */}
+          <div className="flex-1 space-y-4">
+            {/* 步骤指示器 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-4">基础配置</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">模板ID</label>
-                  <Input 
-                    value={templateId || "sdk_static_splash_000001"} 
-                    disabled 
-                    className="bg-gray-50"
-                  />
+              <div className="flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1">
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
+                    step >= 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>1</span>
+                  <span className={step >= 1 ? "text-gray-900" : "text-gray-500"}>选择样式</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">模板名称</label>
-                  <Input 
-                    defaultValue={`${info.name}模板1`} 
-                    placeholder="请输入模板名称"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">广告位ID</label>
-                  <Input 
-                    defaultValue="slot_static_0001" 
-                    placeholder="请输入广告位ID"
-                  />
+                <div className="flex items-center gap-1">
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
+                    step >= 2 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>2</span>
+                  <span className={step >= 2 ? "text-blue-600 font-medium" : "text-gray-500"}>填写内容</span>
                 </div>
               </div>
+            </div>
+
+            {/* 基础配置 */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <button
+                className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-gray-50"
+                onClick={() => toggleSection("basic")}
+              >
+                <span className="text-sm font-medium text-gray-700">基础配置</span>
+                {expandedSections.has("basic") ? (
+                  <ChevronUp className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                )}
+              </button>
+              {expandedSections.has("basic") && (
+                <div className="px-4 pb-4 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      模板名称 <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      placeholder="请输入模板名称"
+                      value={config.name}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      广告位
+                    </label>
+                    <Input
+                      placeholder="请输入广告位ID"
+                      value={config.adSlot}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, adSlot: e.target.value }))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        规格
+                      </label>
+                      <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
+                        {sizeInfo.width}×{sizeInfo.height}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        比例
+                      </label>
+                      <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-blue-600">
+                        {sizeInfo.ratio}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 组件关联配置 */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-900">组件关联配置</h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleAddComponent}
-                  className="h-8"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  添加组件
-                </Button>
-              </div>
-              
-              {/* 组件列表 */}
-              <div className="space-y-3">
-                {componentLinks.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
-                    <p className="text-sm">暂未关联组件</p>
-                    <p className="text-xs mt-1">点击上方按钮添加组件</p>
-                  </div>
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <button
+                className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-gray-50"
+                onClick={() => toggleSection("components")}
+              >
+                <span className="text-sm font-medium text-gray-700">
+                  组件关联配置 ({config.componentLinks.length})
+                </span>
+                {expandedSections.has("components") ? (
+                  <ChevronUp className="w-4 h-4 text-gray-400" />
                 ) : (
-                  componentLinks.map((link) => (
-                    <div 
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                )}
+              </button>
+              {expandedSections.has("components") && (
+                <div className="px-4 pb-4 space-y-4">
+                  <p className="text-xs text-gray-500">
+                    点击下方按钮添加组件，并设置触发规则
+                  </p>
+                  
+                  {/* 已添加的组件列表 */}
+                  {config.componentLinks.map((link, index) => (
+                    <div
                       key={link.id}
-                      className={`border rounded-lg p-3 transition-all ${
-                        link.status === "enabled" 
-                          ? "border-blue-200 bg-blue-50/50" 
-                          : "border-gray-200 bg-gray-50"
-                      }`}
+                      className="border border-gray-200 rounded-lg bg-white p-4"
                     >
-                      {/* 组件信息 */}
-                      <div className="flex items-start gap-3">
-                        <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                          <img 
-                            src={link.componentPreview} 
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                          <span className="text-sm font-medium text-gray-700">
+                            {link.componentName}
+                          </span>
+                          <span className="text-xs text-gray-400 px-2 py-0.5 bg-gray-100 rounded">
+                            {link.componentType}
+                          </span>
+                        </div>
+                        <button
+                          className="text-red-500 hover:bg-red-50 p-1.5 rounded"
+                          onClick={() => handleRemoveComponent(link.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* 组件预览图 */}
+                      {link.componentPreview && (
+                        <div className="mb-3">
+                          <img
+                            src={link.componentPreview}
                             alt={link.componentName}
-                            className="w-full h-full object-cover"
+                            className="h-20 object-contain rounded border border-gray-200 bg-gray-50"
                           />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 truncate">
-                              {link.componentName}
-                            </span>
-                            <span className="px-1.5 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">
-                              {link.componentType}
-                            </span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setSelectedComponent({
-                                id: link.componentId,
-                                name: link.componentName,
-                                type: link.componentType,
-                                preview: link.componentPreview
+                      )}
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* 上一级 */}
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">
+                            上一级
+                          </label>
+                          <Select
+                            value={link.parentId}
+                            onChange={(e) => {
+                              const parent = getParentOptions().find(p => p.id === e.target.value);
+                              handleUpdateLink(link.id, {
+                                parentId: e.target.value,
+                                parentName: parent?.name || "",
                               });
-                              setEditingLinkId(link.id);
-                              setShowParentPicker(true);
                             }}
-                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+                            className="w-full"
                           >
-                            <span className="text-gray-500">上一级：</span>
-                            <span className="font-medium">{link.parentName}</span>
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </button>
+                            {getParentOptions().map((option) => (
+                              <option key={option.id} value={option.id}>
+                                {option.name}
+                              </option>
+                            ))}
+                          </Select>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleToggleStatus(link.id)}
-                            className={`p-1.5 rounded transition-colors ${
-                              link.status === "enabled"
-                                ? "bg-green-100 text-green-600"
-                                : "bg-gray-100 text-gray-400"
-                            }`}
-                            title={link.status === "enabled" ? "已启用" : "已禁用"}
+
+                        {/* 触发规则 */}
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">
+                            触发规则
+                          </label>
+                          <Select
+                            value={link.triggerRule}
+                            onChange={(e) => handleUpdateLink(link.id, { triggerRule: e.target.value })}
+                            className="w-full"
                           >
-                            {link.status === "enabled" ? (
-                              <Eye className="w-4 h-4" />
-                            ) : (
-                              <Eye className="w-4 h-4" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteLink(link.id)}
-                            className="p-1.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                            {TRIGGER_RULES.map((rule) => (
+                              <option key={rule.value} value={rule.value}>
+                                {rule.label}
+                              </option>
+                            ))}
+                          </Select>
                         </div>
                       </div>
 
-                      {/* 触发规则 */}
-                      <div className="mt-3">
-                        <p className="text-xs text-gray-500 mb-1">触发规则</p>
-                        {renderTriggerRuleSelector(link)}
-                        
-                        {/* 出现时间输入 */}
-                        {link.triggerRule === "show_time" && (
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs text-gray-500">延迟</span>
-                            <button
-                              onClick={() => {
-                                setTimeValue(link.triggerTime || 5);
-                                setShowTimeDialog(link.id);
-                              }}
-                              className="px-2 py-1 bg-white border border-gray-300 rounded text-xs hover:bg-gray-50"
-                            >
-                              {link.triggerTime}s
-                            </button>
-                            <span className="text-xs text-gray-500">后弹出</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* 提示信息 */}
-              {componentLinks.length > 0 && (
-                <p className="text-xs text-gray-400 mt-3">
-                  提示：同层级相同触发规则只能配置一次
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* 右侧：预览区域 */}
-          <div className="space-y-4">
-            {/* 广告互动链路示意图 */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-4">广告互动链路示意图</h3>
-              <div className="relative">
-                {/* 使用广告互动链路预览组件 */}
-                <AdInteractionPreview
-                  templateType={type}
-                  templateName={info.name}
-                  componentLinks={componentLinks}
-                />
-              </div>
-            </div>
-
-            {/* 组件预览 */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-4">组件预览</h3>
-              {loading ? (
-                <div className="flex items-center justify-center py-8 text-gray-400">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  <span className="text-sm">加载中...</span>
-                </div>
-              ) : availableComponents.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <ImageIcon className="w-8 h-8 mx-auto mb-2" />
-                  <p className="text-sm">暂无组件</p>
-                  <p className="text-xs mt-1">请先在「模板组件」中创建组件</p>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {availableComponents.map((comp) => (
-                    <div 
-                      key={comp.id}
-                      className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
-                      onClick={() => {
-                        if (!componentLinks.find(l => l.componentId === comp.id)) {
-                          handleSelectComponent(comp);
-                        }
-                      }}
-                    >
-                      <img 
-                        src={comp.preview}
-                        alt={comp.name}
-                        className="w-full h-full object-cover"
-                      />
+                      {/* 触发时间（仅部分规则需要） */}
+                      {link.triggerRule === "show_time" || link.triggerRule === "in_app_interaction" ? (
+                        <div className="mt-3">
+                          <label className="block text-xs text-gray-500 mb-1">
+                            {TRIGGER_RULES.find((r) => r.value === link.triggerRule)?.timeLabel}
+                          </label>
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="请输入"
+                            value={link.triggerTime || ""}
+                            onChange={(e) => handleUpdateLink(link.id, { 
+                              triggerTime: parseInt(e.target.value) || undefined 
+                            })}
+                            className="w-full"
+                          />
+                        </div>
+                      ) : null}
                     </div>
                   ))}
+
+                  {/* 添加按钮 */}
+                  <button
+                    className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
+                    onClick={() => setShowComponentPicker(true)}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="text-sm">添加组件</span>
+                  </button>
                 </div>
               )}
-              <p className="text-xs text-gray-400 mt-2">点击组件卡片可快速添加到关联列表</p>
             </div>
           </div>
+
+          {/* 右侧预览 */}
+          {showPreview && (
+            <div className="w-80 flex-shrink-0">
+              <div className="bg-white rounded-lg border border-gray-200 p-4 sticky top-20">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">预览效果</h3>
+                <div className="relative">
+                  <AdInteractionPreview
+                    templateType={type}
+                    templateName={config.name || info.name}
+                    componentLinks={config.componentLinks}
+                    isFullPreview
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* 选择组件弹窗 */}
+      {/* 组件选择弹窗 */}
       {showComponentPicker && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
-            <div className="px-5 pt-5 pb-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">选择组件</h3>
-                <button
-                  onClick={() => setShowComponentPicker(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-500 mt-1">请选择要关联的组件</p>
-            </div>
-            <div className="p-4 overflow-y-auto max-h-[60vh]">
-              {loading ? (
-                <div className="flex items-center justify-center py-8 text-gray-400">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  <span className="text-sm">加载中...</span>
-                </div>
-              ) : availableComponents.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <ImageIcon className="w-8 h-8 mx-auto mb-2" />
-                  <p className="text-sm">暂无组件可关联</p>
-                  <p className="text-xs mt-1">请先在「模板组件」中创建组件</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {availableComponents.map((comp) => {
-                    const isLinked = componentLinks.some(l => l.componentId === comp.id);
-                    return (
-                      <div
-                        key={comp.id}
-                        onClick={() => !isLinked && handleSelectComponent(comp)}
-                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                          isLinked
-                            ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-50"
-                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
-                        }`}
-                      >
-                        <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                          <img 
-                            src={comp.preview}
-                            alt={comp.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900">
-                              {comp.name}
-                            </span>
-                            {isLinked && (
-                              <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-xs rounded">
-                                已关联
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-xs text-gray-500">{comp.type}</span>
-                        </div>
-                        {isLinked && (
-                          <span className="text-xs text-gray-400">不可重复添加</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 选择上一级弹窗 */}
-      {showParentPicker && selectedComponent && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
-            <div className="px-5 pt-5 pb-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">选择上一级</h3>
-                <button
-                  onClick={() => {
-                    setShowParentPicker(false);
-                    setSelectedComponent(null);
-                  }}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-500 mt-1">请选择触发该组件的上一级</p>
-            </div>
-            <div className="p-4 overflow-y-auto max-h-[60vh]">
-              {/* 已选组件预览 */}
-              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 mb-4">
-                <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                  <img 
-                    src={selectedComponent.preview}
-                    alt={selectedComponent.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-900 block">
-                    {selectedComponent.name}
-                  </span>
-                  <span className="text-xs text-gray-500">{selectedComponent.type}</span>
-                </div>
-              </div>
-              
-              {/* 上一级选项 */}
-              <div className="space-y-2">
-                {getParentOptions().map((parent) => (
-                  <div
-                    key={parent.id}
-                    onClick={() => handleSelectParent(parent)}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
-                  >
-                    <div className={`w-12 h-10 rounded flex items-center justify-center flex-shrink-0 ${
-                      parent.type === "main" 
-                        ? "bg-gradient-to-br from-blue-100 to-blue-200" 
-                        : "bg-gradient-to-br from-purple-100 to-purple-200"
-                    }`}>
-                      {parent.type === "main" ? (
-                        <span className="text-xs font-medium text-blue-700">主素材</span>
-                      ) : (
-                        parent.preview ? (
-                          <img 
-                            src={parent.preview}
-                            alt={parent.name}
-                            className="w-full h-full object-cover rounded"
-                          />
-                        ) : (
-                          <span className="text-xs font-medium text-purple-700">组件</span>
-                        )
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-900 block">
-                        {parent.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {parent.type === "main" ? "广告主素材" : "已添加的组件"}
-                      </span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 触发时间设置弹窗 */}
-      {showTimeDialog && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-xs overflow-hidden">
-            <div className="px-5 pt-5 pb-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">设置出现时间</h3>
-              <p className="text-sm text-gray-500 mt-1">组件弹出的延迟时间（秒）</p>
-            </div>
-            <div className="p-5">
-              <div className="flex items-center justify-center gap-4">
-                <button
-                  onClick={() => setTimeValue(Math.max(1, timeValue - 1))}
-                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-bold"
-                >
-                  -
-                </button>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={timeValue}
-                    onChange={(e) => setTimeValue(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-20 h-12 text-center text-2xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                    min="1"
-                  />
-                  <span className="text-lg text-gray-600">秒</span>
-                </div>
-                <button
-                  onClick={() => setTimeValue(timeValue + 1)}
-                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-bold"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-            <div className="px-5 pb-5 flex gap-3">
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => setShowTimeDialog(null)}
-              >
-                取消
-              </Button>
-              <Button 
-                className="flex-1 bg-blue-500 hover:bg-blue-600"
-                onClick={() => handleUpdateTriggerTime(showTimeDialog)}
-              >
-                确认
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ComponentPickerModal
+          components={components.filter(c => !config.componentLinks.some(l => l.componentId === c.id))}
+          onSelect={handleAddComponent}
+          onClose={() => {
+            setShowComponentPicker(false);
+            setEditingLinkId(null);
+          }}
+        />
       )}
     </div>
   );

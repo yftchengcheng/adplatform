@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { 
   ChevronLeft, 
@@ -10,7 +10,9 @@ import {
   Trash2, 
   Edit, 
   Play, 
-  Pause
+  Pause,
+  Loader2,
+  Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,13 +20,13 @@ import { AdInteractionPreview } from "./ad-interaction-preview";
 
 // SDK模板类型
 type SDKTemplateType = 
-  | "static_splash"      // 静态开屏
-  | "video_splash"       // 视频开屏
-  | "interstitial_half"  // 插屏-半屏
-  | "interstitial_full"  // 插屏-全屏
-  | "banner"             // 横幅
-  | "native"             // 原生（信息流）
-  | "rewarded_video";    // 激励视频
+  | "static_splash"      
+  | "video_splash"       
+  | "interstitial_half"   
+  | "interstitial_full"   
+  | "banner"             
+  | "native"             
+  | "rewarded_video";    
 
 // SDK模板信息
 const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }> = {
@@ -39,8 +41,8 @@ const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }>
 
 // SDK模板尺寸配置
 const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: number; ratio: string }> = {
-  static_splash: { width: 540, height: 960, ratio: "9:16" },     // 9:16
-  video_splash: { width: 540, height: 960, ratio: "9:16" },      // 9:16
+  static_splash: { width: 540, height: 960, ratio: "9:16" },
+  video_splash: { width: 540, height: 960, ratio: "9:16" },
   interstitial_half: { width: 600, height: 500, ratio: "6:5" },
   interstitial_full: { width: 1080, height: 1920, ratio: "9:16" },
   banner: { width: 1080, height: 120, ratio: "9:1" },
@@ -48,28 +50,32 @@ const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: numbe
   rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
 };
 
-// 模拟数据
-const generateMockData = (type: SDKTemplateType, count: number) => {
-  const templates = [];
-  const sizeConfig = SDK_TEMPLATE_SIZES[type];
-  for (let i = 1; i <= count; i++) {
-    const isEnabled = Math.random() > 0.3;
-    templates.push({
-      id: `sdk_${type}_${String(i).padStart(6, "0")}`,
-      name: `${SDK_TEMPLATE_INFO[type].name}模板${i}`,
-      status: isEnabled ? "enabled" : "paused",
-      preview: `https://picsum.photos/seed/${type}${i}/320/180`,
-      linkedComponents: Math.floor(Math.random() * 5),
-      creator: ["张三", "李四", "王五", "赵六"][Math.floor(Math.random() * 4)],
-      createTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString("zh-CN"),
-      adSlot: `slot_${type}_${String(i).padStart(4, "0")}`,
-      format: ["图片", "图片+文字", "视频"][Math.floor(Math.random() * 3)],
-      size: `${sizeConfig.width}×${sizeConfig.height}`,
-      ratio: sizeConfig.ratio,
-    });
-  }
-  return templates;
-};
+// 列表项数据结构
+interface SDKTemplateListItem {
+  id: string;
+  name: string;
+  type: string;
+  adSlot?: string;
+  format?: string;
+  size?: string;
+  ratio?: string;
+  status: string;
+  linkedComponentCount: number;
+  creator: string;
+  createTime: string;
+  componentLinks: Array<{
+    id: string;
+    componentId: string;
+    componentName: string;
+    componentType: string;
+    componentPreview: string;
+    parentId: string;
+    parentName: string;
+    triggerRule: string;
+    triggerTime?: number;
+    status: string;
+  }>;
+}
 
 interface SDKTemplateListProps {
   type: SDKTemplateType;
@@ -79,9 +85,30 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [data] = useState(() => generateMockData(type, 12));
+  const [data, setData] = useState<SDKTemplateListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const info = SDK_TEMPLATE_INFO[type];
+
+  // 获取模板列表数据
+  const fetchTemplates = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/sdk?type=${type}`);
+      const result = await response.json();
+      if (result.success) {
+        setData(result.data || []);
+      }
+    } catch (error) {
+      console.error("获取模板列表失败:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [type]);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
 
   // 过滤数据
   const filteredData = data.filter(item =>
@@ -113,6 +140,51 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   // 返回列表
   const handleBack = () => {
     router.push("/");
+  };
+
+  // 删除模板
+  const handleDelete = async (id: string) => {
+    if (!confirm("确定要删除这个模板吗？")) return;
+    
+    try {
+      const response = await fetch(`/api/sdk/${type}/${id}`, { method: "DELETE" });
+      const result = await response.json();
+      if (result.success) {
+        setData(prev => prev.filter(item => item.id !== id));
+      } else {
+        alert("删除失败");
+      }
+    } catch (error) {
+      console.error("删除模板失败:", error);
+      alert("删除失败");
+    }
+  };
+
+  // 切换状态
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "enabled" ? "paused" : "enabled";
+    
+    try {
+      const response = await fetch(`/api/sdk/${type}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        setData(prev => prev.map(item => 
+          item.id === id ? { ...item, status: newStatus } : item
+        ));
+      }
+    } catch (error) {
+      console.error("切换状态失败:", error);
+    }
+  };
+
+  // 复制模板
+  const handleCopy = (id: string) => {
+    // 跳转到编辑页面并复制数据
+    router.push(`/sdk/${type}/${id}?action=copy`);
   };
 
   return (
@@ -163,124 +235,152 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
 
         {/* 列表 */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="w-10 px-4 py-3 text-left">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.size === filteredData.length && filteredData.length > 0}
-                    onChange={handleSelectAll}
-                    className="w-4 h-4 rounded border-gray-300"
-                  />
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模板ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模板名称</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">规格</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">预览</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">关联组件</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredData.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(item.id)}
-                      onChange={() => handleSelect(item.id)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 font-mono">{item.id}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{item.name}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.status === "enabled"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {item.status === "enabled" ? "开启" : "暂停"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    <div>{item.size}</div>
-                    <div className="text-xs text-blue-600">{item.ratio}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="w-20 h-12 bg-gray-100 rounded overflow-hidden">
-                      <AdInteractionPreview
-                        templateType={type}
-                        templateName={item.name}
-                      />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-blue-600">{item.linkedComponents}个</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{item.creator}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{item.createTime}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <button className="p-1.5 hover:bg-gray-100 rounded" title="预览">
-                        <Eye className="w-4 h-4 text-gray-500" />
-                      </button>
-                      <button className="p-1.5 hover:bg-gray-100 rounded" title="复制">
-                        <Copy className="w-4 h-4 text-gray-500" />
-                      </button>
-                      <button 
-                        className="p-1.5 hover:bg-gray-100 rounded" 
-                        title="编辑"
-                        onClick={() => router.push(`/sdk/${type}/${item.id}`)}
-                      >
-                        <Edit className="w-4 h-4 text-gray-500" />
-                      </button>
-                      <button
-                        className="p-1.5 hover:bg-gray-100 rounded"
-                        title={item.status === "enabled" ? "暂停" : "开启"}
-                      >
-                        {item.status === "enabled" ? (
-                          <Pause className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <Play className="w-4 h-4 text-gray-500" />
-                        )}
-                      </button>
-                      <button className="p-1.5 hover:bg-gray-100 rounded" title="删除">
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {filteredData.length === 0 && (
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-400 mr-2" />
+              <span className="text-gray-500">加载中...</span>
+            </div>
+          ) : filteredData.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500">暂无数据</p>
+              <Button 
+                className="mt-4 bg-blue-500 hover:bg-blue-600"
+                onClick={() => router.push(`/sdk/${type}/new`)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                创建模板
+              </Button>
             </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="w-10 px-4 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.size === filteredData.length && filteredData.length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模板ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模板名称</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">规格</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">预览</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">关联组件</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredData.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(item.id)}
+                        onChange={() => handleSelect(item.id)}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900 font-mono">{item.id}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{item.name}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          item.status === "enabled"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {item.status === "enabled" ? "开启" : "暂停"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      <div>{item.size || `${SDK_TEMPLATE_SIZES[type].width}×${SDK_TEMPLATE_SIZES[type].height}`}</div>
+                      <div className="text-xs text-blue-600">{item.ratio || SDK_TEMPLATE_SIZES[type].ratio}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="w-20 h-12 bg-gray-100 rounded overflow-hidden">
+                        <AdInteractionPreview
+                          templateType={type}
+                          templateName={item.name}
+                          componentLinks={item.componentLinks}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-blue-600">{item.linkedComponentCount}个</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{item.creator}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{item.createTime}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <button 
+                          className="p-1.5 hover:bg-gray-100 rounded" 
+                          title="预览"
+                          onClick={() => router.push(`/sdk/${type}/${item.id}?mode=preview`)}
+                        >
+                          <Eye className="w-4 h-4 text-gray-500" />
+                        </button>
+                        <button 
+                          className="p-1.5 hover:bg-gray-100 rounded" 
+                          title="复制"
+                          onClick={() => handleCopy(item.id)}
+                        >
+                          <Copy className="w-4 h-4 text-gray-500" />
+                        </button>
+                        <button 
+                          className="p-1.5 hover:bg-gray-100 rounded" 
+                          title="编辑"
+                          onClick={() => router.push(`/sdk/${type}/${item.id}`)}
+                        >
+                          <Edit className="w-4 h-4 text-gray-500" />
+                        </button>
+                        <button
+                          className="p-1.5 hover:bg-gray-100 rounded"
+                          title={item.status === "enabled" ? "暂停" : "开启"}
+                          onClick={() => handleToggleStatus(item.id, item.status)}
+                        >
+                          {item.status === "enabled" ? (
+                            <Pause className="w-4 h-4 text-gray-500" />
+                          ) : (
+                            <Play className="w-4 h-4 text-gray-500" />
+                          )}
+                        </button>
+                        <button 
+                          className="p-1.5 hover:bg-gray-100 rounded" 
+                          title="删除"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
 
         {/* 分页 */}
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-500">
-            共 {filteredData.length} 条数据
-          </p>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
-              上一页
-            </Button>
-            <span className="px-3 py-1 text-sm text-gray-700">1 / 1</span>
-            <Button variant="outline" size="sm" disabled>
-              下一页
-            </Button>
+        {!loading && filteredData.length > 0 && (
+          <div className="flex items-center justify-between mt-4">
+            <p className="text-sm text-gray-500">
+              共 {filteredData.length} 条数据
+            </p>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" disabled>
+                上一页
+              </Button>
+              <span className="px-3 py-1 text-sm text-gray-700">1 / 1</span>
+              <Button variant="outline" size="sm" disabled>
+                下一页
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
