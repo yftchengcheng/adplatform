@@ -230,7 +230,7 @@ export function VoteTemplate({
       <div
         className={cn(
           previewMode
-            ? "flex items-center justify-center min-h-[400px]"
+            ? "absolute inset-0"
             : "fixed inset-0 z-50 bg-black/50",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
@@ -242,7 +242,7 @@ export function VoteTemplate({
       <div
         className={cn(
           previewMode
-            ? "w-full max-w-sm mx-4"
+            ? "w-full max-w-[280px] mx-auto"
             : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
           "transition-all duration-300",
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
