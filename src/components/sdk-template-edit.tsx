@@ -398,7 +398,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" style={{ minHeight: '600px' }}>
           {/* 左侧：配置面板 */}
           <div className="space-y-4">
             {/* 基础配置 */}
@@ -566,7 +566,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
             {/* 广告互动链路示意图 */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <h3 className="text-sm font-medium text-gray-900 mb-4">广告互动链路示意图</h3>
-              <div className="relative">
+              <div className="bg-gray-50 rounded-lg overflow-hidden" style={{ height: '480px' }}>
                 {/* 使用广告互动链路预览组件 */}
                 <AdInteractionPreview
                   templateType={type}

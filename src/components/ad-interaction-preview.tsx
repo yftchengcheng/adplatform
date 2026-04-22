@@ -100,55 +100,6 @@ export function AdInteractionPreview({
   const handleZoomIn = () => setScale(prev => Math.min(prev + 0.2, 2));
   const handleZoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.5));
 
-  // 列表页面小预览
-  const ListPreview = () => (
-    <div className="relative w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 rounded overflow-hidden">
-      {/* 主素材 */}
-      <div className="absolute inset-x-2 top-2 bottom-1/2 bg-white rounded-lg shadow-sm flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-6 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded mx-auto mb-1" />
-          <span className="text-[8px] text-gray-500">主素材</span>
-        </div>
-      </div>
-      
-      {/* 链路指示 */}
-      {linkedComponents.length > 0 && (
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex flex-col items-center">
-          <div className="w-4 h-4 bg-white border border-gray-300 rounded-full flex items-center justify-center">
-            <ChevronDown className="w-2 h-2 text-gray-400" />
-          </div>
-        </div>
-      )}
-      
-      {/* 组件 */}
-      <div className="absolute inset-x-2 bottom-2 top-1/2 flex flex-col items-center justify-start pt-4 gap-1">
-        {linkedComponents.slice(0, 2).map((comp, index) => (
-          <div
-            key={index}
-            className="w-full bg-gradient-to-br from-purple-100 to-purple-200 rounded shadow-sm p-0.5"
-          >
-            <div className="bg-white rounded flex items-center gap-1 px-1 py-0.5">
-              <div className="w-4 h-3 bg-gray-200 rounded overflow-hidden">
-                <img src={comp.preview} alt="" className="w-full h-full object-cover" />
-              </div>
-              <span className="text-[8px] text-gray-600 truncate flex-1">
-                {comp.name.length > 8 ? comp.name.slice(0, 8) + "..." : comp.name}
-              </span>
-            </div>
-          </div>
-        ))}
-        {linkedComponents.length > 2 && (
-          <span className="text-[8px] text-gray-500">+{linkedComponents.length - 2}个</span>
-        )}
-        {linkedComponents.length === 0 && (
-          <div className="w-full h-6 border border-dashed border-gray-300 rounded flex items-center justify-center">
-            <span className="text-[8px] text-gray-400">暂无关联</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   // 展开详情预览
   const ExpandedPreview = () => (
     <div 
@@ -321,7 +272,54 @@ export function AdInteractionPreview({
   // 默认列表预览
   return (
     <div className="relative w-full h-full group">
-      <ListPreview />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-100 to-slate-200 overflow-hidden flex flex-col">
+        {/* 主素材 */}
+        <div className="flex-shrink-0 m-2 bg-white rounded-lg shadow-sm flex items-center justify-center" style={{ height: 'calc(50% - 16px)' }}>
+          <div className="text-center">
+            <div className="w-12 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded mx-auto mb-1" />
+            <span className="text-xs text-gray-500">主素材</span>
+          </div>
+        </div>
+        
+        {/* 链路指示 */}
+        {linkedComponents.length > 0 && (
+          <div className="flex items-center justify-center">
+            <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center">
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            </div>
+          </div>
+        )}
+        
+        {/* 组件列表 */}
+        <div className="flex-1 flex flex-col items-center justify-start gap-1 p-2 overflow-hidden">
+          {linkedComponents.length > 0 ? (
+            <>
+              {linkedComponents.slice(0, 3).map((comp, index) => (
+                <div
+                  key={index}
+                  className="w-full max-w-[200px] bg-gradient-to-br from-purple-100 to-purple-200 rounded shadow-sm p-0.5"
+                >
+                  <div className="bg-white rounded flex items-center gap-1 px-2 py-1">
+                    <div className="w-8 h-6 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                      <img src={comp.preview} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-xs text-gray-600 truncate flex-1">
+                      {comp.name.length > 10 ? comp.name.slice(0, 10) + "..." : comp.name}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {linkedComponents.length > 3 && (
+                <span className="text-xs text-gray-500">+{linkedComponents.length - 3}个</span>
+              )}
+            </>
+          ) : (
+            <div className="flex-1 w-full max-w-[200px] border border-dashed border-gray-300 rounded flex items-center justify-center">
+              <span className="text-xs text-gray-400">暂无关联</span>
+            </div>
+          )}
+        </div>
+      </div>
       
       {/* 悬停操作 */}
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -330,12 +328,12 @@ export function AdInteractionPreview({
             e.stopPropagation();
             setIsExpanded(true);
           }}
-          className="px-2 py-1 bg-white/90 hover:bg-white rounded text-xs font-medium transition-colors"
+          className="px-3 py-1.5 bg-white/90 hover:bg-white rounded text-xs font-medium transition-colors"
         >
           预览
         </button>
         {linkedComponents.length > 0 && (
-          <span className="px-2 py-1 bg-purple-500/90 text-white rounded text-xs">
+          <span className="px-2 py-1.5 bg-purple-500/90 text-white rounded text-xs">
             {linkedComponents.length}个组件
           </span>
         )}

@@ -214,7 +214,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                     <div className="text-xs text-blue-600">{item.ratio}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="w-20 h-12 bg-gray-100 rounded overflow-hidden">
+                    <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden">
                       <AdInteractionPreview
                         templateType={type}
                         templateName={item.name}
