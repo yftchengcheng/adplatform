@@ -550,8 +550,8 @@ export function SDKTemplateStyleCard({
 }) {
   const TemplateComponent = TEMPLATE_STYLES[type];
 
-  // 判断是否需要手机框架（全屏类型需要，半屏/横幅/原生不需要）
-  const needsPhoneFrame = type !== "banner" && type !== "native" && type !== "interstitial_half";
+  // 判断内容是否需要居中显示（半屏/横幅/原生需要，内容缩小在中间）
+  const needsCenteredContent = type === "banner" || type === "native" || type === "interstitial_half";
 
   // 获取手机框架尺寸
   const getPhoneFrameClasses = () => {
@@ -580,27 +580,24 @@ export function SDKTemplateStyleCard({
     }
   };
 
-  // 获取预览内容高度
-  const getContentHeight = () => {
+  // 获取内容尺寸（需要居中的类型内容较小）
+  const getContentClasses = () => {
     switch (type) {
       case "banner":
-        return "h-[26px]";
+        return "w-[126px] h-[24px]";
       case "native":
-        return "h-[48px]";
+        return "w-[116px] h-[46px]";
       case "interstitial_half":
-        return "h-[168px]";
+        return "w-[88px] h-[158px]";
       default:
-        return "h-[132px]";
+        return "w-full h-full";
     }
   };
 
-  if (!showFrame || !needsPhoneFrame) {
-    // 横幅、原生、插屏-半屏：直接展示广告内容，不需要手机框架
+  if (!showFrame) {
     return (
       <div className={cn("rounded-lg overflow-hidden", className)}>
-        <div className={getContentHeight()}>
-          <TemplateComponent />
-        </div>
+        <TemplateComponent />
       </div>
     );
   }
@@ -616,24 +613,32 @@ export function SDKTemplateStyleCard({
         getPhoneContentClasses()
       )}>
         {/* 状态栏 */}
-        <div className="h-2 bg-white flex items-center justify-between px-1.5">
-          <span className="text-[6px] text-gray-900">9:41</span>
-          <div className="flex gap-0.5">
-            <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-            <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-            <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+        {type !== "banner" && type !== "native" && (
+          <div className="h-2 bg-white flex items-center justify-between px-1.5">
+            <span className="text-[6px] text-gray-900">9:41</span>
+            <div className="flex gap-0.5">
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+            </div>
+          </div>
+        )}
+
+        {/* 内容 - 需要居中的类型居中显示 */}
+        <div className={cn(
+          needsCenteredContent ? "flex items-center justify-center" : "w-full h-full"
+        )}>
+          <div className={getContentClasses()}>
+            <TemplateComponent />
           </div>
         </div>
 
-        {/* 内容 */}
-        <div className={getContentHeight()}>
-          <TemplateComponent />
-        </div>
-
         {/* 底部指示器 */}
-        <div className="h-1.5 bg-white flex items-center justify-center">
-          <div className="w-6 h-0.5 bg-gray-300 rounded-full" />
-        </div>
+        {type !== "banner" && type !== "native" && (
+          <div className="h-1.5 bg-white flex items-center justify-center">
+            <div className="w-6 h-0.5 bg-gray-300 rounded-full" />
+          </div>
+        )}
       </div>
     </div>
   );
