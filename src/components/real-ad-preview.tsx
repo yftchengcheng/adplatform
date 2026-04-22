@@ -137,19 +137,18 @@ export function FullscreenPreviewModal({
 
   // 倒计时状态
   const [countdown, setCountdown] = useState(5);
-  const [currentTime, setCurrentTime] = useState("9:41");
-  
+
   // 重置倒计时
   const resetCountdown = useCallback(() => {
     setCountdown(5);
   }, []);
-  
+
   // 倒计时逻辑
   useEffect(() => {
     if (!isOpen) return;
-    
+
     resetCountdown();
-    
+
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -158,96 +157,84 @@ export function FullscreenPreviewModal({
         return prev - 1;
       });
     }, 1000);
-    
+
     return () => clearInterval(timer);
   }, [isOpen, resetCountdown]);
-  
-  // 更新时间（模拟）
-  useEffect(() => {
-    if (!isOpen) return;
-    
-    const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      setCurrentTime(`${hours}:${minutes}`);
-    };
-    
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
       <div className="relative w-full max-w-sm mx-auto">
-        {/* 手机框架 - 统一显示 */}
-        <div className="bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl">
-          {/* 状态栏 */}
-          <div className="h-5 bg-white rounded-t-[1.2rem] flex items-center justify-between px-4">
-            <span className="text-[9px] font-medium text-gray-900">{currentTime}</span>
-            <div className="flex gap-0.5">
-              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-              <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
+        {/* 完整手机框架 */}
+        <div 
+          className="relative mx-auto bg-gray-900 rounded-[3rem] p-2 shadow-2xl"
+          style={{ width: phoneWidth, height: phoneHeight }}
+        >
+          {/* 手机外边框 */}
+          <div className="relative w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
+            {/* 刘海区域 */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-gray-900 rounded-b-2xl z-10" />
+
+            {/* 内容区域 */}
+            <div 
+              className="relative w-full h-full overflow-hidden"
+              style={{ aspectRatio: `${templateSize.width}/${templateSize.height}` }}
+            >
+              {isVideoType ? (
+                <video
+                  src={defaultImage}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                />
+              ) : (
+                <img
+                  src={defaultImage}
+                  alt={displayName}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
+
+              {/* 底部渐变遮罩 */}
+              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+
+              {/* 跳过按钮 */}
+              <button
+                onClick={onClose}
+                className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
+              >
+                <span className="text-white/80 text-xs">
+                  {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
+                </span>
+              </button>
+
+              {/* 关闭按钮 */}
+              <button
+                onClick={onClose}
+                className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* 底部文字 */}
+              <div className="absolute bottom-4 left-0 right-0 text-center">
+                <h2 className="text-lg font-bold text-white">{displayName}</h2>
+                <p className="text-xs text-white/80 mt-1">点击查看详情</p>
+              </div>
             </div>
           </div>
 
-          {/* 内容 */}
-          <div 
-            className="bg-white rounded-[1rem] overflow-hidden relative"
-            style={{ aspectRatio: `${templateSize.width}/${templateSize.height}` }}
-          >
-            {isVideoType ? (
-              <video
-                src={defaultImage}
-                className="absolute inset-0 w-full h-full object-cover"
-                muted
-                loop
-                playsInline
-                autoPlay
-              />
-            ) : (
-              <img
-                src={defaultImage}
-                alt={displayName}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )}
-
-            {/* 底部渐变遮罩 */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-
-            {/* 跳过按钮 */}
-            <button 
-              onClick={onClose}
-              className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
-            >
-              <span className="text-white/80 text-xs">
-                {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
-              </span>
-            </button>
-
-            {/* 关闭按钮 */}
-            <button 
-              onClick={onClose}
-              className="absolute top-3 left-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* 底部文字 */}
-            <div className="absolute bottom-4 left-0 right-0 text-center">
-              <h2 className="text-lg font-bold text-white">{displayName}</h2>
-              <p className="text-xs text-white/80 mt-1">点击查看详情</p>
-            </div>
+          {/* 右侧按钮（音量键） */}
+          <div className="absolute -right-2 top-32 flex flex-col gap-2">
+            <div className="w-1 h-8 bg-gray-700 rounded" />
+            <div className="w-1 h-12 bg-gray-700 rounded" />
           </div>
-
-          {/* 主页指示器 */}
-          <div className="h-4 bg-white rounded-b-[1.2rem] flex items-center justify-center">
-            <div className="w-16 h-0.5 bg-gray-300 rounded-full" />
+          {/* 左侧按钮（电源键） */}
+          <div className="absolute -left-2 top-28 flex flex-col gap-2">
+            <div className="w-1 h-10 bg-gray-700 rounded" />
           </div>
         </div>
 
