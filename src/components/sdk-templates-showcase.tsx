@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 // SDK模板类型
@@ -13,17 +14,39 @@ type SDKTemplateType =
   | "native"              // 原生（信息流）
   | "rewarded_video";    // 激励视频
 
+// 默认图片URL
+const DEFAULT_IMAGES: Record<SDKTemplateType, string> = {
+  static_splash: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E9%9D%99%E6%80%81%E5%BC%80%E5%B1%8F.png&nonce=75f52b3b-8301-46f6-aead-6bfa0ceeb080&project_id=7628071345674895423&sign=e29040bd10a4501b325c3e84721d6bab1eb4ec2f5e28a6d7ad9e669dddd42b6b",
+  video_splash: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E8%A7%86%E9%A2%91%E5%BC%80%E5%B1%8F.mp4&nonce=97d1e2bf-2958-470f-8400-be5f4b45ee72&project_id=7628071345674895423&sign=0c93fff74d3cb45fef06eb6bed7e195f7c58dd7c4bad716ec19282f5a108903a",
+  interstitial_half: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%8F%92%E5%B1%8F-%E5%8D%8A%E5%B1%8F.png&nonce=4714e042-8d12-4497-ac5b-9297adeed1b6&project_id=7628071345674895423&sign=f54b47fd7755e4825f4bda7c503f536da59fa5cada4faefed2bface3cdbfc2e0",
+  interstitial_full: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%8F%92%E5%B1%8F-%E5%85%A8%E5%B1%8F.png&nonce=94e1d76b-3536-4739-ae83-8f1e928cf361&project_id=7628071345674895423&sign=c3c1205b71886860de92f7378343d5fe9989572f3961446045cb9963a9a2f10c",
+  banner: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%A8%AA%E5%B9%85.png&nonce=88afd256-378f-4016-a603-98eeeef852d8&project_id=7628071345674895423&sign=6174036e694310520f103aa1739725d804aaf7e1e3d60fc49692c8b7e16cbb6a",
+  native: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E5%8E%9F%E7%94%9F%EF%BC%88%E4%BF%A1%E6%81%AF%E6%B5%81%EF%BC%89.png&nonce=0fb3ead2-fee1-4120-8bde-cd9908671a6f&project_id=7628071345674895423&sign=55e5301e475021854b5224ce02acaa81f97d06ebc78c7f7663783a70387ae188",
+  rewarded_video: "https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2F%E6%BF%80%E5%8A%B1%E8%A7%86%E9%A2%91.mp4&nonce=55ea299f-b88f-4868-bafe-fea3ba59ec67&project_id=7628071345674895423&sign=0b73f64cd14b78c5f5484a685a3e97458148d3209706640678527a9017309a25",
+};
+
 // ============================================
 // 1. 静态开屏广告
 // 尺寸：1080×1920 px，9:16
-// 特点：化妆品静物、粉色渐变、金色胶囊按钮
+// 特点：大连五一风景图+跳过按钮
 // ============================================
 function StaticSplashStyle() {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-pink-100 via-pink-50 to-rose-100 overflow-hidden">
-      {/* 左上角：App Logo 浮层 */}
+    <div className="relative w-full h-full bg-gradient-to-br from-sky-200 via-blue-100 to-sky-300 overflow-hidden">
+      {/* 背景图片 */}
+      <div className="absolute inset-0">
+        <img 
+          src={DEFAULT_IMAGES.static_splash} 
+          alt="静态开屏"
+          className="w-full h-full object-cover"
+        />
+        {/* 底部渐变遮罩，确保底部内容可读 */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+      </div>
+
+      {/* 左上角：App Logo */}
       <div className="absolute top-10 left-4 w-10 h-10 bg-white/40 backdrop-blur-sm rounded-xl flex items-center justify-center">
-        <div className="w-6 h-6 bg-gradient-to-br from-pink-300 to-pink-500 rounded-lg" />
+        <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg" />
       </div>
 
       {/* 右上角：跳过按钮 */}
@@ -31,25 +54,15 @@ function StaticSplashStyle() {
         <span className="text-white/90 text-xs font-light tracking-wide">跳过 5s</span>
       </div>
 
-      {/* 中央：化妆品静物 */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center">
-          {/* 化妆品瓶子 */}
-          <div className="w-32 h-40 bg-gradient-to-br from-pink-200 via-pink-100 to-white rounded-3xl mx-auto shadow-lg shadow-pink-200/50 flex items-center justify-center">
-            <div className="w-20 h-28 bg-gradient-to-br from-pink-300 to-pink-400 rounded-2xl" />
-          </div>
-        </div>
-      </div>
-
-      {/* 底部三分之一：标题和按钮 */}
-      <div className="absolute bottom-24 left-0 right-0 text-center">
+      {/* 底部：标题和按钮 */}
+      <div className="absolute bottom-16 left-0 right-0 text-center px-4">
         {/* 主标题 */}
-        <h2 className="text-3xl font-bold text-gray-800 tracking-wide">Adtalos</h2>
+        <h2 className="text-2xl font-bold text-white tracking-wide drop-shadow-lg">大连五一游</h2>
         {/* 副标题 */}
-        <p className="text-sm text-gray-500 mt-1">Discover the routine</p>
+        <p className="text-sm text-white/90 mt-1 drop-shadow">浪漫滨城 欢乐假期</p>
         {/* 金色胶囊按钮 */}
-        <button className="mt-6 px-10 py-3 bg-gradient-to-r from-amber-300 to-amber-400 text-white rounded-full shadow-lg text-sm font-medium">
-          LEARN MORE
+        <button className="mt-4 px-8 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-full shadow-lg text-sm font-medium">
+          查看详情
         </button>
       </div>
 
@@ -62,21 +75,23 @@ function StaticSplashStyle() {
 // ============================================
 // 2. 视频开屏广告
 // 尺寸：1080×1920 px，9:16
-// 特点：红色跑车、沿海公路、滑动引导条
+// 特点：大连五一人物图+跳过按钮+滑动引导
 // ============================================
 function VideoSplashStyle() {
   return (
     <div className="relative w-full h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 overflow-hidden">
-      {/* 动态模糊背景：红色跑车沿海公路 */}
+      {/* 背景图片 */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/30 to-slate-900" />
-        {/* 模拟沿海公路模糊效果 */}
-        <div className="absolute top-1/4 left-0 right-0 h-48 bg-gradient-to-r from-red-500/30 via-orange-500/30 to-red-500/30 blur-3xl" />
-        <div className="absolute bottom-1/3 left-0 right-0 h-24 bg-gradient-to-r from-blue-400/20 via-cyan-400/20 to-blue-400/20 blur-2xl" />
+        <img 
+          src={DEFAULT_IMAGES.video_splash} 
+          alt="视频开屏"
+          className="w-full h-full object-cover opacity-80"
+        />
+        {/* 顶部渐变遮罩 */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
+        {/* 底部渐变遮罩 */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
       </div>
-
-      {/* 顶部渐变遮罩 */}
-      <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
 
       {/* 左上角：App Logo */}
       <div className="absolute top-10 left-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
@@ -88,14 +103,7 @@ function VideoSplashStyle() {
         <span className="text-white/80 text-xs">跳过 5s | 静音</span>
       </div>
 
-      {/* 中央：红色跑车 */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-48 h-28 bg-gradient-to-br from-red-400/60 to-red-600/60 rounded-2xl blur-sm" />
-        </div>
-      </div>
-
-      {/* 底部：滑动引导条（三个小横条） */}
+      {/* 底部：滑动引导条 */}
       <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
         <div className="flex gap-1.5">
           <div className="w-5 h-0.5 bg-white/60 rounded" />
@@ -115,8 +123,8 @@ function VideoSplashStyle() {
 
 // ============================================
 // 3. 插屏广告 - 半屏
-// 尺寸：1080×1920，广告居中，宽高比5:4或1:1
-// 特点：白色卡片、游戏Royal Match、三颗星
+// 尺寸：1080×1920，广告居中，宽高比5:4
+// 特点：大连五一横幅图+游戏卡片布局
 // ============================================
 function InterstitialHalfStyle() {
   return (
@@ -128,40 +136,28 @@ function InterstitialHalfStyle() {
           <span className="text-gray-500 text-lg font-light leading-none">×</span>
         </div>
 
-        <div className="p-4">
-          <div className="flex gap-3">
-            {/* 左侧：游戏图标和文字 */}
-            <div className="flex-1 flex gap-3">
-              {/* 游戏图标 */}
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-xl font-bold">R</span>
-              </div>
-              {/* 文字信息 */}
-              <div className="flex-1">
-                <h3 className="font-bold text-gray-800 text-sm">Royal Match</h3>
-                {/* 三颗星星评分 */}
-                <div className="flex items-center gap-0.5 mt-1">
-                  <span className="text-amber-400 text-sm">★</span>
-                  <span className="text-amber-400 text-sm">★</span>
-                  <span className="text-amber-400 text-sm">★</span>
-                </div>
-                <p className="text-xs text-gray-400 mt-0.5">Match 3 Game</p>
-              </div>
-            </div>
-
-            {/* 右侧：下载按钮 */}
-            <div className="flex items-center">
-              <button className="px-4 py-2 bg-green-500 text-white text-sm rounded-lg font-medium">
-                下载
-              </button>
-            </div>
+        {/* 背景图 */}
+        <div className="w-full aspect-[5/4] relative">
+          <img 
+            src={DEFAULT_IMAGES.interstitial_half} 
+            alt="插屏半屏"
+            className="w-full h-full object-cover"
+          />
+          {/* 底部渐变 */}
+          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+          {/* 底部文字 */}
+          <div className="absolute bottom-3 left-4 right-4">
+            <h3 className="font-bold text-white text-sm drop-shadow">大连五一旅游季</h3>
+            <p className="text-white/80 text-xs mt-0.5">邂逅滨海浪漫 畅玩活力五一</p>
           </div>
         </div>
 
-        {/* 底部 */}
-        <div className="px-4 pb-3 flex items-center justify-between">
+        {/* 底部信息 */}
+        <div className="px-4 py-3 flex items-center justify-between">
           <span className="text-[10px] text-gray-400">Sponsored</span>
-          <span className="text-[10px] text-gray-400">🔒 Privacy</span>
+          <button className="px-4 py-1.5 bg-green-500 text-white text-xs rounded-lg font-medium">
+            查看详情
+          </button>
         </div>
       </div>
     </div>
@@ -171,26 +167,20 @@ function InterstitialHalfStyle() {
 // ============================================
 // 4. 插屏广告 - 全屏
 // 尺寸：1080×1920 px，保留状态栏和Home指示器
-// 特点：深蓝色科技感网格、电竞风格
+// 特点：大连五一人物图+电竞风格
 // ============================================
 function InterstitialFullStyle() {
   return (
     <div className="relative w-full h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
-      {/* 科技感网格背景 */}
-      <div className="absolute inset-0 opacity-20">
-        <div 
-          className="absolute inset-0" 
-          style={{
-            backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.4) 1px, transparent 1px)',
-            backgroundSize: '24px 24px'
-          }} 
-        />
-      </div>
-
-      {/* 粒子光效 */}
+      {/* 背景图片 */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
+        <img 
+          src={DEFAULT_IMAGES.interstitial_full} 
+          alt="插屏全屏"
+          className="w-full h-full object-cover"
+        />
+        {/* 渐变遮罩 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
       </div>
 
       {/* 顶部状态栏 */}
@@ -203,35 +193,30 @@ function InterstitialFullStyle() {
         </div>
       </div>
 
-      {/* 中央内容 */}
+      {/* 中央内容叠加 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        {/* 电竞风格圆形应用图标 */}
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-full shadow-2xl shadow-purple-500/40 flex items-center justify-center">
-          <span className="text-3xl">⚔️</span>
-        </div>
-
         {/* 标题 */}
-        <h2 className="mt-6 text-xl font-bold text-white text-center">史诗级策略对战</h2>
+        <h2 className="text-xl font-bold text-white text-center drop-shadow-lg px-4">大连五一游</h2>
         {/* 描述文字 */}
-        <p className="mt-2 text-xs text-white/60 text-center px-8">
-          与全球玩家一决高下，体验极致策略乐趣
+        <p className="mt-2 text-xs text-white/90 text-center px-8 drop-shadow">
+          浪漫滨城 五一等你来
         </p>
 
         {/* 评分和下载次数 */}
         <div className="mt-4 flex items-center gap-2">
           <span className="text-amber-400 text-sm">★★★★★</span>
-          <span className="text-white/60 text-xs">999万+ 下载</span>
+          <span className="text-white/60 text-xs">2024.05.01-05.07</span>
         </div>
 
         {/* 巨型渐变按钮 */}
         <button className="absolute bottom-20 left-4 right-4 py-3.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-lg text-sm font-bold">
-          立即下载（99MB）
+          立即查看（99MB）
         </button>
       </div>
 
       {/* 底部信息 */}
       <div className="absolute bottom-6 right-4 text-[10px] text-white/30">
-        广告 | Epic Games
+        广告
       </div>
 
       {/* Home指示器 */}
@@ -243,7 +228,7 @@ function InterstitialFullStyle() {
 // ============================================
 // 5. 原生广告（信息流）
 // 尺寸：宽度自适应，高度根据内容自适应
-// 特点：左文右图、16:9图片、书桌场景
+// 特点：大连横幅图+左文右图布局
 // ============================================
 function NativeStyle() {
   return (
@@ -261,28 +246,25 @@ function NativeStyle() {
 
             {/* 标题 */}
             <h3 className="text-xs font-bold text-gray-800 line-clamp-2">
-              告别拖延，从微习惯开始
+              大连五一·海滨之旅
             </h3>
 
             {/* 描述 */}
-            <p className="text-[10px] text-gray-400">已有10万人参与挑战</p>
+            <p className="text-[10px] text-gray-400">蔚蓝海岸 金色假期</p>
 
             {/* 底部 */}
             <div className="flex items-center justify-between mt-1">
-              <span className="text-[10px] text-green-600">免费下载</span>
+              <span className="text-[10px] text-green-600">查看详情</span>
             </div>
           </div>
 
-          {/* 右侧：16:9图片 */}
+          {/* 右侧：图片 */}
           <div className="w-20 h-12 bg-gradient-to-br from-amber-100 to-orange-100 rounded-md overflow-hidden flex-shrink-0">
-            <div className="w-full h-full flex items-center justify-center">
-              {/* 模拟书桌场景 */}
-              <div className="relative w-full h-full">
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-amber-200" />
-                <div className="absolute bottom-1/2 left-1/4 w-3 h-4 bg-amber-400 rounded" />
-                <div className="absolute bottom-1/2 right-1/4 w-4 h-3 bg-blue-200 rounded" />
-              </div>
-            </div>
+            <img 
+              src={DEFAULT_IMAGES.native} 
+              alt="原生信息流"
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </div>
@@ -293,25 +275,34 @@ function NativeStyle() {
 // ============================================
 // 6. 横幅广告 (Banner)
 // 尺寸：320×50 dp
-// 特点：电商类应用、橙色按钮
+// 特点：大连横幅图+电商风格
 // ============================================
 function BannerStyle() {
   return (
-    <div className="relative w-full h-full bg-[#F8F9FA] border-t border-gray-200 flex items-center">
-      <div className="flex items-center gap-1.5 px-1.5 w-full">
+    <div className="relative w-full h-full bg-[#F8F9FA] border-t border-gray-200 flex items-center overflow-hidden">
+      {/* 背景图（半透明） */}
+      <div className="absolute inset-0 opacity-20">
+        <img 
+          src={DEFAULT_IMAGES.banner} 
+          alt="横幅"
+          className="w-full h-full object-cover object-left"
+        />
+      </div>
+
+      <div className="relative flex items-center gap-1.5 px-1.5 w-full">
         {/* 应用图标 */}
-        <div className="w-7 h-7 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-[10px]">🛒</span>
+        <div className="w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+          <span className="text-white text-[10px]">🏖️</span>
         </div>
 
         {/* 文字内容 */}
         <div className="flex-1 min-w-0">
-          <h4 className="text-[10px] font-medium text-gray-800 truncate leading-tight">购物App - 限时秒杀</h4>
-          <p className="text-[9px] text-gray-500 truncate leading-tight">全场满199减30</p>
+          <h4 className="text-[10px] font-medium text-gray-800 truncate leading-tight">大连五一旅游季</h4>
+          <p className="text-[9px] text-gray-500 truncate leading-tight">邂逅滨海浪漫 畅玩活力五一</p>
         </div>
 
         {/* 查看按钮 */}
-        <button className="px-2 py-1 bg-orange-500 text-white text-[9px] rounded-md font-medium flex-shrink-0">
+        <button className="px-2 py-1 bg-blue-500 text-white text-[9px] rounded-md font-medium flex-shrink-0">
           查看
         </button>
 
@@ -327,7 +318,7 @@ function BannerStyle() {
 // ============================================
 // 7. 激励视频广告
 // 尺寸：1080×1920 px
-// 特点：农场收割游戏、金色横幅、倒计时角标
+// 特点：大连风景图+金色横幅+倒计时角标
 // ============================================
 function RewardedVideoStyle() {
   const [progress, setProgress] = useState(0);
@@ -341,30 +332,15 @@ function RewardedVideoStyle() {
 
   return (
     <div className="relative w-full h-full bg-gradient-to-b from-sky-200 via-green-200 to-green-300 overflow-hidden">
-      {/* 视频内容：农场收割游戏画面 */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center w-full">
-          {/* 游戏场景 */}
-          <div className="w-44 h-64 bg-gradient-to-b from-sky-300 to-green-400 rounded-xl overflow-hidden mx-auto relative">
-            {/* 太阳 */}
-            <div className="absolute top-4 right-6 w-8 h-8 bg-yellow-300 rounded-full" />
-            {/* 云朵 */}
-            <div className="absolute top-6 left-6 w-10 h-4 bg-white/60 rounded-full" />
-            {/* 田野 */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-amber-300 to-amber-200" />
-            {/* 庄稼 */}
-            <div className="absolute bottom-1/2 left-0 right-0 flex justify-around">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="w-1.5 h-8 bg-amber-500 rounded-t" />
-              ))}
-            </div>
-            {/* 进度收割线 */}
-            <div 
-              className="absolute bottom-1/2 left-0 h-0.5 bg-green-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
+      {/* 背景图片 */}
+      <div className="absolute inset-0">
+        <img 
+          src={DEFAULT_IMAGES.rewarded_video} 
+          alt="激励视频"
+          className="w-full h-full object-cover"
+        />
+        {/* 底部渐变 */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
       {/* 顶部：金色奖励横幅 */}
@@ -389,7 +365,7 @@ function RewardedVideoStyle() {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <span className="text-sm font-bold text-amber-600">{progress}%</span>
+          <span className="text-sm font-bold text-white">{progress}%</span>
         </div>
       </div>
 
@@ -626,4 +602,4 @@ export function SDKTemplateStyleCard({
   );
 }
 
-export { TEMPLATE_STYLES, SDK_TEMPLATE_INFO_STYLES };
+export { TEMPLATE_STYLES, SDK_TEMPLATE_INFO_STYLES, DEFAULT_IMAGES };
