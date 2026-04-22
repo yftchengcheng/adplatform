@@ -367,7 +367,7 @@ export function ComponentList() {
                 <button
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-blue-50 text-blue-600"
                 >
-                  模板组件
+                  组件管理
                 </button>
                 <Link href="/sdk">
                   <button

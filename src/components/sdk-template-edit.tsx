@@ -600,7 +600,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                 <div className="text-center py-8 text-gray-400">
                   <ImageIcon className="w-8 h-8 mx-auto mb-2" />
                   <p className="text-sm">暂无组件</p>
-                  <p className="text-xs mt-1">请先在「模板组件」中创建组件</p>
+                  <p className="text-xs mt-1">请先在「组件管理」中创建组件</p>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -655,7 +655,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                 <div className="text-center py-8 text-gray-400">
                   <ImageIcon className="w-8 h-8 mx-auto mb-2" />
                   <p className="text-sm">暂无组件可关联</p>
-                  <p className="text-xs mt-1">请先在「模板组件」中创建组件</p>
+                  <p className="text-xs mt-1">请先在「组件管理」中创建组件</p>
                 </div>
               ) : (
                 <div className="space-y-2">

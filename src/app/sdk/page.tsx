@@ -33,7 +33,7 @@ export default function SDKPage() {
                 <button
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-white hover:shadow-sm"
                 >
-                  模板组件
+                  组件管理
                 </button>
               </Link>
               <button
