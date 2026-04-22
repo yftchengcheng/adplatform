@@ -488,15 +488,17 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
                       </div>
                     </div>
                     <div className="absolute bottom-6 left-0 right-0">
-                      <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
+                      <div className="relative">
+                        <img src={DEFAULT_IMAGES[activeTemplate]} alt={templateInfo.name} className="w-full h-auto" />
+                        {/* 关闭按钮 - 素材右上角 */}
+                        <button
+                          onClick={() => {}}
+                          className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
+                        >
+                          <span className="text-white/80 text-xs leading-none">x</span>
+                        </button>
+                      </div>
                     </div>
-                    {/* 关闭按钮 */}
-                    <button
-                      onClick={() => {}}
-                      className="absolute top-8 right-3 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:bg-black/70"
-                    >
-                      <span className="text-white/80 text-xs leading-none">x</span>
-                    </button>
                   </>
                 )}
 
@@ -643,15 +645,17 @@ export function SDKTemplateStyleCard({
           </div>
           {/* 横幅广告 - 固定在底部 */}
           <div className="absolute bottom-0 left-0 right-0">
-            <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto" />
+            <div className="relative">
+              <img src={DEFAULT_IMAGES[type]} alt={templateInfo.name} className="w-full h-auto" />
+              {/* 关闭按钮 - 素材右上角 */}
+              <button
+                onClick={() => {}}
+                className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-black/50 rounded-full flex items-center justify-center"
+              >
+                <span className="text-white/80 text-[6px] leading-none">x</span>
+              </button>
+            </div>
           </div>
-          {/* 关闭按钮 */}
-          <button
-            onClick={() => {}}
-            className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-black/50 rounded-full flex items-center justify-center"
-          >
-            <span className="text-white/80 text-[6px] leading-none">x</span>
-          </button>
         </div>
       </div>
     );
