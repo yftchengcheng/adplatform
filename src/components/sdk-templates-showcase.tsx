@@ -596,9 +596,10 @@ export function SDKTemplateStyleCard({
 
   return (
     <div className={cn(
-      "bg-gray-900 rounded-xl p-1 shadow-lg flex items-center justify-center",
+      "relative bg-gray-900 rounded-xl p-1 shadow-lg flex items-center justify-center",
       getPhoneFrameClasses()
     )}>
+      {/* 手机外框 */}
       <div className={cn(
         "bg-white rounded-lg overflow-hidden relative",
         getPhoneContentClasses()
@@ -625,6 +626,26 @@ export function SDKTemplateStyleCard({
           <div className="h-1.5 bg-white flex items-center justify-center">
             <div className="w-6 h-0.5 bg-gray-300 rounded-full" />
           </div>
+        )}
+
+        {/* 红框标注 - 全屏类型：覆盖整个手机屏幕 */}
+        {(type === "static_splash" || type === "video_splash" || type === "interstitial_full" || type === "rewarded_video") && (
+          <div className="absolute inset-0 border-[1.5px] border-red-500 rounded-lg pointer-events-none" />
+        )}
+
+        {/* 红框标注 - 横幅：只标注横幅本身 */}
+        {type === "banner" && (
+          <div className="absolute inset-0 border-[1.5px] border-red-500 rounded-md pointer-events-none m-[1px]" />
+        )}
+
+        {/* 红框标注 - 原生：只标注广告内容 */}
+        {type === "native" && (
+          <div className="absolute inset-0 border-[1.5px] border-red-500 rounded-md pointer-events-none m-[1px]" />
+        )}
+
+        {/* 红框标注 - 插屏半屏：标注半屏弹窗区域 */}
+        {type === "interstitial_half" && (
+          <div className="absolute top-1 left-1 right-1 bottom-1 border-[1.5px] border-red-500 rounded-lg pointer-events-none" />
         )}
       </div>
     </div>
