@@ -244,9 +244,9 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
     }
   };
 
-  // 返回SDK模板样式页面
+  // 返回SDK模版页面
   const handleBack = () => {
-    router.push("/sdk/templates");
+    router.push("/");
   };
 
   return (
