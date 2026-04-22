@@ -232,7 +232,11 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                       <button className="p-1.5 hover:bg-gray-100 rounded" title="复制">
                         <Copy className="w-4 h-4 text-gray-500" />
                       </button>
-                      <button className="p-1.5 hover:bg-gray-100 rounded" title="编辑">
+                      <button 
+                        className="p-1.5 hover:bg-gray-100 rounded" 
+                        title="编辑"
+                        onClick={() => router.push(`/sdk/${type}/${item.id}`)}
+                      >
                         <Edit className="w-4 h-4 text-gray-500" />
                       </button>
                       <button

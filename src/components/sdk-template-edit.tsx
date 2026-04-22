@@ -1,0 +1,676 @@
+"use client";
+
+import React, { useState, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { 
+  ChevronLeft, 
+  ChevronRight,
+  Plus,
+  X,
+  Eye,
+  Play,
+  MousePointer,
+  RotateCcw,
+  Hand,
+  Zap,
+  Clock,
+  Trash2
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+// SDK模板类型
+type SDKTemplateType = 
+  | "static_splash"      // 静态开屏
+  | "video_splash"        // 视频开屏
+  | "interstitial_half"   // 插屏-半屏
+  | "interstitial_full"   // 插屏-全屏
+  | "banner"              // 横幅
+  | "native"              // 原生（信息流）
+  | "rewarded_video";     // 激励视频
+
+// 触发规则类型
+type TriggerRule = 
+  | "video_complete"      // 视频播放完毕
+  | "show_time"           // 出现时间
+  | "click_close"         // 点击广告关闭按钮
+  | "back_from_media"     // 跳转后返回媒体
+  | "click_other_ad"      // 点击其他(匿名)广告
+  | "in_app_interaction"; // 应用内非广告互动
+
+// 触发规则配置
+const TRIGGER_RULES: Record<TriggerRule, { label: string; icon: React.ReactNode; desc: string }> = {
+  video_complete: {
+    label: "视频播放完毕",
+    icon: <Play className="w-4 h-4" />,
+    desc: "视频广告播放完毕，即组件弹出展示"
+  },
+  show_time: {
+    label: "出现时间",
+    icon: <Clock className="w-4 h-4" />,
+    desc: "广告展示指定时间后组件弹出"
+  },
+  click_close: {
+    label: "点击关闭按钮",
+    icon: <X className="w-4 h-4" />,
+    desc: "点击广告关闭按钮后触发组件展示"
+  },
+  back_from_media: {
+    label: "跳转后返回",
+    icon: <RotateCcw className="w-4 h-4" />,
+    desc: "跳转后返回媒体时触发组件展示"
+  },
+  click_other_ad: {
+    label: "点击其他广告",
+    icon: <MousePointer className="w-4 h-4" />,
+    desc: "点击其他(匿名)广告后触发"
+  },
+  in_app_interaction: {
+    label: "应用内互动",
+    icon: <Hand className="w-4 h-4" />,
+    desc: "应用内非广告互动，如滑动、点击文章等"
+  }
+};
+
+// 组件关联配置
+interface ComponentLinkConfig {
+  id: string;
+  componentId: string;        // 关联的组件ID
+  componentName: string;      // 关联的组件名称
+  componentType: string;      // 组件类型
+  componentPreview: string;    // 组件预览图
+  triggerRule: TriggerRule;    // 触发规则
+  triggerTime?: number;       // 触发时间（秒），仅show_time类型使用
+  parentId?: string;          // 上一级ID（主素材或已添加的组件）
+  parentName?: string;        // 上一级名称
+  status: "enabled" | "disabled";
+}
+
+// 模拟组件数据
+const MOCK_COMPONENTS = [
+  { id: "comp_001", name: "红包雨-春节活动", type: "红包雨", preview: "https://picsum.photos/seed/comp1/120/80" },
+  { id: "comp_002", name: "砸蛋-惊喜礼包", type: "砸蛋", preview: "https://picsum.photos/seed/comp2/120/80" },
+  { id: "comp_003", name: "刮刮卡-幸运抽奖", type: "刮刮卡", preview: "https://picsum.photos/seed/comp3/120/80" },
+  { id: "comp_004", name: "翻卡-神秘大奖", type: "翻卡", preview: "https://picsum.photos/seed/comp4/120/80" },
+  { id: "comp_005", name: "投票-选择偏好", type: "投票磁贴", preview: "https://picsum.photos/seed/comp5/120/80" },
+  { id: "comp_006", name: "优惠券-新人专享", type: "优惠券", preview: "https://picsum.photos/seed/comp6/120/80" },
+];
+
+// SDK模板信息
+const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }> = {
+  static_splash: { name: "静态开屏", desc: "静态图片展示，应用启动时展示品牌广告" },
+  video_splash: { name: "视频开屏", desc: "视频素材播放，应用启动时自动播放" },
+  interstitial_half: { name: "插屏-半屏", desc: "半屏展示，覆盖部分屏幕" },
+  interstitial_full: { name: "插屏-全屏", desc: "全屏展示，强制用户观看" },
+  banner: { name: "横幅", desc: "顶部或底部横幅，持续展示" },
+  native: { name: "原生（信息流）", desc: "融入内容的原生广告" },
+  rewarded_video: { name: "激励视频", desc: "用户主动观看获取奖励" },
+};
+
+// 模版尺寸配置
+const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: number; ratio: string }> = {
+  static_splash: { width: 540, height: 960, ratio: "9:16" },
+  video_splash: { width: 540, height: 960, ratio: "9:16" },
+  interstitial_half: { width: 600, height: 500, ratio: "6:5" },
+  interstitial_full: { width: 1080, height: 1920, ratio: "9:16" },
+  banner: { width: 1080, height: 120, ratio: "9:1" },
+  native: { width: 1080, height: 540, ratio: "2:1" },
+  rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
+};
+
+interface SDKTemplateEditProps {
+  type: SDKTemplateType;
+  templateId?: string;
+}
+
+export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
+  const router = useRouter();
+  const info = SDK_TEMPLATE_INFO[type];
+  const sizeConfig = SDK_TEMPLATE_SIZES[type];
+  
+  // 组件关联配置列表
+  const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([
+    {
+      id: "link_1",
+      componentId: "comp_001",
+      componentName: "红包雨-春节活动",
+      componentType: "红包雨",
+      componentPreview: "https://picsum.photos/seed/comp1/120/80",
+      triggerRule: "show_time",
+      triggerTime: 5,
+      parentId: "main",
+      parentName: "主素材",
+      status: "enabled"
+    }
+  ]);
+  
+  // 选择组件弹窗
+  const [showComponentPicker, setShowComponentPicker] = useState(false);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  
+  // 触发时间弹窗
+  const [showTimeDialog, setShowTimeDialog] = useState<string | null>(null);
+  const [timeValue, setTimeValue] = useState(5);
+
+  // 返回列表
+  const handleBack = () => {
+    router.push(`/sdk/${type}`);
+  };
+
+  // 添加组件关联
+  const handleAddComponent = () => {
+    setShowComponentPicker(true);
+    setEditingLinkId(null);
+  };
+
+  // 选择组件
+  const handleSelectComponent = (component: typeof MOCK_COMPONENTS[0]) => {
+    const newLink: ComponentLinkConfig = {
+      id: `link_${Date.now()}`,
+      componentId: component.id,
+      componentName: component.name,
+      componentType: component.type,
+      componentPreview: component.preview,
+      triggerRule: "show_time",
+      triggerTime: 5,
+      parentId: "main",
+      parentName: "主素材",
+      status: "enabled"
+    };
+    setComponentLinks(prev => [...prev, newLink]);
+    setShowComponentPicker(false);
+  };
+
+  // 更新触发规则
+  const handleUpdateTriggerRule = (linkId: string, rule: TriggerRule) => {
+    setComponentLinks(prev => prev.map(link => {
+      if (link.id === linkId) {
+        return { ...link, triggerRule: rule };
+      }
+      return link;
+    }));
+  };
+
+  // 更新触发时间
+  const handleUpdateTriggerTime = (linkId: string) => {
+    setComponentLinks(prev => prev.map(link => {
+      if (link.id === linkId) {
+        return { ...link, triggerTime: timeValue };
+      }
+      return link;
+    }));
+    setShowTimeDialog(null);
+  };
+
+  // 删除组件关联
+  const handleDeleteLink = (linkId: string) => {
+    setComponentLinks(prev => prev.filter(link => link.id !== linkId));
+  };
+
+  // 切换组件状态
+  const handleToggleStatus = (linkId: string) => {
+    setComponentLinks(prev => prev.map(link => {
+      if (link.id === linkId) {
+        return { 
+          ...link, 
+          status: link.status === "enabled" ? "disabled" : "enabled" 
+        };
+      }
+      return link;
+    }));
+  };
+
+  // 获取触发规则图标
+  const getTriggerRuleIcon = (rule: TriggerRule) => {
+    return TRIGGER_RULES[rule]?.icon || <Zap className="w-4 h-4" />;
+  };
+
+  // 渲染触发规则选择器
+  const renderTriggerRuleSelector = (link: ComponentLinkConfig) => (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {(Object.keys(TRIGGER_RULES) as TriggerRule[]).map(rule => (
+        <button
+          key={rule}
+          onClick={() => handleUpdateTriggerRule(link.id, rule)}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-all ${
+            link.triggerRule === rule 
+              ? "bg-blue-100 text-blue-700 border border-blue-300" 
+              : "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200"
+          }`}
+        >
+          {getTriggerRuleIcon(rule)}
+          <span>{TRIGGER_RULES[rule].label}</span>
+        </button>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleBack}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">编辑模板</h1>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {info.name} · {sizeConfig.width}×{sizeConfig.height} · {sizeConfig.ratio}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={handleBack}>
+                取消
+              </Button>
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                保存
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 左侧：配置面板 */}
+          <div className="space-y-4">
+            {/* 基础配置 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">基础配置</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">模板ID</label>
+                  <Input 
+                    value={templateId || "sdk_static_splash_000001"} 
+                    disabled 
+                    className="bg-gray-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">模板名称</label>
+                  <Input 
+                    defaultValue={`${info.name}模板1`} 
+                    placeholder="请输入模板名称"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">广告位ID</label>
+                  <Input 
+                    defaultValue="slot_static_0001" 
+                    placeholder="请输入广告位ID"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 组件关联配置 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-gray-900">组件关联配置</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleAddComponent}
+                  className="h-8"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  添加组件
+                </Button>
+              </div>
+              
+              {/* 组件列表 */}
+              <div className="space-y-3">
+                {componentLinks.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">
+                    <p className="text-sm">暂未关联组件</p>
+                    <p className="text-xs mt-1">点击上方按钮添加组件</p>
+                  </div>
+                ) : (
+                  componentLinks.map((link) => (
+                    <div 
+                      key={link.id}
+                      className={`border rounded-lg p-3 transition-all ${
+                        link.status === "enabled" 
+                          ? "border-blue-200 bg-blue-50/50" 
+                          : "border-gray-200 bg-gray-50"
+                      }`}
+                    >
+                      {/* 组件信息 */}
+                      <div className="flex items-start gap-3">
+                        <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
+                          <img 
+                            src={link.componentPreview} 
+                            alt={link.componentName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 truncate">
+                              {link.componentName}
+                            </span>
+                            <span className="px-1.5 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">
+                              {link.componentType}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            上一级：{link.parentName}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleToggleStatus(link.id)}
+                            className={`p-1.5 rounded transition-colors ${
+                              link.status === "enabled"
+                                ? "bg-green-100 text-green-600"
+                                : "bg-gray-100 text-gray-400"
+                            }`}
+                            title={link.status === "enabled" ? "已启用" : "已禁用"}
+                          >
+                            {link.status === "enabled" ? (
+                              <Eye className="w-4 h-4" />
+                            ) : (
+                              <Eye className="w-4 h-4" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteLink(link.id)}
+                            className="p-1.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* 触发规则 */}
+                      <div className="mt-3">
+                        <p className="text-xs text-gray-500 mb-1">触发规则</p>
+                        {renderTriggerRuleSelector(link)}
+                        
+                        {/* 出现时间输入 */}
+                        {link.triggerRule === "show_time" && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs text-gray-500">延迟</span>
+                            <button
+                              onClick={() => {
+                                setTimeValue(link.triggerTime || 5);
+                                setShowTimeDialog(link.id);
+                              }}
+                              className="px-2 py-1 bg-white border border-gray-300 rounded text-xs hover:bg-gray-50"
+                            >
+                              {link.triggerTime}s
+                            </button>
+                            <span className="text-xs text-gray-500">后弹出</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 提示信息 */}
+              {componentLinks.length > 0 && (
+                <p className="text-xs text-gray-400 mt-3">
+                  提示：同层级相同触发规则只能配置一次
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* 右侧：预览区域 */}
+          <div className="space-y-4">
+            {/* 广告互动链路示意图 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">广告互动链路示意图</h3>
+              
+              <div className="relative">
+                {/* 链路图 */}
+                <div className="flex flex-col items-center">
+                  {/* 主素材 */}
+                  <div className="w-32 h-44 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg border-2 border-blue-300 flex flex-col items-center justify-center p-2">
+                    <div className="w-full h-24 bg-white rounded mb-2 flex items-center justify-center">
+                      <img 
+                        src={`https://picsum.photos/seed/${type}/80/120`}
+                        alt="主素材"
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-blue-700">主素材</span>
+                    <span className="text-[10px] text-blue-500">{info.name}</span>
+                  </div>
+                  
+                  {/* 连接线 */}
+                  {componentLinks.length > 0 && (
+                    <div className="relative py-2">
+                      <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-300 -translate-x-1/2" />
+                      <div className="relative z-10 w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center">
+                        <ChevronRight className="w-3 h-3 text-gray-400" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 已配置组件 */}
+                  {componentLinks.length > 0 ? (
+                    <div className="space-y-3">
+                      {componentLinks.map((link) => (
+                        <div key={link.id} className="relative">
+                          {/* 连接线 */}
+                          {componentLinks.indexOf(link) > 0 && (
+                            <div className="absolute left-1/2 -top-3 w-0.5 h-3 bg-gray-300 -translate-x-1/2" />
+                          )}
+                          
+                          <div className={`w-32 rounded-lg border-2 p-2 flex flex-col items-center ${
+                            link.status === "enabled"
+                              ? "bg-gradient-to-br from-purple-100 to-purple-200 border-purple-300"
+                              : "bg-gray-100 border-gray-300"
+                          }`}>
+                            <div className="w-full h-10 bg-white rounded mb-1.5 flex items-center justify-center overflow-hidden">
+                              <img 
+                                src={link.componentPreview}
+                                alt={link.componentName}
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <span className={`text-[10px] font-medium ${
+                              link.status === "enabled" ? "text-purple-700" : "text-gray-500"
+                            }`}>
+                              {link.componentName}
+                            </span>
+                            <span className={`text-[9px] px-1 py-0.5 rounded mt-0.5 ${
+                              link.status === "enabled" 
+                                ? "bg-purple-200 text-purple-600" 
+                                : "bg-gray-200 text-gray-500"
+                            }`}>
+                              {TRIGGER_RULES[link.triggerRule].label}
+                              {link.triggerRule === "show_time" && ` · ${link.triggerTime}s`}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    /* 未配置提示 */
+                    <div className="w-32 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center">
+                      <Plus className="w-5 h-5 text-gray-300" />
+                      <span className="text-xs text-gray-400 mt-1">添加组件</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 图例 */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 mb-2">图例</p>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-3 bg-gradient-to-br from-blue-100 to-blue-200 border border-blue-300 rounded" />
+                      <span className="text-xs text-gray-600">主素材</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-3 bg-gradient-to-br from-purple-100 to-purple-200 border border-purple-300 rounded" />
+                      <span className="text-xs text-gray-600">关联组件</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-0.5 bg-gray-300" />
+                      <span className="text-xs text-gray-600">触发链路</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 组件预览 */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">组件预览</h3>
+              <div className="flex flex-wrap gap-2">
+                {MOCK_COMPONENTS.map((comp) => (
+                  <div 
+                    key={comp.id}
+                    className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
+                    onClick={() => {
+                      if (!componentLinks.find(l => l.componentId === comp.id)) {
+                        handleSelectComponent(comp);
+                      }
+                    }}
+                  >
+                    <img 
+                      src={comp.preview}
+                      alt={comp.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 mt-2">点击组件卡片可快速添加到关联列表</p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* 选择组件弹窗 */}
+      {showComponentPicker && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
+            <div className="px-5 pt-5 pb-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">选择组件</h3>
+                <button
+                  onClick={() => setShowComponentPicker(false)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">请选择要关联的组件</p>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              <div className="space-y-2">
+                {MOCK_COMPONENTS.map((comp) => {
+                  const isLinked = componentLinks.some(l => l.componentId === comp.id);
+                  return (
+                    <div
+                      key={comp.id}
+                      onClick={() => !isLinked && handleSelectComponent(comp)}
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                        isLinked
+                          ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-50"
+                          : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
+                      }`}
+                    >
+                      <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
+                        <img 
+                          src={comp.preview}
+                          alt={comp.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-900">
+                            {comp.name}
+                          </span>
+                          {isLinked && (
+                            <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-xs rounded">
+                              已关联
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500">{comp.type}</span>
+                      </div>
+                      {isLinked && (
+                        <span className="text-xs text-gray-400">不可重复添加</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 触发时间设置弹窗 */}
+      {showTimeDialog && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-xs overflow-hidden">
+            <div className="px-5 pt-5 pb-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">设置出现时间</h3>
+              <p className="text-sm text-gray-500 mt-1">组件弹出的延迟时间（秒）</p>
+            </div>
+            <div className="p-5">
+              <div className="flex items-center justify-center gap-4">
+                <button
+                  onClick={() => setTimeValue(Math.max(1, timeValue - 1))}
+                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-bold"
+                >
+                  -
+                </button>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={timeValue}
+                    onChange={(e) => setTimeValue(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-20 h-12 text-center text-2xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    min="1"
+                  />
+                  <span className="text-lg text-gray-600">秒</span>
+                </div>
+                <button
+                  onClick={() => setTimeValue(timeValue + 1)}
+                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-bold"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="px-5 pb-5 flex gap-3">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setShowTimeDialog(null)}
+              >
+                取消
+              </Button>
+              <Button 
+                className="flex-1 bg-blue-500 hover:bg-blue-600"
+                onClick={() => handleUpdateTriggerTime(showTimeDialog)}
+              >
+                确认
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default SDKTemplateEdit;
