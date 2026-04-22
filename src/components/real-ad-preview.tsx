@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -134,6 +134,49 @@ export function FullscreenPreviewModal({
   const templateSize = SDK_TEMPLATE_SIZES[templateType] || { width: 540, height: 960 };
   const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
+  
+  // 倒计时状态
+  const [countdown, setCountdown] = useState(5);
+  const [currentTime, setCurrentTime] = useState("9:41");
+  
+  // 重置倒计时
+  const resetCountdown = useCallback(() => {
+    setCountdown(5);
+  }, []);
+  
+  // 倒计时逻辑
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    resetCountdown();
+    
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [isOpen, resetCountdown]);
+  
+  // 更新时间（模拟）
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const updateTime = () => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      setCurrentTime(`${hours}:${minutes}`);
+    };
+    
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -144,7 +187,7 @@ export function FullscreenPreviewModal({
         <div className="bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl">
           {/* 状态栏 */}
           <div className="h-5 bg-white rounded-t-[1.2rem] flex items-center justify-between px-4">
-            <span className="text-[9px] font-medium text-gray-900">9:41</span>
+            <span className="text-[9px] font-medium text-gray-900">{currentTime}</span>
             <div className="flex gap-0.5">
               <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
               <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
@@ -179,9 +222,14 @@ export function FullscreenPreviewModal({
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
 
             {/* 跳过按钮 */}
-            <div className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full">
-              <span className="text-white/80 text-xs">跳过 5s</span>
-            </div>
+            <button 
+              onClick={onClose}
+              className="absolute top-3 right-3 px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors"
+            >
+              <span className="text-white/80 text-xs">
+                {countdown > 0 ? `跳过 ${countdown}s` : "跳过"}
+              </span>
+            </button>
 
             {/* 关闭按钮 */}
             <button 
