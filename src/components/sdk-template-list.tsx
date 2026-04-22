@@ -11,11 +11,13 @@ import {
   Edit, 
   Play, 
   Pause,
-  Loader2
+  Loader2,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RealAdPreview } from "./real-ad-preview";
+import { SDKTemplatesShowcase } from "./sdk-templates-showcase";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -77,6 +79,18 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   const [data, setData] = useState<SDKTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // 预览弹窗状态
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<SDKTemplate | null>(null);
+  
+  // 编辑弹窗状态
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTemplate, setEditTemplate] = useState<SDKTemplate | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editAdSlot, setEditAdSlot] = useState("");
+  const [editFormat, setEditFormat] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const info = SDK_TEMPLATE_INFO[type];
   const sizeConfig = SDK_TEMPLATE_SIZES[type];
@@ -131,6 +145,65 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
       newSelected.add(id);
     }
     setSelectedIds(newSelected);
+  };
+
+  // 预览
+  const handlePreview = (item: SDKTemplate) => {
+    setPreviewTemplate(item);
+    setPreviewOpen(true);
+  };
+
+  // 复制ID
+  const handleCopy = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      // 可以添加一个提示
+      alert("已复制模板ID: " + id);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  // 编辑
+  const handleEdit = (item: SDKTemplate) => {
+    setEditTemplate(item);
+    setEditName(item.name);
+    setEditAdSlot(item.ad_slot || "");
+    setEditFormat(item.format || "");
+    setEditOpen(true);
+  };
+
+  // 保存编辑
+  const handleSaveEdit = async () => {
+    if (!editTemplate) return;
+    
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/sdk/templates/${editTemplate.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName,
+          adSlot: editAdSlot,
+          format: editFormat,
+        }),
+      });
+      const json = await res.json();
+      
+      if (json.success) {
+        setData(prev => prev.map(d => 
+          d.id === editTemplate.id ? { ...d, name: editName, ad_slot: editAdSlot, format: editFormat } : d
+        ));
+        setEditOpen(false);
+      } else {
+        alert(json.error || "保存失败");
+      }
+    } catch (err) {
+      console.error("Error saving edit:", err);
+      alert("保存失败，请重试");
+    } finally {
+      setSaving(false);
+    }
   };
 
   // 切换状态
@@ -309,16 +382,24 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <button className="p-1.5 hover:bg-gray-100 rounded" title="预览">
+                        <button 
+                          className="p-1.5 hover:bg-gray-100 rounded" 
+                          title="预览"
+                          onClick={() => handlePreview(item)}
+                        >
                           <Eye className="w-4 h-4 text-gray-500" />
                         </button>
-                        <button className="p-1.5 hover:bg-gray-100 rounded" title="复制">
+                        <button 
+                          className="p-1.5 hover:bg-gray-100 rounded" 
+                          title="复制"
+                          onClick={() => handleCopy(item.id)}
+                        >
                           <Copy className="w-4 h-4 text-gray-500" />
                         </button>
                         <button 
                           className="p-1.5 hover:bg-gray-100 rounded" 
                           title="编辑"
-                          onClick={() => router.push(`/sdk/${type}/${item.id}`)}
+                          onClick={() => handleEdit(item)}
                         >
                           <Edit className="w-4 h-4 text-gray-500" />
                         </button>
@@ -371,6 +452,92 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
           </div>
         </div>
       </main>
+
+      {/* 预览弹窗 */}
+      {previewOpen && previewTemplate && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h3 className="font-semibold text-gray-900">模板预览</h3>
+              <button 
+                onClick={() => setPreviewOpen(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-4">
+              <div className="bg-gray-100 rounded-lg overflow-hidden">
+                <SDKTemplatesShowcase />
+              </div>
+              <div className="mt-4 text-sm text-gray-500">
+                <p><span className="font-medium">模板名称：</span>{previewTemplate.name}</p>
+                <p><span className="font-medium">模板ID：</span>{previewTemplate.id}</p>
+                <p><span className="font-medium">规格：</span>{previewTemplate.width}×{previewTemplate.height}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 编辑弹窗 */}
+      {editOpen && editTemplate && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h3 className="font-semibold text-gray-900">编辑模板</h3>
+              <button 
+                onClick={() => setEditOpen(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">模板名称</label>
+                <Input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="请输入模板名称"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">广告位</label>
+                <Input
+                  value={editAdSlot}
+                  onChange={(e) => setEditAdSlot(e.target.value)}
+                  placeholder="请输入广告位"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">格式</label>
+                <Input
+                  value={editFormat}
+                  onChange={(e) => setEditFormat(e.target.value)}
+                  placeholder="请输入格式"
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setEditOpen(false)}
+                >
+                  取消
+                </Button>
+                <Button 
+                  className="flex-1"
+                  onClick={handleSaveEdit}
+                  disabled={saving}
+                >
+                  {saving ? "保存中..." : "保存"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
