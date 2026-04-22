@@ -290,22 +290,40 @@ function BannerStyle() {
 
 // ============================================
 // 7. 激励视频广告
-// 尺寸：1080×1920 px
-// 特点：大连风景图+金色横幅+倒计时角标
+// 尺寸：1080×1920 px，视频播放界面
+// 特点：金色横幅 + 倒计时角标 + 钻石动画 + 毛玻璃UI
 // ============================================
 function RewardedVideoStyle() {
   const [progress, setProgress] = useState(0);
+  const [diamondCount, setDiamondCount] = useState(0);
+  const maxSeconds = 15;
+  const currentSeconds = Math.max(0, Math.ceil((100 - progress) / (100 / maxSeconds)));
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setProgress((p) => (p >= 100 ? 100 : p + 1.5));
-    }, 200);
+      setProgress((p) => {
+        if (p >= 100) return 100;
+        return p + 0.8;
+      });
+    }, 150);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const diamondTimer = setInterval(() => {
+      setDiamondCount((c) => {
+        if (c >= 50) return 50;
+        return c + 1;
+      });
+    }, 300);
+    return () => clearInterval(diamondTimer);
+  }, []);
+
+  const isCompleted = progress >= 100;
+
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* 背景图片 */}
+      {/* 视频内容背景 */}
       <div className="absolute inset-0">
         <img 
           src={DEFAULT_IMAGES.rewarded_video} 
@@ -313,39 +331,113 @@ function RewardedVideoStyle() {
           className="w-full h-full object-cover"
         />
         {/* 底部渐变 */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/40 to-transparent" />
       </div>
 
-      {/* 顶部：金色奖励横幅 */}
-      <div className="absolute top-1 left-1 right-1">
-        <div className="bg-gradient-to-r from-amber-400 to-amber-500 text-white text-center py-0.5 px-1 rounded text-[5px]">
-          观看视频领取双倍金币
+      {/* 顶部：金色横幅 - 居中醒目 */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
+        <div className="relative">
+          {/* 光晕效果 */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-md" />
+          <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-2.5 px-6 rounded-full shadow-xl border border-amber-300/30">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">🎁</span>
+              <p className="text-sm font-semibold whitespace-nowrap">观看视频以领取双倍金币奖励</p>
+              <span className="text-sm">🎁</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 右下角：倒计时角标 */}
-      <div className="absolute bottom-3 right-0.5 px-1 py-0.5 bg-white/90 rounded text-[6px]">
-        {Math.max(0, Math.floor((100 - progress) / 6.7))}s
+      {/* 右下角：倒计时角标 - 白底黑字圆角矩形 */}
+      <div className="absolute bottom-24 right-3 z-20">
+        <div className="bg-white/90 backdrop-blur-md rounded-lg px-3 py-1.5 shadow-lg border border-white/50">
+          <p className="text-gray-800 text-xs font-medium">
+            {isCompleted ? "可领取" : `${currentSeconds}s后可领取`}
+          </p>
+        </div>
       </div>
 
-      {/* 底部：进度条 */}
-      <div className="absolute bottom-2 left-1 right-1 flex items-center gap-1">
-        <span className="text-[8px]">💎</span>
-        <div className="flex-1 h-1 bg-white/60 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-200"
-            style={{ width: `${progress}%` }}
-          />
+      {/* 底部左侧：钻石计数动画 */}
+      <div className="absolute bottom-6 left-3 z-20">
+        <div className="bg-white/25 backdrop-blur-md rounded-xl px-3 py-2 shadow-lg border border-white/30">
+          <div className="flex items-center gap-2">
+            {/* 钻石图标 + 动态计数 */}
+            <div className="relative flex items-center gap-1">
+              <span className="text-lg">💎</span>
+              <span className="text-white text-base font-bold drop-shadow-md tabular-nums">
+                ×{diamondCount}
+              </span>
+              {/* 增长中的闪烁效果 */}
+              {diamondCount < 50 && (
+                <div className="absolute -top-0.5 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping opacity-75" />
+              )}
+            </div>
+          </div>
+          {/* 进度条 */}
+          <div className="mt-1.5 w-16 h-1.5 bg-white/30 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-300 rounded-full"
+              style={{ width: `${(diamondCount / 50) * 100}%` }}
+            />
+          </div>
         </div>
-        <span className="text-[6px] text-white font-bold">{progress}%</span>
+      </div>
+
+      {/* 底部右侧：视频进度条 */}
+      <div className="absolute bottom-6 right-3 left-20 z-20">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1.5 border border-white/20">
+          <div className="flex items-center gap-2">
+            <span className="text-white/80 text-xs">▶️</span>
+            <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-amber-400 to-yellow-400 transition-all duration-150 rounded-full"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <span className="text-white/90 text-xs font-medium">{Math.floor(progress)}%</span>
+          </div>
+        </div>
       </div>
 
       {/* 视频结束画面 */}
-      {progress >= 100 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <button className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded text-[7px] font-bold">
-            点击领取奖励
-          </button>
+      {isCompleted && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center">
+          {/* 半透明遮罩 */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          
+          {/* 内容 */}
+          <div className="relative text-center">
+            {/* 奖励图标 */}
+            <div className="mb-4">
+              <span className="text-7xl drop-shadow-xl">🎉</span>
+            </div>
+            
+            {/* 奖励信息 */}
+            <div className="mb-6">
+              <p className="text-white/80 text-sm mb-1">恭喜获得</p>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-3xl">🪙</span>
+                <span className="text-5xl font-bold text-yellow-400 drop-shadow-lg">
+                  {diamondCount * 2}
+                </span>
+                <span className="text-xl text-yellow-300">金币</span>
+              </div>
+            </div>
+
+            {/* 大按钮 - 点击屏幕领取奖励 */}
+            <button className="relative group">
+              {/* 按钮光晕 */}
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-2xl blur opacity-60 group-hover:opacity-90 transition-opacity" />
+              <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white px-10 py-4 rounded-2xl shadow-xl border border-amber-300/30">
+                <p className="text-lg font-bold">点击屏幕领取奖励</p>
+              </div>
+            </button>
+
+            {/* 提示文字 */}
+            <p className="text-white/50 text-xs mt-4">观看完成后即可领取</p>
+          </div>
         </div>
       )}
     </div>
@@ -353,7 +445,7 @@ function RewardedVideoStyle() {
 }
 
 // 模板样式映射
-const TEMPLATE_STYLES: Record<SDKTemplateType, React.ComponentType> = {
+const TEMPLATE_STYLES: Record<SDKTemplateType, () => JSX.Element> = {
   static_splash: StaticSplashStyle,
   video_splash: VideoSplashStyle,
   interstitial_half: InterstitialHalfStyle,
