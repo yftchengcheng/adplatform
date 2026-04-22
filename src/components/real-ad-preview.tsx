@@ -158,6 +158,69 @@ export function RealAdPreview({
     );
   }
 
+  // 激励视频：在手机框架内展示完整UI（进度、倒计时、奖励）
+  if (templateType === "rewarded_video") {
+    return (
+      <div
+        className={cn(
+          "relative w-full h-full overflow-hidden cursor-pointer bg-black",
+          onClick && "hover:opacity-90 transition-opacity",
+          className
+        )}
+        onClick={onClick}
+      >
+        {/* 视频背景 */}
+        <video
+          src={defaultImage}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+        />
+        {/* 底部渐变 */}
+        <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/40 to-transparent" />
+
+        {/* 顶部：金色横幅 */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20">
+          <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-0.5 px-2 rounded-full shadow border border-amber-300/30">
+            <p className="text-[5px] font-semibold whitespace-nowrap">观看视频领取双倍金币</p>
+          </div>
+        </div>
+
+        {/* 右下角：倒计时角标 */}
+        <div className="absolute bottom-8 right-1 z-20">
+          <div className="bg-white/90 rounded px-1 py-0.5 shadow">
+            <p className="text-gray-800 text-[5px] font-medium">15s后</p>
+          </div>
+        </div>
+
+        {/* 底部左侧：钻石 */}
+        <div className="absolute bottom-1 left-1 z-20">
+          <div className="bg-white/25 backdrop-blur-sm rounded px-1 py-0.5">
+            <div className="flex items-center gap-0.5">
+              <span className="text-[6px]">💎</span>
+              <span className="text-white text-[6px] font-bold">×50</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 底部进度条 */}
+        <div className="absolute bottom-1 right-1 left-8 z-20">
+          <div className="bg-white/20 backdrop-blur-sm rounded-full px-1 py-0.5 border border-white/20">
+            <div className="flex items-center gap-0.5">
+              <span className="text-white/80 text-[4px]">▶</span>
+              <div className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
+                <div className="h-full w-2/3 bg-gradient-to-r from-amber-400 to-yellow-400 rounded-full" />
+              </div>
+              <span className="text-white/90 text-[4px] font-medium">67%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 全屏类型：填满整个区域
   return (
     <div 
@@ -236,7 +299,7 @@ export function FullscreenPreviewModal({
   if (!isOpen) return null;
 
   // 判断是否为特殊类型（需要场景化展示）
-  const isSpecialType = templateType === "banner" || templateType === "interstitial_half" || templateType === "native";
+  const isSpecialType = templateType === "banner" || templateType === "interstitial_half" || templateType === "native" || templateType === "rewarded_video";
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
@@ -330,6 +393,71 @@ export function FullscreenPreviewModal({
                     </div>
                     <div className="h-4 bg-gray-200 rounded w-2/3" />
                     <div className="h-16 bg-gray-200 rounded" />
+                  </div>
+                </div>
+              )}
+
+              {/* 激励视频 - 在手机框架内展示完整UI */}
+              {templateType === "rewarded_video" && (
+                <div className="absolute inset-0 bg-black">
+                  {/* 视频背景 */}
+                  <video
+                    src={defaultImage}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                  />
+                  {/* 底部渐变 */}
+                  <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
+
+                  {/* 顶部：金色横幅 */}
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
+                    <div className="relative">
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-sm" />
+                      <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-1.5 px-5 rounded-full shadow-lg border border-amber-300/30">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs">🎁</span>
+                          <p className="text-[9px] font-semibold whitespace-nowrap">观看视频以领取双倍金币奖励</p>
+                          <span className="text-xs">🎁</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 右下角：倒计时角标 - 白底黑字圆角矩形 */}
+                  <div className="absolute bottom-20 right-3 z-20">
+                    <div className="bg-white/90 backdrop-blur-md rounded-lg px-2.5 py-1 shadow-lg border border-white/50">
+                      <p className="text-gray-800 text-[9px] font-medium">15s后可领取</p>
+                    </div>
+                  </div>
+
+                  {/* 底部左侧：钻石计数 */}
+                  <div className="absolute bottom-6 left-3 z-20">
+                    <div className="bg-white/25 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-lg border border-white/30">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">💎</span>
+                        <span className="text-white text-xs font-bold drop-shadow-md">×50</span>
+                      </div>
+                      <div className="mt-1 w-12 h-1 bg-white/30 rounded-full overflow-hidden">
+                        <div className="h-full w-full bg-gradient-to-r from-cyan-400 to-emerald-400 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 底部右侧：视频进度条 */}
+                  <div className="absolute bottom-6 right-3 left-20 z-20">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 border border-white/20">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-white/80 text-[8px]">▶️</span>
+                        <div className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
+                          <div className="h-full w-2/3 bg-gradient-to-r from-amber-400 to-yellow-400 rounded-full" />
+                        </div>
+                        <span className="text-white/90 text-[8px] font-medium">67%</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

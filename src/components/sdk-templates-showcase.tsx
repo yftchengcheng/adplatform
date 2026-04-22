@@ -788,9 +788,15 @@ export function SDKTemplateStyleCard({
     );
   }
 
-  // 激励视频：在手机中展示完整UI
+  // 激励视频：在手机框架中展示完整UI
   if (type === "rewarded_video") {
-    return <RewardedVideoStyle />;
+    return (
+      <div className={cn("bg-gray-900 rounded-xl p-1 shadow-lg", "w-[80px] h-[144px]", className)}>
+        <div className="relative w-full h-full rounded-lg overflow-hidden">
+          <RewardedVideoStyle />
+        </div>
+      </div>
+    );
   }
 
   // 全屏类型：填满整个手机框架
