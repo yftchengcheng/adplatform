@@ -38,9 +38,21 @@ const SDK_TEMPLATE_INFO: Record<SDKTemplateType, { name: string; desc: string }>
   rewarded_video: { name: "激励视频", desc: "用户主动观看获取奖励" },
 };
 
+// SDK模板尺寸配置
+const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: number; ratio: string }> = {
+  static_splash: { width: 540, height: 960, ratio: "9:16" },     // 9:16
+  video_splash: { width: 540, height: 960, ratio: "9:16" },      // 9:16
+  interstitial_half: { width: 600, height: 500, ratio: "6:5" },
+  interstitial_full: { width: 1080, height: 1920, ratio: "9:16" },
+  banner: { width: 1080, height: 120, ratio: "9:1" },
+  native: { width: 1080, height: 540, ratio: "2:1" },
+  rewarded_video: { width: 1080, height: 1920, ratio: "9:16" },
+};
+
 // 模拟数据
 const generateMockData = (type: SDKTemplateType, count: number) => {
   const templates = [];
+  const sizeConfig = SDK_TEMPLATE_SIZES[type];
   for (let i = 1; i <= count; i++) {
     const isEnabled = Math.random() > 0.3;
     templates.push({
@@ -53,7 +65,8 @@ const generateMockData = (type: SDKTemplateType, count: number) => {
       createTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString("zh-CN"),
       adSlot: `slot_${type}_${String(i).padStart(4, "0")}`,
       format: ["图片", "图片+文字", "视频"][Math.floor(Math.random() * 3)],
-      size: `${320 + Math.floor(Math.random() * 3) * 80}×${180 + Math.floor(Math.random() * 3) * 60}`,
+      size: `${sizeConfig.width}×${sizeConfig.height}`,
+      ratio: sizeConfig.ratio,
     });
   }
   return templates;
@@ -202,7 +215,10 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                       {item.status === "enabled" ? "开启" : "暂停"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{item.size}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500">
+                    <div>{item.size}</div>
+                    <div className="text-xs text-blue-600">{item.ratio}</div>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="w-20 h-12 bg-gray-100 rounded overflow-hidden">
                       <img
