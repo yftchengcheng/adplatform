@@ -290,7 +290,7 @@ function BannerStyle() {
 
 // ============================================
 // 7. 激励视频广告
-// 尺寸：1080×1920 px，视频播放界面
+// 尺寸：1080×1920 px，手机框架内预览
 // 特点：金色横幅 + 倒计时角标 + 钻石动画 + 毛玻璃UI
 // ============================================
 function RewardedVideoStyle() {
@@ -332,51 +332,43 @@ function RewardedVideoStyle() {
         />
         {/* 底部渐变 */}
         <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/40 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
       </div>
 
-      {/* 顶部：金色横幅 - 居中醒目 */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
+      {/* 顶部：金色横幅 - 居中醒目（适配手机框架） */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20">
         <div className="relative">
           {/* 光晕效果 */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-md" />
-          <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-2.5 px-6 rounded-full shadow-xl border border-amber-300/30">
-            <div className="flex items-center gap-2">
-              <span className="text-sm">🎁</span>
-              <p className="text-sm font-semibold whitespace-nowrap">观看视频以领取双倍金币奖励</p>
-              <span className="text-sm">🎁</span>
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-300/50 via-yellow-300/50 to-amber-400/50 rounded-full blur-[2px]" />
+          <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white text-center py-1 px-3 rounded-full shadow-lg border border-amber-300/30">
+            <div className="flex items-center gap-1">
+              <span className="text-[8px]">🎁</span>
+              <p className="text-[7px] font-semibold whitespace-nowrap">观看视频领取双倍金币</p>
+              <span className="text-[8px]">🎁</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* 右下角：倒计时角标 - 白底黑字圆角矩形 */}
-      <div className="absolute bottom-24 right-3 z-20">
-        <div className="bg-white/90 backdrop-blur-md rounded-lg px-3 py-1.5 shadow-lg border border-white/50">
-          <p className="text-gray-800 text-xs font-medium">
-            {isCompleted ? "可领取" : `${currentSeconds}s后可领取`}
+      <div className="absolute bottom-14 right-1 z-20">
+        <div className="bg-white/90 backdrop-blur-md rounded px-1.5 py-0.5 shadow border border-white/50">
+          <p className="text-gray-800 text-[6px] font-medium">
+            {isCompleted ? "可领取" : `${currentSeconds}s后`}
           </p>
         </div>
       </div>
 
       {/* 底部左侧：钻石计数动画 */}
-      <div className="absolute bottom-6 left-3 z-20">
-        <div className="bg-white/25 backdrop-blur-md rounded-xl px-3 py-2 shadow-lg border border-white/30">
-          <div className="flex items-center gap-2">
-            {/* 钻石图标 + 动态计数 */}
-            <div className="relative flex items-center gap-1">
-              <span className="text-lg">💎</span>
-              <span className="text-white text-base font-bold drop-shadow-md tabular-nums">
-                ×{diamondCount}
-              </span>
-              {/* 增长中的闪烁效果 */}
-              {diamondCount < 50 && (
-                <div className="absolute -top-0.5 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping opacity-75" />
-              )}
-            </div>
+      <div className="absolute bottom-2 left-1 z-20">
+        <div className="bg-white/25 backdrop-blur-md rounded px-1.5 py-1 shadow border border-white/30">
+          <div className="flex items-center gap-1">
+            <span className="text-[8px]">💎</span>
+            <span className="text-white text-[8px] font-bold drop-shadow-md tabular-nums">
+              ×{diamondCount}
+            </span>
           </div>
-          {/* 进度条 */}
-          <div className="mt-1.5 w-16 h-1.5 bg-white/30 rounded-full overflow-hidden">
+          <div className="mt-0.5 w-8 h-0.5 bg-white/30 rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-300 rounded-full"
               style={{ width: `${(diamondCount / 50) * 100}%` }}
@@ -386,17 +378,17 @@ function RewardedVideoStyle() {
       </div>
 
       {/* 底部右侧：视频进度条 */}
-      <div className="absolute bottom-6 right-3 left-20 z-20">
-        <div className="bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1.5 border border-white/20">
-          <div className="flex items-center gap-2">
-            <span className="text-white/80 text-xs">▶️</span>
-            <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden">
+      <div className="absolute bottom-2 right-1 left-10 z-20">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full px-1 py-0.5 border border-white/20">
+          <div className="flex items-center gap-1">
+            <span className="text-white/80 text-[5px]">▶</span>
+            <div className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-amber-400 to-yellow-400 transition-all duration-150 rounded-full"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-white/90 text-xs font-medium">{Math.floor(progress)}%</span>
+            <span className="text-white/90 text-[5px] font-medium">{Math.floor(progress)}%</span>
           </div>
         </div>
       </div>
@@ -410,33 +402,33 @@ function RewardedVideoStyle() {
           {/* 内容 */}
           <div className="relative text-center">
             {/* 奖励图标 */}
-            <div className="mb-4">
-              <span className="text-7xl drop-shadow-xl">🎉</span>
+            <div className="mb-1">
+              <span className="text-3xl drop-shadow-xl">🎉</span>
             </div>
             
             {/* 奖励信息 */}
-            <div className="mb-6">
-              <p className="text-white/80 text-sm mb-1">恭喜获得</p>
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-3xl">🪙</span>
-                <span className="text-5xl font-bold text-yellow-400 drop-shadow-lg">
+            <div className="mb-2">
+              <p className="text-white/80 text-[7px] mb-0.5">恭喜获得</p>
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-lg">🪙</span>
+                <span className="text-2xl font-bold text-yellow-400 drop-shadow-lg">
                   {diamondCount * 2}
                 </span>
-                <span className="text-xl text-yellow-300">金币</span>
+                <span className="text-[8px] text-yellow-300">金币</span>
               </div>
             </div>
 
-            {/* 大按钮 - 点击屏幕领取奖励 */}
+            {/* 大按钮 */}
             <button className="relative group">
               {/* 按钮光晕 */}
-              <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-2xl blur opacity-60 group-hover:opacity-90 transition-opacity" />
-              <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white px-10 py-4 rounded-2xl shadow-xl border border-amber-300/30">
-                <p className="text-lg font-bold">点击屏幕领取奖励</p>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-lg blur-[2px] opacity-60 group-hover:opacity-90 transition-opacity" />
+              <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-white px-4 py-1.5 rounded-lg shadow border border-amber-300/30">
+                <p className="text-[8px] font-bold">点击领取奖励</p>
               </div>
             </button>
 
             {/* 提示文字 */}
-            <p className="text-white/50 text-xs mt-4">观看完成后即可领取</p>
+            <p className="text-white/50 text-[5px] mt-1">观看完成即可领取</p>
           </div>
         </div>
       )}
