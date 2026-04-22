@@ -16,8 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RealAdPreview } from "./real-ad-preview";
-import { SDKTemplatesShowcase } from "./sdk-templates-showcase";
+import { RealAdPreview, FullscreenPreviewModal } from "./real-ad-preview";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -368,7 +367,10 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                       <div className="text-xs text-blue-600">{item.ratio}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden">
+                      <div 
+                        className="w-24 h-16 bg-gray-100 rounded overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                        onClick={() => handlePreview(item)}
+                      >
                         <RealAdPreview
                           templateType={type}
                           templateName={item.name}
@@ -454,31 +456,12 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
       </main>
 
       {/* 预览弹窗 */}
-      {previewOpen && previewTemplate && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h3 className="font-semibold text-gray-900">模板预览</h3>
-              <button 
-                onClick={() => setPreviewOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <div className="p-4">
-              <div className="bg-gray-100 rounded-lg overflow-hidden">
-                <SDKTemplatesShowcase />
-              </div>
-              <div className="mt-4 text-sm text-gray-500">
-                <p><span className="font-medium">模板名称：</span>{previewTemplate.name}</p>
-                <p><span className="font-medium">模板ID：</span>{previewTemplate.id}</p>
-                <p><span className="font-medium">规格：</span>{previewTemplate.width}×{previewTemplate.height}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <FullscreenPreviewModal
+        templateType={type}
+        templateName={previewTemplate?.name}
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+      />
 
       {/* 编辑弹窗 */}
       {editOpen && editTemplate && (
