@@ -414,12 +414,24 @@ export const SDK_TEMPLATE_INFO_STYLES: Record<SDKTemplateType, {
   },
 };
 
-// SDK模板样式展示组件
+// SDK模板尺寸配置
+const SDK_TEMPLATE_SIZES: Record<SDKTemplateType, { width: number; height: number }> = {
+  static_splash: { width: 1080, height: 1920 },
+  video_splash: { width: 1080, height: 1920 },
+  interstitial_half: { width: 600, height: 500 },
+  interstitial_full: { width: 1080, height: 1920 },
+  banner: { width: 320, height: 50 },
+  native: { width: 540, height: 200 },
+  rewarded_video: { width: 1080, height: 1920 },
+};
+
+// SDK模板样式展示组件 - 与列表页预览保持一致
 export function SDKTemplatesShowcase({ className }: { className?: string }) {
   const [activeTemplate, setActiveTemplate] = useState<SDKTemplateType>("static_splash");
   
-  const TemplateComponent = TEMPLATE_STYLES[activeTemplate];
   const templateInfo = SDK_TEMPLATE_INFO_STYLES[activeTemplate];
+  const templateSize = SDK_TEMPLATE_SIZES[activeTemplate];
+  const isVideoType = activeTemplate === "video_splash" || activeTemplate === "rewarded_video";
 
   return (
     <div className={cn("w-full h-full flex flex-col", className)}>
@@ -443,53 +455,47 @@ export function SDKTemplatesShowcase({ className }: { className?: string }) {
         </div>
       </div>
 
-      {/* 样式展示区域 */}
+      {/* 样式展示区域 - 与列表页RealAdPreview保持一致 */}
       <div className="flex-1 flex items-center justify-center p-4 bg-gray-100 overflow-auto">
         <div className="flex flex-col items-center gap-4">
-          {/* 手机框架 */}
+          {/* 手机框架 - 固定尺寸 */}
           <div className="relative">
             {/* 手机外框 */}
-            <div className={cn(
-              "bg-gray-900 rounded-[2rem] p-1.5 shadow-2xl",
-              activeTemplate === "banner" ? "w-[200px]" : 
-              activeTemplate === "native" ? "w-[200px]" : "w-[180px]"
-            )}>
-              <div className={cn(
-                "bg-white rounded-[1.5rem] overflow-hidden relative",
-                activeTemplate === "banner" ? "h-[32px]" : 
-                activeTemplate === "native" ? "h-[60px]" : "h-[320px]"
-              )}>
-                {/* 状态栏 */}
-                {activeTemplate !== "banner" && activeTemplate !== "native" && (
-                  <div className="h-5 bg-white flex items-center justify-between px-4">
-                    <span className="text-[9px] font-medium text-gray-900">9:41</span>
-                    <div className="flex gap-0.5">
-                      <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-                      <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-                      <div className="w-0.5 h-1 bg-gray-900 rounded-full" />
-                    </div>
-                  </div>
-                )}
+            <div className="bg-gray-900 rounded-[2rem] p-2 shadow-2xl w-[200px]">
+              <div className="bg-white rounded-[1.75rem] overflow-hidden relative h-[355px]">
+                {/* 内容区域 */}
+                <div className="relative w-full h-full bg-gray-100">
+                  {/* 图片或视频 */}
+                  {isVideoType ? (
+                    <video
+                      src={DEFAULT_IMAGES[activeTemplate]}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                    />
+                  ) : (
+                    <img
+                      src={DEFAULT_IMAGES[activeTemplate]}
+                      alt={templateInfo.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
 
-                {/* 模板内容 */}
-                <div className={cn(
-                  "w-full",
-                  activeTemplate === "banner" || activeTemplate === "native" ? "h-full" : "flex-1"
-                )}>
-                  <TemplateComponent />
+                  {/* 底部遮罩 */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+
+                  {/* 模板名称 */}
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-white text-xs font-medium">{templateInfo.name}</p>
+                  </div>
                 </div>
-
-                {/* 主页指示器 */}
-                {activeTemplate !== "banner" && activeTemplate !== "native" && (
-                  <div className="h-4 bg-white flex items-center justify-center">
-                    <div className="w-16 h-0.5 bg-gray-300 rounded-full" />
-                  </div>
-                )}
               </div>
             </div>
 
             {/* 装饰：手机听筒 */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-gray-700 rounded-full" />
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-gray-700 rounded-full" />
           </div>
 
           {/* 模板信息 */}
@@ -514,7 +520,8 @@ export function SDKTemplateStyleCard({
   className?: string;
   showFrame?: boolean;
 }) {
-  const TemplateComponent = TEMPLATE_STYLES[type];
+  const templateInfo = SDK_TEMPLATE_INFO_STYLES[type];
+  const isVideoType = type === "video_splash" || type === "rewarded_video";
 
   // 统一手机框架尺寸
   const phoneWidth = "w-[80px]";
@@ -522,8 +529,23 @@ export function SDKTemplateStyleCard({
 
   if (!showFrame) {
     return (
-      <div className={cn("rounded-lg overflow-hidden", className)}>
-        <TemplateComponent />
+      <div className={cn("rounded-lg overflow-hidden relative", className)}>
+        {isVideoType ? (
+          <video
+            src={DEFAULT_IMAGES[type]}
+            className="w-full h-full object-cover"
+            muted
+            loop
+            playsInline
+            autoPlay
+          />
+        ) : (
+          <img
+            src={DEFAULT_IMAGES[type]}
+            alt={templateInfo.name}
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
     );
   }
@@ -548,9 +570,30 @@ export function SDKTemplateStyleCard({
           </div>
         </div>
 
-        {/* 内容区域 - 自适应高度 */}
-        <div className="flex-1 overflow-hidden">
-          <TemplateComponent />
+        {/* 内容区域 - 与RealAdPreview保持一致 */}
+        <div className="flex-1 relative overflow-hidden bg-gray-100">
+          {isVideoType ? (
+            <video
+              src={DEFAULT_IMAGES[type]}
+              className="absolute inset-0 w-full h-full object-cover"
+              muted
+              loop
+              playsInline
+              autoPlay
+            />
+          ) : (
+            <img
+              src={DEFAULT_IMAGES[type]}
+              alt={templateInfo.name}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )}
+          {/* 底部遮罩 */}
+          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+          {/* 模板名称 */}
+          <div className="absolute bottom-1 left-1 right-1">
+            <p className="text-white text-[6px] font-medium truncate">{templateInfo.name}</p>
+          </div>
         </div>
 
         {/* 底部指示器 */}
