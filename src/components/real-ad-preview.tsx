@@ -65,6 +65,10 @@ export function RealAdPreview({
   const displayName = templateName || SDK_TEMPLATE_NAMES[templateType] || "广告模板";
   const isVideoType = templateType === "video_splash" || templateType === "rewarded_video";
 
+  // 计算手机框架尺寸
+  const phoneWidth = `${Math.round(templateSize.width * 0.4)}px`;
+  const phoneHeight = `${Math.round(templateSize.height * 0.4)}px`;
+
   // 计算缩放比例以适应容器
   const scaleToFit = (containerWidth: number, containerHeight: number) => {
     const scaleX = containerWidth / templateSize.width;
