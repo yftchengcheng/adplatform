@@ -85,13 +85,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<SDKTemplate | null>(null);
   
-  // 编辑弹窗状态
-  const [editOpen, setEditOpen] = useState(false);
-  const [editTemplate, setEditTemplate] = useState<SDKTemplate | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editAdSlot, setEditAdSlot] = useState("");
-  const [editFormat, setEditFormat] = useState("");
-  const [saving, setSaving] = useState(false);
+
 
   const info = SDK_TEMPLATE_INFO[type];
   const sizeConfig = SDK_TEMPLATE_SIZES[type];
@@ -199,46 +193,9 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
     }
   };
 
-  // 编辑
+  // 编辑 - 跳转至组件关联设置页面
   const handleEdit = (item: SDKTemplate) => {
-    setEditTemplate(item);
-    setEditName(item.name);
-    setEditAdSlot(item.ad_slot || "");
-    setEditFormat(item.format || "");
-    setEditOpen(true);
-  };
-
-  // 保存编辑
-  const handleSaveEdit = async () => {
-    if (!editTemplate) return;
-    
-    setSaving(true);
-    try {
-      const res = await fetch(`/api/sdk/templates/${editTemplate.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editName,
-          adSlot: editAdSlot,
-          format: editFormat,
-        }),
-      });
-      const json = await res.json();
-      
-      if (json.success) {
-        setData(prev => prev.map(d => 
-          d.id === editTemplate.id ? { ...d, name: editName, ad_slot: editAdSlot, format: editFormat } : d
-        ));
-        setEditOpen(false);
-      } else {
-        alert(json.error || "保存失败");
-      }
-    } catch (err) {
-      console.error("Error saving edit:", err);
-      alert("保存失败，请重试");
-    } finally {
-      setSaving(false);
-    }
+    router.push(`/sdk/${type}/${item.id}`);
   };
 
   // 切换状态
@@ -499,64 +456,6 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
         onClose={() => setPreviewOpen(false)}
       />
 
-      {/* 编辑弹窗 */}
-      {editOpen && editTemplate && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h3 className="font-semibold text-gray-900">编辑模板</h3>
-              <button 
-                onClick={() => setEditOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <div className="p-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">模板名称</label>
-                <Input
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  placeholder="请输入模板名称"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">广告位</label>
-                <Input
-                  value={editAdSlot}
-                  onChange={(e) => setEditAdSlot(e.target.value)}
-                  placeholder="请输入广告位"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">格式</label>
-                <Input
-                  value={editFormat}
-                  onChange={(e) => setEditFormat(e.target.value)}
-                  placeholder="请输入格式"
-                />
-              </div>
-              <div className="flex gap-2 pt-2">
-                <Button 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={() => setEditOpen(false)}
-                >
-                  取消
-                </Button>
-                <Button 
-                  className="flex-1"
-                  onClick={handleSaveEdit}
-                  disabled={saving}
-                >
-                  {saving ? "保存中..." : "保存"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
