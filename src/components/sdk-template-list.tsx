@@ -400,6 +400,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                         className="w-3.5 h-3.5 rounded border-gray-300"
                       />
                     </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">模板ID</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">模板名称</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">广告位ID</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">状态</th>
@@ -422,9 +423,9 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                           className="w-3.5 h-3.5 rounded border-gray-300"
                         />
                       </td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500 font-mono max-w-[140px] truncate" title={item.id}>{item.id}</td>
                       <td className="px-3 py-2.5">
                         <div className="text-sm font-medium text-gray-900 max-w-[160px] truncate" title={item.name}>{item.name}</div>
-                        <div className="text-xs text-gray-400 font-mono">{item.id.slice(0, 12)}...</div>
                       </td>
                       <td className="px-3 py-2.5 text-sm text-gray-600 font-mono max-w-[120px] truncate" title={item.ad_slot || ""}>{item.ad_slot || "-"}</td>
                       <td className="px-3 py-2.5">
