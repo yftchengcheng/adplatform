@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // 图片项配置
@@ -177,6 +177,13 @@ export function ImageTemplate({
           )}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageUrl}
@@ -214,6 +221,13 @@ export function ImageTemplate({
         )}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-1 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
         {/* 主图 */}
         <div className="relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
