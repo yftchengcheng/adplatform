@@ -332,14 +332,15 @@ export function TreasureboxRainTemplate({
 
   // 预览模式
   return (
-    <div className="w-full rounded-t-2xl shadow-lg relative" style={{ overflow: 'visible' }}>
-      {/* Close Button - 预览模式下显示 */}
+    <div className="w-full rounded-2xl shadow-lg relative">
+      {/* Close Button - 预览模式下显示 - 位于右上角 */}
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+          className="absolute top-2 right-2 z-30 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
         >
-          <X className="w-3 h-3" />
+          <X className="w-3 h-3 text-white" />
         </button>
       )}
 

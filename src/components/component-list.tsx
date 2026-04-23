@@ -722,7 +722,10 @@ export function ComponentList() {
               <div className="relative z-10">
                 <div className="w-[280px] h-[520px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
                   <div className={`w-full h-full bg-white rounded-[2rem] overflow-hidden relative ${
-                    previewComponent?.config && ["dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift"].includes(previewComponent?.type || "")
+                    previewComponent?.config && [
+                      "dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift",
+                      "flip_redpacket", "flip_card", "flip_treasure", "redpacket_rain", "treasure_rain",
+                    ].includes(previewComponent?.type || "")
                       ? "flex items-center justify-center"
                       : ""
                   }`}>

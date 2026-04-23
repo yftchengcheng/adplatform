@@ -662,7 +662,7 @@ function ConfigContent() {
                       </div>
 
                       {/* App content */}
-                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'flex-col items-center justify-start pt-4' : 'items-center justify-center'} ${isRedpacketRainComponent ? 'bg-transparent' : ''}`}>
+                      <div className={`h-[calc(100%-28px)] overflow-auto flex ${isRedpacketRainComponent ? 'flex-col items-center justify-center' : 'items-center justify-center'} ${isRedpacketRainComponent ? 'bg-transparent' : ''}`}>
                         {isRedpacketRainComponent ? (
                           <div className="w-full px-4">
                             <RedpacketRainTemplate
@@ -714,7 +714,7 @@ function ConfigContent() {
                             </button>
                           </div>
                         ) : isFlipCardComponent ? (
-                          <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
+                          <div className="relative w-full px-4">
                             <FlipCardTemplate
                               key={`card-${previewResetKey}`}
                               config={config as FlipCardConfig}
@@ -722,6 +722,16 @@ function ConfigContent() {
                               previewMode={true}
                               onClose={() => setPreviewResetKey(k => k + 1)}
                             />
+                            {/* 预览关闭按钮 */}
+                            <button
+                              onClick={() => setPreviewResetKey(k => k + 1)}
+                              className="absolute top-2 right-6 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+                              style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+                            >
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
                         ) : isSmashEggComponent ? (
                           <SmashEggTemplate

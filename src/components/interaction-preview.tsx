@@ -856,11 +856,14 @@ export function InteractionPreview({
 
               {/* 上层：组件真实预览弹出（逐层覆盖） */}
               {activeComponents.map((link, idx) => {
-                const isStaticType = ["dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift"].includes(link.componentTypeKey);
+                const isCenteredType = [
+                  "dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift",
+                  "flip_redpacket", "flip_card", "flip_treasure", "redpacket_rain", "treasure_rain",
+                ].includes(link.componentTypeKey);
                 return (
                   <div
                     key={link.id}
-                    className={`absolute inset-0 z-40 ${isStaticType ? "flex items-center justify-center" : ""}`}
+                    className={`absolute inset-0 z-40 ${isCenteredType ? "flex items-center justify-center" : ""}`}
                     style={{ zIndex: 40 + idx }}
                   >
                     <RealComponentPreview

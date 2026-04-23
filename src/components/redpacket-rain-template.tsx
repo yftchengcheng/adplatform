@@ -365,12 +365,13 @@ export function RedpacketRainTemplate({
         className={`relative w-full h-full max-w-full flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button - 底边中间，仅图标 */}
+        {/* Close Button - 右上角 */}
         <button
           onClick={onClose}
-          className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+          className="absolute top-2 right-2 z-30 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
         >
-          <X className="w-4 h-4" />
+          <X className="w-3 h-3 text-white" />
         </button>
 
         {/* Redpacket Rain Scene */}
