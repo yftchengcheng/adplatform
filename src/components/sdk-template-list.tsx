@@ -13,10 +13,17 @@ import {
   Play, 
   Pause,
   Loader2,
-  X
+  X,
+  MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { RealAdPreview } from "./real-ad-preview";
 import { InteractionPreview, ComponentLinkConfig } from "./interaction-preview";
 import { useComponents } from "@/contexts/component-context";
@@ -452,38 +459,44 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                         {new Date(item.create_time).toLocaleDateString("zh-CN")}
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="flex items-center gap-1">
-                          <button 
-                            className="px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors font-medium" 
-                            onClick={() => handlePreview(item)}
-                          >
-                            预览
-                          </button>
-                          <button 
-                            className="px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded transition-colors font-medium" 
-                            onClick={() => handleClone(item)}
-                          >
-                            克隆
-                          </button>
-                          <button 
-                            className="px-2 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors font-medium" 
-                            onClick={() => handleEdit(item)}
-                          >
-                            编辑
-                          </button>
-                          <button
-                            className="px-2 py-1 text-xs text-orange-600 hover:bg-orange-50 rounded transition-colors font-medium"
-                            onClick={() => handleToggleStatus(item)}
-                          >
-                            {item.status === "enabled" ? "暂停" : "启用"}
-                          </button>
-                          <button 
-                            className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors font-medium" 
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            删除
-                          </button>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-32">
+                            <DropdownMenuItem onClick={() => handlePreview(item)}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              预览
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleClone(item)}>
+                              <Copy className="w-4 h-4 mr-2" />
+                              克隆
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(item)}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              编辑
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleToggleStatus(item)}>
+                              {item.status === "enabled" ? (
+                                <>
+                                  <Pause className="w-4 h-4 mr-2" />
+                                  暂停
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="w-4 h-4 mr-2" />
+                                  开启
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(item.id)} className="text-red-600">
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              删除
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   ))}
