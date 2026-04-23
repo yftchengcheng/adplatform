@@ -709,9 +709,12 @@ export function InteractionPreview({
   componentLinks,
   onClose,
 }: InteractionPreviewProps) {
+  // 用 ref 持有最新的 enabledLinks，避免所有闭包陈旧问题
+  const enabledLinksRef = useRef<ComponentLinkConfig[]>([]);
   const enabledLinks = componentLinks.filter((l) => l.status === "enabled");
+  enabledLinksRef.current = enabledLinks;
 
-  // 交互状态：追踪当前弹出的组件栈
+  // 交互状态
   const [activeComponents, setActiveComponents] = useState<ComponentLinkConfig[]>([]);
   const [dismissedComponents, setDismissedComponents] = useState<Set<string>>(new Set());
   const [triggeredComponents, setTriggeredComponents] = useState<Set<string>>(new Set());
@@ -722,17 +725,13 @@ export function InteractionPreview({
   const triggeredRef = useRef<Set<string>>(new Set());
   const dismissedRef = useRef<Set<string>>(new Set());
 
+  // 清除所有计时器
   const clearAllTimers = useCallback(() => {
     triggerTimersRef.current.forEach((timer) => clearTimeout(timer));
     triggerTimersRef.current.clear();
   }, []);
 
-  // 获取某个组件的所有子组件（parentId 等于该组件 id 的组件）
-  const getChildren = useCallback((parentId: string) => {
-    return enabledLinks.filter((l) => l.parentId === parentId);
-  }, [enabledLinks]);
-
-  // 触发组件弹出
+  // 触发组件弹出（通过 ref + updater 确保状态一致）
   const triggerComponent = useCallback((link: ComponentLinkConfig) => {
     triggeredRef.current.add(link.id);
     setTriggeredComponents(new Set(triggeredRef.current));
@@ -742,31 +741,25 @@ export function InteractionPreview({
     });
   }, []);
 
-  // 启动某个父级下子组件的自动触发计时器
+  // 启动某个父级下子组件的自动触发计时器（通过 ref 读取最新 enabledLinks）
   const startChildAutoTriggers = useCallback((parentId: string) => {
-    const children = getChildren(parentId);
+    const currentLinks = enabledLinksRef.current;
+    const children = currentLinks.filter((l) => l.parentId === parentId);
     children.forEach((link) => {
-      // 跳过已触发或已关闭的
       if (triggeredRef.current.has(link.id) || dismissedRef.current.has(link.id)) return;
-
       const rule = TRIGGER_RULES[link.triggerRule];
-      if (!rule) return;
+      if (!rule || rule.autoDelay <= 0) return;
 
-      if (rule.autoDelay > 0) {
-        // 自动触发类规则：show_time, video_complete, back_from_media, in_app_interaction
-        const actualDelay = link.triggerRule === "show_time" && link.triggerTime
-          ? link.triggerTime * 1000
-          : rule.autoDelay;
-        const timer = setTimeout(() => {
-          // 再次检查是否已被其他路径触发
-          if (triggeredRef.current.has(link.id)) return;
-          triggerComponent(link);
-        }, actualDelay);
-        triggerTimersRef.current.set(link.id, timer);
-      }
-      // 手动触发类规则（click_close, click_other_ad）需要用户操作，不在此启动
+      const actualDelay = link.triggerRule === "show_time" && link.triggerTime
+        ? link.triggerTime * 1000
+        : rule.autoDelay;
+      const timer = setTimeout(() => {
+        if (triggeredRef.current.has(link.id)) return;
+        triggerComponent(link);
+      }, actualDelay);
+      triggerTimersRef.current.set(link.id, timer);
     });
-  }, [getChildren, triggerComponent]);
+  }, [triggerComponent]);
 
   // 关闭组件弹出
   const dismissComponent = useCallback((linkId: string) => {
@@ -774,129 +767,56 @@ export function InteractionPreview({
     setDismissedComponents(new Set(dismissedRef.current));
     setActiveComponents((prev) => prev.filter((l) => l.id !== linkId));
 
-    // 关闭组件后，触发其所有子组件中需要父组件关闭才能触发的规则
-    const children = getChildren(linkId);
-    children.forEach((link) => {
-      if (triggeredRef.current.has(link.id) || dismissedRef.current.has(link.id)) return;
-      const rule = TRIGGER_RULES[link.triggerRule];
-      if (!rule) return;
-
-      if (rule.autoDelay > 0) {
-        // back_from_media 等：父组件关闭后延迟触发
-        const timer = setTimeout(() => {
-          if (triggeredRef.current.has(link.id)) return;
-          triggerComponent(link);
-        }, rule.autoDelay);
-        triggerTimersRef.current.set(link.id, timer);
-      }
-      // click_close 等手动触发类：需要用户再次点击关闭
-    });
-  }, [getChildren, triggerComponent]);
-
-  // 启动根级自动触发逻辑
-  const startAutoTriggers = useCallback(() => {
-    clearAllTimers();
-    // 启动主素材下的子组件触发
-    startChildAutoTriggers("main");
-  }, [clearAllTimers, startChildAutoTriggers]);
+    // 关闭组件后，启动子组件的触发
+    startChildAutoTriggers(linkId);
+  }, [startChildAutoTriggers]);
 
   // 处理关闭按钮点击（click_close 类型触发）
   const handleCloseClick = useCallback((parentId: string) => {
-    const clickCloseLinks = enabledLinks.filter(
+    const currentLinks = enabledLinksRef.current;
+    const clickCloseLinks = currentLinks.filter(
       (l) => l.triggerRule === "click_close" && l.parentId === parentId && !triggeredRef.current.has(l.id) && !dismissedRef.current.has(l.id)
     );
     clickCloseLinks.forEach((link) => {
       triggerComponent(link);
     });
-  }, [enabledLinks, triggerComponent]);
+  }, [triggerComponent]);
 
   // 组件被触发后，启动其子组件的触发计时器
   useEffect(() => {
     if (activeComponents.length === 0) return;
-    // 对最新激活的组件，启动其子组件的触发计时器
     const latest = activeComponents[activeComponents.length - 1];
     startChildAutoTriggers(latest.id);
   }, [activeComponents, startChildAutoTriggers]);
 
-  // 重置预览
-  const handleReset = useCallback(() => {
+  // 重置所有状态并重启
+  const resetAndStart = useCallback(() => {
     clearAllTimers();
-    // 重置所有追踪状态
     triggeredRef.current = new Set();
     dismissedRef.current = new Set();
     setActiveComponents([]);
     setDismissedComponents(new Set());
     setTriggeredComponents(new Set());
-    // 延迟一帧后重新启动触发（确保状态已清空）
-    setTimeout(() => {
-      // 直接遍历 enabledLinks 启动根级触发，避免闭包陈旧问题
-      const rootLinks = enabledLinks.filter((l) => l.parentId === "main");
-      rootLinks.forEach((link) => {
-        const rule = TRIGGER_RULES[link.triggerRule];
-        if (rule && rule.autoDelay > 0) {
-          const actualDelay = link.triggerRule === "show_time" && link.triggerTime
-            ? link.triggerTime * 1000
-            : rule.autoDelay;
-          const timer = setTimeout(() => {
-            if (triggeredRef.current.has(link.id)) return;
-            triggeredRef.current.add(link.id);
-            setTriggeredComponents(new Set(triggeredRef.current));
-            setActiveComponents((prev) => {
-              if (prev.find((l) => l.id === link.id)) return prev;
-              return [...prev, link];
-            });
-          }, actualDelay);
-          triggerTimersRef.current.set(link.id, timer);
-        }
-      });
-    }, 50);
-  }, [clearAllTimers, enabledLinks]);
+    // 延迟启动，确保状态已清空
+    const initTimer = setTimeout(() => {
+      startChildAutoTriggers("main");
+    }, 100);
+    triggerTimersRef.current.set("__init__", initTimer);
+  }, [clearAllTimers, startChildAutoTriggers]);
 
-  // componentLinks 的稳定签名（仅在内容变化时更新）
+  // componentLinks 变化时启动触发
   const linksSignature = componentLinks.map(l => `${l.id}:${l.triggerRule}:${l.status}:${l.parentId}`).join('|');
 
-  // 初始启动 & componentLinks 变化时重启触发
   useEffect(() => {
-    // 先清除旧计时器
-    clearAllTimers();
-    // 重置状态
-    triggeredRef.current = new Set();
-    dismissedRef.current = new Set();
-    setActiveComponents([]);
-    setDismissedComponents(new Set());
-    setTriggeredComponents(new Set());
-    // 有启用的组件时才启动触发
-    if (enabledLinks.length > 0) {
-      // 延迟一帧后启动，确保状态已清空
-      const initTimer = setTimeout(() => {
-        const rootLinks = enabledLinks.filter((l) => l.parentId === "main");
-        rootLinks.forEach((link) => {
-          const rule = TRIGGER_RULES[link.triggerRule];
-          if (rule && rule.autoDelay > 0) {
-            const actualDelay = link.triggerRule === "show_time" && link.triggerTime
-              ? link.triggerTime * 1000
-              : rule.autoDelay;
-            const timer = setTimeout(() => {
-              if (triggeredRef.current.has(link.id)) return;
-              triggeredRef.current.add(link.id);
-              setTriggeredComponents(new Set(triggeredRef.current));
-              setActiveComponents((prev) => {
-                if (prev.find((l) => l.id === link.id)) return prev;
-                return [...prev, link];
-              });
-            }, actualDelay);
-            triggerTimersRef.current.set(link.id, timer);
-          }
-        });
-      }, 100);
-      return () => {
-        clearTimeout(initTimer);
-        clearAllTimers();
-      };
-    }
+    resetAndStart();
     return () => clearAllTimers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linksSignature]);
+
+  // 重置按钮
+  const handleReset = useCallback(() => {
+    resetAndStart();
+  }, [resetAndStart]);
 
   // 计算链路描述
   const getChainDescription = () => {
