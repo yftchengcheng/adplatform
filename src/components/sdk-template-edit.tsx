@@ -423,16 +423,12 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   // 组件关联配置列表（初始为空）
   const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([]);
   
-  // 将组件列表转换为选择器需要的格式（取自组件管理列表数据）
+  // 将组件列表转换为选择器需要的格式
   const availableComponents = components.map(comp => ({
     id: comp.id,
     name: comp.name,
     type: comp.type,
-    category: comp.category,
-    status: comp.status,
-    templateCount: comp.templateCount,
     preview: getComponentPreview(comp.type, comp.config),
-    config: comp.config,
   }));
 
   // 选择组件弹窗
@@ -494,11 +490,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     id: string;
     name: string;
     type: string;
-    category: "static" | "animation";
-    status: string;
-    templateCount: number;
     preview: string;
-    config?: Record<string, unknown>;
   }
   const handleSelectComponent = (component: SelectableComponent) => {
     setSelectedComponent(component);
@@ -550,7 +542,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         componentType: getComponentTypeName(selectedComponent.type),
         componentTypeKey: selectedComponent.type,
         componentPreview: selectedComponent.preview,
-        componentConfig: selectedComponent.config,
+        componentConfig: components.find(c => c.id === selectedComponent.id)?.config,
         triggerRule: autoRule,
         triggerTime: autoRule === "show_time" ? 5 : undefined,
         parentId: parent.id,
@@ -828,16 +820,11 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                           </div>
                           <button
                             onClick={() => {
-                              const sourceComp = components.find(c => c.id === link.componentId);
                               setSelectedComponent({
                                 id: link.componentId,
                                 name: link.componentName,
-                                type: link.componentTypeKey || link.componentType,
-                                category: sourceComp?.category || "static",
-                                status: sourceComp?.status || "enabled",
-                                templateCount: sourceComp?.templateCount || 0,
-                                preview: link.componentPreview,
-                                config: sourceComp?.config || link.componentConfig,
+                                type: link.componentType,
+                                preview: link.componentPreview
                               });
                               setEditingLinkId(link.id);
                               setShowParentPicker(true);
@@ -978,7 +965,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
       {/* 选择组件弹窗 */}
       {showComponentPicker && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
             <div className="px-5 pt-5 pb-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">选择组件</h3>
@@ -989,7 +976,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mt-1">从组件管理列表中选择要关联的组件</p>
+              <p className="text-sm text-gray-500 mt-1">请选择要关联的组件</p>
             </div>
             <div className="p-4 overflow-y-auto max-h-[60vh]">
               {loading ? (
@@ -1007,18 +994,11 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                 <div className="space-y-2">
                   {availableComponents.map((comp) => {
                     const linkedCount = componentLinks.filter(l => l.componentId === comp.id).length;
-                    const isDisabled = comp.status === "disabled";
-                    const typeName = getComponentTypeName(comp.type);
-                    const categoryLabel = comp.category === "static" ? "静态类" : "动效类";
                     return (
                       <div
                         key={comp.id}
-                        onClick={() => !isDisabled && handleSelectComponent(comp)}
-                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                          isDisabled
-                            ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
-                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
-                        }`}
+                        onClick={() => handleSelectComponent(comp)}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
                       >
                         <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
                           <img 
@@ -1027,33 +1007,18 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 truncate">
+                            <span className="text-sm font-medium text-gray-900">
                               {comp.name}
                             </span>
                             {linkedCount > 0 && (
-                              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded flex-shrink-0">
+                              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded">
                                 已关联{linkedCount}次
                               </span>
                             )}
-                            {isDisabled && (
-                              <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-xs rounded flex-shrink-0">
-                                已禁用
-                              </span>
-                            )}
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                              comp.category === "static"
-                                ? "bg-gray-100 text-gray-600"
-                                : "bg-purple-100 text-purple-700"
-                            }`}>
-                              {categoryLabel}
-                            </span>
-                            <span className="text-xs text-gray-500">{typeName}</span>
-                            <span className="text-xs text-gray-400">关联{comp.templateCount}个模版</span>
-                          </div>
+                          <span className="text-xs text-gray-500">{comp.type}</span>
                         </div>
                       </div>
                     );
