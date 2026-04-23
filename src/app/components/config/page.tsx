@@ -758,13 +758,15 @@ function ConfigContent() {
                             onClose={() => setPreviewResetKey(k => k + 1)}
                           />
                         ) : isTreasureboxRainComponent ? (
-                          <TreasureboxRainTemplate
-                            key={`treasureboxrain-${previewResetKey}`}
-                            config={config as TreasureboxRainTemplateConfig}
-                            isOpen={true}
-                            previewMode={true}
-                            onClose={() => setPreviewResetKey(k => k + 1)}
-                          />
+                          <div className="w-full h-full flex items-center justify-center">
+                            <TreasureboxRainTemplate
+                              key={`treasureboxrain-${previewResetKey}`}
+                              config={config as TreasureboxRainTemplateConfig}
+                              isOpen={true}
+                              previewMode={true}
+                              onClose={() => setPreviewResetKey(k => k + 1)}
+                            />
+                          </div>
                         ) : isGameGiftComponent ? (
                           <GameGiftTemplate
                             config={config as GameGiftTemplateConfig}

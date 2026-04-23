@@ -326,12 +326,14 @@ function RealComponentPreview({
   // 红包雨
   if (componentTypeKey === "redpacket_rain") {
     return (
-      <RedpacketRainTemplate
-        config={config as unknown as RedpacketRainTemplateConfig}
-        isOpen={true}
-        onClose={onDismiss}
-        previewMode={true}
-      />
+      <div className="w-full h-full flex items-center justify-center">
+        <RedpacketRainTemplate
+          config={config as unknown as RedpacketRainTemplateConfig}
+          isOpen={true}
+          onClose={onDismiss}
+          previewMode={true}
+        />
+      </div>
     );
   }
 
@@ -386,12 +388,14 @@ function RealComponentPreview({
   // 宝箱雨
   if (componentTypeKey === "treasure_rain") {
     return (
-      <TreasureboxRainTemplate
-        config={config as unknown as TreasureboxRainTemplateConfig}
-        isOpen={true}
-        onClose={onDismiss}
-        previewMode={true}
-      />
+      <div className="w-full h-full flex items-center justify-center">
+        <TreasureboxRainTemplate
+          config={config as unknown as TreasureboxRainTemplateConfig}
+          isOpen={true}
+          onClose={onDismiss}
+          previewMode={true}
+        />
+      </div>
     );
   }
 
@@ -858,7 +862,7 @@ export function InteractionPreview({
               {activeComponents.map((link, idx) => {
                 const isCenteredType = [
                   "dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift",
-                  "flip_redpacket", "flip_card", "flip_treasure", "redpacket_rain", "treasure_rain",
+                  "flip_redpacket", "flip_card", "flip_treasure",
                 ].includes(link.componentTypeKey);
                 return (
                   <div

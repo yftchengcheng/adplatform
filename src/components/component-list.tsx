@@ -724,7 +724,7 @@ export function ComponentList() {
                   <div className={`w-full h-full bg-white rounded-[2rem] overflow-hidden relative ${
                     previewComponent?.config && [
                       "dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift",
-                      "flip_redpacket", "flip_card", "flip_treasure", "redpacket_rain", "treasure_rain",
+                      "flip_redpacket", "flip_card", "flip_treasure", "treasure_rain",
                     ].includes(previewComponent?.type || "")
                       ? "flex items-center justify-center"
                       : ""
@@ -768,12 +768,14 @@ export function ComponentList() {
                           previewMode={true}
                         />
                       ) : previewComponent?.type === "redpacket_rain" ? (
-                        <RedpacketRainTemplate
-                          config={previewComponent.config as unknown as RedpacketRainTemplateConfig}
-                          isOpen={true}
-                          previewMode={true}
-                          onClose={() => {}}
-                        />
+                        <div className="w-full h-full flex items-center justify-center">
+                          <RedpacketRainTemplate
+                            config={previewComponent.config as unknown as RedpacketRainTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => {}}
+                          />
+                        </div>
                       ) : previewComponent?.type === "flip_redpacket" ? (
                         <FlipRedpacketTemplate
                           config={editingPreviewConfig["flip_redpacket"] as unknown as FlipRedpacketTemplateConfig || previewComponent.config as unknown as FlipRedpacketTemplateConfig}
@@ -817,12 +819,14 @@ export function ComponentList() {
                           onClose={() => setPreviewComponent(null)}
                         />
                       ) : previewComponent?.type === "treasure_rain" ? (
-                        <TreasureboxRainTemplateDefault
-                          config={editingPreviewConfig["treasure_rain"] as unknown as TreasureboxRainTemplateConfig || previewComponent.config as unknown as TreasureboxRainTemplateConfig}
-                          isOpen={true}
-                          previewMode={true}
-                          onClose={() => setPreviewComponent(null)}
-                        />
+                        <div className="w-full h-full flex items-center justify-center">
+                          <TreasureboxRainTemplateDefault
+                            config={editingPreviewConfig["treasure_rain"] as unknown as TreasureboxRainTemplateConfig || previewComponent.config as unknown as TreasureboxRainTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => setPreviewComponent(null)}
+                          />
+                        </div>
                       ) : (
                         <AdTemplate
                           config={previewComponent.config as unknown as AdTemplateConfig}
