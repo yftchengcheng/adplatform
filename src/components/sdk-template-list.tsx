@@ -423,11 +423,11 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                           className="w-3.5 h-3.5 rounded border-gray-300"
                         />
                       </td>
-                      <td className="px-3 py-2.5 text-xs text-gray-500 font-mono max-w-[140px] truncate" title={item.id}>{item.id}</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500 font-mono max-w-[180px] truncate cursor-help" title={item.id}>{item.id}</td>
                       <td className="px-3 py-2.5">
                         <div className="text-sm font-medium text-gray-900 max-w-[160px] truncate" title={item.name}>{item.name}</div>
                       </td>
-                      <td className="px-3 py-2.5 text-sm text-gray-600 font-mono max-w-[120px] truncate" title={item.ad_slot || ""}>{item.ad_slot || "-"}</td>
+                      <td className="px-3 py-2.5 text-sm text-gray-600 font-mono max-w-[160px] truncate cursor-help" title={item.ad_slot || ""}>{item.ad_slot || "-"}</td>
                       <td className="px-3 py-2.5">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
