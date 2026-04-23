@@ -157,7 +157,7 @@ export function CouponTemplate({
         className={cn(
           previewMode
             ? "flex items-center justify-center w-full max-w-sm"
-            : "fixed inset-0 z-50 bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]",
+            : "fixed inset-0 z-50 bg-black/50",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
