@@ -381,121 +381,122 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
         {/* 列表 */}
         {!loading && !error && (
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="w-10 px-4 py-3 text-left">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.size === filteredData.length && filteredData.length > 0}
-                      onChange={handleSelectAll}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模板ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模板名称</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">广告位ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">规格</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">预览</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">关联组件</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建人</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredData.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[900px]">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="w-8 px-3 py-2.5 text-left">
                       <input
                         type="checkbox"
-                        checked={selectedIds.has(item.id)}
-                        onChange={() => handleSelect(item.id)}
-                        className="w-4 h-4 rounded border-gray-300"
+                        checked={selectedIds.size === filteredData.length && filteredData.length > 0}
+                        onChange={handleSelectAll}
+                        className="w-3.5 h-3.5 rounded border-gray-300"
                       />
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 font-mono">{item.id}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{item.name}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 font-mono">{item.ad_slot || "-"}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          item.status === "enabled"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {item.status === "enabled" ? "开启" : "暂停"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      <div>{item.width}×{item.height}</div>
-                      <div className="text-xs text-blue-600">{item.ratio}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div 
-                        className="w-24 h-16 bg-gray-100 rounded overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
-                        onClick={() => handlePreview(item)}
-                      >
-                        <RealAdPreview
-                          templateType={type}
-                          templateName={item.name}
+                    </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">模板名称</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">广告位ID</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">状态</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">规格</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">预览</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">关联组件</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">创建时间</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredData.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="px-3 py-2.5">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(item.id)}
+                          onChange={() => handleSelect(item.id)}
+                          className="w-3.5 h-3.5 rounded border-gray-300"
                         />
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-blue-600">{item.linked_component_count}个</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{item.creator}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      {new Date(item.create_time).toLocaleString("zh-CN")}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <button 
-                          className="p-1.5 hover:bg-gray-100 rounded" 
-                          title="预览"
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="text-sm font-medium text-gray-900 max-w-[160px] truncate" title={item.name}>{item.name}</div>
+                        <div className="text-xs text-gray-400 font-mono">{item.id.slice(0, 12)}...</div>
+                      </td>
+                      <td className="px-3 py-2.5 text-sm text-gray-600 font-mono max-w-[120px] truncate" title={item.ad_slot || ""}>{item.ad_slot || "-"}</td>
+                      <td className="px-3 py-2.5">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            item.status === "enabled"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {item.status === "enabled" ? "开启" : "暂停"}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="text-xs text-gray-600">{item.width}×{item.height}</div>
+                        <div className="text-xs text-blue-500">{item.ratio}</div>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div 
+                          className="w-20 h-12 bg-gray-100 rounded cursor-pointer hover:ring-2 hover:ring-blue-400 hover:shadow-md transition-all"
                           onClick={() => handlePreview(item)}
                         >
-                          <Eye className="w-4 h-4 text-gray-500" />
-                        </button>
-                        <button 
-                          className="p-1.5 hover:bg-gray-100 rounded" 
-                          title="克隆"
-                          onClick={() => handleClone(item)}
-                        >
-                          <Copy className="w-4 h-4 text-green-500" />
-                        </button>
-                        <button 
-                          className="p-1.5 hover:bg-gray-100 rounded" 
-                          title="编辑"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <Edit className="w-4 h-4 text-gray-500" />
-                        </button>
-                        <button
-                          className="p-1.5 hover:bg-gray-100 rounded"
-                          title={item.status === "enabled" ? "暂停" : "开启"}
-                          onClick={() => handleToggleStatus(item)}
-                        >
-                          {item.status === "enabled" ? (
-                            <Pause className="w-4 h-4 text-gray-500" />
-                          ) : (
-                            <Play className="w-4 h-4 text-gray-500" />
-                          )}
-                        </button>
-                        <button 
-                          className="p-1.5 hover:bg-gray-100 rounded" 
-                          title="删除"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <RealAdPreview
+                            templateType={type}
+                            templateName={item.name}
+                          />
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5 text-sm text-blue-600 font-medium">{item.linked_component_count}个</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">
+                        {new Date(item.create_time).toLocaleDateString("zh-CN")}
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-0.5">
+                          <button 
+                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors" 
+                            title="预览"
+                            onClick={() => handlePreview(item)}
+                          >
+                            <Eye className="w-4 h-4 text-gray-500" />
+                          </button>
+                          <button 
+                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors" 
+                            title="克隆"
+                            onClick={() => handleClone(item)}
+                          >
+                            <Copy className="w-4 h-4 text-green-500" />
+                          </button>
+                          <button 
+                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors" 
+                            title="编辑"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <Edit className="w-4 h-4 text-gray-500" />
+                          </button>
+                          <button
+                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
+                            title={item.status === "enabled" ? "暂停" : "开启"}
+                            onClick={() => handleToggleStatus(item)}
+                          >
+                            {item.status === "enabled" ? (
+                              <Pause className="w-4 h-4 text-gray-500" />
+                            ) : (
+                              <Play className="w-4 h-4 text-gray-500" />
+                            )}
+                          </button>
+                          <button 
+                            className="p-1.5 hover:bg-red-100 rounded-md transition-colors" 
+                            title="删除"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             {filteredData.length === 0 && (
               <div className="text-center py-12">
