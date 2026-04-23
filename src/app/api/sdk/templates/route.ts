@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { type, name, format, adSlot, width, height, ratio, cloneFrom } = body;
+    const { type, name, format, adSlot, width, height, ratio, cloneFrom, componentLinks } = body;
 
     if (!type || !name) {
       return NextResponse.json(
@@ -125,6 +125,11 @@ export async function POST(request: NextRequest) {
       ? `${adSlot}_copy_${Date.now()}`
       : adSlot;
 
+    // 计算启用的关联组件数
+    const enabledCount = componentLinks
+      ? componentLinks.filter((l: { status: string }) => l.status === "enabled").length
+      : 0;
+
     const newTemplate = {
       id,
       type,
@@ -136,7 +141,7 @@ export async function POST(request: NextRequest) {
       ratio: ratio || size.ratio,
       status: "enabled",
       creator: "用户",
-      linked_component_count: 0,
+      linked_component_count: enabledCount,
       create_time: new Date().toISOString(),
     };
 
@@ -149,6 +154,45 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Error creating SDK template:", error);
       throw error;
+    }
+
+    // 如果有组件关联配置，批量插入
+    if (componentLinks && componentLinks.length > 0) {
+      const insertRows = componentLinks.map(
+        (link: {
+          id: string;
+          componentId: string;
+          componentTypeKey?: string;
+          componentConfig?: Record<string, unknown>;
+          parentId: string;
+          parentName: string;
+          triggerRule: string;
+          triggerTime?: number;
+          status: string;
+          sortOrder: number;
+        }, index: number) => ({
+          id: link.id,
+          template_id: id,
+          component_id: link.componentId,
+          component_type_key: link.componentTypeKey || null,
+          component_config: link.componentConfig || null,
+          parent_id: link.parentId || "main",
+          parent_name: link.parentName || "主素材",
+          trigger_rule: link.triggerRule,
+          trigger_time: link.triggerTime || null,
+          status: link.status,
+          sort_order: index,
+          create_time: new Date().toISOString(),
+        })
+      );
+
+      const { error: insertError } = await client
+        .from("sdk_template_components")
+        .insert(insertRows);
+
+      if (insertError) {
+        console.error("Error inserting component links:", insertError);
+      }
     }
 
     return NextResponse.json({ success: true, data });

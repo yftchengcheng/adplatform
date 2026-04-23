@@ -556,12 +556,8 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     router.push(`/sdk/${type}`);
   };
 
-  // 保存模板
+  // 保存模板（插入新记录）
   const handleSave = async () => {
-    if (!templateId) {
-      setToastMessage({ text: "模板ID缺失，无法保存", type: "error" });
-      return;
-    }
     if (saving) return;
 
     // 校验
@@ -572,9 +568,24 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
 
     setSaving(true);
     try {
+      const formatMap: Record<string, string> = {
+        static_splash: "图片",
+        video_splash: "视频",
+        interstitial_half: "图片+文字",
+        interstitial_full: "图片",
+        banner: "图片+文字",
+        native: "图片+文字",
+        rewarded_video: "视频",
+      };
+
       const payload = {
+        type,
         name: templateName.trim(),
+        format: formatMap[type] || "图片",
         adSlot: adSlot.trim(),
+        width: sizeConfig.width,
+        height: sizeConfig.height,
+        ratio: sizeConfig.ratio,
         componentLinks: componentLinks.map((link, index) => ({
           id: link.id,
           componentId: link.componentId,
@@ -589,15 +600,16 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         })),
       };
 
-      const res = await fetch(`/api/sdk/templates/${templateId}`, {
-        method: "PUT",
+      const res = await fetch("/api/sdk/templates", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       const json = await res.json();
       if (json.success) {
-        setToastMessage({ text: "保存成功", type: "success" });
+        // 保存成功后返回模板列表
+        router.push(`/sdk/${type}`);
       } else {
         setToastMessage({ text: json.error || "保存失败", type: "error" });
       }
