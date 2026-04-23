@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RealAdPreview, FullscreenPreviewModal } from "./real-ad-preview";
+import { RealAdPreview } from "./real-ad-preview";
+import { InteractionPreview, ComponentLinkConfig } from "./interaction-preview";
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -84,6 +85,8 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
   // 预览弹窗状态
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<SDKTemplate | null>(null);
+  const [previewLinks, setPreviewLinks] = useState<ComponentLinkConfig[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
   
 
 
@@ -142,10 +145,50 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
     setSelectedIds(newSelected);
   };
 
-  // 预览
-  const handlePreview = (item: SDKTemplate) => {
+  // 预览（全屏交互预览）
+  const handlePreview = async (item: SDKTemplate) => {
     setPreviewTemplate(item);
     setPreviewOpen(true);
+    setPreviewLinks([]);
+    setPreviewLoading(true);
+    try {
+      const res = await fetch(`/api/sdk/templates/${item.id}`);
+      const json = await res.json();
+      if (json.success && json.data?.componentLinks) {
+        // 将数据库行转换为 ComponentLinkConfig
+        const links: ComponentLinkConfig[] = json.data.componentLinks.map(
+          (row: {
+            id: string;
+            component_id: string;
+            component_type_key: string;
+            parent_id: string;
+            parent_name: string;
+            trigger_rule: string;
+            trigger_time: number;
+            status: string;
+          }) => ({
+            id: row.id,
+            componentId: row.component_id,
+            componentName: row.component_id,
+            componentType: row.component_type_key || "",
+            componentTypeKey: row.component_type_key || "",
+            componentConfig: (json.data.componentLinks.find(
+              (r: { id: string }) => r.id === row.id
+            )?.component_config) as Record<string, unknown> | undefined,
+            triggerRule: (row.trigger_rule || "show_time") as ComponentLinkConfig["triggerRule"],
+            triggerTime: row.trigger_time || undefined,
+            parentId: row.parent_id || "main",
+            parentName: row.parent_name || "主素材",
+            status: (row.status === "enabled" ? "enabled" : "disabled") as "enabled" | "disabled",
+          })
+        );
+        setPreviewLinks(links);
+      }
+    } catch (err) {
+      console.error("Failed to load component links for preview:", err);
+    } finally {
+      setPreviewLoading(false);
+    }
   };
 
   // 复制ID
@@ -448,13 +491,15 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
         </div>
       </main>
 
-      {/* 预览弹窗 */}
-      <FullscreenPreviewModal
-        templateType={type}
-        templateName={previewTemplate?.name}
-        isOpen={previewOpen}
-        onClose={() => setPreviewOpen(false)}
-      />
+      {/* 全屏交互预览 */}
+      {previewOpen && (
+        <InteractionPreview
+          templateType={type}
+          templateName={previewTemplate?.name || ""}
+          componentLinks={previewLinks}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
 
     </div>
   );

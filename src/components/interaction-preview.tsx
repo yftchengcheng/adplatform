@@ -49,7 +49,7 @@ type TriggerRule =
   | "click_other_ad"
   | "in_app_interaction";
 
-interface ComponentLinkConfig {
+export interface ComponentLinkConfig {
   id: string;
   componentId: string;
   componentName: string;
