@@ -199,17 +199,15 @@ export function TreasureBoxTemplate({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        {!previewMode && (
-          <button
-            onClick={onClose}
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-          >
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )}
+        <button
+          onClick={onClose}
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
         {/* Content */}
         <div className="p-6 flex flex-col items-center relative">

@@ -210,15 +210,13 @@ export function FlipRedpacketTemplate({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        {!previewMode && (
-          <button
-            onClick={onClose}
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-        )}
+        <button
+          onClick={onClose}
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+        >
+          <X className="w-5 h-5 text-white" />
+        </button>
 
         {/* Content */}
         <div className="p-6 flex flex-col items-center">
