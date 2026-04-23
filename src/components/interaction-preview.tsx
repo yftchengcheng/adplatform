@@ -818,7 +818,8 @@ export function InteractionPreview({
     startChildAutoTriggers(latest.id);
   }, [activeComponents, startChildAutoTriggers]);
 
-  // 重置预览
+  // 重置预览（通过改变签名触发 useEffect 重新启动）
+  const [resetKey, setResetKey] = useState(0);
   const handleReset = useCallback(() => {
     clearAllTimers();
     triggeredRef.current = new Set();
@@ -826,17 +827,35 @@ export function InteractionPreview({
     setActiveComponents([]);
     setDismissedComponents(new Set());
     setTriggeredComponents(new Set());
-    // 延迟启动，确保状态已清除
-    setTimeout(() => {
-      startAutoTriggers();
-    }, 100);
-  }, [clearAllTimers, startAutoTriggers]);
+    setResetKey(k => k + 1);
+  }, [clearAllTimers]);
 
-  // 初始启动
+  // componentLinks 的稳定签名（仅在内容变化时更新）
+  const linksSignature = componentLinks.map(l => `${l.id}:${l.triggerRule}:${l.status}:${l.parentId}`).join('|');
+
+  // 初始启动 & componentLinks 变化 / 重置时重启触发
   useEffect(() => {
-    startAutoTriggers();
+    // 先清除旧计时器
+    clearAllTimers();
+    // 重置状态
+    triggeredRef.current = new Set();
+    dismissedRef.current = new Set();
+    setActiveComponents([]);
+    setDismissedComponents(new Set());
+    setTriggeredComponents(new Set());
+    // 有启用的组件时才启动触发
+    if (enabledLinks.length > 0) {
+      const timer = setTimeout(() => {
+        startAutoTriggers();
+      }, 100);
+      return () => {
+        clearTimeout(timer);
+        clearAllTimers();
+      };
+    }
     return () => clearAllTimers();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linksSignature, resetKey]);
 
   // 计算链路描述
   const getChainDescription = () => {

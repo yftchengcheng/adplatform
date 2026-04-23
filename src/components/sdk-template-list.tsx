@@ -19,6 +19,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RealAdPreview } from "./real-ad-preview";
 import { InteractionPreview, ComponentLinkConfig } from "./interaction-preview";
+import { useComponents } from "@/contexts/component-context";
+
+// 组件类型中文名映射
+const COMPONENT_TYPE_NAMES: Record<string, string> = {
+  redpacket_rain: "红包雨",
+  flip_card: "翻卡",
+  flip_redpacket: "翻红包",
+  flip_treasure: "翻宝箱",
+  treasure_rain: "宝箱雨",
+  scratch_card: "刮刮卡",
+  smash_egg: "砸蛋",
+  popup_redpacket: "弹窗红包",
+  dual_button: "双按钮",
+  vote: "投票磁贴",
+  image: "图片磁贴",
+  ecommerce: "电商磁贴",
+  coupon: "优惠券磁贴",
+  promotion_card: "推广卡片",
+  game_gift: "游戏礼包码",
+};
+
+function getComponentTypeName(componentType: string): string {
+  return COMPONENT_TYPE_NAMES[componentType] || componentType;
+}
 
 // SDK模板类型
 type SDKTemplateType = 
@@ -76,6 +100,7 @@ interface SDKTemplateListProps {
 export function SDKTemplateList({ type }: SDKTemplateListProps) {
   const router = useRouter();
   const { showToast } = useToast();
+  const { components } = useComponents();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [data, setData] = useState<SDKTemplate[]>([]);
@@ -161,26 +186,30 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
             id: string;
             component_id: string;
             component_type_key: string;
+            component_config: Record<string, unknown> | null;
             parent_id: string;
             parent_name: string;
             trigger_rule: string;
             trigger_time: number;
             status: string;
-          }) => ({
-            id: row.id,
-            componentId: row.component_id,
-            componentName: row.component_id,
-            componentType: row.component_type_key || "",
-            componentTypeKey: row.component_type_key || "",
-            componentConfig: (json.data.componentLinks.find(
-              (r: { id: string }) => r.id === row.id
-            )?.component_config) as Record<string, unknown> | undefined,
-            triggerRule: (row.trigger_rule || "show_time") as ComponentLinkConfig["triggerRule"],
-            triggerTime: row.trigger_time || undefined,
-            parentId: row.parent_id || "main",
-            parentName: row.parent_name || "主素材",
-            status: (row.status === "enabled" ? "enabled" : "disabled") as "enabled" | "disabled",
-          })
+          }) => {
+            // 从组件列表中查找对应的组件
+            const comp = components.find(c => c.id === row.component_id);
+            return {
+              id: row.id,
+              componentId: row.component_id,
+              componentName: comp?.name || row.component_id,
+              componentType: comp ? getComponentTypeName(comp.type) : (COMPONENT_TYPE_NAMES[row.component_type_key] || row.component_type_key),
+              componentTypeKey: row.component_type_key || comp?.type || "",
+              componentPreview: undefined,
+              componentConfig: row.component_config || comp?.config,
+              triggerRule: (row.trigger_rule || "show_time") as ComponentLinkConfig["triggerRule"],
+              triggerTime: row.trigger_time || undefined,
+              parentId: row.parent_id || "main",
+              parentName: row.parent_name || "主素材",
+              status: (row.status === "enabled" ? "enabled" : "disabled") as "enabled" | "disabled",
+            };
+          }
         );
         setPreviewLinks(links);
       }
