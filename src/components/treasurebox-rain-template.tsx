@@ -198,7 +198,7 @@ export function TreasureboxRainTemplate({
     }
   }, [resolveLandingPage]);
 
-  if (!isVisible) return null;
+  if (!isVisible && !previewMode) return null;
 
   const treasureboxImage = resolveTreasureboxImage();
 
