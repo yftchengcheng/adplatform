@@ -942,16 +942,20 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   {availableComponents.map((comp) => (
                     <div 
                       key={comp.id}
-                      className="w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
+                      className="group relative w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
                       onClick={() => {
                         handleSelectComponent(comp);
                       }}
+                      title={`${comp.name}（${getComponentTypeName(comp.type)}）`}
                     >
                       <img 
                         src={comp.preview}
                         alt={comp.name}
                         className="w-full h-full object-cover"
                       />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-[8px] text-white truncate">{comp.name}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1018,7 +1022,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">{comp.type}</span>
+                          <span className="text-xs text-gray-500">{getComponentTypeName(comp.type)}</span>
                         </div>
                       </div>
                     );
