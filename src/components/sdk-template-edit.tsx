@@ -428,7 +428,11 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     id: comp.id,
     name: comp.name,
     type: comp.type,
+    typeLabel: getComponentTypeName(comp.type),
+    category: comp.category,
+    status: comp.status,
     preview: getComponentPreview(comp.type, comp.config),
+    config: comp.config,
   }));
 
   // 选择组件弹窗
@@ -490,7 +494,11 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     id: string;
     name: string;
     type: string;
+    typeLabel: string;
+    category: string;
+    status: string;
     preview: string;
+    config?: Record<string, unknown>;
   }
   const handleSelectComponent = (component: SelectableComponent) => {
     setSelectedComponent(component);
@@ -542,7 +550,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         componentType: getComponentTypeName(selectedComponent.type),
         componentTypeKey: selectedComponent.type,
         componentPreview: selectedComponent.preview,
-        componentConfig: components.find(c => c.id === selectedComponent.id)?.config,
+        componentConfig: selectedComponent.config,
         triggerRule: autoRule,
         triggerTime: autoRule === "show_time" ? 5 : undefined,
         parentId: parent.id,
@@ -823,8 +831,12 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               setSelectedComponent({
                                 id: link.componentId,
                                 name: link.componentName,
-                                type: link.componentType,
-                                preview: link.componentPreview
+                                type: link.componentTypeKey,
+                                typeLabel: link.componentType,
+                                category: "static",
+                                status: link.status,
+                                preview: link.componentPreview,
+                                config: link.componentConfig,
                               });
                               setEditingLinkId(link.id);
                               setShowParentPicker(true);
@@ -1018,7 +1030,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">{comp.type}</span>
+                          <span className="text-xs text-gray-500">{comp.typeLabel}</span>
                         </div>
                       </div>
                     );
@@ -1063,7 +1075,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   <span className="text-sm font-medium text-gray-900 block">
                     {selectedComponent.name}
                   </span>
-                  <span className="text-xs text-gray-500">{selectedComponent.type}</span>
+                  <span className="text-xs text-gray-500">{selectedComponent.typeLabel}</span>
                 </div>
               </div>
               
