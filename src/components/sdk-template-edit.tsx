@@ -1018,7 +1018,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">{getComponentTypeName(comp.type)}</span>
+                          <span className="text-xs text-gray-500">{comp.type}</span>
                         </div>
                       </div>
                     );
