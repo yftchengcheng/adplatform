@@ -714,71 +714,122 @@ export function InteractionPreview({
   // 交互状态：追踪当前弹出的组件栈
   const [activeComponents, setActiveComponents] = useState<ComponentLinkConfig[]>([]);
   const [dismissedComponents, setDismissedComponents] = useState<Set<string>>(new Set());
+  const [triggeredComponents, setTriggeredComponents] = useState<Set<string>>(new Set());
 
   // 自动触发计时器
   const triggerTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  // 用 ref 跟踪状态，避免闭包陈旧引用
+  const triggeredRef = useRef<Set<string>>(new Set());
+  const dismissedRef = useRef<Set<string>>(new Set());
 
   const clearAllTimers = useCallback(() => {
     triggerTimersRef.current.forEach((timer) => clearTimeout(timer));
     triggerTimersRef.current.clear();
   }, []);
 
+  // 获取某个组件的所有子组件（parentId 等于该组件 id 的组件）
+  const getChildren = useCallback((parentId: string) => {
+    return enabledLinks.filter((l) => l.parentId === parentId);
+  }, [enabledLinks]);
+
   // 触发组件弹出
   const triggerComponent = useCallback((link: ComponentLinkConfig) => {
+    triggeredRef.current.add(link.id);
+    setTriggeredComponents(new Set(triggeredRef.current));
     setActiveComponents((prev) => {
       if (prev.find((l) => l.id === link.id)) return prev;
       return [...prev, link];
     });
   }, []);
 
-  // 关闭组件弹出
-  const dismissComponent = useCallback((linkId: string) => {
-    setDismissedComponents((prev) => new Set(prev).add(linkId));
-    setActiveComponents((prev) => prev.filter((l) => l.id !== linkId));
-    // 触发 back_from_media 类型的子组件
-    const backLinks = enabledLinks.filter(
-      (l) => l.triggerRule === "back_from_media" && l.parentId === linkId && !dismissedComponents.has(l.id)
-    );
-    backLinks.forEach((link) => {
-      const delay = TRIGGER_RULES[link.triggerRule].autoDelay;
-      setTimeout(() => triggerComponent(link), delay);
-    });
-  }, [enabledLinks, dismissedComponents, triggerComponent]);
+  // 启动某个父级下子组件的自动触发计时器
+  const startChildAutoTriggers = useCallback((parentId: string) => {
+    const children = getChildren(parentId);
+    children.forEach((link) => {
+      // 跳过已触发或已关闭的
+      if (triggeredRef.current.has(link.id) || dismissedRef.current.has(link.id)) return;
 
-  // 启动自动触发逻辑
-  const startAutoTriggers = useCallback(() => {
-    clearAllTimers();
-    const rootLinks = enabledLinks.filter((l) => l.parentId === "main");
-    rootLinks.forEach((link) => {
       const rule = TRIGGER_RULES[link.triggerRule];
-      if (rule && rule.autoDelay > 0) {
+      if (!rule) return;
+
+      if (rule.autoDelay > 0) {
+        // 自动触发类规则：show_time, video_complete, back_from_media, in_app_interaction
         const actualDelay = link.triggerRule === "show_time" && link.triggerTime
           ? link.triggerTime * 1000
           : rule.autoDelay;
         const timer = setTimeout(() => {
+          // 再次检查是否已被其他路径触发
+          if (triggeredRef.current.has(link.id)) return;
           triggerComponent(link);
         }, actualDelay);
         triggerTimersRef.current.set(link.id, timer);
       }
+      // 手动触发类规则（click_close, click_other_ad）需要用户操作，不在此启动
     });
-  }, [enabledLinks, clearAllTimers, triggerComponent]);
+  }, [getChildren, triggerComponent]);
+
+  // 关闭组件弹出
+  const dismissComponent = useCallback((linkId: string) => {
+    dismissedRef.current.add(linkId);
+    setDismissedComponents(new Set(dismissedRef.current));
+    setActiveComponents((prev) => prev.filter((l) => l.id !== linkId));
+
+    // 关闭组件后，触发其所有子组件中需要父组件关闭才能触发的规则
+    const children = getChildren(linkId);
+    children.forEach((link) => {
+      if (triggeredRef.current.has(link.id) || dismissedRef.current.has(link.id)) return;
+      const rule = TRIGGER_RULES[link.triggerRule];
+      if (!rule) return;
+
+      if (rule.autoDelay > 0) {
+        // back_from_media 等：父组件关闭后延迟触发
+        const timer = setTimeout(() => {
+          if (triggeredRef.current.has(link.id)) return;
+          triggerComponent(link);
+        }, rule.autoDelay);
+        triggerTimersRef.current.set(link.id, timer);
+      }
+      // click_close 等手动触发类：需要用户再次点击关闭
+    });
+  }, [getChildren, triggerComponent]);
+
+  // 启动根级自动触发逻辑
+  const startAutoTriggers = useCallback(() => {
+    clearAllTimers();
+    // 启动主素材下的子组件触发
+    startChildAutoTriggers("main");
+  }, [clearAllTimers, startChildAutoTriggers]);
 
   // 处理关闭按钮点击（click_close 类型触发）
-  const handleCloseClick = useCallback(() => {
+  const handleCloseClick = useCallback((parentId: string) => {
     const clickCloseLinks = enabledLinks.filter(
-      (l) => l.triggerRule === "click_close" && l.parentId === "main" && !dismissedComponents.has(l.id)
+      (l) => l.triggerRule === "click_close" && l.parentId === parentId && !triggeredRef.current.has(l.id) && !dismissedRef.current.has(l.id)
     );
     clickCloseLinks.forEach((link) => {
       triggerComponent(link);
     });
-  }, [enabledLinks, dismissedComponents, triggerComponent]);
+  }, [enabledLinks, triggerComponent]);
+
+  // 组件被触发后，启动其子组件的触发计时器
+  useEffect(() => {
+    if (activeComponents.length === 0) return;
+    // 对最新激活的组件，启动其子组件的触发计时器
+    const latest = activeComponents[activeComponents.length - 1];
+    startChildAutoTriggers(latest.id);
+  }, [activeComponents, startChildAutoTriggers]);
 
   // 重置预览
   const handleReset = useCallback(() => {
     clearAllTimers();
+    triggeredRef.current = new Set();
+    dismissedRef.current = new Set();
     setActiveComponents([]);
     setDismissedComponents(new Set());
-    startAutoTriggers();
+    setTriggeredComponents(new Set());
+    // 延迟启动，确保状态已清除
+    setTimeout(() => {
+      startAutoTriggers();
+    }, 100);
   }, [clearAllTimers, startAutoTriggers]);
 
   // 初始启动
@@ -789,12 +840,15 @@ export function InteractionPreview({
 
   // 计算链路描述
   const getChainDescription = () => {
-    if (activeComponents.length === 0) {
+    if (activeComponents.length === 0 && triggeredComponents.size === 0) {
       const pendingRoots = enabledLinks.filter((l) => l.parentId === "main");
       if (pendingRoots.length === 0) return "模版展示中";
       const next = pendingRoots[0];
       const rule = TRIGGER_RULES[next.triggerRule];
-      return `模版展示 → ${rule.label}后弹出「${next.componentName}」`;
+      return rule ? `模版展示 → ${rule.label}后弹出「${next.componentName}」` : "模版展示中";
+    }
+    if (activeComponents.length === 0 && triggeredComponents.size > 0) {
+      return "所有组件已关闭";
     }
     const chain = activeComponents.map((l) => l.componentName).join(" → ");
     return `模版 → ${chain}`;
@@ -817,7 +871,7 @@ export function InteractionPreview({
               {/* 底层：模版展示 */}
               <PhoneTemplatePreview
                 templateType={templateType}
-                onCloseClick={handleCloseClick}
+                onCloseClick={() => handleCloseClick("main")}
               />
 
               {/* 上层：组件真实预览弹出（逐层覆盖） */}
@@ -830,7 +884,11 @@ export function InteractionPreview({
                   <RealComponentPreview
                     componentTypeKey={link.componentTypeKey}
                     componentConfig={link.componentConfig}
-                    onDismiss={() => dismissComponent(link.id)}
+                    onDismiss={() => {
+                      dismissComponent(link.id);
+                      // 同时检查该组件的子组件中是否有 click_close 类型需要触发
+                      handleCloseClick(link.id);
+                    }}
                   />
                 </div>
               ))}
@@ -869,24 +927,39 @@ export function InteractionPreview({
             </button>
           </div>
 
-          {/* 交互提示 */}
+          {/* 交互提示 - 完整链路 */}
           <div className="space-y-1">
-            {enabledLinks.filter((l) => l.parentId === "main").map((link) => {
+            {enabledLinks.map((link) => {
               const rule = TRIGGER_RULES[link.triggerRule];
+              if (!rule) return null;
               const isAuto = rule.autoDelay > 0;
-              const isTriggered = activeComponents.some((c) => c.id === link.id) || dismissedComponents.has(link.id);
+              const isTriggered = triggeredComponents.has(link.id);
+              const isDismissed = dismissedComponents.has(link.id);
+              const isActive = activeComponents.some((c) => c.id === link.id);
+              // 确定父级名称
+              const parentLabel = link.parentId === "main" ? "模版" : enabledLinks.find(l => l.id === link.parentId)?.componentName || link.parentName;
+              const indent = link.parentId === "main" ? "" : "  └ ";
+
               return (
                 <div
                   key={link.id}
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] mx-0.5 ${
-                    isTriggered
-                      ? "bg-green-500/20 text-green-300"
-                      : isAuto
-                        ? "bg-blue-500/20 text-blue-300"
-                        : "bg-amber-500/20 text-amber-300"
+                    isDismissed
+                      ? "bg-gray-500/20 text-gray-400"
+                      : isActive
+                        ? "bg-amber-500/20 text-amber-300"
+                        : isTriggered
+                          ? "bg-green-500/20 text-green-300"
+                          : isAuto
+                            ? "bg-blue-500/20 text-blue-300"
+                            : "bg-amber-500/20 text-amber-300"
                   }`}
                 >
-                  {isTriggered ? (
+                  {isDismissed ? (
+                    <span className="text-gray-400">✓</span>
+                  ) : isActive ? (
+                    <span className="text-amber-400 animate-pulse">●</span>
+                  ) : isTriggered ? (
                     <span className="text-green-400">✓</span>
                   ) : isAuto ? (
                     <Clock className="w-3 h-3" />
@@ -894,11 +967,9 @@ export function InteractionPreview({
                     <MousePointer className="w-3 h-3" />
                   )}
                   <span>
-                    {isTriggered
-                      ? `已触发「${link.componentName}」`
-                      : isAuto
-                        ? `${rule.label}后 → ${link.componentName}`
-                        : `${rule.label} → ${link.componentName}`}
+                    {indent}{parentLabel} → {rule.label}{isAuto ? "后" : ""} → {link.componentName}
+                    {isActive && " (展示中)"}
+                    {isDismissed && " (已关闭)"}
                   </span>
                 </div>
               );
