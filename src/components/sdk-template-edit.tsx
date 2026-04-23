@@ -600,8 +600,12 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         })),
       };
 
-      const res = await fetch("/api/sdk/templates", {
-        method: "POST",
+      // 编辑模式（有templateId）使用PUT更新，新增模式使用POST
+      const url = templateId ? `/api/sdk/templates/${templateId}` : "/api/sdk/templates";
+      const method = templateId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
