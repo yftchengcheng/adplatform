@@ -3,20 +3,32 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   X,
-  Play,
   Clock,
   MousePointer,
   RotateCcw,
-  Zap,
 } from "lucide-react";
 import { AdTemplate, AdTemplateConfig } from "./ad-template";
+import { VoteTemplate, VoteTemplateConfig } from "./vote-template";
+import { ImageTemplate, ImageTemplateConfig } from "./image-template";
+import { EcommerceTemplate, EcommerceTemplateConfig } from "./ecommerce-template";
+import { CouponTemplate, CouponTemplateConfig } from "./coupon-template";
+import { PromotionTemplate, PromotionTemplateConfig } from "./promotion-template";
 import { GameGiftTemplate, GameGiftTemplateConfig } from "./game-gift-template";
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "./redpacket-rain-template";
-import { VoteTemplateConfig } from "./vote-template";
-import { ImageTemplateConfig } from "./image-template";
-import { EcommerceTemplateConfig } from "./ecommerce-template";
-import { CouponTemplateConfig } from "./coupon-template";
-import { PromotionTemplateConfig } from "./promotion-template";
+import { FlipRedpacketTemplateConfig } from "./flip-redpacket-template-config";
+import { FlipRedpacketTemplate as FlipRedpacketTemplateComp } from "./flip-redpacket-template";
+import TreasureBoxTemplate from "./treasurebox-template";
+import { TreasureBoxConfig } from "./treasurebox-template-config";
+import FlipCardTemplate from "./flip-card-template";
+import { FlipCardConfig } from "./flip-card-template-config";
+import { TreasureboxRainTemplate } from "./treasurebox-rain-template";
+import { TreasureboxRainTemplateConfig } from "./treasurebox-rain-template-config";
+import { SmashEggConfig } from "./smash-egg-template-config";
+import { SmashEggTemplate } from "./smash-egg-template";
+import { ScratchCardConfig } from "./scratch-card-config";
+import { ScratchCardTemplate } from "./scratch-card-template";
+import { PopupRedpacketTemplateConfig } from "./popup-redpacket-template";
+import PopupRedpacketTemplate from "./popup-redpacket-template";
 
 // ---- 类型定义 ----
 
@@ -251,6 +263,66 @@ function RealComponentPreview({
 }) {
   const config = componentConfig || DEFAULT_COMPONENT_CONFIGS[componentTypeKey] || DEFAULT_COMPONENT_CONFIGS.dual_button;
 
+  // 投票组件
+  if (componentTypeKey === "vote") {
+    return (
+      <VoteTemplate
+        config={config as unknown as VoteTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 图片磁贴
+  if (componentTypeKey === "image") {
+    return (
+      <ImageTemplate
+        config={config as unknown as ImageTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 电商磁贴
+  if (componentTypeKey === "ecommerce") {
+    return (
+      <EcommerceTemplate
+        config={config as unknown as EcommerceTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 优惠券磁贴
+  if (componentTypeKey === "coupon") {
+    return (
+      <CouponTemplate
+        config={config as unknown as CouponTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 推广卡片
+  if (componentTypeKey === "promotion_card") {
+    return (
+      <PromotionTemplate
+        config={config as unknown as PromotionTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
   // 红包雨
   if (componentTypeKey === "redpacket_rain") {
     return (
@@ -275,7 +347,91 @@ function RealComponentPreview({
     );
   }
 
-  // 其他所有类型使用 AdTemplate
+  // 翻转红包
+  if (componentTypeKey === "flip_redpacket") {
+    return (
+      <FlipRedpacketTemplateComp
+        config={config as unknown as FlipRedpacketTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 翻转宝箱
+  if (componentTypeKey === "flip_treasure") {
+    return (
+      <TreasureBoxTemplate
+        config={config as unknown as TreasureBoxConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 翻转卡牌
+  if (componentTypeKey === "flip_card") {
+    return (
+      <FlipCardTemplate
+        config={config as unknown as FlipCardConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 宝箱雨
+  if (componentTypeKey === "treasure_rain") {
+    return (
+      <TreasureboxRainTemplate
+        config={config as unknown as TreasureboxRainTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 砸金蛋
+  if (componentTypeKey === "smash_egg") {
+    return (
+      <SmashEggTemplate
+        config={config as unknown as SmashEggConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 刮刮卡
+  if (componentTypeKey === "scratch_card") {
+    return (
+      <ScratchCardTemplate
+        config={config as unknown as ScratchCardConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 弹窗红包
+  if (componentTypeKey === "popup_redpacket") {
+    return (
+      <PopupRedpacketTemplate
+        config={config as unknown as PopupRedpacketTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  // 双按钮等其他类型使用 AdTemplate
   return (
     <AdTemplate
       config={config as unknown as AdTemplateConfig}
