@@ -420,8 +420,86 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   const info = SDK_TEMPLATE_INFO[type];
   const sizeConfig = SDK_TEMPLATE_SIZES[type];
   
+  // 基础配置状态
+  const [templateName, setTemplateName] = useState(`${info.name}模板1`);
+  const [adSlot, setAdSlot] = useState("slot_static_0001");
+  
   // 组件关联配置列表（初始为空）
   const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([]);
+
+  // 数据加载/保存状态
+  const [dataLoading, setDataLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  // 页面加载时从API获取模板数据
+  useEffect(() => {
+    async function loadTemplate() {
+      if (!templateId) {
+        setDataLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/sdk/templates/${templateId}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          // 恢复基础配置
+          if (json.data.name) setTemplateName(json.data.name);
+          if (json.data.ad_slot) setAdSlot(json.data.ad_slot);
+          // 恢复组件关联配置
+          if (json.data.componentLinks && Array.isArray(json.data.componentLinks)) {
+            const links: ComponentLinkConfig[] = json.data.componentLinks.map(
+              (row: {
+                id: string;
+                component_id: string;
+                component_type_key: string;
+                component_config: Record<string, unknown>;
+                parent_id: string;
+                parent_name: string;
+                trigger_rule: string;
+                trigger_time: number;
+                status: string;
+              }) => {
+                // 从组件列表中查找组件名称和类型
+                const comp = components.find(c => c.id === row.component_id);
+                return {
+                  id: row.id,
+                  componentId: row.component_id,
+                  componentName: comp?.name || row.component_id,
+                  componentType: comp ? getComponentTypeName(comp.type) : (COMPONENT_TYPE_NAMES[row.component_type_key] || row.component_type_key),
+                  componentTypeKey: row.component_type_key || comp?.type || "",
+                  componentPreview: comp ? getComponentPreview(comp.type, comp.config) : getComponentPreview(row.component_type_key, row.component_config),
+                  componentConfig: row.component_config || comp?.config,
+                  triggerRule: (row.trigger_rule || "show_time") as TriggerRule,
+                  triggerTime: row.trigger_time || undefined,
+                  parentId: row.parent_id || "main",
+                  parentName: row.parent_name || "主素材",
+                  status: (row.status === "enabled" ? "enabled" : "disabled") as "enabled" | "disabled",
+                };
+              }
+            );
+            setComponentLinks(links);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load template data:", err);
+      } finally {
+        setDataLoading(false);
+      }
+    }
+    // 等待 components 加载完成后再加载模板（因为需要组件名称映射）
+    if (!loading) {
+      loadTemplate();
+    }
+  }, [templateId, loading, components]);
+
+  // Toast 自动消失
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
   
   // 将组件列表转换为选择器需要的格式
   const availableComponents = components.map(comp => ({
@@ -476,6 +554,59 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   // 返回列表
   const handleBack = () => {
     router.push(`/sdk/${type}`);
+  };
+
+  // 保存模板
+  const handleSave = async () => {
+    if (!templateId) {
+      setToastMessage({ text: "模板ID缺失，无法保存", type: "error" });
+      return;
+    }
+    if (saving) return;
+
+    // 校验
+    if (!templateName.trim()) {
+      setToastMessage({ text: "请输入模板名称", type: "error" });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = {
+        name: templateName.trim(),
+        adSlot: adSlot.trim(),
+        componentLinks: componentLinks.map((link, index) => ({
+          id: link.id,
+          componentId: link.componentId,
+          componentTypeKey: link.componentTypeKey,
+          componentConfig: link.componentConfig,
+          parentId: link.parentId || "main",
+          parentName: link.parentName || "主素材",
+          triggerRule: link.triggerRule,
+          triggerTime: link.triggerTime,
+          status: link.status,
+          sortOrder: index,
+        })),
+      };
+
+      const res = await fetch(`/api/sdk/templates/${templateId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        setToastMessage({ text: "保存成功", type: "success" });
+      } else {
+        setToastMessage({ text: json.error || "保存失败", type: "error" });
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
+      setToastMessage({ text: "保存失败，请重试", type: "error" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // 添加组件关联
@@ -726,8 +857,17 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
               <Button variant="outline" onClick={handleBack}>
                 取消
               </Button>
-              <Button className="bg-blue-500 hover:bg-blue-600">
-                保存
+              <Button 
+                className="bg-blue-500 hover:bg-blue-600"
+                onClick={handleSave}
+                disabled={saving || dataLoading}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                    保存中...
+                  </>
+                ) : "保存"}
               </Button>
             </div>
           </div>
@@ -754,14 +894,16 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">模板名称</label>
                   <Input 
-                    defaultValue={`${info.name}模板1`} 
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
                     placeholder="请输入模板名称"
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">广告位ID</label>
                   <Input 
-                    defaultValue="slot_static_0001" 
+                    value={adSlot}
+                    onChange={(e) => setAdSlot(e.target.value)}
                     placeholder="请输入广告位ID"
                   />
                 </div>
@@ -965,6 +1107,27 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
           </div>
         </div>
       </main>
+
+      {/* Toast 消息 */}
+      {toastMessage && (
+        <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium transition-all ${
+          toastMessage.type === "success"
+            ? "bg-green-500 text-white"
+            : "bg-red-500 text-white"
+        }`}>
+          {toastMessage.text}
+        </div>
+      )}
+
+      {/* 数据加载中 */}
+      {dataLoading && (
+        <div className="fixed inset-0 z-[60] bg-white/80 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            <span className="text-sm text-gray-500">加载模板数据...</span>
+          </div>
+        </div>
+      )}
 
       {/* 选择组件弹窗 */}
       {showComponentPicker && (
