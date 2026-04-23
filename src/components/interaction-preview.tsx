@@ -818,22 +818,44 @@ export function InteractionPreview({
     startChildAutoTriggers(latest.id);
   }, [activeComponents, startChildAutoTriggers]);
 
-  // 重置预览（通过改变签名触发 useEffect 重新启动）
-  const [resetKey, setResetKey] = useState(0);
+  // 重置预览
   const handleReset = useCallback(() => {
     clearAllTimers();
+    // 重置所有追踪状态
     triggeredRef.current = new Set();
     dismissedRef.current = new Set();
     setActiveComponents([]);
     setDismissedComponents(new Set());
     setTriggeredComponents(new Set());
-    setResetKey(k => k + 1);
-  }, [clearAllTimers]);
+    // 延迟一帧后重新启动触发（确保状态已清空）
+    setTimeout(() => {
+      // 直接遍历 enabledLinks 启动根级触发，避免闭包陈旧问题
+      const rootLinks = enabledLinks.filter((l) => l.parentId === "main");
+      rootLinks.forEach((link) => {
+        const rule = TRIGGER_RULES[link.triggerRule];
+        if (rule && rule.autoDelay > 0) {
+          const actualDelay = link.triggerRule === "show_time" && link.triggerTime
+            ? link.triggerTime * 1000
+            : rule.autoDelay;
+          const timer = setTimeout(() => {
+            if (triggeredRef.current.has(link.id)) return;
+            triggeredRef.current.add(link.id);
+            setTriggeredComponents(new Set(triggeredRef.current));
+            setActiveComponents((prev) => {
+              if (prev.find((l) => l.id === link.id)) return prev;
+              return [...prev, link];
+            });
+          }, actualDelay);
+          triggerTimersRef.current.set(link.id, timer);
+        }
+      });
+    }, 50);
+  }, [clearAllTimers, enabledLinks]);
 
   // componentLinks 的稳定签名（仅在内容变化时更新）
   const linksSignature = componentLinks.map(l => `${l.id}:${l.triggerRule}:${l.status}:${l.parentId}`).join('|');
 
-  // 初始启动 & componentLinks 变化 / 重置时重启触发
+  // 初始启动 & componentLinks 变化时重启触发
   useEffect(() => {
     // 先清除旧计时器
     clearAllTimers();
@@ -845,17 +867,36 @@ export function InteractionPreview({
     setTriggeredComponents(new Set());
     // 有启用的组件时才启动触发
     if (enabledLinks.length > 0) {
-      const timer = setTimeout(() => {
-        startAutoTriggers();
+      // 延迟一帧后启动，确保状态已清空
+      const initTimer = setTimeout(() => {
+        const rootLinks = enabledLinks.filter((l) => l.parentId === "main");
+        rootLinks.forEach((link) => {
+          const rule = TRIGGER_RULES[link.triggerRule];
+          if (rule && rule.autoDelay > 0) {
+            const actualDelay = link.triggerRule === "show_time" && link.triggerTime
+              ? link.triggerTime * 1000
+              : rule.autoDelay;
+            const timer = setTimeout(() => {
+              if (triggeredRef.current.has(link.id)) return;
+              triggeredRef.current.add(link.id);
+              setTriggeredComponents(new Set(triggeredRef.current));
+              setActiveComponents((prev) => {
+                if (prev.find((l) => l.id === link.id)) return prev;
+                return [...prev, link];
+              });
+            }, actualDelay);
+            triggerTimersRef.current.set(link.id, timer);
+          }
+        });
       }, 100);
       return () => {
-        clearTimeout(timer);
+        clearTimeout(initTimer);
         clearAllTimers();
       };
     }
     return () => clearAllTimers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [linksSignature, resetKey]);
+  }, [linksSignature]);
 
   // 计算链路描述
   const getChainDescription = () => {
