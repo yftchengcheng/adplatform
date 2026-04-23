@@ -173,14 +173,12 @@ export function CouponTemplate({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
-          {!previewMode && (
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-gray-500 z-10 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-gray-500 z-10 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
           {/* Activity Title */}
           <div className="px-4 pt-3 pb-1">

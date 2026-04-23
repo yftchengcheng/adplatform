@@ -225,15 +225,13 @@ export function GameGiftTemplate({
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button - 仅在非预览模式下显示 */}
-          {!previewMode && (
-            <button
-              onClick={onClose}
-              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-gray-500 z-10 transition-colors"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          )}
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-gray-500 z-10 transition-colors"
+          >
+            <X className="w-3 h-3" />
+          </button>
 
           {/* Content */}
           <div className="p-3 space-y-2">
