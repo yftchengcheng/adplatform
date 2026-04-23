@@ -382,7 +382,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
         {!loading && !error && (
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px]">
+              <table className="w-full min-w-[1100px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="w-8 px-3 py-2.5 text-left">
@@ -399,6 +399,7 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">规格</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">预览</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">关联组件</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">创建人</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">创建时间</th>
                     <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">操作</th>
                   </tr>
@@ -446,49 +447,41 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                         </div>
                       </td>
                       <td className="px-3 py-2.5 text-sm text-blue-600 font-medium">{item.linked_component_count}个</td>
+                      <td className="px-3 py-2.5 text-sm text-gray-500">{item.creator}</td>
                       <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">
                         {new Date(item.create_time).toLocaleDateString("zh-CN")}
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="flex items-center gap-0.5">
+                        <div className="flex items-center gap-1">
                           <button 
-                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors" 
-                            title="预览"
+                            className="px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors font-medium" 
                             onClick={() => handlePreview(item)}
                           >
-                            <Eye className="w-4 h-4 text-gray-500" />
+                            预览
                           </button>
                           <button 
-                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors" 
-                            title="克隆"
+                            className="px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded transition-colors font-medium" 
                             onClick={() => handleClone(item)}
                           >
-                            <Copy className="w-4 h-4 text-green-500" />
+                            克隆
                           </button>
                           <button 
-                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors" 
-                            title="编辑"
+                            className="px-2 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors font-medium" 
                             onClick={() => handleEdit(item)}
                           >
-                            <Edit className="w-4 h-4 text-gray-500" />
+                            编辑
                           </button>
                           <button
-                            className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
-                            title={item.status === "enabled" ? "暂停" : "开启"}
+                            className="px-2 py-1 text-xs text-orange-600 hover:bg-orange-50 rounded transition-colors font-medium"
                             onClick={() => handleToggleStatus(item)}
                           >
-                            {item.status === "enabled" ? (
-                              <Pause className="w-4 h-4 text-gray-500" />
-                            ) : (
-                              <Play className="w-4 h-4 text-gray-500" />
-                            )}
+                            {item.status === "enabled" ? "暂停" : "启用"}
                           </button>
                           <button 
-                            className="p-1.5 hover:bg-red-100 rounded-md transition-colors" 
-                            title="删除"
+                            className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors font-medium" 
                             onClick={() => handleDelete(item.id)}
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                            删除
                           </button>
                         </div>
                       </td>
