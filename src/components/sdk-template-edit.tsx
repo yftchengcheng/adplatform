@@ -198,8 +198,8 @@ const COMPONENT_TYPE_NAMES: Record<string, string> = {
   treasure_rain: "宝箱雨",
   scratch_card: "刮刮卡",
   smash_egg: "砸蛋",
-  popup_redpacket: "弹窗红包",
-  dual_button: "双按钮",
+  popup_redpacket: "弹窗(红包)",
+  dual_button: "选择磁贴(双按钮)",
   vote: "投票磁贴",
   image: "图片磁贴",
   ecommerce: "电商磁贴",
@@ -423,12 +423,14 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
   // 组件关联配置列表（初始为空）
   const [componentLinks, setComponentLinks] = useState<ComponentLinkConfig[]>([]);
   
-  // 将组件列表转换为选择器需要的格式
+  // 将组件列表转换为选择器需要的格式（数据源：组件管理的组件列表）
   const availableComponents = components.map(comp => ({
     id: comp.id,
     name: comp.name,
     type: comp.type,
+    typeName: COMPONENT_TYPE_NAMES[comp.type] || comp.type,
     preview: getComponentPreview(comp.type, comp.config),
+    config: comp.config,
   }));
 
   // 选择组件弹窗
@@ -490,7 +492,9 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     id: string;
     name: string;
     type: string;
+    typeName: string;
     preview: string;
+    config?: Record<string, unknown>;
   }
   const handleSelectComponent = (component: SelectableComponent) => {
     setSelectedComponent(component);
@@ -542,7 +546,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
         componentType: getComponentTypeName(selectedComponent.type),
         componentTypeKey: selectedComponent.type,
         componentPreview: selectedComponent.preview,
-        componentConfig: components.find(c => c.id === selectedComponent.id)?.config,
+        componentConfig: selectedComponent.config,
         triggerRule: autoRule,
         triggerTime: autoRule === "show_time" ? 5 : undefined,
         parentId: parent.id,
@@ -823,8 +827,10 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               setSelectedComponent({
                                 id: link.componentId,
                                 name: link.componentName,
-                                type: link.componentType,
-                                preview: link.componentPreview
+                                type: link.componentTypeKey,
+                                typeName: link.componentType,
+                                preview: link.componentPreview,
+                                config: link.componentConfig,
                               });
                               setEditingLinkId(link.id);
                               setShowParentPicker(true);
@@ -1018,7 +1024,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">{comp.type}</span>
+                          <span className="text-xs text-gray-500">{comp.typeName}</span>
                         </div>
                       </div>
                     );
@@ -1063,7 +1069,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                   <span className="text-sm font-medium text-gray-900 block">
                     {selectedComponent.name}
                   </span>
-                  <span className="text-xs text-gray-500">{selectedComponent.type}</span>
+                  <span className="text-xs text-gray-500">{selectedComponent.typeName}</span>
                 </div>
               </div>
               
