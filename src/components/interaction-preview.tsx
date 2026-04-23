@@ -855,23 +855,25 @@ export function InteractionPreview({
               />
 
               {/* 上层：组件真实预览弹出（逐层覆盖） */}
-              {activeComponents.map((link, idx) => (
-                <div
-                  key={link.id}
-                  className="absolute inset-0 z-40"
-                  style={{ zIndex: 40 + idx }}
-                >
-                  <RealComponentPreview
-                    componentTypeKey={link.componentTypeKey}
-                    componentConfig={link.componentConfig}
-                    onDismiss={() => {
-                      dismissComponent(link.id);
-                      // 同时检查该组件的子组件中是否有 click_close 类型需要触发
-                      handleCloseClick(link.id);
-                    }}
-                  />
-                </div>
-              ))}
+              {activeComponents.map((link, idx) => {
+                const isStaticType = ["dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift"].includes(link.componentTypeKey);
+                return (
+                  <div
+                    key={link.id}
+                    className={`absolute inset-0 z-40 ${isStaticType ? "flex items-center justify-center" : ""}`}
+                    style={{ zIndex: 40 + idx }}
+                  >
+                    <RealComponentPreview
+                      componentTypeKey={link.componentTypeKey}
+                      componentConfig={link.componentConfig}
+                      onDismiss={() => {
+                        dismissComponent(link.id);
+                        handleCloseClick(link.id);
+                      }}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
 
