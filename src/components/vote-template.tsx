@@ -231,7 +231,7 @@ export function VoteTemplate({
         className={cn(
           previewMode
             ? "absolute inset-0"
-            : "fixed inset-0 z-50 bg-black/50",
+            : "fixed inset-0 z-50 bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
