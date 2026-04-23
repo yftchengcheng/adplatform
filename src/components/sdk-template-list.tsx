@@ -24,6 +24,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { RealAdPreview } from "./real-ad-preview";
 import { InteractionPreview, ComponentLinkConfig } from "./interaction-preview";
 import { useComponents } from "@/contexts/component-context";
@@ -423,11 +428,29 @@ export function SDKTemplateList({ type }: SDKTemplateListProps) {
                           className="w-3.5 h-3.5 rounded border-gray-300"
                         />
                       </td>
-                      <td className="px-3 py-2.5 text-xs text-gray-500 font-mono max-w-[180px] truncate cursor-help" title={item.id}>{item.id}</td>
+                      <td className="px-3 py-2.5">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xs text-gray-500 font-mono max-w-[180px] truncate block cursor-pointer">{item.id}</span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[300px] break-all">
+                            <p className="font-mono">{item.id}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </td>
                       <td className="px-3 py-2.5">
                         <div className="text-sm font-medium text-gray-900 max-w-[160px] truncate" title={item.name}>{item.name}</div>
                       </td>
-                      <td className="px-3 py-2.5 text-sm text-gray-600 font-mono max-w-[160px] truncate cursor-help" title={item.ad_slot || ""}>{item.ad_slot || "-"}</td>
+                      <td className="px-3 py-2.5">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-sm text-gray-600 font-mono max-w-[160px] truncate block cursor-pointer">{item.ad_slot || "-"}</span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[300px]">
+                            <p className="font-mono">{item.ad_slot || "无"}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </td>
                       <td className="px-3 py-2.5">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
