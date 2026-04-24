@@ -1161,25 +1161,24 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {availableComponents.map((comp) => (
-                    <div 
-                      key={comp.id}
-                      className="group relative w-20 h-16 rounded border border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow transition-all"
-                      onClick={() => {
-                        handleSelectComponent(comp);
-                      }}
-                      title={`${comp.name}（${getComponentTypeName(comp.type)}）`}
-                    >
-                      <img 
-                        src={comp.preview}
-                        alt={comp.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <p className="text-[8px] text-white truncate">{comp.name}</p>
+                  {availableComponents.map((comp) => {
+                    const iconInfo = getComponentTypeIcon(comp.type);
+                    return (
+                      <div 
+                        key={comp.id}
+                        className="group flex flex-col items-center justify-center w-20 h-16 rounded-lg border border-gray-200 bg-white cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
+                        onClick={() => {
+                          handleSelectComponent(comp);
+                        }}
+                        title={comp.name + '（' + getComponentTypeName(comp.type) + '）'}
+                      >
+                        <div className={"w-8 h-8 rounded-lg flex items-center justify-center " + iconInfo.bg + " " + iconInfo.color}>
+                          {iconInfo.icon}
+                        </div>
+                        <p className="text-[10px] text-gray-600 mt-1 truncate max-w-full px-1">{comp.name}</p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
               <p className="text-xs text-gray-400 mt-2">点击组件卡片可快速添加到关联列表</p>
