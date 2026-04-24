@@ -1,0 +1,51 @@
+{
+  "component": "宝箱雨",
+  "type": "treasure_rain",
+  "colors": {
+    "rain_scene": {
+      "name": "飘落场景背景",
+      "gradient": {
+        "direction": "vertical (top to bottom)",
+        "start": "#1a0a2e",
+        "end": "#2d1b4e",
+        "description": "深紫色渐变"
+      }
+    },
+    "guide_text_bg": {
+      "name": "引导文案背景",
+      "gradient": {
+        "direction": "horizontal",
+        "colors": ["rgba(0,0,0,0.4)", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.4)"],
+        "description": "半透明黑色毛玻璃效果"
+      },
+      "border": "rgba(255,255,255,0.2)"
+    },
+    "reward_scene": {
+      "name": "领奖场景背景",
+      "gradient": {
+        "direction": "vertical (top to bottom)",
+        "start": "#FFF5E6",
+        "end": "#FFE4CC",
+        "description": "浅米色渐变"
+      }
+    },
+    "reward_display": {
+      "name": "奖励展示背景",
+      "gradient": {
+        "direction": "diagonal (top-left to bottom-right)",
+        "start": "#FFD700",
+        "end": "#FFA500",
+        "description": "金色到橙色渐变"
+      }
+    },
+    "claim_button": {
+      "name": "领取按钮背景",
+      "gradient": {
+        "direction": "horizontal",
+        "start": "#FF6B6B",
+        "end": "#FF4757",
+        "description": "珊瑚红到红色渐变"
+      }
+    }
+  }
+}
