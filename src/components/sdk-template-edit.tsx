@@ -591,6 +591,7 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
     name: string;
     type: "main" | "component";
     preview?: string;
+    componentTypeKey?: string;
   }
 
   // 获取上一级选项列表
@@ -606,7 +607,8 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
           id: link.id,
           name: link.componentName,
           type: "component",
-          preview: link.componentPreview
+          preview: link.componentPreview,
+          componentTypeKey: link.componentTypeKey,
         });
       });
     return options;
@@ -1245,12 +1247,8 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                         onClick={() => handleSelectComponent(comp)}
                         className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
                       >
-                        <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                          <img 
-                            src={comp.preview}
-                            alt={comp.name}
-                            className="w-full h-full object-cover"
-                          />
+                        <div className={`w-10 h-10 rounded-lg ${getComponentTypeIcon(comp.type).bg} flex items-center justify-center flex-shrink-0 ${getComponentTypeIcon(comp.type).color}`}>
+                          {getComponentTypeIcon(comp.type).icon}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -1297,12 +1295,8 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
             <div className="p-4 overflow-y-auto max-h-[60vh]">
               {/* 已选组件预览 */}
               <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 mb-4">
-                <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                  <img 
-                    src={selectedComponent.preview}
-                    alt={selectedComponent.name}
-                    className="w-full h-full object-cover"
-                  />
+                <div className={`w-10 h-10 rounded-lg ${getComponentTypeIcon(selectedComponent.type).bg} flex items-center justify-center flex-shrink-0 ${getComponentTypeIcon(selectedComponent.type).color}`}>
+                  {getComponentTypeIcon(selectedComponent.type).icon}
                 </div>
                 <div>
                   <span className="text-sm font-medium text-gray-900 block">
@@ -1320,23 +1314,15 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                     onClick={() => handleSelectParent(parent)}
                     className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all"
                   >
-                    <div className={`w-12 h-10 rounded flex items-center justify-center flex-shrink-0 ${
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       parent.type === "main" 
-                        ? "bg-gradient-to-br from-blue-100 to-blue-200" 
-                        : "bg-gradient-to-br from-purple-100 to-purple-200"
+                        ? "bg-blue-50 text-blue-600" 
+                        : (() => { const ic = getComponentTypeIcon(parent.componentTypeKey || ""); return `${ic.bg} ${ic.color}`; })()
                     }`}>
                       {parent.type === "main" ? (
-                        <span className="text-xs font-medium text-blue-700">主素材</span>
+                        <Play className="w-5 h-5" />
                       ) : (
-                        parent.preview ? (
-                          <img 
-                            src={parent.preview}
-                            alt={parent.name}
-                            className="w-full h-full object-cover rounded"
-                          />
-                        ) : (
-                          <span className="text-xs font-medium text-purple-700">组件</span>
-                        )
+                        getComponentTypeIcon(parent.componentTypeKey || "").icon
                       )}
                     </div>
                     <div className="flex-1">
