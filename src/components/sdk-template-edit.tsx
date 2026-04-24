@@ -16,13 +16,48 @@ import {
   Clock,
   Trash2,
   ImageIcon,
-  Loader2
+  Loader2,
+  LayoutGrid,
+  CheckSquare,
+  ShoppingBag,
+  Ticket,
+  Layers,
+  Gift,
+  DollarSign,
+  Box,
+  CloudRain,
+  PenTool,
+  Bell,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useComponents } from "@/contexts/component-context";
 import { RealAdPreview } from "./real-ad-preview";
 import { InteractionPreview } from "./interaction-preview";
+
+// 组件类型图标映射（与创建组件页面一致）
+const COMPONENT_TYPE_ICON_MAP: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
+  dual_button:    { icon: <LayoutGrid className="w-5 h-5" />,  color: "text-blue-600",   bg: "bg-blue-50" },
+  vote:           { icon: <CheckSquare className="w-5 h-5" />, color: "text-violet-600",  bg: "bg-violet-50" },
+  image:          { icon: <ImageIcon className="w-5 h-5" />,   color: "text-emerald-600", bg: "bg-emerald-50" },
+  ecommerce:      { icon: <ShoppingBag className="w-5 h-5" />, color: "text-orange-600",  bg: "bg-orange-50" },
+  coupon:         { icon: <Ticket className="w-5 h-5" />,      color: "text-red-600",     bg: "bg-red-50" },
+  promotion_card: { icon: <Layers className="w-5 h-5" />,      color: "text-cyan-600",    bg: "bg-cyan-50" },
+  game_gift:      { icon: <Gift className="w-5 h-5" />,        color: "text-pink-600",    bg: "bg-pink-50" },
+  redpacket_rain: { icon: <DollarSign className="w-5 h-5" />,  color: "text-red-600",     bg: "bg-red-50" },
+  flip_card:      { icon: <Sparkles className="w-5 h-5" />,    color: "text-indigo-600",  bg: "bg-indigo-50" },
+  flip_redpacket: { icon: <Gift className="w-5 h-5" />,        color: "text-rose-600",    bg: "bg-rose-50" },
+  flip_treasure:  { icon: <Box className="w-5 h-5" />,         color: "text-amber-600",   bg: "bg-amber-50" },
+  treasure_rain:  { icon: <CloudRain className="w-5 h-5" />,   color: "text-teal-600",    bg: "bg-teal-50" },
+  scratch_card:   { icon: <PenTool className="w-5 h-5" />,     color: "text-purple-600",  bg: "bg-purple-50" },
+  smash_egg:      { icon: <Sparkles className="w-5 h-5" />,    color: "text-yellow-600",  bg: "bg-yellow-50" },
+  popup_redpacket:{ icon: <Bell className="w-5 h-5" />,        color: "text-rose-600",    bg: "bg-rose-50" },
+};
+
+function getComponentTypeIcon(typeKey: string): { icon: React.ReactNode; color: string; bg: string } {
+  return COMPONENT_TYPE_ICON_MAP[typeKey] || { icon: <Layers className="w-5 h-5" />, color: "text-gray-600", bg: "bg-gray-50" };
+}
 
 // 获取触发规则图标（组件外定义，供 InteractionFlowChart 和 SDKTemplateEdit 共用）
 function getTriggerRuleIcon(rule: TriggerRule): React.ReactNode {
@@ -36,6 +71,7 @@ interface FlowNode {
   type: "template" | "component";
   subtitle?: string;
   preview?: string;
+  componentTypeKey?: string;
   status?: "enabled" | "disabled";
   triggerRule?: TriggerRule;
   triggerTime?: number;
@@ -74,6 +110,7 @@ function buildFlowTree(
       type: "component",
       subtitle: `${triggerLabel}${link.triggerRule === "show_time" ? ` ${link.triggerTime}s` : ""}`,
       preview: link.componentPreview,
+      componentTypeKey: link.componentTypeKey,
       status: link.status,
       triggerRule: link.triggerRule,
       triggerTime: link.triggerTime,
@@ -293,17 +330,41 @@ function InteractionFlowChart({
             }
           `}
         >
-          {/* 顶部：预览图+名称 */}
+          {/* 顶部：图标+名称 */}
           <div className="flex items-center gap-2.5">
-            {node.preview && !isTemplate ? (
-              <div className="w-9 h-9 rounded bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-100">
-                <img src={node.preview} alt={node.name} className="w-full h-full object-cover" />
-              </div>
-            ) : isTemplate ? (
+            {isTemplate ? (
               <div className="w-9 h-9 rounded bg-white/20 flex items-center justify-center flex-shrink-0">
                 <Play className="w-4 h-4 text-white" />
               </div>
-            ) : null}
+            ) : (() => {
+              const iconInfo = getComponentTypeIcon(node.componentTypeKey || "");
+              const IconComponent = (() => {
+                const key = node.componentTypeKey || "";
+                const map: Record<string, typeof LayoutGrid> = {
+                  dual_button: LayoutGrid,
+                  vote: CheckSquare,
+                  image: ImageIcon,
+                  ecommerce: ShoppingBag,
+                  coupon: Ticket,
+                  promotion_card: Layers,
+                  game_gift: Gift,
+                  redpacket_rain: DollarSign,
+                  flip_card: Sparkles,
+                  flip_redpacket: Gift,
+                  flip_treasure: Box,
+                  treasure_rain: CloudRain,
+                  scratch_card: PenTool,
+                  smash_egg: Sparkles,
+                  popup_redpacket: Bell,
+                };
+                return map[key] || Layers;
+              })();
+              return (
+                <div className={`w-9 h-9 rounded-lg ${iconInfo.bg} flex items-center justify-center flex-shrink-0 ${iconInfo.color}`}>
+                  <IconComponent className="w-4 h-4" />
+                </div>
+              );
+            })()}
             <div className="min-w-0 flex-1">
               <div
                 className={`text-sm font-semibold truncate ${
@@ -960,13 +1021,14 @@ export function SDKTemplateEdit({ type, templateId }: SDKTemplateEditProps) {
                     >
                       {/* 组件信息 */}
                       <div className="flex items-start gap-3">
-                        <div className="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
-                          <img 
-                            src={link.componentPreview} 
-                            alt={link.componentName}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                        {(() => {
+                          const iconInfo = getComponentTypeIcon(link.componentTypeKey);
+                          return (
+                            <div className={`w-10 h-10 rounded-lg ${iconInfo.bg} flex items-center justify-center flex-shrink-0 ${iconInfo.color}`}>
+                              {iconInfo.icon}
+                            </div>
+                          );
+                        })()}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-gray-900 truncate">
