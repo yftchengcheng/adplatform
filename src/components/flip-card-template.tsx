@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { FlipCardConfig } from "./flip-card-template-config";
+import { openLandingPage } from "./landing-page-config";
 
 interface FlipCardTemplateProps {
   config?: Partial<FlipCardConfig>;
@@ -171,7 +172,7 @@ export function FlipCardTemplate({
   const handleClaim = useCallback(() => {
     const landingPage = resolveLandingPage();
     if (landingPage) {
-      window.open(landingPage, "_blank");
+      openLandingPage(finalConfig, landingPage);
     } else if (!previewMode) {
       onClose?.();
     }

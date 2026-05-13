@@ -24,6 +24,7 @@ import {
   AdTemplate,
 } from "@/components/ad-template";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Tab switch component
 function ModeToggle({
@@ -326,12 +327,15 @@ function ButtonConfigSection({
   const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">(
     safeConfig.landingPageMacro ? "macro" : "input"
   );
+  const [deeplinkMode, setDeeplinkMode] = useState<"input" | "macro">(
+    safeConfig.deeplinkMacro ? "macro" : "input"
+  );
 
   const handleTextChange = (text: string) => {
     onChange({ ...safeConfig, text });
   };
 
-  const handleActionChange = (action: "jump" | "show_image") => {
+  const handleActionChange = (action: "jump" | "show_image" | "deeplink") => {
     onChange({ ...safeConfig, action });
   };
 
@@ -386,8 +390,8 @@ function ButtonConfigSection({
               点击按钮{index}后显示
             </label>
             <Select
-              value={safeConfig.action}
-              onValueChange={(v) => handleActionChange(v as "jump" | "show_image")}
+              value={safeConfig.action === "deeplink" ? "deeplink" : safeConfig.action}
+              onValueChange={(v) => onChange({ ...safeConfig, action: v as "jump" | "show_image" | "deeplink" })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -397,6 +401,12 @@ function ButtonConfigSection({
                   <div className="flex items-center gap-2">
                     <Link2 className="w-4 h-4" />
                     <span>跳转落地页</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="deeplink">
+                  <div className="flex items-center gap-2">
+                    <Link2 className="w-4 h-4" />
+                    <span>Deeplink跳转</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="show_image">
@@ -409,7 +419,7 @@ function ButtonConfigSection({
             </Select>
           </div>
 
-          {/* Action Config */}
+          {/* Action Config - Jump URL */}
           {safeConfig.action === "jump" && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -440,6 +450,32 @@ function ButtonConfigSection({
                 <p className="text-xs text-gray-400">
                   当前将使用广告素材链接: {defaultLandingPageUrl}
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* Action Config - Deeplink */}
+          {safeConfig.action === "deeplink" && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-gray-500">Deeplink地址</label>
+                <ModeToggle
+                  value={deeplinkMode}
+                  onChange={setDeeplinkMode}
+                />
+              </div>
+              {deeplinkMode === "input" ? (
+                <Input
+                  value={safeConfig.deeplinkUrl || ""}
+                  onChange={(e) => onChange({ ...safeConfig, deeplinkUrl: e.target.value, deeplinkMacro: undefined })}
+                  placeholder="请输入Deeplink地址，如 myapp://page/detail"
+                />
+              ) : (
+                <Input
+                  value={safeConfig.deeplinkMacro || ""}
+                  onChange={(e) => onChange({ ...safeConfig, deeplinkMacro: e.target.value, deeplinkUrl: undefined })}
+                  placeholder="请输入Deeplink宏变量，如 ${deeplink_url}"
+                />
               )}
             </div>
           )}

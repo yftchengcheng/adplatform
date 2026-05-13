@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 export interface GameGiftTemplateConfig {
   // 组件名称
@@ -35,6 +36,9 @@ export interface GameGiftTemplateConfig {
   // 默认落地页
   defaultLandingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   // 宏替换变量
   macroVariables?: Record<string, string>;
 }
@@ -181,7 +185,7 @@ export function GameGiftTemplate({
     e.stopPropagation();
     const url = resolveDownloadUrl();
     if (url) {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
     onButtonClick?.(finalConfig);
   };

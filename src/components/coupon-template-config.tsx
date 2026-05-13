@@ -19,6 +19,7 @@ import {
   CouponTemplate,
 } from "@/components/coupon-template";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Tab switch component
 function ModeToggle({
@@ -153,11 +154,6 @@ export function CouponTemplateConfigPanel({
   const [dateOpen, setDateOpen] = useState(true);
   const [landingOpen, setLandingOpen] = useState(true);
 
-  // 落地页模式
-  const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">(
-    config.landingPageMacro ? "macro" : "input"
-  );
-
   // 按钮文案模式
   const [buttonTextMode, setButtonTextMode] = useState<"input" | "macro">(
     config.buttonTextMacro ? "macro" : "input"
@@ -168,15 +164,6 @@ export function CouponTemplateConfigPanel({
     const newConfig = { ...config, ...updates, macroVariables };
     setConfig(newConfig);
     onChange?.(newConfig);
-  };
-
-  // 处理落地页输入
-  const handleLandingPageInput = (value: string) => {
-    if (landingPageMode === "macro") {
-      updateConfig({ landingPageMacro: value, landingPageUrl: "" });
-    } else {
-      updateConfig({ landingPageUrl: value, landingPageMacro: "" });
-    }
   };
 
   // 处理按钮文案输入
@@ -196,13 +183,6 @@ export function CouponTemplateConfigPanel({
   // 保存
   const handleSave = () => {
     onSave?.(config);
-  };
-
-  // 获取落地页输入值
-  const getLandingPageValue = (): string => {
-    return landingPageMode === "macro"
-      ? (config.landingPageMacro || "")
-      : (config.landingPageUrl || "");
   };
 
   // 获取按钮文案输入值
@@ -361,41 +341,19 @@ export function CouponTemplateConfigPanel({
           />
         </div>
         {landingOpen && (
-          <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">
-                点击后动作
-              </label>
-              <ModeToggle
-                value={landingPageMode}
-                onChange={setLandingPageMode}
-              />
-            </div>
-
-            {landingPageMode === "macro" ? (
-              <div className="space-y-2">
-                <Input
-                  placeholder="如 ${landing_page_url}"
-                  value={getLandingPageValue()}
-                  onChange={(e) => handleLandingPageInput(e.target.value)}
-                />
-                <p className="text-xs text-gray-400 flex items-center gap-1">
-                  <Link2 className="w-3 h-3" />
-                  宏变量将自动替换为实际值
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Input
-                  placeholder="请输入落地页链接"
-                  value={getLandingPageValue()}
-                  onChange={(e) => handleLandingPageInput(e.target.value)}
-                />
-                <p className="text-xs text-gray-400">
-                  不配置默认使用广告（素材）链接
-                </p>
-              </div>
-            )}
+          <div className="p-4">
+            <LandingPageConfigSection
+              config={{
+                landingPageType: config.landingPageType || "url",
+                landingPageUrl: config.landingPageUrl || "",
+                landingPageMacro: config.landingPageMacro || "",
+                deeplinkUrl: config.deeplinkUrl || "",
+                deeplinkMacro: config.deeplinkMacro || "",
+                defaultLandingPageUrl: config.defaultLandingPageUrl,
+                macroVariables: config.macroVariables,
+              }}
+              onChange={(updates) => updateConfig(updates)}
+            />
           </div>
         )}
       </div>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 // 配置数据类型
 export interface RedpacketRainConfig {
@@ -29,6 +30,9 @@ export interface RedpacketRainConfig {
   // 落地页
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   // 默认落地页
   defaultLandingPageUrl?: string;
   // 宏变量
@@ -334,7 +338,7 @@ export function RedpacketRainTemplate({
   const handleClaim = useCallback(() => {
     const landingPage = resolveLandingPage();
     if (landingPage) {
-      window.open(landingPage, "_blank");
+      openLandingPage(finalConfig, landingPage);
     } else if (!previewMode) {
       // 非预览模式下且没有落地页时才关闭
       onClose();

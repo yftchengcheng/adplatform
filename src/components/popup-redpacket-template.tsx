@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 // 配置数据类型
 export interface PopupRedpacketConfig {
@@ -23,6 +24,9 @@ export interface PopupRedpacketConfig {
   // 落地页
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string;
+  deeplinkMacro?: string;
   // 默认落地页
   defaultLandingPageUrl?: string;
   // 宏变量
@@ -120,7 +124,7 @@ export function PopupRedpacketTemplate({
   // 点击领取按钮
   const handleClaim = useCallback(() => {
     if (resolvedConfig.landingPageUrl) {
-      window.open(resolvedConfig.landingPageUrl, "_blank");
+      openLandingPage(finalConfig, resolvedConfig.landingPageUrl);
     }
     if (onButtonClick) {
       onButtonClick(finalConfig);

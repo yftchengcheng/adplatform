@@ -15,6 +15,7 @@ import {
   GameGiftTemplate,
 } from "@/components/game-gift-template";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Tab switch component
 function ModeToggle({
@@ -684,40 +685,30 @@ export function GameGiftTemplateConfigPanel({
         </div>
         {downloadOpen && (
           <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">
-                点击后动作
-              </label>
-              <ModeToggle
-                value={downloadMode}
-                onChange={setDownloadMode}
-              />
-            </div>
-
-            {downloadMode === "macro" ? (
-              <div className="space-y-2">
-                <Input
-                  placeholder="如 ${download_url}"
-                  value={getDownloadValue()}
-                  onChange={(e) => handleDownloadInput(e.target.value)}
-                />
-                <p className="text-xs text-gray-400 flex items-center gap-1">
-                  <Link2 className="w-3 h-3" />
-                  宏变量将自动替换为实际值
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Input
-                  placeholder="请输入下载链接"
-                  value={getDownloadValue()}
-                  onChange={(e) => handleDownloadInput(e.target.value)}
-                />
-                <p className="text-xs text-gray-400">
-                  不配置默认使用广告（素材）链接
-                </p>
-              </div>
-            )}
+            <LandingPageConfigSection
+              config={{
+                landingPageType: config.landingPageType || "url",
+                landingPageUrl: config.downloadUrl || "",
+                landingPageMacro: config.downloadMacro || "",
+                deeplinkUrl: config.deeplinkUrl || "",
+                deeplinkMacro: config.deeplinkMacro || "",
+                defaultLandingPageUrl: config.defaultLandingPageUrl,
+                macroVariables: config.macroVariables,
+              }}
+              onChange={(updates) => {
+                // Map landingPageUrl/downloadMacro back to downloadUrl/downloadMacro
+                const mapped: Partial<GameGiftTemplateConfig> = {};
+                if (updates.landingPageType !== undefined) mapped.landingPageType = updates.landingPageType;
+                if (updates.landingPageUrl !== undefined) mapped.downloadUrl = updates.landingPageUrl;
+                if (updates.landingPageMacro !== undefined) mapped.downloadMacro = updates.landingPageMacro;
+                if (updates.deeplinkUrl !== undefined) mapped.deeplinkUrl = updates.deeplinkUrl;
+                if (updates.deeplinkMacro !== undefined) mapped.deeplinkMacro = updates.deeplinkMacro;
+                if (updates.defaultLandingPageUrl !== undefined) mapped.defaultLandingPageUrl = updates.defaultLandingPageUrl;
+                updateConfig(mapped);
+              }}
+              urlLabel="下载链接"
+              deeplinkLabel="下载Deeplink"
+            />
           </div>
         )}
       </div>

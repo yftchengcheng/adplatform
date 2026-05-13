@@ -5,6 +5,7 @@ import { X, Upload, ImageIcon, Link2, Plus, Trash2, ChevronDown, AlertCircle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,9 @@ export interface PopupRedpacketConfig {
   // 落地页
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   // 默认落地页
   defaultLandingPageUrl?: string;
   // 宏变量
@@ -561,39 +565,19 @@ export function PopupRedpacketConfigPanel({
         </SectionCollapse>
 
         {/* 落地页配置 */}
-        <SectionCollapse
-          title="落地页配置"
-          isOpen={activeSection.includes("落地页配置")}
-          onToggle={() => toggleSection("落地页配置")}
-        >
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm text-gray-700">落地页链接</label>
-              <ModeToggle
-                value={landingPageMode}
-                onChange={setLandingPageMode}
-              />
-            </div>
-            {landingPageMode === "input" ? (
-              <Input
-                placeholder="输入落地页链接"
-                value={config.landingPageUrl || ""}
-                onChange={(e) => updateConfig({ landingPageUrl: e.target.value })}
-                className="text-sm"
-              />
-            ) : (
-              <Input
-                placeholder="输入落地页宏变量，如 ${landing_url}"
-                value={config.landingPageMacro || ""}
-                onChange={(e) => updateConfig({ landingPageMacro: e.target.value })}
-                className="text-sm"
-              />
-            )}
-            <p className="text-xs text-gray-400">
-              不配置默认使用广告（素材）链接
-            </p>
-          </div>
-        </SectionCollapse>
+        <LandingPageConfigSection
+          config={{
+            landingPageType: config.landingPageType || "url",
+            landingPageUrl: config.landingPageUrl || "",
+            landingPageMacro: config.landingPageMacro || "",
+            deeplinkUrl: config.deeplinkUrl || "",
+            deeplinkMacro: config.deeplinkMacro || "",
+            defaultLandingPageUrl: config.defaultLandingPageUrl,
+            macroVariables: config.macroVariables,
+          }}
+          onChange={(updates) => updateConfig(updates)}
+          hint="不配置默认使用广告（素材）链接"
+        />
 
         {/* 组件名称 */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-2">

@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { TreasureBoxConfig } from "./treasurebox-template-config";
+import { openLandingPage } from "./landing-page-config";
 
 interface TreasureBoxTemplateProps {
   config?: Partial<TreasureBoxConfig>;
@@ -172,7 +173,7 @@ export function TreasureBoxTemplate({
   const handleClaim = useCallback(() => {
     const landingPage = resolveLandingPage();
     if (landingPage) {
-      window.open(landingPage, "_blank");
+      openLandingPage(finalConfig, landingPage);
     } else if (!previewMode) {
       onClose?.();
     }

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Plus, Trash2, ImageIcon, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // 获取字符串显示宽度（中文2字符，英文1字符）
 function getStringWidth(str: string): number {
@@ -36,6 +37,9 @@ export interface SmashEggConfig {
   // 落地页配置
   landingPageUrl: string;         // 落地页链接
   landingPageMacro: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   defaultLandingPageUrl: string;   // 默认落地页（复用广告链接）
   // 宏变量
   macroVariables: Record<string, string>;
@@ -55,6 +59,9 @@ export const defaultSmashEggConfig: SmashEggConfig = {
   specialNoteMacro: "",
   landingPageUrl: "",
   landingPageMacro: "",
+    landingPageType: "url",
+    deeplinkUrl: "",
+    deeplinkMacro: "",
   defaultLandingPageUrl: "",
   macroVariables: {},
 };
@@ -456,45 +463,19 @@ export function SmashEggTemplateConfigPanel({
       </div>
 
       {/* 落地页配置 */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <SectionHeader
-            title="落地页配置"
-            isOpen={landingOpen}
-            onToggle={() => setLandingOpen(!landingOpen)}
-          />
-        </div>
-        {landingOpen && (
-          <div className="p-4 space-y-4">
-            {/* 落地页链接 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">落地页链接</label>
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <ModeToggle
-                  value={landingMode}
-                  onChange={setLandingMode}
-                />
-              </div>
-              {landingMode === "input" ? (
-                <Input
-                  placeholder="请输入落地页链接"
-                  value={config.landingPageUrl || ""}
-                  onChange={(e) => updateConfig({ landingPageUrl: e.target.value, landingPageMacro: "" })}
-                />
-              ) : (
-                <Input
-                  placeholder="如 ${landing_page}"
-                  value={config.landingPageMacro || ""}
-                  onChange={(e) => updateConfig({ landingPageMacro: e.target.value })}
-                />
-              )}
-              <p className="text-xs text-gray-400">不配置默认使用广告（素材）链接</p>
-            </div>
-          </div>
-        )}
-      </div>
+      <LandingPageConfigSection
+        config={{
+          landingPageType: config.landingPageType || "url",
+          landingPageUrl: config.landingPageUrl || "",
+          landingPageMacro: config.landingPageMacro || "",
+          deeplinkUrl: config.deeplinkUrl || "",
+          deeplinkMacro: config.deeplinkMacro || "",
+          defaultLandingPageUrl: config.defaultLandingPageUrl,
+          macroVariables: config.macroVariables,
+        }}
+        onChange={(updates) => updateConfig(updates)}
+        hint="不配置默认使用广告（素材）链接"
+      />
 
       {/* 组件名称 */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">

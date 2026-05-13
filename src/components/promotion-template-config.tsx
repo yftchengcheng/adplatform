@@ -15,6 +15,7 @@ import {
   PromotionTemplate,
 } from "@/components/promotion-template";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Tab switch component
 function ModeToggle({
@@ -581,53 +582,19 @@ export function PromotionTemplateConfigPanel({
       </div>
 
       {/* Landing Page Section */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <SectionHeader
-            title="落地页配置"
-            isOpen={landingOpen}
-            onToggle={() => setLandingOpen(!landingOpen)}
-          />
-        </div>
-        {landingOpen && (
-          <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">
-                点击后动作
-              </label>
-              <ModeToggle
-                value={landingPageMode}
-                onChange={setLandingPageMode}
-              />
-            </div>
-
-            {landingPageMode === "macro" ? (
-              <div className="space-y-2">
-                <Input
-                  placeholder="如 ${landing_page_url}"
-                  value={getLandingPageValue()}
-                  onChange={(e) => handleLandingPageInput(e.target.value)}
-                />
-                <p className="text-xs text-gray-400 flex items-center gap-1">
-                  <Link2 className="w-3 h-3" />
-                  宏变量将自动替换为实际值
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Input
-                  placeholder="请输入落地页链接"
-                  value={getLandingPageValue()}
-                  onChange={(e) => handleLandingPageInput(e.target.value)}
-                />
-                <p className="text-xs text-gray-400">
-                  不配置默认使用广告（素材）链接
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <LandingPageConfigSection
+        config={{
+          landingPageType: config.landingPageType || "url",
+          landingPageUrl: config.landingPageUrl || "",
+          landingPageMacro: config.landingPageMacro || "",
+          deeplinkUrl: config.deeplinkUrl || "",
+          deeplinkMacro: config.deeplinkMacro || "",
+          defaultLandingPageUrl: config.defaultLandingPageUrl,
+          macroVariables: config.macroVariables,
+        }}
+        onChange={(updates) => updateConfig(updates)}
+        hint="不配置默认使用广告（素材）链接"
+      />
 
       {/* Preview & Save Buttons */}
       <div className="flex items-center justify-end gap-3 pt-2">

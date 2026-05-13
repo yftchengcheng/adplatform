@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScratchCardConfig } from "./scratch-card-config";
+import { openLandingPage } from "./landing-page-config";
 
 interface ScratchCardTemplateProps {
   config?: Partial<ScratchCardConfig>;
@@ -147,7 +148,7 @@ export function ScratchCardTemplate({
   const handleClaim = useCallback(() => {
     const url = getLandingPageUrl();
     if (url && url !== "#") {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
   }, [getLandingPageUrl]);
 

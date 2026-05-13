@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Plus, Trash2, ImageIcon, Link2 } from "lucide-react";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Tab switch component
 function ModeToggle({
@@ -121,6 +122,9 @@ export interface RedpacketRainConfig {
   // 落地页
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink";
+  deeplinkUrl?: string;
+  deeplinkMacro?: string;
   // 默认落地页
   defaultLandingPageUrl?: string;
   // 宏变量
@@ -149,6 +153,9 @@ export const defaultRedpacketRainConfig: RedpacketRainConfig = {
   redpacketImageMacro: "",
   landingPageUrl: "",
   landingPageMacro: "",
+  landingPageType: "url",
+  deeplinkUrl: "",
+  deeplinkMacro: "",
   defaultLandingPageUrl: "",
   macroVariables: {
     guide_text: "点击红包，领取奖品",
@@ -195,10 +202,7 @@ export function RedpacketRainTemplateConfigPanel({
   const [cashMode, setCashMode] = useState<"input" | "macro">(
     config.cashAmountMacro ? "macro" : "input"
   );
-  const [landingMode, setLandingMode] = useState<"input" | "macro">(
-    config.landingPageMacro ? "macro" : "input"
-  );
-  const [redpacketMode, setRedpacketMode] = useState<"upload" | "macro">(
+const [redpacketMode, setRedpacketMode] = useState<"upload" | "macro">(
     config.redpacketImageMacro ? "macro" : "upload"
   );
   const [rewardImageMode, setRewardImageMode] = useState<"upload" | "macro">(
@@ -214,24 +218,6 @@ export function RedpacketRainTemplateConfigPanel({
   const updateConfig = useCallback((updates: Partial<RedpacketRainConfig>) => {
     onChange({ ...config, ...updates });
   }, [config, onChange]);
-
-  // 获取落地页值
-  const getLandingValue = () => {
-    if (landingMode === "macro") {
-      return config.landingPageMacro || "";
-    }
-    return config.landingPageUrl || "";
-  };
-
-  // 处理落地页输入
-  const handleLandingInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (landingMode === "macro") {
-      updateConfig({ landingPageMacro: value, landingPageUrl: "" });
-    } else {
-      updateConfig({ landingPageUrl: value, landingPageMacro: "" });
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -667,48 +653,19 @@ export function RedpacketRainTemplateConfigPanel({
           />
         </div>
         {landingOpen && (
-          <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">
-                点击后动作
-              </label>
-              <ModeToggle
-                value={landingMode}
-                onChange={(v) => {
-                  setLandingMode(v);
-                  if (v === "macro") {
-                    updateConfig({ landingPageMacro: config.landingPageUrl, landingPageUrl: "" });
-                  } else {
-                    updateConfig({ landingPageUrl: config.landingPageMacro || "", landingPageMacro: "" });
-                  }
-                }}
-              />
-            </div>
-
-            {landingMode === "macro" ? (
-              <div className="space-y-2">
-                <Input
-                  placeholder="如 ${landing_url}"
-                  value={getLandingValue()}
-                  onChange={handleLandingInput}
-                />
-                <p className="text-xs text-gray-400 flex items-center gap-1">
-                  <Link2 className="w-3 h-3" />
-                  宏变量将自动替换为实际值
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Input
-                  placeholder="请输入落地页链接"
-                  value={getLandingValue()}
-                  onChange={handleLandingInput}
-                />
-                <p className="text-xs text-gray-400">
-                  不配置默认使用广告（素材）链接
-                </p>
-              </div>
-            )}
+          <div className="p-4 space-y-4 border-t border-gray-200">
+            <LandingPageConfigSection
+              config={{
+                landingPageType: config.landingPageType || "url",
+                landingPageUrl: config.landingPageUrl || "",
+                landingPageMacro: config.landingPageMacro || "",
+                deeplinkUrl: config.deeplinkUrl || "",
+                deeplinkMacro: config.deeplinkMacro || "",
+                defaultLandingPageUrl: config.defaultLandingPageUrl,
+                macroVariables: config.macroVariables,
+              }}
+              onChange={(updates) => updateConfig(updates)}
+            />
           </div>
         )}
       </div>

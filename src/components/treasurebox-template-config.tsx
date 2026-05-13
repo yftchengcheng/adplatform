@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Plus, Trash2, ImageIcon, Link2 } from "lucide-react";
 import { cn, getStringWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Tab switch component
 function ModeToggle({
@@ -241,6 +242,9 @@ export interface TreasureBoxConfig {
   // 落地页
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   // 默认落地页
   defaultLandingPageUrl?: string;
   // 宏变量
@@ -266,6 +270,9 @@ export const defaultTreasureBoxConfig: TreasureBoxConfig = {
   treasureboxImageMacro: "",
   landingPageUrl: "",
   landingPageMacro: "",
+    landingPageType: "url",
+    deeplinkUrl: "",
+    deeplinkMacro: "",
   defaultLandingPageUrl: "",
   macroVariables: {},
   componentName: "点击宝箱领取奖品",
@@ -523,55 +530,18 @@ export function TreasureBoxTemplateConfigPanel({
       </div>
 
       {/* 落地页配置 */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <button
-          onClick={() => setLandingOpen(!landingOpen)}
-          className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-gray-50"
-        >
-          <span className="text-sm font-medium text-gray-700">落地页配置</span>
-          <ChevronDown
-            className={cn(
-              "w-4 h-4 text-gray-400 transition-transform",
-              !landingOpen && "-rotate-90"
-            )}
-          />
-        </button>
-        {landingOpen && (
-          <div className="p-4 space-y-4 border-t border-gray-200">
-            {/* 落地页模式 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">落地页</label>
-                <ModeToggle value={landingPageMode} onChange={setLandingPageMode} />
-              </div>
-              <Input
-                value={getLandingPageValue()}
-                onChange={(e) => {
-                  if (landingPageMode === "macro") {
-                    updateConfig({ landingPageMacro: e.target.value });
-                  } else {
-                    updateConfig({ landingPageUrl: e.target.value });
-                  }
-                }}
-                placeholder={landingPageMode === "macro" ? '如 ${landing_url}' : "输入落地页链接"}
-              />
-            </div>
-
-            {/* 默认落地页 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">默认落地页</label>
-              <Input
-                value={config.defaultLandingPageUrl || ""}
-                onChange={(e) => updateConfig({ defaultLandingPageUrl: e.target.value })}
-                placeholder="输入默认落地页链接"
-              />
-              <p className="text-xs text-gray-400">
-                当宏变量未解析时使用此链接
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+      <LandingPageConfigSection
+        config={{
+          landingPageType: config.landingPageType || "url",
+          landingPageUrl: config.landingPageUrl || "",
+          landingPageMacro: config.landingPageMacro || "",
+          deeplinkUrl: config.deeplinkUrl || "",
+          deeplinkMacro: config.deeplinkMacro || "",
+          defaultLandingPageUrl: config.defaultLandingPageUrl,
+          macroVariables: config.macroVariables,
+        }}
+        onChange={(updates) => updateConfig(updates)}
+      />
 
       {/* 组件名称 */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">

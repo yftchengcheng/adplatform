@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 export interface AdButtonConfig {
   text: string;
-  action: "jump" | "show_image";
+  action: "jump" | "show_image" | "deeplink";
   landingPageUrl?: string;
   landingPageMacro?: string; // 落地页宏变量
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   imageUrl?: string;
   imageMacro?: string;
   resultText?: string;
@@ -103,6 +107,21 @@ export function AdTemplate({
 
   // 解析落地页链接
   const resolveLandingPageUrl = (button: AdButtonConfig): string | undefined => {
+    // Deeplink 类型
+    if (button.action === "deeplink") {
+      if (button.deeplinkMacro) {
+        const resolved = resolveMacro(button.deeplinkMacro);
+        if (resolved.includes('${') || resolved.startsWith('$')) {
+          return undefined;
+        }
+        return resolved;
+      }
+      if (button.deeplinkUrl) {
+        return resolveMacro(button.deeplinkUrl);
+      }
+      return undefined;
+    }
+    // URL 类型
     // 优先使用宏变量
     if (button.landingPageMacro) {
       const resolved = resolveMacro(button.landingPageMacro);
@@ -133,11 +152,10 @@ export function AdTemplate({
   }, [isOpen]);
 
   const handleButton1Click = () => {
-    if (finalConfig.button1.action === "jump") {
+    if (finalConfig.button1.action === "jump" || finalConfig.button1.action === "deeplink") {
       const url = resolveLandingPageUrl(finalConfig.button1);
       if (url) {
-        // 始终在新页面打开
-        window.open(url, "_blank");
+        openLandingPage(finalConfig.button1, url);
       } else {
         onButton1Click?.(finalConfig.button1);
       }
@@ -153,11 +171,10 @@ export function AdTemplate({
   };
 
   const handleButton2Click = () => {
-    if (finalConfig.button2.action === "jump") {
+    if (finalConfig.button2.action === "jump" || finalConfig.button2.action === "deeplink") {
       const url = resolveLandingPageUrl(finalConfig.button2);
       if (url) {
-        // 始终在新页面打开
-        window.open(url, "_blank");
+        openLandingPage(finalConfig.button2, url);
       } else {
         onButton2Click?.(finalConfig.button2);
       }
@@ -178,8 +195,7 @@ export function AdTemplate({
     const url = resolveLandingPageUrl(currentButtonConfig);
     if (url) {
       setShowImageModal(false);
-      // 始终在新页面打开
-      window.open(url, "_blank");
+      openLandingPage(currentButtonConfig, url);
     }
   };
 

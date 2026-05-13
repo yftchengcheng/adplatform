@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 export interface PromotionPoint {
   id: string;
@@ -19,7 +20,10 @@ export interface PromotionTemplateConfig {
   buttonText: string;            // 行动号召（最多12字符）
   buttonTextMacro?: string;      // 行动号召宏变量
   landingPageUrl?: string;      // 落地页URL
-  landingPageMacro?: string;    // 落地页宏变量
+  landingPageMacro?: string; // 落地页宏变量
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   defaultLandingPageUrl?: string;
   // 宏替换变量映射
   macroVariables?: Record<string, string>;
@@ -128,6 +132,21 @@ export function PromotionTemplate({
 
   // 解析落地页链接
   const resolveLandingPageUrl = (): string | undefined => {
+    // Deeplink 类型
+    if (finalConfig.landingPageType === "deeplink") {
+      if (finalConfig.deeplinkMacro) {
+        const resolved = resolveMacro(finalConfig.deeplinkMacro);
+        if (resolved.includes('${') || resolved.startsWith('$')) {
+          return undefined;
+        }
+        return resolved;
+      }
+      if (finalConfig.deeplinkUrl) {
+        return resolveMacro(finalConfig.deeplinkUrl);
+      }
+      return undefined;
+    }
+
     if (finalConfig.landingPageMacro) {
       const resolved = resolveMacro(finalConfig.landingPageMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
@@ -173,7 +192,7 @@ export function PromotionTemplate({
     e.stopPropagation();
     const url = resolveLandingPageUrl();
     if (url) {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
     onButtonClick?.(finalConfig);
   };

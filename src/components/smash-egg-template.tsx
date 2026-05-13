@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SmashEggConfig } from "./smash-egg-template-config";
+import { openLandingPage } from "./landing-page-config";
 
 interface SmashEggTemplateProps {
   config?: Partial<SmashEggConfig>;
@@ -112,7 +113,7 @@ export function SmashEggTemplate({
   const handleClaim = useCallback(() => {
     const url = getLandingPageUrl();
     if (url && url !== "#") {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
   }, [getLandingPageUrl]);
 

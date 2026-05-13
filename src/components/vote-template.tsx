@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 // 配置接口
 export interface VoteOption {
@@ -19,6 +20,9 @@ export interface VoteTemplateConfig {
   action: "jump" | "show_image";
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   imageUrl?: string;
   imageMacro?: string;
   defaultLandingPageUrl?: string;
@@ -154,6 +158,20 @@ export function VoteTemplate({
 
   // 解析落地页链接
   const resolveLandingPageUrl = (): string | undefined => {
+        // Deeplink 类型
+    if (finalConfig.landingPageType === "deeplink") {
+      if (finalConfig.deeplinkMacro) {
+        const resolved = resolveMacro(finalConfig.deeplinkMacro);
+        if (resolved.includes('${') || resolved.startsWith('$')) {
+          return undefined;
+        }
+        return resolved;
+      }
+      if (finalConfig.deeplinkUrl) {
+        return resolveMacro(finalConfig.deeplinkUrl);
+      }
+      return undefined;
+    }
     // 优先使用宏变量
     if (finalConfig.landingPageMacro) {
       const resolved = resolveMacro(finalConfig.landingPageMacro);
@@ -204,7 +222,7 @@ export function VoteTemplate({
       // jump 模式：直接跳转落地页
       const url = resolveLandingPageUrl();
       if (url) {
-        window.open(url, "_blank");
+        openLandingPage(finalConfig, url);
       }
     }
 
@@ -218,7 +236,7 @@ export function VoteTemplate({
     if (url) {
       setShowImageModal(false);
       // 始终在新页面打开
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
   };
 

@@ -19,6 +19,7 @@ import {
   EcommerceTemplateConfig,
 } from "./ecommerce-template";
 import { cn, getStringWidth, isOverWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // 按钮文案选项
 const BUTTON_TEXT_OPTIONS = [
@@ -223,8 +224,7 @@ export function EcommerceTemplateConfigPanel({
   const [buttonTextMode, setButtonTextMode] = useState<"input" | "macro">("input");
   // 图片模式
   const [imageMode, setImageMode] = useState<"upload" | "macro">("upload");
-  // 落地页模式
-  const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">("macro");
+
 
   // 处理标题变化
   const handleTitleChange = (value: string) => {
@@ -259,15 +259,6 @@ export function EcommerceTemplateConfigPanel({
       onChange({ ...config, imageMacro: url, imageUrl: undefined });
     } else {
       onChange({ ...config, imageUrl: url, imageMacro: undefined });
-    }
-  };
-
-  // 处理落地页变化
-  const handleLandingPageChange = (value: string) => {
-    if (landingPageMode === "macro") {
-      onChange({ ...config, landingPageMacro: value, landingPageUrl: undefined });
-    } else {
-      onChange({ ...config, landingPageUrl: value, landingPageMacro: undefined });
     }
   };
 
@@ -481,24 +472,19 @@ export function EcommerceTemplateConfigPanel({
                 支持手动输入、宏替换，默认使用广告（素材）链接
               </p>
               
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs text-gray-500">落地页链接</label>
-                  <ModeToggle
-                    value={landingPageMode}
-                    onChange={setLandingPageMode}
-                  />
-                </div>
-                <Input
-                  value={
-                    landingPageMode === "macro"
-                      ? (config.landingPageMacro || "")
-                      : (config.landingPageUrl || "")
-                  }
-                  onChange={(e) => handleLandingPageChange(e.target.value)}
-                  placeholder={landingPageMode === "macro" ? "如 ${landing_url}" : "请输入落地页链接"}
-                />
-              </div>
+              <LandingPageConfigSection
+                config={{
+                  landingPageType: config.landingPageType || "url",
+                  landingPageUrl: config.landingPageUrl || "",
+                  landingPageMacro: config.landingPageMacro || "",
+                  deeplinkUrl: config.deeplinkUrl || "",
+                  deeplinkMacro: config.deeplinkMacro || "",
+                  defaultLandingPageUrl: config.defaultLandingPageUrl,
+                  macroVariables: config.macroVariables,
+                }}
+                onChange={(updates) => onChange({ ...config, ...updates })}
+                hint="支持手动输入、宏替换，默认使用广告（素材）链接"
+              />
             </div>
           )}
         </div>

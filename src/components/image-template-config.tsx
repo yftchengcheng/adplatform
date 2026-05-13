@@ -23,6 +23,7 @@ import {
   ImageItem,
 } from "./image-template";
 import { cn } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // 图片上传组件（复用）
 function ImageUpload({
@@ -286,28 +287,25 @@ function ImageItemEditor({
       </div>
 
       {/* 落地页 */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="text-xs text-gray-500">落地页链接</label>
-          <ModeToggle
-            value={landingPageMode}
-            onChange={setLandingPageMode}
-          />
-        </div>
-        {landingPageMode === "macro" ? (
-          <Input
-            value={image.landingPageMacro || ""}
-            onChange={(e) => onChange({ ...image, landingPageMacro: e.target.value, landingPageUrl: undefined })}
-            placeholder="如 ${landing_url}"
-          />
-        ) : (
-          <Input
-            value={image.landingPageUrl || ""}
-            onChange={(e) => onChange({ ...image, landingPageUrl: e.target.value, landingPageMacro: undefined })}
-            placeholder="请输入落地页链接"
-          />
-        )}
-      </div>
+      <LandingPageConfigSection
+        config={{
+          landingPageType: image.landingPageType || "url",
+          landingPageUrl: image.landingPageUrl || "",
+          landingPageMacro: image.landingPageMacro || "",
+          deeplinkUrl: image.deeplinkUrl || "",
+          deeplinkMacro: image.deeplinkMacro || "",
+        }}
+        onChange={(updates) => {
+          const updated = { ...image };
+          if (updates.landingPageType !== undefined) updated.landingPageType = updates.landingPageType;
+          if (updates.landingPageUrl !== undefined) { updated.landingPageUrl = updates.landingPageUrl; updated.landingPageMacro = ""; }
+          if (updates.landingPageMacro !== undefined) { updated.landingPageMacro = updates.landingPageMacro; updated.landingPageUrl = ""; }
+          if (updates.deeplinkUrl !== undefined) { updated.deeplinkUrl = updates.deeplinkUrl; updated.deeplinkMacro = ""; }
+          if (updates.deeplinkMacro !== undefined) { updated.deeplinkMacro = updates.deeplinkMacro; updated.deeplinkUrl = ""; }
+          onChange(updated);
+        }}
+        sectionTitle="落地页配置"
+      />
     </div>
   );
 }
@@ -323,7 +321,6 @@ export function ImageTemplateConfigPanel({
   onSave?: () => void;
 }) {
   const [isBasicOpen, setIsBasicOpen] = useState(true);
-  const [landingPageMode, setLandingPageMode] = useState<"input" | "macro">("input");
 
   // 确保 images 是数组
   const safeImages: ImageItem[] = Array.isArray(config.images) ? config.images : [];
@@ -348,15 +345,6 @@ export function ImageTemplateConfigPanel({
   const handleRemoveImage = (index: number) => {
     const newImages = safeImages.filter((_, i) => i !== index);
     onChange({ ...config, images: newImages });
-  };
-
-  // 全局落地页配置
-  const handleGlobalLandingPageChange = (url: string) => {
-    onChange({ ...config, defaultLandingPageUrl: url });
-  };
-
-  const handleGlobalLandingPageMacroChange = (macro: string) => {
-    onChange({ ...config, landingPageMacro: macro });
   };
 
   return (
@@ -392,28 +380,28 @@ export function ImageTemplateConfigPanel({
               <p className="text-xs text-gray-400">
                 每张图片可单独配置落地页，未配置时使用全局落地页
               </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs text-gray-500">全局落地页</label>
-                  <ModeToggle
-                    value={landingPageMode}
-                    onChange={setLandingPageMode}
-                  />
-                </div>
-                {landingPageMode === "macro" ? (
-                  <Input
-                    value={config.landingPageMacro || ""}
-                    onChange={(e) => handleGlobalLandingPageMacroChange(e.target.value)}
-                    placeholder="如 ${landing_url}"
-                  />
-                ) : (
-                  <Input
-                    value={config.defaultLandingPageUrl || ""}
-                    onChange={(e) => handleGlobalLandingPageChange(e.target.value)}
-                    placeholder="请输入全局落地页链接"
-                  />
-                )}
-              </div>
+              <LandingPageConfigSection
+                config={{
+                  landingPageType: config.landingPageType || "url",
+                  landingPageUrl: config.defaultLandingPageUrl || "",
+                  landingPageMacro: config.landingPageMacro || "",
+                  deeplinkUrl: config.deeplinkUrl || "",
+                  deeplinkMacro: config.deeplinkMacro || "",
+                  defaultLandingPageUrl: config.defaultLandingPageUrl,
+                  macroVariables: config.macroVariables,
+                }}
+                onChange={(updates) => {
+                  const mapped: Partial<ImageTemplateConfig> = {};
+                  if (updates.landingPageType !== undefined) mapped.landingPageType = updates.landingPageType;
+                  if (updates.landingPageUrl !== undefined) mapped.defaultLandingPageUrl = updates.landingPageUrl;
+                  if (updates.landingPageMacro !== undefined) mapped.landingPageMacro = updates.landingPageMacro;
+                  if (updates.deeplinkUrl !== undefined) mapped.deeplinkUrl = updates.deeplinkUrl;
+                  if (updates.deeplinkMacro !== undefined) mapped.deeplinkMacro = updates.deeplinkMacro;
+                  if (updates.defaultLandingPageUrl !== undefined) mapped.defaultLandingPageUrl = updates.defaultLandingPageUrl;
+                  onChange({ ...config, ...mapped });
+                }}
+                urlLabel="全局落地页"
+              />
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 export interface CouponTemplateConfig {
   title: string;              // 活动名称（最多14字符）
@@ -13,7 +14,10 @@ export interface CouponTemplateConfig {
   validFrom?: string;         // 有效期开始
   validTo?: string;           // 有效期结束
   landingPageUrl?: string;    // 落地页URL
-  landingPageMacro?: string;  // 落地页宏变量
+  landingPageMacro?: string; // 落地页宏变量
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   defaultLandingPageUrl?: string;
   // 宏替换变量映射
   macroVariables?: Record<string, string>;
@@ -67,6 +71,20 @@ export function CouponTemplate({
 
   // 解析落地页链接
   const resolveLandingPageUrl = (): string | undefined => {
+        // Deeplink 类型
+    if (finalConfig.landingPageType === "deeplink") {
+      if (finalConfig.deeplinkMacro) {
+        const resolved = resolveMacro(finalConfig.deeplinkMacro);
+        if (resolved.includes('${') || resolved.startsWith('$')) {
+          return undefined;
+        }
+        return resolved;
+      }
+      if (finalConfig.deeplinkUrl) {
+        return resolveMacro(finalConfig.deeplinkUrl);
+      }
+      return undefined;
+    }
     // 优先使用宏变量
     if (finalConfig.landingPageMacro) {
       const resolved = resolveMacro(finalConfig.landingPageMacro);
@@ -143,7 +161,7 @@ export function CouponTemplate({
   const handleButtonClick = () => {
     const url = resolveLandingPageUrl();
     if (url) {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
     onButtonClick?.(finalConfig);
   };

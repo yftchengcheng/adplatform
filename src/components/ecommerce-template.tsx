@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 // 组件配置
 export interface EcommerceTemplateConfig {
@@ -16,6 +17,9 @@ export interface EcommerceTemplateConfig {
   imageMacro?: string;
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   defaultLandingPageUrl?: string;
   macroVariables?: Record<string, string>;
   onButtonClick?: () => void;
@@ -113,6 +117,20 @@ export function EcommerceTemplate({
 
   // 解析落地页URL
   const resolveLandingPageUrl = (): string | undefined => {
+        // Deeplink 类型
+    if (finalConfig.landingPageType === "deeplink") {
+      if (finalConfig.deeplinkMacro) {
+        const resolved = resolveMacro(finalConfig.deeplinkMacro);
+        if (resolved.includes('${') || resolved.startsWith('$')) {
+          return undefined;
+        }
+        return resolved;
+      }
+      if (finalConfig.deeplinkUrl) {
+        return resolveMacro(finalConfig.deeplinkUrl);
+      }
+      return undefined;
+    }
     // 优先使用宏变量
     if (finalConfig.landingPageMacro) {
       const resolved = resolveMacro(finalConfig.landingPageMacro);
@@ -145,7 +163,7 @@ export function EcommerceTemplate({
   const handleButtonClick = () => {
     const url = resolveLandingPageUrl();
     if (url) {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
     finalConfig.onButtonClick?.();
   };

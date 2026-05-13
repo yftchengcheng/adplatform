@@ -22,6 +22,7 @@ import {
   VoteTemplate,
 } from "./vote-template";
 import { cn, getStringWidth, isOverWidth } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // Image Upload Component with validation
 function ImageUpload({
@@ -589,53 +590,18 @@ export function VoteTemplateConfigPanel({
               )}
 
               {/* Landing Page URL - Show for both actions */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs text-gray-500">
-                    落地页链接
-                  </label>
-                  <ModeToggle 
-                    value={landingPageMode} 
-                    onChange={(v) => {
-                      setLandingPageMode(v);
-                      if (v === "macro") {
-                        handleLandingPageChange("");
-                      } else {
-                        handleLandingPageMacroChange("");
-                      }
-                    }} 
-                  />
-                </div>
-                {landingPageMode === "input" ? (
-                  <Input
-                    value={config.landingPageUrl || ""}
-                    onChange={(e) => handleLandingPageChange(e.target.value)}
-                    placeholder={
-                      config.defaultLandingPageUrl
-                        ? `不配置默认使用: ${config.defaultLandingPageUrl}`
-                        : "请输入落地页链接"
-                    }
-                  />
-                ) : (
-                  <Input
-                    value={config.landingPageMacro || ""}
-                    onChange={(e) => handleLandingPageMacroChange(e.target.value)}
-                    placeholder="如 ${landing_page_url}"
-                  />
-                )}
-              </div>
-
-              {/* Default Landing Page */}
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500">
-                  默认落地页链接（全局）
-                </label>
-                <Input
-                  value={config.defaultLandingPageUrl || ""}
-                  onChange={(e) => handleDefaultLandingPageChange(e.target.value)}
-                  placeholder="当选项未配置落地页时使用此链接"
-                />
-              </div>
+              <LandingPageConfigSection
+                config={{
+                  landingPageType: config.landingPageType || "url",
+                  landingPageUrl: config.landingPageUrl || "",
+                  landingPageMacro: config.landingPageMacro || "",
+                  deeplinkUrl: config.deeplinkUrl || "",
+                  deeplinkMacro: config.deeplinkMacro || "",
+                  defaultLandingPageUrl: config.defaultLandingPageUrl,
+                  macroVariables: config.macroVariables,
+                }}
+                onChange={(updates) => onChange({ ...config, ...updates })}
+              />
             </div>
           )}
         </div>

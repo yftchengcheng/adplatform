@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TreasureboxRainConfig } from "./treasurebox-rain-template-config";
+import { openLandingPage } from "./landing-page-config";
 
 interface TreasureboxRainTemplateProps {
   config?: Partial<TreasureboxRainConfig>;
@@ -194,7 +195,7 @@ export function TreasureboxRainTemplate({
   const handleClaim = useCallback(() => {
     const url = resolveLandingPage();
     if (url) {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
   }, [resolveLandingPage]);
 

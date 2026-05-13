@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Plus, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LandingPageConfigSection } from "./landing-page-config";
 
 // 获取字符串显示宽度（中文2字符，英文1字符）
 function getStringWidth(str: string): number {
@@ -37,6 +38,9 @@ export interface ScratchCardConfig {
   // 落地页配置
   landingPageUrl: string;         // 落地页链接
   landingPageMacro: string;
+  landingPageType?: "url" | "deeplink"; // 跳转类型
+  deeplinkUrl?: string; // Deeplink地址
+  deeplinkMacro?: string; // Deeplink宏变量
   defaultLandingPageUrl: string;   // 默认落地页（复用广告链接）
   // 宏变量
   macroVariables: Record<string, string>;
@@ -58,6 +62,9 @@ export const defaultScratchCardConfig: ScratchCardConfig = {
   specialNoteMacro: "",
   landingPageUrl: "",
   landingPageMacro: "",
+    landingPageType: "url",
+    deeplinkUrl: "",
+    deeplinkMacro: "",
   defaultLandingPageUrl: "",
   macroVariables: {},
 };
@@ -426,38 +433,18 @@ export function ScratchCardTemplateConfigPanel({
       </div>
 
       {/* 落地页配置 */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <SectionHeader
-            title="落地页配置"
-            isOpen={landingOpen}
-            onToggle={() => setLandingOpen(!landingOpen)}
-          />
-        </div>
-        {landingOpen && (
-          <div className="p-4 space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <ModeToggle
-                value={landingMode}
-                onChange={setLandingMode}
-              />
-            </div>
-            {landingMode === "input" ? (
-              <Input
-                placeholder="请输入落地页链接"
-                value={config.landingPageUrl || ""}
-                onChange={(e) => updateConfig({ landingPageUrl: e.target.value, landingPageMacro: "" })}
-              />
-            ) : (
-              <Input
-                placeholder="如 ${landing_page}"
-                value={config.landingPageMacro || ""}
-                onChange={(e) => updateConfig({ landingPageMacro: e.target.value })}
-              />
-            )}
-          </div>
-        )}
-      </div>
+      <LandingPageConfigSection
+        config={{
+          landingPageType: config.landingPageType || "url",
+          landingPageUrl: config.landingPageUrl || "",
+          landingPageMacro: config.landingPageMacro || "",
+          deeplinkUrl: config.deeplinkUrl || "",
+          deeplinkMacro: config.deeplinkMacro || "",
+          defaultLandingPageUrl: config.defaultLandingPageUrl,
+          macroVariables: config.macroVariables,
+        }}
+        onChange={(updates) => updateConfig(updates)}
+      />
 
       {/* 组件名称 */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">

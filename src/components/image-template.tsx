@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { openLandingPage } from "./landing-page-config";
 
 // 图片项配置
 export interface ImageItem {
@@ -11,6 +12,9 @@ export interface ImageItem {
   imageMacro?: string;
   landingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink";
+  deeplinkUrl?: string;
+  deeplinkMacro?: string;
 }
 
 // 组件配置
@@ -18,6 +22,9 @@ export interface ImageTemplateConfig {
   images: ImageItem[];
   defaultLandingPageUrl?: string;
   landingPageMacro?: string;
+  landingPageType?: "url" | "deeplink";
+  deeplinkUrl?: string;
+  deeplinkMacro?: string;
   macroVariables?: Record<string, string>;
   onImageClick?: (imageIndex: number) => void;
 }
@@ -94,6 +101,21 @@ export function ImageTemplate({
 
   // 解析落地页URL
   const resolveLandingPageUrl = (image?: ImageItem): string | undefined => {
+    // Deeplink 类型
+    if (finalConfig.landingPageType === "deeplink") {
+      if (finalConfig.deeplinkMacro) {
+        const resolved = resolveMacro(finalConfig.deeplinkMacro);
+        if (resolved.includes("${") || resolved.startsWith("$")) {
+          return undefined;
+        }
+        return resolved;
+      }
+      if (finalConfig.deeplinkUrl) {
+        return resolveMacro(finalConfig.deeplinkUrl);
+      }
+      return undefined;
+    }
+
     // 优先使用图片单独的落地页
     if (image?.landingPageMacro) {
       const resolved = resolveMacro(image.landingPageMacro);
@@ -137,7 +159,7 @@ export function ImageTemplate({
     const image = images[index];
     const url = resolveLandingPageUrl(image);
     if (url) {
-      window.open(url, "_blank");
+      openLandingPage(finalConfig, url);
     }
     finalConfig.onImageClick?.(index);
   };

@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FlipRedpacketTemplateConfig } from "./flip-redpacket-template-config";
+import { openLandingPage } from "./landing-page-config";
 
 // Props
 export interface FlipRedpacketTemplateProps {
@@ -178,7 +179,7 @@ export function FlipRedpacketTemplate({
   const handleClaim = useCallback(() => {
     const landingPage = resolveLandingPage();
     if (landingPage) {
-      window.open(landingPage, "_blank");
+      openLandingPage(finalConfig, landingPage);
     } else if (!previewMode) {
       onClose?.();
     }
