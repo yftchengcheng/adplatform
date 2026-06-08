@@ -202,7 +202,7 @@ export function AdTemplate({
   if (!isVisible && !previewMode) return null;
 
   return (
-    <div className={cn(previewMode ? "relative left-0 top-1/2 -translate-y-1/2" : "")}>
+    <div className={cn(previewMode ? "absolute left-0 top-1/2 -translate-y-1/2" : "")}>
       {/* Container */}
       <div
         className={cn(

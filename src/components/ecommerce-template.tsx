@@ -186,8 +186,8 @@ export function EcommerceTemplate({
       <div
         className={cn(
           previewMode
-            ? "w-full"
-            : "fixed left-0 z-50",
+            ? "absolute left-0 top-1/2 -translate-y-1/2"
+            : "fixed left-0 top-1/2 -translate-y-1/2 z-50",
           "transition-all duration-300",
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
