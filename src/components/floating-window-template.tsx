@@ -87,6 +87,7 @@ export function FloatingWindowTemplate({
   const [isClosed, setIsClosed] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [showGlow, setShowGlow] = useState(false);
 
   // 获取有效的推广卖点
   const safePoints = Array.isArray(finalConfig.promotionPoints) ? finalConfig.promotionPoints : [];
@@ -197,8 +198,18 @@ export function FloatingWindowTemplate({
   useEffect(() => {
     if (isClosed) return;
     setIsAnimating(false);
-    const timer = setTimeout(() => setIsAnimating(true), 150);
-    return () => clearTimeout(timer);
+    setShowGlow(false);
+    const timer = setTimeout(() => {
+      setIsAnimating(true);
+    }, 150);
+    // 滑入动画1.2s完成后，触发边框流光效果（播放一次）
+    const glowTimer = setTimeout(() => {
+      setShowGlow(true);
+    }, 150 + 1200);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(glowTimer);
+    };
   }, [isOpen, finalConfig.position, isClosed]);
 
   // 全局点击跳转 - 点击浮层任意位置（含卡片区域）触发落地页跳转
@@ -277,23 +288,47 @@ export function FloatingWindowTemplate({
   // 预览容器约264px宽（280px手机框 - 16px内边距），模拟640px设计宽度
   const scale = previewMode ? 264 / 640 : 1;
 
-  // 浮窗卡片主体
+  // 流光边框圆角
+  const glowBorderRadius = previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px");
+
+  // 浮窗卡片主体（外层流光容器 + 内层内容）
   const floatingWindowContent = (
     <div
-      className="relative overflow-hidden cursor-pointer"
+      className="relative cursor-pointer"
       style={{
         width: getWindowWidth(),
         height: `${100 * scale}px`,
         transform: getAnimationTransform(),
         transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        background: "rgba(255, 255, 255, 0.1)",
-        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
-        borderRadius: previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px"),
-        backdropFilter: "blur(8px)",
+        borderRadius: glowBorderRadius,
+        padding: `${Math.max(1.5 * scale, 1)}px`,
+        overflow: "hidden",
       }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      {/* 流光层 - 旋转的锥形渐变，滑入完成后播放一次 */}
+      {showGlow && (
+        <span
+          className="absolute"
+          style={{
+            inset: `-${Math.max(20 * scale, 12)}px`,
+            background: `conic-gradient(from 0deg, transparent 0%, transparent 60%, rgba(48,135,255,0.7) 75%, rgba(100,180,255,0.9) 85%, transparent 100%)`,
+            animation: "glow-spin 1.5s linear forwards",
+          }}
+        />
+      )}
+
+      {/* 卡片内容层 */}
+      <div
+        className="relative overflow-hidden h-full"
+        style={{
+          background: "rgba(255, 255, 255, 0.1)",
+          borderRadius: `calc(${glowBorderRadius} - ${Math.max(1.5 * scale, 1)}px)`,
+          backdropFilter: "blur(8px)",
+          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
+        }}
+      >
       {/* 关闭按钮 - stopPropagation 阻止冒泡到浮层全局点击 */}
       <button
         onClick={(e) => { e.stopPropagation(); handleClose(e); }}
@@ -367,6 +402,7 @@ export function FloatingWindowTemplate({
           {finalConfig.buttonText}
         </button>
       </div>
+      </div>{/* 关闭卡片内容层 */}
     </div>
   );
 
@@ -374,6 +410,14 @@ export function FloatingWindowTemplate({
   if (previewMode) {
     return (
       <div className="relative w-full h-full">
+        {/* 流光边框动画 keyframes */}
+        <style>{`
+          @keyframes glow-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); opacity: 0; }
+          }
+        `}</style>
+
         {/* 模拟手机屏幕内容 */}
         <div className="absolute inset-0 flex flex-col items-center justify-start pt-6 px-4 gap-2">
           {[1, 2, 3].map((i) => (
@@ -409,6 +453,13 @@ export function FloatingWindowTemplate({
   // 非预览模式 - 全屏透明浮层 + flexbox 定位
   return (
     <>
+      {/* 流光边框动画 keyframes */}
+      <style>{`
+        @keyframes glow-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); opacity: 0; }
+        }
+      `}</style>
       {!isClosed && (
         <div
           className="fixed inset-0 z-50 flex flex-col"
