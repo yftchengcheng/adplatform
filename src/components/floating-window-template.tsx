@@ -18,7 +18,7 @@ export interface FloatingWindowPromotionPoint {
 // 浮窗配置
 export interface FloatingWindowTemplateConfig {
   // 行动
-  action?: "open";                  // 组件动作，默认打开
+  action?: "open" | "close";           // 组件动作，默认打开
 
   // 浮窗位置
   position: FloatingWindowPosition; // 顶部/底部/中下部
@@ -31,6 +31,7 @@ export interface FloatingWindowTemplateConfig {
   // 卡片标题（最多14字符）
   title: string;
   titleMacro?: string;
+  titleMode?: "input" | "macro";   // 标题输入模式
 
   // 推广卖点（最多10条，轮播）
   promotionPoints: FloatingWindowPromotionPoint[];
@@ -38,6 +39,7 @@ export interface FloatingWindowTemplateConfig {
   // 行动号召（最多12字符）
   buttonText: string;
   buttonTextMacro?: string;
+  buttonTextMode?: "input" | "macro"; // 按钮文案输入模式
 
   // 落地页
   landingPageUrl?: string;
@@ -86,8 +88,8 @@ export function FloatingWindowTemplate({
     ...config,
   };
 
-  const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -108,7 +110,7 @@ export function FloatingWindowTemplate({
 
   // 解析图标
   const resolveIcon = (): string | undefined => {
-    if (finalConfig.iconMacro) {
+    if (finalConfig.iconMode === "macro" && finalConfig.iconMacro) {
       const resolved = resolveMacro(finalConfig.iconMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
         return undefined;
@@ -123,7 +125,7 @@ export function FloatingWindowTemplate({
 
   // 解析标题
   const resolveTitle = (): string => {
-    if (finalConfig.titleMacro) {
+    if (finalConfig.titleMode === "macro" && finalConfig.titleMacro) {
       const resolved = resolveMacro(finalConfig.titleMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
         return finalConfig.title;
@@ -147,7 +149,7 @@ export function FloatingWindowTemplate({
 
   // 解析按钮文案
   const resolveButtonText = (): string => {
-    if (finalConfig.buttonTextMacro) {
+    if (finalConfig.buttonTextMode === "macro" && finalConfig.buttonTextMacro) {
       const resolved = resolveMacro(finalConfig.buttonTextMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
         return finalConfig.buttonText;
@@ -159,7 +161,6 @@ export function FloatingWindowTemplate({
 
   // 解析落地页链接
   const resolveLandingPageUrl = (): string | undefined => {
-    // Deeplink 类型
     if (finalConfig.landingPageType === "deeplink") {
       if (finalConfig.deeplinkMacro) {
         const resolved = resolveMacro(finalConfig.deeplinkMacro);
@@ -201,30 +202,13 @@ export function FloatingWindowTemplate({
     return () => clearInterval(interval);
   }, [hasMultiplePoints, isPaused, validPoints.length]);
 
-  // 入场动画 - 根据位置不同使用不同滑入方向
+  // 入场动画 - isOpen 或 position 变化时重新播放
   useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      // 延迟触发动画，确保DOM已渲染
-      const timer = setTimeout(() => {
-        setIsAnimating(true);
-      }, 50);
-      return () => clearTimeout(timer);
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  // 预览模式动画
-  useEffect(() => {
-    if (previewMode && !isVisible) {
-      setIsVisible(true);
-      const timer = setTimeout(() => setIsAnimating(true), 50);
-      return () => clearTimeout(timer);
-    }
-  }, [previewMode, isVisible]);
+    if (isClosed) return;
+    setIsAnimating(false);
+    const timer = setTimeout(() => setIsAnimating(true), 50);
+    return () => clearTimeout(timer);
+  }, [isOpen, finalConfig.position, isClosed]);
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -247,162 +231,224 @@ export function FloatingWindowTemplate({
 
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onClose?.();
+    if (previewMode) {
+      // 预览模式下，关闭后重新播放动画
+      setIsAnimating(false);
+      setIsClosed(true);
+      setTimeout(() => {
+        setIsClosed(false);
+        setIsAnimating(true);
+      }, 500);
+    } else {
+      setIsAnimating(false);
+      onClose?.();
+    }
   };
-
-  if (!isVisible) return null;
 
   const iconSrc = resolveIcon();
   const currentPoint = validPoints[currentIndex] || { text: "" };
   const position = finalConfig.position || "bottom";
-
-  // 根据位置决定组件宽度
   const isMiddleBottom = position === "middle_bottom";
 
-  // 根据位置决定滑入动画
-  const getAnimationClass = () => {
-    if (!isAnimating) {
-      switch (position) {
-        case "top":
-          return "translate-y-[-100%]";
-        case "bottom":
-          return "translate-y-[100%]";
-        case "middle_bottom":
-          return "translate-x-[-100%]";
-      }
+  // 根据位置决定滑入动画的初始偏移
+  const getAnimationTransform = () => {
+    if (isAnimating) {
+      return "translate(0, 0)";
     }
-    return "translate-y-0 translate-x-0";
-  };
-
-  // 根据位置决定定位方式
-  const getPositionClass = () => {
-    if (previewMode) return "";
     switch (position) {
       case "top":
-        return "fixed top-0 left-0 right-0 z-50";
+        return "translate(0, -100%)";
       case "bottom":
-        return "fixed bottom-0 left-0 right-0 z-50";
+        return "translate(0, 100%)";
       case "middle_bottom":
-        return "fixed bottom-[30%] left-0 z-50";
+        return "translate(-100%, 0)";
     }
   };
 
+  // 浮窗主体内容
+  const floatingWindowContent = (
+    <div
+      className={cn(
+        "relative bg-white/90 backdrop-blur-sm shadow-lg overflow-hidden h-[100px]",
+      )}
+      style={{
+        width: previewMode ? "100%" : (isMiddleBottom ? "480px" : "100%"),
+        maxWidth: isMiddleBottom ? "480px" : "640px",
+        transform: getAnimationTransform(),
+        transition: "transform 0.5s ease-out",
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* 关闭按钮 */}
+      <button
+        onClick={handleClose}
+        className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/15 text-gray-400 hover:text-gray-600 z-10 transition-colors"
+      >
+        <X className="w-3 h-3" />
+      </button>
+
+      {/* 内容 - 水平布局 */}
+      <div
+        className="flex items-center h-full px-4 gap-3"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* 左侧：图标 */}
+        <div className="flex-shrink-0 w-[54px] h-[54px] rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
+          {iconSrc ? (
+            <img
+              src={iconSrc}
+              alt="图标"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <span className="text-gray-300 text-xs">图标</span>
+          )}
+        </div>
+
+        {/* 中间：标题 + 推广卖点 */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          {/* 标题 */}
+          <p className="text-sm font-semibold text-gray-800 truncate">
+            {resolveTitle()}
+          </p>
+
+          {/* 推广卖点（带导航） */}
+          <div className="flex items-center gap-1 mt-1">
+            {hasMultiplePoints && (
+              <button
+                onClick={handlePrev}
+                className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
+              >
+                <ChevronLeft className="w-3 h-3" />
+              </button>
+            )}
+
+            <p className="text-xs text-gray-500 truncate flex-1">
+              {resolvePointText(currentPoint)}
+            </p>
+
+            {hasMultiplePoints && (
+              <button
+                onClick={handleNext}
+                className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
+              >
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* 轮播指示器 */}
+          {hasMultiplePoints && (
+            <div className="flex items-center gap-1 mt-1.5">
+              {validPoints.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIndex(index);
+                  }}
+                  className={cn(
+                    "h-1 rounded-full transition-all",
+                    index === currentIndex ? "w-3 bg-blue-500" : "w-1 bg-gray-300"
+                  )}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 右侧：行动号召按钮 */}
+        <button
+          onClick={handleButtonClick}
+          className="flex-shrink-0 h-8 px-4 bg-[#3087FF] text-white text-xs font-medium rounded-lg flex items-center justify-center whitespace-nowrap hover:bg-[#2070EE] transition-colors"
+        >
+          {resolveButtonText()}
+        </button>
+      </div>
+    </div>
+  );
+
+  // 预览模式 - 模拟手机屏幕，展示位置和动画效果
+  if (previewMode) {
+    return (
+      <div className="w-full flex items-center justify-center">
+        <div
+          className="relative bg-gray-100 rounded-xl overflow-hidden border border-gray-200"
+          style={{ width: "260px", height: "312px" }}
+        >
+          {/* 模拟屏幕内容 */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400 text-[10px]">预览</span>
+            </div>
+          </div>
+
+          {/* 浮窗定位容器 */}
+          <div
+            className={cn(
+              "absolute left-0 right-0 z-10",
+              position === "top" && "top-0",
+              position === "bottom" && "bottom-0",
+              position === "middle_bottom" && "bottom-[30%]"
+            )}
+            style={{
+              display: "flex",
+              justifyContent: isMiddleBottom ? "flex-start" : "center",
+              paddingLeft: isMiddleBottom ? "8px" : undefined,
+            }}
+          >
+            {!isClosed && floatingWindowContent}
+          </div>
+
+          {/* 底层透明度10%遮罩 - 预览模式 */}
+          {!isClosed && (
+            <div
+              className={cn(
+                "absolute inset-0 bg-black/10 transition-opacity duration-300",
+                isAnimating ? "opacity-100" : "opacity-0"
+              )}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 非预览模式 - 完整浮窗展示
   return (
-    <div className={cn(previewMode ? "w-full flex items-center justify-center" : getPositionClass())}>
+    <>
       {/* 底层透明度10%遮罩 */}
-      {!previewMode && (
+      {!isClosed && (
         <div
           className={cn(
-            "fixed inset-0 bg-black/10 transition-opacity duration-300",
+            "fixed inset-0 bg-black/10 transition-opacity duration-300 z-40",
             isAnimating ? "opacity-100" : "opacity-0"
           )}
           onClick={handleClose}
         />
       )}
 
-      {/* 浮窗主体 */}
+      {/* 浮窗定位容器 */}
       <div
         className={cn(
-          "relative bg-white shadow-lg overflow-hidden transition-transform duration-500 ease-out",
-          isMiddleBottom ? "w-[480px]" : "w-[640px] max-w-full",
-          isMiddleBottom ? "h-[100px]" : "h-[100px]",
-          getAnimationClass(),
-          previewMode && "w-full"
+          "fixed z-50",
+          position === "top" && "top-0 left-0 right-0",
+          position === "bottom" && "bottom-0 left-0 right-0",
+          position === "middle_bottom" && "bottom-[30%] left-0"
         )}
-        onClick={(e) => e.stopPropagation()}
+        style={{
+          display: "flex",
+          justifyContent: isMiddleBottom ? "flex-start" : "center",
+          paddingLeft: isMiddleBottom ? "0" : undefined,
+        }}
       >
-        {/* 关闭按钮 */}
-        <button
-          onClick={handleClose}
-          className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/15 text-gray-400 hover:text-gray-600 z-10 transition-colors"
-        >
-          <X className="w-3 h-3" />
-        </button>
-
-        {/* 内容 - 水平布局 */}
-        <div
-          className="flex items-center h-full px-4 gap-3"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {/* 左侧：图标 */}
-          <div className="flex-shrink-0 w-[54px] h-[54px] rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
-            {iconSrc ? (
-              <img
-                src={iconSrc}
-                alt="图标"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-gray-300 text-xs">图标</span>
-            )}
-          </div>
-
-          {/* 中间：标题 + 推广卖点 */}
-          <div className="flex-1 min-w-0 flex flex-col justify-center">
-            {/* 标题 */}
-            <p className="text-sm font-semibold text-gray-800 truncate">
-              {resolveTitle()}
-            </p>
-
-            {/* 推广卖点（带导航） */}
-            <div className="flex items-center gap-1 mt-1">
-              {hasMultiplePoints && (
-                <button
-                  onClick={handlePrev}
-                  className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
-                >
-                  <ChevronLeft className="w-3 h-3" />
-                </button>
-              )}
-
-              <p className="text-xs text-gray-500 truncate flex-1">
-                {resolvePointText(currentPoint)}
-              </p>
-
-              {hasMultiplePoints && (
-                <button
-                  onClick={handleNext}
-                  className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
-                >
-                  <ChevronRight className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-
-            {/* 轮播指示器 */}
-            {hasMultiplePoints && (
-              <div className="flex items-center gap-1 mt-1.5">
-                {validPoints.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentIndex(index);
-                    }}
-                    className={cn(
-                      "h-1 rounded-full transition-all",
-                      index === currentIndex ? "w-3 bg-blue-500" : "w-1 bg-gray-300"
-                    )}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 右侧：行动号召按钮 */}
-          <button
-            onClick={handleButtonClick}
-            className="flex-shrink-0 h-8 px-4 bg-[#3087FF] text-white text-xs font-medium rounded-lg flex items-center justify-center whitespace-nowrap hover:bg-[#2070EE] transition-colors"
-          >
-            {resolveButtonText()}
-          </button>
-        </div>
+        {!isClosed && floatingWindowContent}
       </div>
-    </div>
+    </>
   );
 }
 

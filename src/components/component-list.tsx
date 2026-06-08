@@ -832,6 +832,7 @@ export function ComponentList() {
                         <div className="w-full h-full flex items-center justify-center">
                           <FloatingWindowTemplate
                             config={editingPreviewConfig["floating_window"] as unknown as FloatingWindowTemplateConfig || previewComponent.config as unknown as FloatingWindowTemplateConfig}
+                            isOpen={true}
                             previewMode={true}
                             onClose={() => setPreviewComponent(null)}
                           />

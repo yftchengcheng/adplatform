@@ -182,7 +182,9 @@ function ImageUpload({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700">卡片主图</label>
+        <label className="text-sm font-medium text-gray-700">
+          图片模式<span className="text-red-500 ml-1">*</span>
+        </label>
         <div className="flex items-center gap-1 p-0.5 bg-gray-100 rounded-lg">
           <button
             onClick={() => {
@@ -212,11 +214,13 @@ function ImageUpload({
       </div>
 
       {mode === "macro" ? (
-        <Input
-          placeholder="如 ${icon_url}"
-          value={macroValue || ""}
-          onChange={(e) => macroOnChange(e.target.value)}
-        />
+        <div className="space-y-1">
+          <Input
+            placeholder="如 ${icon_url}"
+            value={macroValue || ""}
+            onChange={(e) => macroOnChange(e.target.value)}
+          />
+        </div>
       ) : (
         <>
           <div
@@ -324,7 +328,7 @@ function PromotionPointEditor({
 
       <div className="flex items-center justify-between">
         <Input
-          placeholder="添加推广卖点"
+          placeholder={mode === "macro" ? "如 ${promotion_point}" : "添加推广卖点"}
           value={mode === "macro" ? (point.textMacro || "") : point.text}
           onChange={(e) => handleTextChange(e.target.value)}
           className="flex-1"
@@ -377,10 +381,10 @@ export function FloatingWindowTemplateConfigPanel({
     config.iconMacro ? "macro" : (config.iconMode || "upload")
   );
   const [titleMode, setTitleMode] = useState<"input" | "macro">(
-    config.titleMacro ? "macro" : "input"
+    config.titleMacro ? "macro" : (config.titleMode || "input")
   );
   const [buttonTextMode, setButtonTextMode] = useState<"input" | "macro">(
-    config.buttonTextMacro ? "macro" : "input"
+    config.buttonTextMacro ? "macro" : (config.buttonTextMode || "input")
   );
 
   // 更新配置
@@ -388,6 +392,18 @@ export function FloatingWindowTemplateConfigPanel({
     const newConfig = { ...config, ...updates, macroVariables };
     setConfig(newConfig);
     onChange?.(newConfig);
+  };
+
+  // 处理标题模式切换
+  const handleTitleModeChange = (mode: "input" | "macro") => {
+    setTitleMode(mode);
+    updateConfig({ titleMode: mode });
+  };
+
+  // 处理按钮文案模式切换
+  const handleButtonTextModeChange = (mode: "input" | "macro") => {
+    setButtonTextMode(mode);
+    updateConfig({ buttonTextMode: mode });
   };
 
   // 添加推广卖点
@@ -430,18 +446,18 @@ export function FloatingWindowTemplateConfigPanel({
   // 处理标题输入
   const handleTitleInput = (value: string) => {
     if (titleMode === "macro") {
-      updateConfig({ titleMacro: value, title: value });
+      updateConfig({ titleMacro: value, title: value, titleMode: "macro" });
     } else {
-      updateConfig({ title: value, titleMacro: "" });
+      updateConfig({ title: value, titleMacro: "", titleMode: "input" });
     }
   };
 
   // 处理按钮文案输入
   const handleButtonTextInput = (value: string) => {
     if (buttonTextMode === "macro") {
-      updateConfig({ buttonTextMacro: value, buttonText: value });
+      updateConfig({ buttonTextMacro: value, buttonText: value, buttonTextMode: "macro" });
     } else {
-      updateConfig({ buttonText: value, buttonTextMacro: "" });
+      updateConfig({ buttonText: value, buttonTextMacro: "", buttonTextMode: "input" });
     }
   };
 
@@ -514,7 +530,10 @@ export function FloatingWindowTemplateConfigPanel({
               macroValue={config.iconMacro || ""}
               macroOnChange={(v) => updateConfig({ iconMacro: v, iconUrl: "", iconMode: "macro" })}
               mode={iconMode}
-              onModeChange={setIconMode}
+              onModeChange={(m) => {
+                setIconMode(m);
+                updateConfig({ iconMode: m });
+              }}
             />
 
             {/* 卡片标题 */}
@@ -523,11 +542,11 @@ export function FloatingWindowTemplateConfigPanel({
                 <label className="text-sm font-medium text-gray-700">
                   卡片标题<span className="text-red-500 ml-1">*</span>
                 </label>
-                <ModeToggle value={titleMode} onChange={setTitleMode} />
+                <ModeToggle value={titleMode} onChange={handleTitleModeChange} />
               </div>
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder="请输入磁贴标题, 最多14个字符"
+                  placeholder={titleMode === "macro" ? "如 ${title}" : "请输入磁贴标题, 最多14个字符"}
                   value={getTitleValue()}
                   onChange={(e) => handleTitleInput(e.target.value)}
                   className="flex-1"
@@ -542,31 +561,16 @@ export function FloatingWindowTemplateConfigPanel({
                 <label className="text-sm font-medium text-gray-700">
                   行动号召<span className="text-red-500 ml-1">*</span>
                 </label>
+                <ModeToggle value={buttonTextMode} onChange={handleButtonTextModeChange} />
               </div>
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder="请输入行动号召, 最多12个字符"
+                  placeholder={buttonTextMode === "macro" ? "如 ${button_text}" : "请输入行动号召, 最多12个字符"}
                   value={getButtonTextValue()}
                   onChange={(e) => handleButtonTextInput(e.target.value)}
                   className="flex-1"
                 />
                 <CharCounter value={getButtonTextValue()} max={12} />
-              </div>
-            </div>
-
-            {/* 组件名称 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                组件名称<span className="text-red-500 ml-1">*</span>
-              </label>
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="请输入组件名称, 最多20个字符"
-                  value={config.componentName || ""}
-                  onChange={(e) => updateConfig({ componentName: e.target.value })}
-                  className="flex-1"
-                />
-                <CharCounter value={config.componentName || ""} max={20} />
               </div>
             </div>
           </div>
@@ -625,6 +629,24 @@ export function FloatingWindowTemplateConfigPanel({
         onChange={(updates) => updateConfig(updates)}
         hint="不配置默认使用广告（素材）链接"
       />
+
+      {/* Component Name - 最下方 */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="p-4 space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            组件名称<span className="text-red-500 ml-1">*</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="请输入组件名称, 最多20个字符"
+              value={config.componentName || ""}
+              onChange={(e) => updateConfig({ componentName: e.target.value })}
+              className="flex-1"
+            />
+            <CharCounter value={config.componentName || ""} max={20} />
+          </div>
+        </div>
+      </div>
 
       {/* Preview & Save Buttons */}
       <div className="flex items-center justify-end gap-3 pt-2">
