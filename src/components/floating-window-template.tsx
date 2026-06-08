@@ -201,6 +201,14 @@ export function FloatingWindowTemplate({
     return () => clearTimeout(timer);
   }, [isOpen, finalConfig.position, isClosed]);
 
+  // 全局点击跳转 - 点击浮层任意位置（含卡片区域）触发落地页跳转
+  const handleGlobalClick = (e: React.MouseEvent) => {
+    const url = resolveLandingPageUrl();
+    if (url) {
+      openLandingPage(finalConfig, url);
+    }
+  };
+
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     const url = resolveLandingPageUrl();
@@ -268,12 +276,10 @@ export function FloatingWindowTemplate({
   // 缩放比例（预览模式下文字和图标需要等比缩小）
   const scale = previewMode ? 260 / 640 : 1;
 
-  // 浮窗主体内容
+  // 浮窗卡片主体
   const floatingWindowContent = (
     <div
-      className={cn(
-        "relative overflow-hidden cursor-pointer",
-      )}
+      className="relative overflow-hidden cursor-pointer"
       style={{
         width: getWindowWidth(),
         height: `${100 * scale}px`,
@@ -284,13 +290,12 @@ export function FloatingWindowTemplate({
         borderRadius: previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px"),
         backdropFilter: "blur(8px)",
       }}
-      onClick={(e) => e.stopPropagation()}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* 关闭按钮 */}
+      {/* 关闭按钮 - stopPropagation 阻止冒泡到浮层全局点击 */}
       <button
-        onClick={handleClose}
+        onClick={(e) => { e.stopPropagation(); handleClose(e); }}
         className="absolute flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100/50 z-10 transition-colors duration-200 cursor-pointer"
         style={{
           top: `${Math.max(4 * scale, 3)}px`,
@@ -364,7 +369,7 @@ export function FloatingWindowTemplate({
     </div>
   );
 
-  // 预览模式 - 模拟手机屏幕，展示位置和动画效果
+  // 预览模式 - 模拟手机屏幕，全屏透明浮层 + flexbox 定位
   if (previewMode) {
     return (
       <div className="w-full flex items-center justify-center">
@@ -387,48 +392,47 @@ export function FloatingWindowTemplate({
             ))}
           </div>
 
-          {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
-          <div
-            className="absolute z-20"
-            style={{
-              position: "absolute",
-              top: position === "top" ? 0 : undefined,
-              bottom: position === "bottom" ? 0 : position === "middle_bottom" ? "25%" : undefined,
-              left: 0,
-              right: position === "middle_bottom" ? undefined : 0,
-              zIndex: 20,
-              display: "flex",
-              justifyContent: isMiddleBottom ? "flex-start" : "center",
-              paddingLeft: isMiddleBottom ? `${8 * scale}px` : undefined,
-            }}
-          >
-            {!isClosed && floatingWindowContent}
-          </div>
+          {/* 全屏透明浮层 - 通过 flexbox 定位卡片 */}
+          {!isClosed && (
+            <div
+              className="absolute inset-0 z-20 flex flex-col"
+              style={{
+                background: "transparent",
+                cursor: "pointer",
+                justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "flex-end",
+                alignItems: isMiddleBottom ? "flex-start" : "center",
+                paddingBottom: position === "middle_bottom" ? "25%" : undefined,
+                paddingLeft: isMiddleBottom ? `${8 * scale}px` : undefined,
+              }}
+              onClick={handleGlobalClick}
+            >
+              {floatingWindowContent}
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
-  // 非预览模式 - 完整浮窗展示
+  // 非预览模式 - 全屏透明浮层 + flexbox 定位
   return (
     <>
-      {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
-      <div
-        className="fixed z-50"
-        style={{
-          position: "fixed",
-          top: position === "top" ? 0 : undefined,
-          bottom: position === "bottom" ? 0 : position === "middle_bottom" ? "25%" : undefined,
-          left: 0,
-          right: position === "middle_bottom" ? undefined : 0,
-          zIndex: 50,
-          display: "flex",
-          justifyContent: isMiddleBottom ? "flex-start" : "center",
-          paddingLeft: isMiddleBottom ? "0" : undefined,
-        }}
-      >
-        {!isClosed && floatingWindowContent}
-      </div>
+      {!isClosed && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col"
+          style={{
+            background: "transparent",
+            cursor: "pointer",
+            justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "flex-end",
+            alignItems: isMiddleBottom ? "flex-start" : "center",
+            paddingBottom: position === "middle_bottom" ? "25%" : undefined,
+            paddingLeft: isMiddleBottom ? "8px" : undefined,
+          }}
+          onClick={handleGlobalClick}
+        >
+          {floatingWindowContent}
+        </div>
+      )}
     </>
   );
 }
