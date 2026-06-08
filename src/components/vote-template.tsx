@@ -68,7 +68,7 @@ function VoteOptionBar({
     <button
       onClick={onSelect}
       className={cn(
-        "relative w-full h-14 rounded-xl border-2 overflow-hidden transition-all duration-300",
+        "relative w-full h-10 rounded-lg border-2 overflow-hidden transition-all duration-300",
         selected
           ? "border-blue-500 bg-blue-50"
           : "border-blue-500 bg-white hover:bg-blue-50"
@@ -84,11 +84,11 @@ function VoteOptionBar({
       />
 
       {/* 内容 */}
-      <div className="relative flex items-center justify-between h-full px-4">
+      <div className="relative flex items-center justify-between h-full px-2.5">
         {/* 左侧：按钮文字 */}
         <span
           className={cn(
-            "font-medium text-sm",
+            "font-medium text-[11px]",
             selected ? "text-white" : "text-blue-600"
           )}
         >
@@ -98,7 +98,7 @@ function VoteOptionBar({
         {/* 右侧：百分比 */}
         <span
           className={cn(
-            "font-semibold text-sm",
+            "font-semibold text-[11px]",
             selected ? "text-white" : "text-gray-600"
           )}
         >
@@ -270,29 +270,29 @@ export function VoteTemplate({
           {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="关闭"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-3 h-3 text-gray-500" />
             </button>
 
           {/* Content */}
-          <div className="px-5 pt-6 pb-4">
+          <div className="px-3 pt-2 pb-2">
             {/* Title */}
-            <h2 className="text-xl font-bold text-gray-900 pr-8 leading-tight">
+            <h2 className="text-xs font-bold text-gray-900 pr-6 leading-tight truncate">
               {finalConfig.title}
             </h2>
 
             {/* Subtitle */}
             {finalConfig.subtitle && (
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+              <p className="mt-0.5 text-[10px] text-gray-500 leading-tight truncate">
                 {finalConfig.subtitle}
               </p>
             )}
           </div>
 
           {/* Vote Options */}
-          <div className="px-5 pb-6 space-y-3">
+          <div className="px-3 pb-2 space-y-1.5">
             {finalConfig.options.map((option, index) => (
               <VoteOptionBar
                 key={option.id}
