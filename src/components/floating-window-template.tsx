@@ -279,7 +279,7 @@ export function FloatingWindowTemplate({
         height: `${100 * scale}px`,
         transform: getAnimationTransform(),
         transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        background: "rgba(255, 255, 255, 0.9)",
+        background: "rgba(255, 255, 255, 1)",
         boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
         borderRadius: previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px"),
         backdropFilter: "blur(8px)",
