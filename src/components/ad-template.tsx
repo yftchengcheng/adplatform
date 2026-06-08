@@ -202,60 +202,50 @@ export function AdTemplate({
   if (!isVisible && !previewMode) return null;
 
   return (
-    <div className={cn(previewMode ? "w-[375px] max-w-full flex items-center justify-center" : "")}>
-      {/* Backdrop */}
+    <div className={cn(previewMode ? "relative left-0 top-1/2 -translate-y-1/2" : "")}>
+      {/* Container */}
       <div
         className={cn(
           previewMode
-            ? "flex items-center justify-center w-full max-w-full"
-            : "fixed inset-0 z-50 bg-black/50",
-          "transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0"
+            ? "w-[240px] bg-white rounded-r-2xl shadow-xl overflow-hidden"
+            : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] bg-white rounded-r-2xl shadow-2xl overflow-hidden",
+          "transition-all duration-300",
+          isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
-        onClick={!previewMode ? onClose : undefined}
+        style={{ height: 160 }}
       >
-        {/* Modal */}
-        <div
-          className={cn(
-            previewMode
-              ? "w-full bg-white rounded-2xl shadow-xl overflow-hidden"
-              : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl overflow-hidden",
-            "transition-all duration-300",
-            isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
-          )}
-        >
           {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="关闭"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-3 h-3 text-gray-500" />
             </button>
 
           {/* Content */}
-          <div className="px-5 pt-6 pb-4">
+          <div className="px-2.5 pt-2 pb-1.5">
             {/* Title */}
-            <h2 className="text-xl font-bold text-gray-900 pr-8 leading-tight">
+            <h2 className="text-xs font-bold text-gray-900 pr-5 leading-tight">
               {finalConfig.title}
             </h2>
 
             {/* Subtitle */}
-            <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            <p className="mt-0.5 text-[10px] text-gray-600 leading-relaxed">
               {finalConfig.subtitle}
             </p>
           </div>
 
           {/* Buttons */}
-          <div className="px-5 pb-6 space-y-3">
+          <div className="px-2.5 pb-2 space-y-1">
             <button
               onClick={handleButton1Click}
               className={cn(
-                "w-full h-12 rounded-xl text-white font-medium text-base",
+                "w-full h-7 rounded-lg text-white font-medium text-[11px]",
                 "bg-gradient-to-r from-blue-500 to-blue-600",
                 "hover:from-blue-600 hover:to-blue-700",
                 "active:scale-[0.98] transition-all duration-150",
-                "shadow-lg shadow-blue-500/25",
+                "shadow-md shadow-blue-500/25",
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
@@ -265,18 +255,17 @@ export function AdTemplate({
             <button
               onClick={handleButton2Click}
               className={cn(
-                "w-full h-12 rounded-xl text-white font-medium text-base",
+                "w-full h-7 rounded-lg text-white font-medium text-[11px]",
                 "bg-gradient-to-r from-blue-500 to-blue-600",
                 "hover:from-blue-600 hover:to-blue-700",
                 "active:scale-[0.98] transition-all duration-150",
-                "shadow-lg shadow-blue-500/25",
+                "shadow-md shadow-blue-500/25",
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
               {finalConfig.button2.text}
             </button>
           </div>
-        </div>
       </div>
 
       {/* Image Modal (for show_image action) */}
