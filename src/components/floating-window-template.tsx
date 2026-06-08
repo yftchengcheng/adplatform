@@ -544,12 +544,12 @@ export function FloatingWindowTemplate({
               background: "transparent",
               cursor: "pointer",
               justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "center",
-              alignItems: "center",
+              alignItems: position === "middle" ? "flex-start" : "center",
               padding: position === "top"
                 ? `${8 * scale}px ${8 * scale}px 0 ${8 * scale}px`
                 : position === "bottom"
                   ? `0 ${8 * scale}px ${8 * scale}px ${8 * scale}px`
-                  : `${8 * scale}px`,
+                  : `${8 * scale}px 0 ${8 * scale}px ${8 * scale}px`,
             }}
             onClick={handleGlobalClick}
           >
@@ -570,12 +570,12 @@ export function FloatingWindowTemplate({
             background: "transparent",
             cursor: "pointer",
             justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "center",
-            alignItems: "center",
+            alignItems: position === "middle" ? "flex-start" : "center",
             padding: position === "top"
               ? "12px 12px 0 12px"
               : position === "bottom"
                 ? "0 12px 12px 12px"
-                : "12px",
+                : "12px 0 12px 12px",
           }}
           onClick={handleGlobalClick}
         >
