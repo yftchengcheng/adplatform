@@ -83,7 +83,7 @@ export const componentStyleTemplates: ComponentStyleTemplate[] = [
   {
     id: "floating_window",
     name: "浮窗",
-    category: "static",
+    category: "animation",
     description: "左图右文浮窗，支持推广卖点轮播",
     icon: "panel-top",
   },

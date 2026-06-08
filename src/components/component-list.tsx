@@ -77,6 +77,7 @@ import { ScratchCardConfig, defaultScratchCardConfig } from "@/components/scratc
 import { ScratchCardTemplate as ScratchCardTemplateDefault } from "@/components/scratch-card-template";
 import { PopupRedpacketConfig } from "@/components/popup-redpacket-config";
 import PopupRedpacketTemplate from "@/components/popup-redpacket-template";
+import { FloatingWindowTemplate, FloatingWindowTemplateConfig } from "@/components/floating-window-template";
 
 import { useRouter } from "next/navigation";
 
@@ -823,6 +824,14 @@ export function ComponentList() {
                           <TreasureboxRainTemplateDefault
                             config={editingPreviewConfig["treasure_rain"] as unknown as TreasureboxRainTemplateConfig || previewComponent.config as unknown as TreasureboxRainTemplateConfig}
                             isOpen={true}
+                            previewMode={true}
+                            onClose={() => setPreviewComponent(null)}
+                          />
+                        </div>
+                      ) : previewComponent?.type === "floating_window" ? (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <FloatingWindowTemplate
+                            config={editingPreviewConfig["floating_window"] as unknown as FloatingWindowTemplateConfig || previewComponent.config as unknown as FloatingWindowTemplateConfig}
                             previewMode={true}
                             onClose={() => setPreviewComponent(null)}
                           />
