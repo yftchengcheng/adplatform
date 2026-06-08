@@ -245,6 +245,7 @@ const COMPONENT_TYPE_NAMES: Record<string, string> = {
   coupon: "优惠券磁贴",
   promotion_card: "推广卡片",
   game_gift: "游戏礼包码",
+  floating_window: "浮窗",
 };
 
 // 获取组件预览图
@@ -277,6 +278,7 @@ function getComponentPreview(componentType: string, config?: Record<string, unkn
     coupon: "coupon",
     promotion_card: "promo",
     game_gift: "game",
+    floating_window: "floatwin",
   };
   const seed = seedMap[componentType] || componentType;
   return `https://picsum.photos/seed/${seed}/120/80`;

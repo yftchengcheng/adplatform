@@ -29,6 +29,7 @@ import { ScratchCardConfig } from "./scratch-card-config";
 import { ScratchCardTemplate } from "./scratch-card-template";
 import { PopupRedpacketTemplateConfig } from "./popup-redpacket-template";
 import PopupRedpacketTemplate from "./popup-redpacket-template";
+import { FloatingWindowTemplate, FloatingWindowTemplateConfig, defaultFloatingWindowConfig } from "./floating-window-template";
 
 // ---- 类型定义 ----
 
@@ -248,6 +249,15 @@ const DEFAULT_COMPONENT_CONFIGS: Record<string, Record<string, unknown>> = {
     action: "open",
     defaultLandingPageUrl: "",
   },
+  floating_window: {
+    position: "top",
+    action: "open",
+    title: "官方推广",
+    promotionPoints: [{ id: "1", text: "官方正版授权" }, { id: "2", text: "安全无毒无插件" }],
+    buttonText: "立即下载",
+    landingPageUrl: "",
+    defaultLandingPageUrl: "",
+  },
 };
 
 // ---- 真实组件渲染 ----
@@ -428,6 +438,17 @@ function RealComponentPreview({
     return (
       <PopupRedpacketTemplate
         config={config as unknown as PopupRedpacketTemplateConfig}
+        isOpen={true}
+        onClose={onDismiss}
+        previewMode={true}
+      />
+    );
+  }
+
+  if (componentTypeKey === "floating_window") {
+    return (
+      <FloatingWindowTemplate
+        config={config as unknown as FloatingWindowTemplateConfig}
         isOpen={true}
         onClose={onDismiss}
         previewMode={true}

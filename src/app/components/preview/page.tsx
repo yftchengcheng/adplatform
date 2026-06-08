@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import { AdTemplate, AdTemplateConfig } from "@/components/ad-template";
 import { GameGiftTemplate, GameGiftTemplateConfig } from "@/components/game-gift-template";
 import { RedpacketRainTemplate, RedpacketRainTemplateConfig } from "@/components/redpacket-rain-template";
+import { FloatingWindowTemplate, FloatingWindowTemplateConfig, defaultFloatingWindowConfig } from "@/components/floating-window-template";
 import { VoteTemplateConfig } from "@/components/vote-template";
 import { ImageTemplateConfig } from "@/components/image-template";
 import { EcommerceTemplateConfig } from "@/components/ecommerce-template";
 import { CouponTemplateConfig } from "@/components/coupon-template";
 import { PromotionTemplateConfig } from "@/components/promotion-template";
 
-type ComponentType = "dual_button" | "vote" | "image" | "ecommerce" | "coupon" | "promotion_card" | "game_gift" | "redpacket_rain";
+type ComponentType = "dual_button" | "vote" | "image" | "ecommerce" | "coupon" | "promotion_card" | "game_gift" | "redpacket_rain" | "floating_window";
 
 type AllConfigTypes = AdTemplateConfig | VoteTemplateConfig | ImageTemplateConfig | EcommerceTemplateConfig | CouponTemplateConfig | PromotionTemplateConfig | GameGiftTemplateConfig | RedpacketRainTemplateConfig;
 
@@ -148,6 +149,19 @@ const defaultConfigs: Record<ComponentType, ComponentConfig> = {
     name: "红包雨",
     description: "红包飘落互动，点击领取奖品",
   },
+  floating_window: {
+    defaultConfig: {
+      position: "top",
+      action: "open",
+      title: "官方推广",
+      promotionPoints: [{ id: "1", text: "官方正版授权" }, { id: "2", text: "安全无毒无插件" }],
+      buttonText: "立即下载",
+      landingPageUrl: "",
+      defaultLandingPageUrl: "",
+    } as FloatingWindowTemplateConfig,
+    name: "浮窗",
+    description: "浮窗推广卡片，支持顶部/底部/中部展示",
+  },
 };
 
 function PreviewContent() {
@@ -194,6 +208,18 @@ function PreviewContent() {
       return (
         <RedpacketRainTemplate
           config={redpacketConfig}
+          isOpen={showAd}
+          onClose={() => setShowAd(false)}
+          previewMode={false}
+        />
+      );
+    }
+
+    if (componentType === "floating_window") {
+      const floatingConfig = config as FloatingWindowTemplateConfig;
+      return (
+        <FloatingWindowTemplate
+          config={floatingConfig}
           isOpen={showAd}
           onClose={() => setShowAd(false)}
           previewMode={false}

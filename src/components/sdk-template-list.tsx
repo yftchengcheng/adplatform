@@ -50,6 +50,7 @@ const COMPONENT_TYPE_NAMES: Record<string, string> = {
   coupon: "优惠券磁贴",
   promotion_card: "推广卡片",
   game_gift: "游戏礼包码",
+  floating_window: "浮窗",
 };
 
 function getComponentTypeName(componentType: string): string {

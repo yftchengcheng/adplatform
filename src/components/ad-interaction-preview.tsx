@@ -365,6 +365,7 @@ function getComponentPreview(componentType: string, config?: Record<string, unkn
     coupon: "coupon",
     promotion_card: "promo",
     game_gift: "game",
+    floating_window: "floatwin",
   };
   const seed = seedMap[componentType] || componentType;
   return `https://picsum.photos/seed/${seed}/120/80`;
