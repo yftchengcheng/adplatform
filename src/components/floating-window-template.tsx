@@ -88,6 +88,7 @@ export function FloatingWindowTemplate({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [showGlow, setShowGlow] = useState(false);
+  const [showButtonGlow, setShowButtonGlow] = useState(false);
 
   // 获取有效的推广卖点
   const safePoints = Array.isArray(finalConfig.promotionPoints) ? finalConfig.promotionPoints : [];
@@ -199,12 +200,19 @@ export function FloatingWindowTemplate({
     if (isClosed) return;
     setIsAnimating(false);
     setShowGlow(false);
+    setShowButtonGlow(false);
     const timer = setTimeout(() => {
       setIsAnimating(true);
     }, 150);
-    // 滑入动画1.2s完成后，触发边框流光效果（播放一次）
+    // 滑入动画1.2s完成后，触发卡片边框七彩流光效果（顺时针跑一圈1.5s）
     const glowTimer = setTimeout(() => {
       setShowGlow(true);
+      // 卡片流光跑完一圈后，切换到按钮流光（持续转圈）
+      const btnGlowTimer = setTimeout(() => {
+        setShowGlow(false);
+        setShowButtonGlow(true);
+      }, 1500);
+      return () => clearTimeout(btnGlowTimer);
     }, 150 + 1200);
     return () => {
       clearTimeout(timer);
@@ -307,14 +315,14 @@ export function FloatingWindowTemplate({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* 流光层 - 使用 @property 驱动 conic-gradient 角度，窄亮带沿边框流动一圈 */}
+      {/* 卡片边框七彩流光层 - @property 驱动 conic-gradient 角度，七彩窄光带顺时针跑一圈 */}
       {showGlow && (
         <span
           className="absolute"
           style={{
-            inset: `-${Math.max(20 * scale, 12)}px`,
-            background: `conic-gradient(from var(--glow-angle, 0deg), transparent 0%, transparent 75%, rgba(48,135,255,0.15) 82%, rgba(100,180,255,0.5) 88%, rgba(255,255,255,0.8) 91%, rgba(100,180,255,0.5) 94%, rgba(48,135,255,0.15) 98%, transparent 100%)`,
-            animation: "glow-travel 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards",
+            inset: `-${Math.max(2 * scale, 1)}px`,
+            background: `conic-gradient(from var(--glow-angle, 0deg), transparent 0%, transparent 70%, #ff0000 76%, #ff8800 80%, #ffff00 83%, #00ff00 86%, #0088ff 89%, #8800ff 92%, #ff00ff 95%, transparent 100%)`,
+            animation: "glow-travel 1.5s linear forwards",
           }}
         />
       )}
@@ -386,21 +394,41 @@ export function FloatingWindowTemplate({
           </p>
         </div>
 
-        {/* 右侧：行动号召按钮 */}
-        <button
-          onClick={handleButtonClick}
-          className="flex-shrink-0 text-white rounded flex items-center justify-center whitespace-nowrap cursor-pointer hover:opacity-90 transition-opacity duration-200 font-medium"
+        {/* 右侧：行动号召按钮（含流光边框） */}
+        <div
+          className="flex-shrink-0 relative"
           style={{
-            height: `${Math.max(24 * scale, 18)}px`,
-            paddingLeft: `${Math.max(8 * scale, 6)}px`,
-            paddingRight: `${Math.max(8 * scale, 6)}px`,
-            fontSize: `${Math.max(10 * scale, 9)}px`,
-            backgroundColor: "#3087FF",
-            borderRadius: `${Math.max(4 * scale, 3)}px`,
+            padding: showButtonGlow ? `${Math.max(2 * scale, 1)}px` : '0px',
+            borderRadius: `${Math.max(6 * scale, 4)}px`,
+            overflow: 'hidden',
           }}
         >
-          {finalConfig.buttonText}
-        </button>
+          {/* 按钮流光层 - 七彩光持续顺时针转圈 */}
+          {showButtonGlow && (
+            <span
+              className="absolute"
+              style={{
+                inset: `-${Math.max(2 * scale, 1)}px`,
+                background: `conic-gradient(from var(--glow-angle, 0deg), transparent 0%, transparent 55%, #ff0000 62%, #ff8800 67%, #ffff00 72%, #00ff00 76%, #0088ff 80%, #8800ff 84%, #ff00ff 88%, transparent 100%)`,
+                animation: "glow-loop 1s linear infinite",
+              }}
+            />
+          )}
+          <button
+            onClick={handleButtonClick}
+            className="relative text-white rounded flex items-center justify-center whitespace-nowrap cursor-pointer hover:opacity-90 transition-opacity duration-200 font-medium"
+            style={{
+              height: `${Math.max(24 * scale, 18)}px`,
+              paddingLeft: `${Math.max(8 * scale, 6)}px`,
+              paddingRight: `${Math.max(8 * scale, 6)}px`,
+              fontSize: `${Math.max(10 * scale, 9)}px`,
+              backgroundColor: "#3087FF",
+              borderRadius: `${Math.max(4 * scale, 3)}px`,
+            }}
+          >
+            {finalConfig.buttonText}
+          </button>
+        </div>
       </div>
       </div>{/* 关闭卡片内容层 */}
     </div>
@@ -410,7 +438,7 @@ export function FloatingWindowTemplate({
   if (previewMode) {
     return (
       <div className="relative w-full h-full">
-        {/* 流光边框动画 - @property 驱动角度旋转 + 优雅消退 */}
+        {/* 七彩流光边框动画 - @property 驱动角度旋转 */}
         <style>{`
           @property --glow-angle {
             syntax: '<angle>';
@@ -418,9 +446,12 @@ export function FloatingWindowTemplate({
             inherits: false;
           }
           @keyframes glow-travel {
-            0% { --glow-angle: 0deg; opacity: 1; }
-            80% { opacity: 1; }
-            100% { --glow-angle: 360deg; opacity: 0; }
+            0% { --glow-angle: 0deg; }
+            100% { --glow-angle: 360deg; }
+          }
+          @keyframes glow-loop {
+            0% { --glow-angle: 0deg; }
+            100% { --glow-angle: 360deg; }
           }
         `}</style>
 
@@ -459,7 +490,7 @@ export function FloatingWindowTemplate({
   // 非预览模式 - 全屏透明浮层 + flexbox 定位
   return (
     <>
-      {/* 流光边框动画 - @property 驱动角度旋转 + 优雅消退 */}
+      {/* 七彩流光边框动画 - @property 驱动角度旋转 */}
       <style>{`
         @property --glow-angle {
           syntax: '<angle>';
@@ -467,9 +498,12 @@ export function FloatingWindowTemplate({
           inherits: false;
         }
         @keyframes glow-travel {
-          0% { --glow-angle: 0deg; opacity: 1; }
-          80% { opacity: 1; }
-          100% { --glow-angle: 360deg; opacity: 0; }
+          0% { --glow-angle: 0deg; }
+          100% { --glow-angle: 360deg; }
+        }
+        @keyframes glow-loop {
+          0% { --glow-angle: 0deg; }
+          100% { --glow-angle: 360deg; }
         }
       `}</style>
       {!isClosed && (
