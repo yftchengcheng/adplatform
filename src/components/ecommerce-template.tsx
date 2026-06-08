@@ -173,39 +173,38 @@ export function EcommerceTemplate({
   const imageUrl = resolveImageUrl();
 
   return (
-    <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
+    <div className={cn(previewMode ? "w-full" : "")}>
       {/* Backdrop */}
+      {!previewMode && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Card - 左图右文布局，左侧贴边 */}
       <div
         className={cn(
           previewMode
-            ? "flex items-center justify-center w-full max-w-sm"
-            : "fixed inset-0 z-50 bg-black/50",
-          "transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0"
+            ? "w-full"
+            : "fixed left-0 z-50",
+          "transition-all duration-300",
+          isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
-        onClick={!previewMode ? onClose : undefined}
+        style={{
+          width: previewMode ? undefined : 320,
+          height: previewMode ? undefined : 150,
+        }}
       >
-        {/* Modal - 左图右文布局 */}
         <div
-          className={cn(
-            previewMode
-              ? "w-full mx-4 bg-white rounded-2xl shadow-xl overflow-hidden"
-              : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl overflow-hidden",
-            "transition-all duration-300",
-            isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
-          )}
+          className="bg-white rounded-r-2xl shadow-xl overflow-hidden"
+          style={{
+            width: previewMode ? "100%" : 320,
+            height: previewMode ? "auto" : 150,
+          }}
         >
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
-            aria-label="关闭"
-          >
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-
           {/* Content - 左图右文 */}
-          <div className="flex items-center p-4 gap-4">
+          <div className="flex items-center p-4 gap-4" style={previewMode ? {} : { height: 150 }}>
             {/* 左侧图片 */}
             <div className="flex-shrink-0 w-[87px] h-[87px] rounded-lg overflow-hidden bg-gray-100">
               {imageUrl ? (
