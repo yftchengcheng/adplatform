@@ -216,7 +216,7 @@ function PreviewContent() {
     }
 
     if (componentType === "floating_window") {
-      const floatingConfig = config as FloatingWindowTemplateConfig;
+      const floatingConfig = config as unknown as FloatingWindowTemplateConfig;
       return (
         <FloatingWindowTemplate
           config={floatingConfig}

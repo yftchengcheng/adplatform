@@ -404,7 +404,7 @@ export function FloatingWindowTemplateConfigPanel({
   };
 
   // 处理图标模式切换 - 切换时清空另一模式的值
-  const handleIconModeChange = (mode: "input" | "macro") => {
+  const handleIconModeChange = (mode: "upload" | "macro") => {
     setIconMode(mode);
     if (mode === "macro") {
       updateConfig({ iconUrl: "", iconMacro: "" });
