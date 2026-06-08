@@ -83,7 +83,7 @@ export function FloatingWindowTemplate({
     ...config,
   };
 
-  const [isAnimating, setIsAnimating] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -197,7 +197,7 @@ export function FloatingWindowTemplate({
   useEffect(() => {
     if (isClosed) return;
     setIsAnimating(false);
-    const timer = setTimeout(() => setIsAnimating(true), 80);
+    const timer = setTimeout(() => setIsAnimating(true), 150);
     return () => clearTimeout(timer);
   }, [isOpen, finalConfig.position, isClosed]);
 
