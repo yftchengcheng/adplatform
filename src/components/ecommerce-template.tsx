@@ -245,7 +245,7 @@ export function EcommerceTemplate({
               {/* 按钮 */}
               <button
                 onClick={handleButtonClick}
-                className="w-full px-3 py-1.5 bg-red-500 text-white text-xs font-normal rounded-lg hover:bg-red-600 transition-colors"
+                className="w-4/5 mx-auto px-3 py-1.5 bg-red-500 text-white text-xs font-normal rounded-lg hover:bg-red-600 transition-colors"
               >
                 {resolveButtonText()}
               </button>
