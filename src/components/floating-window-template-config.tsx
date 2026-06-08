@@ -502,7 +502,7 @@ export function FloatingWindowTemplateConfigPanel({
                 浮窗位置<span className="text-red-500 ml-1">*</span>
               </label>
               <div className="flex items-center gap-4">
-                {(["top", "bottom", "middle_bottom"] as FloatingWindowPosition[]).map((pos) => (
+                {(["top", "bottom", "middle"] as FloatingWindowPosition[]).map((pos) => (
                   <label key={pos} className="flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="radio"
@@ -513,7 +513,7 @@ export function FloatingWindowTemplateConfigPanel({
                       className="w-3.5 h-3.5 text-blue-500"
                     />
                     <span className="text-sm text-gray-700">
-                      {pos === "top" ? "顶部" : pos === "bottom" ? "底部" : "中下部"}
+                      {pos === "top" ? "顶部" : pos === "bottom" ? "底部" : "中部"}
                     </span>
                   </label>
                 ))}

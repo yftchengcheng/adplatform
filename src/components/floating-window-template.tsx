@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { openLandingPage } from "./landing-page-config";
 
 // 浮窗位置类型
-export type FloatingWindowPosition = "top" | "bottom" | "middle_bottom";
+export type FloatingWindowPosition = "top" | "bottom" | "middle";
 
 // 推广卖点
 export interface FloatingWindowPromotionPoint {
@@ -21,7 +21,7 @@ export interface FloatingWindowTemplateConfig {
   action?: "open" | "close";           // 组件动作，默认打开
 
   // 浮窗位置
-  position: FloatingWindowPosition; // 顶部/底部/中下部
+  position: FloatingWindowPosition; // 顶部/底部/中部
 
   // 图标
   iconUrl?: string;                 // 图标URL
@@ -322,7 +322,7 @@ export function FloatingWindowTemplate({
   const iconSrc = resolveIcon();
   const currentPoint = validPoints[currentIndex] || { text: "" };
   const position = finalConfig.position || "bottom";
-  const isMiddleBottom = position === "middle_bottom";
+  const isMiddle = position === "middle";
 
   // 根据位置决定滑入动画的初始偏移
   const getAnimationTransform = () => {
@@ -334,7 +334,7 @@ export function FloatingWindowTemplate({
         return "translate(0, -100%)";
       case "bottom":
         return "translate(0, 100%)";
-      case "middle_bottom":
+      case "middle":
         return "translate(-100%, 0)";
     }
   };
@@ -343,9 +343,9 @@ export function FloatingWindowTemplate({
   const getWindowWidth = () => {
     if (previewMode) {
       // 预览模式：用百分比填充父容器（手机外框由配置页/列表页提供）
-      return isMiddleBottom ? "75%" : "100%";
+      return "100%";
     }
-    return isMiddleBottom ? "480px" : "640px";
+    return "640px";
   };
 
   // 缩放比例（预览模式下文字和图标需要等比缩小）
@@ -353,7 +353,7 @@ export function FloatingWindowTemplate({
   const scale = previewMode ? 264 / 640 : 1;
 
   // 流光边框圆角
-  const glowBorderRadius = previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px");
+  const glowBorderRadius = previewMode ? `${12 * scale}px` : "12px";
 
   // 流光光带长度（卡片短边的80%）
   const glowBandLength = previewMode ? `${Math.max(60 * scale, 30)}px` : "80px";
@@ -542,13 +542,13 @@ export function FloatingWindowTemplate({
             style={{
               background: "transparent",
               cursor: "pointer",
-              justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "flex-end",
-              alignItems: isMiddleBottom ? "flex-start" : "center",
+              justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "center",
+              alignItems: "center",
               padding: position === "top"
                 ? `${8 * scale}px ${8 * scale}px 0 ${8 * scale}px`
                 : position === "bottom"
                   ? `0 ${8 * scale}px ${8 * scale}px ${8 * scale}px`
-                  : `0 0 ${25}% 8px`,
+                  : `${8 * scale}px`,
             }}
             onClick={handleGlobalClick}
           >
@@ -568,13 +568,13 @@ export function FloatingWindowTemplate({
           style={{
             background: "transparent",
             cursor: "pointer",
-            justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "flex-end",
-            alignItems: isMiddleBottom ? "flex-start" : "center",
+            justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "center",
+            alignItems: "center",
             padding: position === "top"
               ? "12px 12px 0 12px"
               : position === "bottom"
                 ? "0 12px 12px 12px"
-                : "0 0 25% 8px",
+                : "12px",
           }}
           onClick={handleGlobalClick}
         >
