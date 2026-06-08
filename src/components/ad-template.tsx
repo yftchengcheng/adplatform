@@ -209,11 +209,10 @@ export function AdTemplate({
           previewMode
             ? "w-[240px] bg-white rounded-r-2xl shadow-xl overflow-hidden"
             : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] bg-white rounded-r-2xl shadow-2xl overflow-hidden",
-          "transition-all duration-300",
+          "transition-all duration-300 flex flex-col",
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
         style={{ height: 160 }}
-        className="flex flex-col"
       >
           {/* Close Button */}
             <button
