@@ -279,7 +279,7 @@ export function FloatingWindowTemplate({
         height: `${100 * scale}px`,
         transform: getAnimationTransform(),
         transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        background: "rgba(255, 255, 255, 0.9)",
+        background: "rgba(255, 255, 255, 0.1)",
         boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
         borderRadius: previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px"),
         backdropFilter: "blur(8px)",
@@ -389,13 +389,14 @@ export function FloatingWindowTemplate({
 
           {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
           <div
-            className={cn(
-              "absolute z-20",
-              position === "top" && "top-0 left-0 right-0",
-              position === "bottom" && "bottom-0 left-0 right-0",
-              position === "middle_bottom" && "bottom-[25%] left-0"
-            )}
+            className="absolute z-20"
             style={{
+              position: "absolute",
+              top: position === "top" ? 0 : undefined,
+              bottom: position === "bottom" ? 0 : position === "middle_bottom" ? "25%" : undefined,
+              left: 0,
+              right: position === "middle_bottom" ? undefined : 0,
+              zIndex: 20,
               display: "flex",
               justifyContent: isMiddleBottom ? "flex-start" : "center",
               paddingLeft: isMiddleBottom ? `${8 * scale}px` : undefined,
@@ -413,13 +414,14 @@ export function FloatingWindowTemplate({
     <>
       {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
       <div
-        className={cn(
-          "fixed z-50",
-          position === "top" && "top-0 left-0 right-0",
-          position === "bottom" && "bottom-0 left-0 right-0",
-          position === "middle_bottom" && "bottom-[25%] left-0"
-        )}
+        className="fixed z-50"
         style={{
+          position: "fixed",
+          top: position === "top" ? 0 : undefined,
+          bottom: position === "bottom" ? 0 : position === "middle_bottom" ? "25%" : undefined,
+          left: 0,
+          right: position === "middle_bottom" ? undefined : 0,
+          zIndex: 50,
           display: "flex",
           justifyContent: isMiddleBottom ? "flex-start" : "center",
           paddingLeft: isMiddleBottom ? "0" : undefined,
