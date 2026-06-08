@@ -383,9 +383,6 @@ export function FloatingWindowTemplateConfigPanel({
   const [titleMode, setTitleMode] = useState<"input" | "macro">(
     config.titleMacro ? "macro" : (config.titleMode || "input")
   );
-  const [buttonTextMode, setButtonTextMode] = useState<"input" | "macro">(
-    config.buttonTextMacro ? "macro" : (config.buttonTextMode || "input")
-  );
 
   // 更新配置
   const updateConfig = (updates: Partial<FloatingWindowTemplateConfig>) => {
@@ -398,12 +395,6 @@ export function FloatingWindowTemplateConfigPanel({
   const handleTitleModeChange = (mode: "input" | "macro") => {
     setTitleMode(mode);
     updateConfig({ titleMode: mode });
-  };
-
-  // 处理按钮文案模式切换
-  const handleButtonTextModeChange = (mode: "input" | "macro") => {
-    setButtonTextMode(mode);
-    updateConfig({ buttonTextMode: mode });
   };
 
   // 添加推广卖点
@@ -452,18 +443,8 @@ export function FloatingWindowTemplateConfigPanel({
     }
   };
 
-  // 处理按钮文案输入
-  const handleButtonTextInput = (value: string) => {
-    if (buttonTextMode === "macro") {
-      updateConfig({ buttonTextMacro: value, buttonText: value, buttonTextMode: "macro" });
-    } else {
-      updateConfig({ buttonText: value, buttonTextMacro: "", buttonTextMode: "input" });
-    }
-  };
-
   // 获取各输入值
   const getTitleValue = () => titleMode === "macro" ? (config.titleMacro || config.title || "") : (config.title || "");
-  const getButtonTextValue = () => buttonTextMode === "macro" ? (config.buttonTextMacro || config.buttonText || "") : (config.buttonText || "");
 
   return (
     <div className="space-y-4">
@@ -555,22 +536,19 @@ export function FloatingWindowTemplateConfigPanel({
               </div>
             </div>
 
-            {/* 行动号召 */}
+            {/* 行动号召 - 无宏模式 */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  行动号召<span className="text-red-500 ml-1">*</span>
-                </label>
-                <ModeToggle value={buttonTextMode} onChange={handleButtonTextModeChange} />
-              </div>
+              <label className="text-sm font-medium text-gray-700">
+                行动号召<span className="text-red-500 ml-1">*</span>
+              </label>
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder={buttonTextMode === "macro" ? "如 ${button_text}" : "请输入行动号召, 最多12个字符"}
-                  value={getButtonTextValue()}
-                  onChange={(e) => handleButtonTextInput(e.target.value)}
+                  placeholder="请输入行动号召, 最多12个字符"
+                  value={config.buttonText || ""}
+                  onChange={(e) => updateConfig({ buttonText: e.target.value })}
                   className="flex-1"
                 />
-                <CharCounter value={getButtonTextValue()} max={12} />
+                <CharCounter value={config.buttonText || ""} max={12} />
               </div>
             </div>
           </div>

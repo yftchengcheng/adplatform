@@ -38,8 +38,6 @@ export interface FloatingWindowTemplateConfig {
 
   // 行动号召（最多12字符）
   buttonText: string;
-  buttonTextMacro?: string;
-  buttonTextMode?: "input" | "macro"; // 按钮文案输入模式
 
   // 落地页
   landingPageUrl?: string;
@@ -147,18 +145,6 @@ export function FloatingWindowTemplate({
     return point.text;
   };
 
-  // 解析按钮文案
-  const resolveButtonText = (): string => {
-    if (finalConfig.buttonTextMode === "macro" && finalConfig.buttonTextMacro) {
-      const resolved = resolveMacro(finalConfig.buttonTextMacro);
-      if (resolved.includes('${') || resolved.startsWith('$')) {
-        return finalConfig.buttonText;
-      }
-      return resolved;
-    }
-    return finalConfig.buttonText;
-  };
-
   // 解析落地页链接
   const resolveLandingPageUrl = (): string | undefined => {
     if (finalConfig.landingPageType === "deeplink") {
@@ -206,7 +192,7 @@ export function FloatingWindowTemplate({
   useEffect(() => {
     if (isClosed) return;
     setIsAnimating(false);
-    const timer = setTimeout(() => setIsAnimating(true), 50);
+    const timer = setTimeout(() => setIsAnimating(true), 80);
     return () => clearTimeout(timer);
   }, [isOpen, finalConfig.position, isClosed]);
 
@@ -238,7 +224,7 @@ export function FloatingWindowTemplate({
       setTimeout(() => {
         setIsClosed(false);
         setIsAnimating(true);
-      }, 500);
+      }, 800);
     } else {
       setIsAnimating(false);
       onClose?.();
@@ -275,7 +261,7 @@ export function FloatingWindowTemplate({
         width: previewMode ? "100%" : (isMiddleBottom ? "480px" : "100%"),
         maxWidth: isMiddleBottom ? "480px" : "640px",
         transform: getAnimationTransform(),
-        transition: "transform 0.5s ease-out",
+        transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -366,7 +352,7 @@ export function FloatingWindowTemplate({
           onClick={handleButtonClick}
           className="flex-shrink-0 h-8 px-4 bg-[#3087FF] text-white text-xs font-medium rounded-lg flex items-center justify-center whitespace-nowrap hover:bg-[#2070EE] transition-colors"
         >
-          {resolveButtonText()}
+          {finalConfig.buttonText}
         </button>
       </div>
     </div>
@@ -380,17 +366,27 @@ export function FloatingWindowTemplate({
           className="relative bg-gray-100 rounded-xl overflow-hidden border border-gray-200"
           style={{ width: "260px", height: "312px" }}
         >
-          {/* 模拟屏幕内容 */}
+          {/* 模拟手机屏幕内容 */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-16 h-16 rounded-2xl bg-gray-200 flex items-center justify-center">
               <span className="text-gray-400 text-[10px]">预览</span>
             </div>
           </div>
 
-          {/* 浮窗定位容器 */}
+          {/* 底层透明度10%遮罩 - 预览模式 */}
+          {!isClosed && (
+            <div
+              className={cn(
+                "absolute inset-0 bg-black/10 transition-opacity duration-500 z-10",
+                isAnimating ? "opacity-100" : "opacity-0"
+              )}
+            />
+          )}
+
+          {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
           <div
             className={cn(
-              "absolute left-0 right-0 z-10",
+              "absolute left-0 right-0 z-20",
               position === "top" && "top-0",
               position === "bottom" && "bottom-0",
               position === "middle_bottom" && "bottom-[30%]"
@@ -403,16 +399,6 @@ export function FloatingWindowTemplate({
           >
             {!isClosed && floatingWindowContent}
           </div>
-
-          {/* 底层透明度10%遮罩 - 预览模式 */}
-          {!isClosed && (
-            <div
-              className={cn(
-                "absolute inset-0 bg-black/10 transition-opacity duration-300",
-                isAnimating ? "opacity-100" : "opacity-0"
-              )}
-            />
-          )}
         </div>
       </div>
     );
@@ -425,14 +411,14 @@ export function FloatingWindowTemplate({
       {!isClosed && (
         <div
           className={cn(
-            "fixed inset-0 bg-black/10 transition-opacity duration-300 z-40",
+            "fixed inset-0 bg-black/10 transition-opacity duration-500 z-40",
             isAnimating ? "opacity-100" : "opacity-0"
           )}
           onClick={handleClose}
         />
       )}
 
-      {/* 浮窗定位容器 */}
+      {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
       <div
         className={cn(
           "fixed z-50",
