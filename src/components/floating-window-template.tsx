@@ -267,14 +267,15 @@ export function FloatingWindowTemplate({
   // 根据位置获取浮窗宽度
   const getWindowWidth = () => {
     if (previewMode) {
-      // 预览模式：按比例缩放，260px手机屏模拟640px宽度
-      return isMiddleBottom ? "195px" : "260px"; // 480/640*260=195, 640/640*260=260
+      // 预览模式：用百分比填充父容器（手机外框由配置页/列表页提供）
+      return isMiddleBottom ? "75%" : "100%";
     }
     return isMiddleBottom ? "480px" : "640px";
   };
 
   // 缩放比例（预览模式下文字和图标需要等比缩小）
-  const scale = previewMode ? 260 / 640 : 1;
+  // 预览容器约264px宽（280px手机框 - 16px内边距），模拟640px设计宽度
+  const scale = previewMode ? 264 / 640 : 1;
 
   // 浮窗卡片主体
   const floatingWindowContent = (
@@ -369,47 +370,38 @@ export function FloatingWindowTemplate({
     </div>
   );
 
-  // 预览模式 - 模拟手机屏幕，全屏透明浮层 + flexbox 定位
+  // 预览模式 - 直接填充父容器（手机外框由配置页/组件列表页提供），全屏透明浮层 + flexbox 定位
   if (previewMode) {
     return (
-      <div className="w-full flex items-center justify-center">
-        <div
-          className="relative rounded-2xl overflow-hidden bg-gray-100"
-          style={{
-            width: "260px",
-            height: "312px",
-            boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.06)",
-          }}
-        >
-          {/* 模拟手机屏幕内容 */}
-          <div className="absolute inset-0 flex flex-col items-center justify-start pt-6 px-4 gap-2">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-full rounded-lg bg-white/70"
-                style={{ height: `${36 * scale}px` }}
-              />
-            ))}
-          </div>
-
-          {/* 全屏透明浮层 - 通过 flexbox 定位卡片 */}
-          {!isClosed && (
+      <div className="relative w-full h-full">
+        {/* 模拟手机屏幕内容 */}
+        <div className="absolute inset-0 flex flex-col items-center justify-start pt-6 px-4 gap-2">
+          {[1, 2, 3].map((i) => (
             <div
-              className="absolute inset-0 z-20 flex flex-col"
-              style={{
-                background: "transparent",
-                cursor: "pointer",
-                justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "flex-end",
-                alignItems: isMiddleBottom ? "flex-start" : "center",
-                paddingBottom: position === "middle_bottom" ? "25%" : undefined,
-                paddingLeft: isMiddleBottom ? `${8 * scale}px` : undefined,
-              }}
-              onClick={handleGlobalClick}
-            >
-              {floatingWindowContent}
-            </div>
-          )}
+              key={i}
+              className="w-full rounded-lg bg-gray-100"
+              style={{ height: "36px" }}
+            />
+          ))}
         </div>
+
+        {/* 全屏透明浮层 - 通过 flexbox 定位卡片 */}
+        {!isClosed && (
+          <div
+            className="absolute inset-0 z-20 flex flex-col"
+            style={{
+              background: "transparent",
+              cursor: "pointer",
+              justifyContent: position === "top" ? "flex-start" : position === "bottom" ? "flex-end" : "flex-end",
+              alignItems: isMiddleBottom ? "flex-start" : "center",
+              paddingBottom: position === "middle_bottom" ? "25%" : undefined,
+              paddingLeft: isMiddleBottom ? "8px" : undefined,
+            }}
+            onClick={handleGlobalClick}
+          >
+            {floatingWindowContent}
+          </div>
+        )}
       </div>
     );
   }
