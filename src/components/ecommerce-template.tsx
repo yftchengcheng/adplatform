@@ -197,12 +197,21 @@ export function EcommerceTemplate({
         }}
       >
         <div
-          className="bg-white rounded-r-2xl shadow-xl overflow-hidden"
+          className="relative bg-white rounded-r-2xl shadow-xl overflow-hidden"
           style={{
             width: previewMode ? "100%" : 320,
             height: previewMode ? "auto" : 150,
           }}
         >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100/80 hover:bg-gray-200 transition-colors z-10"
+            aria-label="关闭"
+          >
+            <X className="w-3.5 h-3.5 text-gray-500" />
+          </button>
+
           {/* Content - 左图右文 */}
           <div className="flex items-center p-4 gap-4" style={previewMode ? {} : { height: 150 }}>
             {/* 左侧图片 */}
