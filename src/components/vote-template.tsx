@@ -260,13 +260,13 @@ export function VoteTemplate({
       <div
         className={cn(
           previewMode
-            ? "w-[240px]"
+            ? "w-[240px] absolute left-0 top-1/2 -translate-y-1/2"
             : "fixed left-0 top-1/2 z-50 -translate-y-1/2 w-[240px]",
           "transition-all duration-300",
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
       >
-        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ minHeight: previewMode ? "auto" : 160 }}>
+        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ height: 160 }}>
           {/* Close Button */}
             <button
               onClick={onClose}
