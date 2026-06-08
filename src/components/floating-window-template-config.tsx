@@ -366,7 +366,7 @@ export function FloatingWindowTemplateConfigPanel({
   const [config, setConfig] = useState<FloatingWindowTemplateConfig>(() => ({
     ...defaultFloatingWindowConfig,
     ...initialConfig,
-    promotionPoints: initialConfig?.promotionPoints?.length
+    promotionPoints: Array.isArray(initialConfig?.promotionPoints) && initialConfig.promotionPoints.length
       ? initialConfig.promotionPoints
       : [...defaultPoints],
     macroVariables,

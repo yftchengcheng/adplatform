@@ -381,7 +381,7 @@ export function PromotionTemplateConfigPanel({
       landingPageMacro: "",
     },
     ...initialConfig,
-    promotionPoints: initialConfig?.promotionPoints?.length 
+    promotionPoints: Array.isArray(initialConfig?.promotionPoints) && initialConfig.promotionPoints.length 
       ? initialConfig.promotionPoints 
       : [...defaultPoints],
     macroVariables,
