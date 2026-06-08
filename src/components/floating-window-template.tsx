@@ -256,15 +256,27 @@ export function FloatingWindowTemplate({
     }
   };
 
+  // 根据位置获取浮窗宽度
+  const getWindowWidth = () => {
+    if (previewMode) {
+      // 预览模式：按比例缩放，260px手机屏模拟640px宽度
+      return isMiddleBottom ? "195px" : "260px"; // 480/640*260=195, 640/640*260=260
+    }
+    return isMiddleBottom ? "480px" : "640px";
+  };
+
+  // 缩放比例（预览模式下文字和图标需要等比缩小）
+  const scale = previewMode ? 260 / 640 : 1;
+
   // 浮窗主体内容
   const floatingWindowContent = (
     <div
       className={cn(
-        "relative bg-white/90 backdrop-blur-sm shadow-lg overflow-hidden h-[100px]",
+        "relative bg-white/90 backdrop-blur-sm shadow-lg overflow-hidden",
       )}
       style={{
-        width: previewMode ? "100%" : (isMiddleBottom ? "480px" : "100%"),
-        maxWidth: isMiddleBottom ? "480px" : "640px",
+        width: getWindowWidth(),
+        height: `${100 * scale}px`,
         transform: getAnimationTransform(),
         transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
       }}
@@ -273,19 +285,27 @@ export function FloatingWindowTemplate({
       {/* 关闭按钮 */}
       <button
         onClick={handleClose}
-        className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/15 text-gray-400 hover:text-gray-600 z-10 transition-colors"
+        className="absolute top-1 right-1 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/15 text-gray-400 hover:text-gray-600 z-10 transition-colors"
+        style={{
+          width: `${20 * scale}px`,
+          height: `${20 * scale}px`,
+        }}
       >
-        <X className="w-3 h-3" />
+        <X style={{ width: `${12 * scale}px`, height: `${12 * scale}px` }} />
       </button>
 
       {/* 内容 - 水平布局 */}
       <div
-        className="flex items-center h-full px-4 gap-3"
+        className="flex items-center h-full gap-2"
+        style={{ padding: `${8 * scale}px` }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* 左侧：图标 */}
-        <div className="flex-shrink-0 w-[54px] h-[54px] rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
+        {/* 左侧：图标 40×40 */}
+        <div
+          className="flex-shrink-0 rounded bg-gray-100 overflow-hidden flex items-center justify-center"
+          style={{ width: `${40 * scale}px`, height: `${40 * scale}px` }}
+        >
           {iconSrc ? (
             <img
               src={iconSrc}
@@ -296,66 +316,55 @@ export function FloatingWindowTemplate({
               }}
             />
           ) : (
-            <span className="text-gray-300 text-xs">图标</span>
+            <span className="text-gray-300" style={{ fontSize: `${10 * scale}px` }}>图标</span>
           )}
         </div>
 
         {/* 中间：标题 + 推广卖点 */}
         <div className="flex-1 min-w-0 flex flex-col justify-center">
-          {/* 标题 */}
-          <p className="text-sm font-semibold text-gray-800 truncate">
+          {/* 标题 text-xs text-gray-500 */}
+          <p className="text-gray-500 truncate" style={{ fontSize: `${12 * scale}px` }}>
             {resolveTitle()}
           </p>
 
-          {/* 推广卖点（带导航） */}
-          <div className="flex items-center gap-1 mt-1">
+          {/* 推广卖点（带导航） text-[10px] text-gray-600 */}
+          <div className="flex items-center gap-0.5" style={{ marginTop: `${2 * scale}px` }}>
             {hasMultiplePoints && (
               <button
                 onClick={handlePrev}
-                className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
+                className="flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
+                style={{ width: `${16 * scale}px`, height: `${16 * scale}px` }}
               >
-                <ChevronLeft className="w-3 h-3" />
+                <ChevronLeft style={{ width: `${12 * scale}px`, height: `${12 * scale}px` }} />
               </button>
             )}
 
-            <p className="text-xs text-gray-500 truncate flex-1">
+            <p className="text-gray-600 truncate flex-1" style={{ fontSize: `${10 * scale}px` }}>
               {resolvePointText(currentPoint)}
             </p>
 
             {hasMultiplePoints && (
               <button
                 onClick={handleNext}
-                className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
+                className="flex items-center justify-center text-gray-400 hover:text-gray-600 flex-shrink-0"
+                style={{ width: `${16 * scale}px`, height: `${16 * scale}px` }}
               >
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight style={{ width: `${12 * scale}px`, height: `${12 * scale}px` }} />
               </button>
             )}
           </div>
-
-          {/* 轮播指示器 */}
-          {hasMultiplePoints && (
-            <div className="flex items-center gap-1 mt-1.5">
-              {validPoints.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentIndex(index);
-                  }}
-                  className={cn(
-                    "h-1 rounded-full transition-all",
-                    index === currentIndex ? "w-3 bg-blue-500" : "w-1 bg-gray-300"
-                  )}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* 右侧：行动号召按钮 */}
+        {/* 右侧：行动号召按钮 h-5 px-2 bg-[#3087FF] text-white text-[10px] rounded */}
         <button
           onClick={handleButtonClick}
-          className="flex-shrink-0 h-8 px-4 bg-[#3087FF] text-white text-xs font-medium rounded-lg flex items-center justify-center whitespace-nowrap hover:bg-[#2070EE] transition-colors"
+          className="flex-shrink-0 bg-[#3087FF] text-white rounded flex items-center justify-center whitespace-nowrap hover:bg-[#2070EE] transition-colors"
+          style={{
+            height: `${20 * scale}px`,
+            paddingLeft: `${8 * scale}px`,
+            paddingRight: `${8 * scale}px`,
+            fontSize: `${10 * scale}px`,
+          }}
         >
           {finalConfig.buttonText}
         </button>
@@ -391,15 +400,15 @@ export function FloatingWindowTemplate({
           {/* 浮窗定位容器 - 相对于手机屏幕定位 */}
           <div
             className={cn(
-              "absolute left-0 right-0 z-20",
-              position === "top" && "top-0",
-              position === "bottom" && "bottom-0",
-              position === "middle_bottom" && "bottom-[30%]"
+              "absolute z-20",
+              position === "top" && "top-0 left-0 right-0",
+              position === "bottom" && "bottom-0 left-0 right-0",
+              position === "middle_bottom" && "bottom-[30%] left-0"
             )}
             style={{
               display: "flex",
               justifyContent: isMiddleBottom ? "flex-start" : "center",
-              paddingLeft: isMiddleBottom ? "8px" : undefined,
+              paddingLeft: isMiddleBottom ? `${8 * scale}px` : undefined,
             }}
           >
             {!isClosed && floatingWindowContent}
