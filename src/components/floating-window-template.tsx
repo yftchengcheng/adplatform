@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { openLandingPage } from "./landing-page-config";
@@ -87,8 +87,9 @@ export function FloatingWindowTemplate({
   const [isClosed, setIsClosed] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [showGlow, setShowGlow] = useState(false);
-  const [showButtonGlow, setShowButtonGlow] = useState(false);
+  const [glowPhase, setGlowPhase] = useState<"none" | "card" | "button">("none");
+  const [glowProgress, setGlowProgress] = useState(0); // 0~1 卡片流光进度
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // 获取有效的推广卖点
   const safePoints = Array.isArray(finalConfig.promotionPoints) ? finalConfig.promotionPoints : [];
@@ -199,26 +200,62 @@ export function FloatingWindowTemplate({
   useEffect(() => {
     if (isClosed) return;
     setIsAnimating(false);
-    setShowGlow(false);
-    setShowButtonGlow(false);
+    setGlowPhase("none");
+    setGlowProgress(0);
     const timer = setTimeout(() => {
       setIsAnimating(true);
     }, 150);
-    // 滑入动画1.2s完成后，触发卡片边框七彩流光效果（顺时针跑一圈1.5s）
-    const glowTimer = setTimeout(() => {
-      setShowGlow(true);
-      // 卡片流光跑完一圈后，切换到按钮流光（持续转圈）
-      const btnGlowTimer = setTimeout(() => {
-        setShowGlow(false);
-        setShowButtonGlow(true);
-      }, 1500);
-      return () => clearTimeout(btnGlowTimer);
+    // 滑入动画1.2s完成后，触发卡片边框七彩光带顺时针跑一圈
+    const cardGlowTimer = setTimeout(() => {
+      setGlowPhase("card");
     }, 150 + 1200);
     return () => {
       clearTimeout(timer);
-      clearTimeout(glowTimer);
+      clearTimeout(cardGlowTimer);
     };
   }, [isOpen, finalConfig.position, isClosed]);
+
+  // 卡片边框流光动画 - 光带沿四条边顺时针移动
+  useEffect(() => {
+    if (glowPhase !== "card") return;
+    const duration = 1500; // 1.5s 跑一圈
+    const startTime = performance.now();
+    let rafId: number;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      setGlowProgress(progress);
+      if (progress < 1) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        // 卡片流光跑完一圈，切换到按钮流光
+        setGlowPhase("button");
+        setGlowProgress(0);
+      }
+    };
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [glowPhase]);
+
+  // 根据进度计算光带在卡片边框上的位置和旋转
+  const getGlowPosition = (progress: number, w: number, h: number) => {
+    const perimeter = 2 * (w + h);
+    const dist = progress * perimeter;
+    if (dist <= w) {
+      // 上边：左→右
+      return { x: dist, y: 0, rotation: 0 };
+    } else if (dist <= w + h) {
+      // 右边：上→下
+      return { x: w, y: dist - w, rotation: 90 };
+    } else if (dist <= 2 * w + h) {
+      // 下边：右→左
+      return { x: w - (dist - w - h), y: h, rotation: 180 };
+    } else {
+      // 左边：下→上
+      return { x: 0, y: h - (dist - 2 * w - h), rotation: 270 };
+    }
+  };
 
   // 全局点击跳转 - 点击浮层任意位置（含卡片区域）触发落地页跳转
   const handleGlobalClick = (e: React.MouseEvent) => {
@@ -299,9 +336,14 @@ export function FloatingWindowTemplate({
   // 流光边框圆角
   const glowBorderRadius = previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px");
 
-  // 浮窗卡片主体（外层流光容器 + 内层内容）
+  // 流光光带长度（卡片短边的80%）
+  const glowBandLength = previewMode ? `${Math.max(60 * scale, 30)}px` : "80px";
+  const glowBandWidth = previewMode ? `${Math.max(4 * scale, 2)}px` : "5px";
+
+  // 浮窗卡片主体（外层容器 + 内层内容 + 光带）
   const floatingWindowContent = (
     <div
+      ref={cardRef}
       className="relative cursor-pointer"
       style={{
         width: getWindowWidth(),
@@ -309,30 +351,42 @@ export function FloatingWindowTemplate({
         transform: getAnimationTransform(),
         transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
         borderRadius: glowBorderRadius,
-        padding: `${Math.max(1.5 * scale, 1)}px`,
-        overflow: "hidden",
+        overflow: "visible",
       }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* 卡片边框七彩流光层 - @property 驱动 conic-gradient 角度，七彩窄光带顺时针跑一圈 */}
-      {showGlow && (
-        <span
-          className="absolute"
-          style={{
-            inset: `-${Math.max(2 * scale, 1)}px`,
-            background: `conic-gradient(from var(--glow-angle, 0deg), transparent 0%, transparent 70%, #ff0000 76%, #ff8800 80%, #ffff00 83%, #00ff00 86%, #0088ff 89%, #8800ff 92%, #ff00ff 95%, transparent 100%)`,
-            animation: "glow-travel 1.5s linear forwards",
-          }}
-        />
-      )}
+      {/* 卡片边框七彩光带 - JS驱动沿四条边顺时针移动 */}
+      {glowPhase === "card" && (() => {
+        const w = cardRef.current?.offsetWidth ?? (previewMode ? 264 : 640);
+        const h = cardRef.current?.offsetHeight ?? (100 * scale);
+        const pos = getGlowPosition(glowProgress, w, h);
+        return (
+          <div
+            style={{
+              position: "absolute",
+              width: glowBandLength,
+              height: glowBandWidth,
+              background: "linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff)",
+              borderRadius: `${Math.max(3 * scale, 2)}px`,
+              boxShadow: `0 0 ${Math.max(8 * scale, 4)}px ${Math.max(3 * scale, 1)}px rgba(255, 100, 100, 0.5), 0 0 ${Math.max(16 * scale, 8)}px ${Math.max(6 * scale, 2)}px rgba(100, 100, 255, 0.3)`,
+              left: `${pos.x}px`,
+              top: `${pos.y}px`,
+              transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
+              zIndex: 30,
+              pointerEvents: "none",
+            }}
+          />
+        );
+      })()}
 
       {/* 卡片内容层 */}
       <div
         className="relative overflow-hidden h-full"
         style={{
           background: "rgba(255, 255, 255, 0.1)",
-          borderRadius: `calc(${glowBorderRadius} - ${Math.max(1.5 * scale, 1)}px)`,
+          borderRadius: glowBorderRadius,
+          border: glowPhase === "card" ? `${Math.max(1.5 * scale, 1)}px solid rgba(255, 255, 255, 0.3)` : "none",
           backdropFilter: "blur(8px)",
           boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
         }}
@@ -398,13 +452,12 @@ export function FloatingWindowTemplate({
         <div
           className="flex-shrink-0 relative"
           style={{
-            padding: showButtonGlow ? `${Math.max(2 * scale, 1)}px` : '0px',
             borderRadius: `${Math.max(6 * scale, 4)}px`,
             overflow: 'hidden',
           }}
         >
-          {/* 按钮流光层 - 七彩光持续顺时针转圈 */}
-          {showButtonGlow && (
+          {/* 按钮流光层 - 七彩光带持续顺时针转圈 */}
+          {glowPhase === "button" && (
             <span
               className="absolute"
               style={{
@@ -438,16 +491,12 @@ export function FloatingWindowTemplate({
   if (previewMode) {
     return (
       <div className="relative w-full h-full">
-        {/* 七彩流光边框动画 - @property 驱动角度旋转 */}
+        {/* 按钮流光动画 - @property 驱动角度旋转 */}
         <style>{`
           @property --glow-angle {
             syntax: '<angle>';
             initial-value: 0deg;
             inherits: false;
-          }
-          @keyframes glow-travel {
-            0% { --glow-angle: 0deg; }
-            100% { --glow-angle: 360deg; }
           }
           @keyframes glow-loop {
             0% { --glow-angle: 0deg; }
@@ -490,16 +539,12 @@ export function FloatingWindowTemplate({
   // 非预览模式 - 全屏透明浮层 + flexbox 定位
   return (
     <>
-      {/* 七彩流光边框动画 - @property 驱动角度旋转 */}
+      {/* 按钮流光动画 - @property 驱动角度旋转 */}
       <style>{`
         @property --glow-angle {
           syntax: '<angle>';
           initial-value: 0deg;
           inherits: false;
-        }
-        @keyframes glow-travel {
-          0% { --glow-angle: 0deg; }
-          100% { --glow-angle: 360deg; }
         }
         @keyframes glow-loop {
           0% { --glow-angle: 0deg; }
