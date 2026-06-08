@@ -213,6 +213,7 @@ export function AdTemplate({
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
         style={{ height: 160 }}
+        className="flex flex-col"
       >
           {/* Close Button */}
             <button
@@ -224,7 +225,7 @@ export function AdTemplate({
             </button>
 
           {/* Content */}
-          <div className="px-2.5 pt-2 pb-1.5">
+          <div className="flex-1 px-2.5 pt-2 pb-1 flex flex-col justify-center">
             {/* Title */}
             <h2 className="text-xs font-bold text-gray-900 pr-5 leading-tight">
               {finalConfig.title}
