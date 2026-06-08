@@ -192,15 +192,15 @@ export function EcommerceTemplate({
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
         style={{
-          width: previewMode ? undefined : 320,
-          height: previewMode ? undefined : 150,
+          width: previewMode ? undefined : 240,
+          height: previewMode ? undefined : 100,
         }}
       >
         <div
           className="relative bg-white rounded-r-2xl shadow-xl overflow-hidden"
           style={{
-            width: previewMode ? "100%" : 320,
-            height: previewMode ? "auto" : 150,
+            width: previewMode ? "100%" : 240,
+            height: previewMode ? "auto" : 100,
           }}
         >
           {/* Close Button */}
@@ -213,9 +213,9 @@ export function EcommerceTemplate({
           </button>
 
           {/* Content - 左图右文 */}
-          <div className="flex items-center p-4 gap-4" style={previewMode ? {} : { height: 150 }}>
+          <div className="flex items-center p-2 gap-2" style={previewMode ? {} : { height: 100 }}>
             {/* 左侧图片 */}
-            <div className="flex-shrink-0 w-[87px] h-[87px] rounded-lg overflow-hidden bg-gray-100">
+            <div className="flex-shrink-0 w-[64px] h-[64px] rounded-lg overflow-hidden bg-gray-100">
               {imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -231,14 +231,14 @@ export function EcommerceTemplate({
             </div>
 
             {/* 右侧文字内容 */}
-            <div className="flex-1 min-w-0 flex flex-col justify-between h-[87px] overflow-hidden">
+            <div className="flex-1 min-w-0 flex flex-col justify-between h-[64px] overflow-hidden">
               {/* 标题 */}
-              <h3 className="text-sm font-medium text-gray-900 leading-tight line-clamp-1 truncate">
+              <h3 className="text-[11px] font-medium text-gray-900 leading-tight line-clamp-1 truncate">
                 {resolveTitle()}
               </h3>
 
               {/* 文案内容 */}
-              <p className="text-xs text-gray-500 leading-snug line-clamp-2 flex-1 overflow-hidden">
+              <p className="text-[10px] text-gray-500 leading-snug line-clamp-1 flex-1 overflow-hidden">
                 {resolveContent()}
               </p>
 
