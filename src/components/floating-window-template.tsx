@@ -93,22 +93,28 @@ export function FloatingWindowTemplate({
   const validPoints = safePoints.filter(p => p.text);
   const hasMultiplePoints = validPoints.length > 1;
 
-  // 宏替换函数
+  // 宏替换函数 - 支持 ${key}、$key、{key} 三种格式
   const resolveMacro = (macro: string): string => {
     if (!macro || !finalConfig.macroVariables) return macro;
     let result = macro;
     Object.entries(finalConfig.macroVariables).forEach(([key, value]) => {
       result = result.replace(new RegExp(`\\$\\{${key}\\}`, 'g'), value);
       result = result.replace(new RegExp(`\\$${key}`, 'g'), value);
+      result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
     });
     return result;
+  };
+
+  // 检查字符串是否包含未解析的宏占位符
+  const hasUnresolvedMacro = (str: string): boolean => {
+    return str.includes('${') || str.startsWith('$') || /\{[a-zA-Z_]\w*\}/.test(str);
   };
 
   // 解析图标 - 与推广卡片一致：有 iconMacro 则使用宏模式
   const resolveIcon = (): string | undefined => {
     if (finalConfig.iconMacro) {
       const resolved = resolveMacro(finalConfig.iconMacro);
-      if (resolved.includes('${') || resolved.startsWith('$')) {
+      if (hasUnresolvedMacro(resolved)) {
         return finalConfig.iconUrl || undefined;
       }
       return resolved;
@@ -123,7 +129,7 @@ export function FloatingWindowTemplate({
   const resolveTitle = (): string => {
     if (finalConfig.titleMacro) {
       const resolved = resolveMacro(finalConfig.titleMacro);
-      if (resolved.includes('${') || resolved.startsWith('$')) {
+      if (hasUnresolvedMacro(resolved)) {
         return finalConfig.title;
       }
       return resolved;
@@ -135,7 +141,7 @@ export function FloatingWindowTemplate({
   const resolvePointText = (point: FloatingWindowPromotionPoint): string => {
     if (point.textMacro) {
       const resolved = resolveMacro(point.textMacro);
-      if (resolved.includes('${') || resolved.startsWith('$')) {
+      if (hasUnresolvedMacro(resolved)) {
         return point.text;
       }
       return resolved;
@@ -148,7 +154,7 @@ export function FloatingWindowTemplate({
     if (finalConfig.landingPageType === "deeplink") {
       if (finalConfig.deeplinkMacro) {
         const resolved = resolveMacro(finalConfig.deeplinkMacro);
-        if (resolved.includes('${') || resolved.startsWith('$')) {
+        if (hasUnresolvedMacro(resolved)) {
           return undefined;
         }
         return resolved;
@@ -161,7 +167,7 @@ export function FloatingWindowTemplate({
 
     if (finalConfig.landingPageMacro) {
       const resolved = resolveMacro(finalConfig.landingPageMacro);
-      if (resolved.includes('${') || resolved.startsWith('$')) {
+      if (hasUnresolvedMacro(resolved)) {
         return undefined;
       }
       return resolved;

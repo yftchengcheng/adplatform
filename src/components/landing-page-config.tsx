@@ -156,7 +156,7 @@ export function LandingPageConfigSection({
                 onChange={(e) => handleLandingPageInput(e.target.value)}
                 placeholder={
                   landingPageMode === "macro"
-                    ? `如 \${variable_name}`
+                    ? `如 {landing_page}`
                     : `请输入${urlLabel}`
                 }
               />
@@ -185,7 +185,7 @@ export function LandingPageConfigSection({
                 onChange={(e) => handleDeeplinkInput(e.target.value)}
                 placeholder={
                   deeplinkMode === "macro"
-                    ? "如 ${deeplink_url}"
+                    ? "如 {deeplink_url}"
                     : `请输入 ${deeplinkLabel} 地址`
                 }
               />
@@ -255,6 +255,7 @@ function resolveMacro(macro: string, macroVariables?: Record<string, string>): s
   Object.entries(macroVariables).forEach(([key, value]) => {
     result = result.replace(new RegExp(`\\$\\{${key}\\}`, "g"), value);
     result = result.replace(new RegExp(`\\$${key}`, "g"), value);
+    result = result.replace(new RegExp(`\\{${key}\\}`, "g"), value);
   });
   return result;
 }

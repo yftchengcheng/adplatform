@@ -216,7 +216,7 @@ function ImageUpload({
       {mode === "macro" ? (
         <div className="space-y-1">
           <Input
-            placeholder="如 ${icon_url}"
+            placeholder="如 {icon_url}"
             value={macroValue || ""}
             onChange={(e) => macroOnChange(e.target.value)}
           />
@@ -328,7 +328,7 @@ function PromotionPointEditor({
 
       <div className="flex items-center justify-between">
         <Input
-          placeholder={mode === "macro" ? "如 ${promotion_point}" : "添加推广卖点"}
+          placeholder={mode === "macro" ? "如 {promotion_point}" : "请输入推广卖点"}
           value={mode === "macro" ? (point.textMacro || "") : point.text}
           onChange={(e) => handleTextChange(e.target.value)}
           className="flex-1"
@@ -391,17 +391,8 @@ export function FloatingWindowTemplateConfigPanel({
     onChange?.(newConfig);
   };
 
-  // 处理标题模式切换
-  const handleTitleModeChange = (mode: "input" | "macro") => {
-    setTitleMode(mode);
-    if (mode === "macro") {
-      // 切到宏模式，保留当前title作为默认宏值
-      updateConfig({ titleMacro: config.title || "", title: config.title || "" });
-    } else {
-      // 切到输入模式，清空宏值
-      updateConfig({ titleMacro: "" });
-    }
-  };
+  // 处理标题模式切换（与推广卡片一致：只切换UI状态，不修改配置数据）
+  // handleTitleInput 会在用户输入时根据 titleMode 正确设置 titleMacro/title
 
   // 添加推广卖点
   const addPromotionPoint = () => {
@@ -528,11 +519,11 @@ export function FloatingWindowTemplateConfigPanel({
                 <label className="text-sm font-medium text-gray-700">
                   卡片标题<span className="text-red-500 ml-1">*</span>
                 </label>
-                <ModeToggle value={titleMode} onChange={handleTitleModeChange} />
+                <ModeToggle value={titleMode} onChange={setTitleMode} />
               </div>
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder={titleMode === "macro" ? "如 ${title}" : "请输入磁贴标题, 最多14个字符"}
+                  placeholder={titleMode === "macro" ? "如 {title}" : "请输入卡片标题, 最多14个字符"}
                   value={getTitleValue()}
                   onChange={(e) => handleTitleInput(e.target.value)}
                   className="flex-1"
