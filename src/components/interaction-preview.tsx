@@ -882,7 +882,7 @@ export function InteractionPreview({
               {/* 上层：组件真实预览弹出（逐层覆盖） */}
               {activeComponents.map((link, idx) => {
                 const isCenteredType = [
-                  "dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift",
+                  "image", "coupon", "promotion_card", "game_gift",
                   "flip_redpacket", "flip_card", "flip_treasure",
                 ].includes(link.componentTypeKey);
                 return (
