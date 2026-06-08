@@ -376,12 +376,12 @@ export function FloatingWindowTemplateConfigPanel({
   const [basicOpen, setBasicOpen] = useState(true);
   const [pointsOpen, setPointsOpen] = useState(true);
 
-  // 模式状态
+  // 模式状态（纯UI状态，不存入配置数据）
   const [iconMode, setIconMode] = useState<"upload" | "macro">(
-    config.iconMacro ? "macro" : (config.iconMode || "upload")
+    config.iconMacro ? "macro" : "upload"
   );
   const [titleMode, setTitleMode] = useState<"input" | "macro">(
-    config.titleMacro ? "macro" : (config.titleMode || "input")
+    config.titleMacro ? "macro" : "input"
   );
 
   // 更新配置
@@ -394,7 +394,13 @@ export function FloatingWindowTemplateConfigPanel({
   // 处理标题模式切换
   const handleTitleModeChange = (mode: "input" | "macro") => {
     setTitleMode(mode);
-    updateConfig({ titleMode: mode });
+    if (mode === "macro") {
+      // 切到宏模式，保留当前title作为默认宏值
+      updateConfig({ titleMacro: config.title || "", title: config.title || "" });
+    } else {
+      // 切到输入模式，清空宏值
+      updateConfig({ titleMacro: "" });
+    }
   };
 
   // 添加推广卖点
@@ -437,9 +443,9 @@ export function FloatingWindowTemplateConfigPanel({
   // 处理标题输入
   const handleTitleInput = (value: string) => {
     if (titleMode === "macro") {
-      updateConfig({ titleMacro: value, title: value, titleMode: "macro" });
+      updateConfig({ titleMacro: value, title: value });
     } else {
-      updateConfig({ title: value, titleMacro: "", titleMode: "input" });
+      updateConfig({ title: value, titleMacro: "" });
     }
   };
 
@@ -507,13 +513,12 @@ export function FloatingWindowTemplateConfigPanel({
             {/* 图标设置 */}
             <ImageUpload
               value={config.iconUrl || ""}
-              onChange={(v) => updateConfig({ iconUrl: v, iconMacro: "", iconMode: "upload" })}
+              onChange={(v) => updateConfig({ iconUrl: v, iconMacro: "" })}
               macroValue={config.iconMacro || ""}
-              macroOnChange={(v) => updateConfig({ iconMacro: v, iconUrl: "", iconMode: "macro" })}
+              macroOnChange={(v) => updateConfig({ iconMacro: v, iconUrl: "" })}
               mode={iconMode}
               onModeChange={(m) => {
                 setIconMode(m);
-                updateConfig({ iconMode: m });
               }}
             />
 

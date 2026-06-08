@@ -23,15 +23,13 @@ export interface FloatingWindowTemplateConfig {
   // 浮窗位置
   position: FloatingWindowPosition; // 顶部/底部/中下部
 
-  // 图片模式
-  iconMode?: "upload" | "macro";    // 图标模式：上传/宏
+  // 图标
   iconUrl?: string;                 // 图标URL
   iconMacro?: string;               // 图标宏变量
 
   // 卡片标题（最多14字符）
   title: string;
   titleMacro?: string;
-  titleMode?: "input" | "macro";   // 标题输入模式
 
   // 推广卖点（最多10条，轮播）
   promotionPoints: FloatingWindowPromotionPoint[];
@@ -65,7 +63,6 @@ export interface FloatingWindowTemplateProps {
 // 默认配置
 const defaultConfig: FloatingWindowTemplateConfig = {
   position: "bottom",
-  iconMode: "upload",
   iconUrl: "",
   title: "卡片标题",
   promotionPoints: [{ id: "1", text: "推广卖点1" }],
@@ -106,24 +103,24 @@ export function FloatingWindowTemplate({
     return result;
   };
 
-  // 解析图标
+  // 解析图标 - 与推广卡片一致：有 iconMacro 则使用宏模式
   const resolveIcon = (): string | undefined => {
-    if (finalConfig.iconMode === "macro" && finalConfig.iconMacro) {
+    if (finalConfig.iconMacro) {
       const resolved = resolveMacro(finalConfig.iconMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
-        return undefined;
+        return finalConfig.iconUrl || undefined;
       }
       return resolved;
     }
     if (finalConfig.iconUrl) {
-      return resolveMacro(finalConfig.iconUrl);
+      return finalConfig.iconUrl;
     }
     return undefined;
   };
 
-  // 解析标题
+  // 解析标题 - 与推广卡片一致：有 titleMacro 则使用宏模式
   const resolveTitle = (): string => {
-    if (finalConfig.titleMode === "macro" && finalConfig.titleMacro) {
+    if (finalConfig.titleMacro) {
       const resolved = resolveMacro(finalConfig.titleMacro);
       if (resolved.includes('${') || resolved.startsWith('$')) {
         return finalConfig.title;
@@ -441,7 +438,6 @@ export function FloatingWindowTemplate({
 // 导出默认配置供外部使用
 export const defaultFloatingWindowConfig: FloatingWindowTemplateConfig = {
   position: "bottom",
-  iconMode: "upload",
   iconUrl: "",
   title: "卡片标题",
   promotionPoints: [{ id: "1", text: "推广卖点1" }],
