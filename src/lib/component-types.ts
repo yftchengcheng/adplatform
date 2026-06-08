@@ -15,7 +15,8 @@ export type ComponentType =
   | "ecommerce"          // 电商磁贴
   | "coupon"            // 优惠券磁贴
   | "promotion_card"    // 推广卡片
-  | "game_gift"         // 游戏礼包码;
+  | "game_gift"         // 游戏礼包码
+  | "floating_window"   // 浮窗;
 
 // 组件样式模板（用于选择页面）
 export interface ComponentStyleTemplate {
@@ -78,6 +79,13 @@ export const componentStyleTemplates: ComponentStyleTemplate[] = [
     category: "static",
     description: "游戏礼包码领取组件",
     icon: "gift",
+  },
+  {
+    id: "floating_window",
+    name: "浮窗",
+    category: "static",
+    description: "左图右文浮窗，支持推广卖点轮播",
+    icon: "panel-top",
   },
   // 动效组件
   {
@@ -162,6 +170,7 @@ export const ComponentTypeMap: Record<ComponentType, string> = {
   coupon: "优惠券磁贴",
   promotion_card: "推广卡片",
   game_gift: "游戏礼包码",
+  floating_window: "浮窗",
 };
 
 // 组件状态映射

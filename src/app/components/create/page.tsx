@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Sparkles,
   MousePointerClick,
+  PanelTop,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +48,7 @@ const iconMap: Record<string, React.ReactNode> = {
   "egg": <Egg className="w-10 h-10" />,
   "bell": <Bell className="w-10 h-10" />,
   "vote": <CheckSquare className="w-10 h-10" />,
+  "panel-top": <PanelTop className="w-10 h-10" />,
 };
 
 export default function ComponentCreatePage() {
@@ -99,6 +101,8 @@ export default function ComponentCreatePage() {
       router.push("/components/config?type=scratch_card");
     } else if (template.id === "popup_redpacket") {
       router.push("/components/config?type=popup_redpacket");
+    } else if (template.id === "floating_window") {
+      router.push("/components/config?type=floating_window");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);

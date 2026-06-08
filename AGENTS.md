@@ -1045,3 +1045,100 @@ isFlipRedpacketComponent || isTreasureBoxComponent ? (
 - [ ] 点击关闭按钮是否正确执行关闭操作
 4. **点击领取**：跳转到落地页链接
 5. **宏变量替换**：支持引导文案、金额、图片、文案、落地页的宏替换
+
+---
+
+## 十八、浮窗组件特殊规范
+
+### 1. 组件特点
+- **左图右文结构**：左侧图标，右侧标题+推广卖点+行动号召按钮
+- **推广卖点**：支持多条轮播展示（最多10条）
+- **出现位置**：顶部/底部/中下部，带滑入动画
+- **出现动作**：
+  - 顶部：自上而下滑动，直到整个组件展示完整后停止
+  - 底部：自下而上滑动，直到整个组件展示完整后停止
+  - 中下部：自左向右滑动，直到整个组件展示完整后停止
+
+### 2. 配置数据结构
+```typescript
+interface FloatingWindowPromotionPoint {
+  id: string;
+  text: string;           // 卖点文本（最多18字符）
+  textMacro?: string;    // 卖点宏变量
+}
+
+interface FloatingWindowTemplateConfig {
+  position: "top" | "bottom" | "middle_bottom";  // 浮窗位置
+  action: "open" | "close";                       // 动作
+  iconUrl?: string;               // 图标URL
+  iconMacro?: string;             // 图标宏变量
+  title: string;                  // 标题（最多14字符）
+  titleMacro?: string;            // 标题宏变量
+  promotionPoints: FloatingWindowPromotionPoint[];  // 推广卖点（最多10条）
+  buttonText: string;             // 行动号召（最多12字符）
+  buttonTextMacro?: string;       // 行动号召宏变量
+  landingPageType?: "url" | "deeplink";  // 落地页类型
+  landingPageUrl?: string;        // 落地页URL
+  landingPageMacro?: string;      // 落地页宏变量
+  deeplinkUrl?: string;           // Deeplink URL
+  deeplinkMacro?: string;         // Deeplink宏变量
+  defaultLandingPageUrl?: string;
+  macroVariables?: Record<string, string>;
+  componentName?: string;         // 组件名称（最多20字符）
+}
+```
+
+### 3. 字段规范
+| 字段 | 最大字符 | 说明 |
+|------|---------|------|
+| 图标 | 1MB | 推荐 108×108px，支持 JPG、PNG、JPEG |
+| 标题 | 14字符 | 7个汉字（不含标点） |
+| 推广卖点(单条) | 18字符 | 9个汉字（不含标点） |
+| 行动号召 | 12字符 | 6个汉字（不含标点） |
+| 组件名称 | 20字符 | 10个汉字（不含标点） |
+
+### 4. 组件尺寸
+| 位置 | 宽度 | 高度 |
+|------|------|------|
+| 顶部 | 640px | 100px |
+| 底部 | 640px | 100px |
+| 中下部 | 480px | 100px |
+
+### 5. 渲染样式
+```tsx
+<div className="flex items-center p-2 gap-2 bg-white/90 rounded-lg shadow-lg">
+  {/* 左侧图标 */}
+  <div className="w-10 h-10 rounded bg-gray-100">
+    <img src={iconUrl} alt="图标" className="w-full h-full object-cover" />
+  </div>
+
+  {/* 右侧内容 */}
+  <div className="flex-1">
+    <p className="text-xs text-gray-500">{title}</p>
+    <p className="text-[10px] text-gray-600">{currentPoint}</p>
+  </div>
+
+  {/* 按钮 */}
+  <button className="h-5 px-2 bg-[#3087FF] text-white text-[10px] rounded">
+    {buttonText}
+  </button>
+
+  {/* 关闭按钮 */}
+  <button className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600">
+    <X className="w-3 h-3" />
+  </button>
+</div>
+```
+
+### 6. 交互逻辑
+1. **点击行动号召按钮**：跳转到落地页
+2. **点击关闭按钮**：关闭浮窗（动画滑出）
+3. **推广卖点轮播**：多条卖点时自动轮播（每3秒切换），鼠标悬停暂停
+4. **手动切换**：点击左右箭头或指示器切换卖点
+5. **宏变量替换**：支持图标、标题、卖点、按钮文案、落地页的宏替换
+
+### 7. 出现动画
+- **顶部**：`translateY(-100%)` → `translateY(0)` 自上而下滑入
+- **底部**：`translateY(100%)` → `translateY(0)` 自下而上滑入
+- **中下部**：`translateX(-100%)` → `translateX(0)` 自左向右滑入
+- 底层透明度10%（`bg-black/10`）

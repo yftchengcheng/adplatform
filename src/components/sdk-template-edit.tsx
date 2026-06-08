@@ -28,7 +28,8 @@ import {
   CloudRain,
   PenTool,
   Bell,
-  Sparkles
+  Sparkles,
+  PanelTop
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,7 @@ const COMPONENT_TYPE_ICON_MAP: Record<string, { icon: React.ReactNode; color: st
   scratch_card:   { icon: <PenTool className="w-5 h-5" />,     color: "text-purple-600",  bg: "bg-purple-50" },
   smash_egg:      { icon: <Sparkles className="w-5 h-5" />,    color: "text-yellow-600",  bg: "bg-yellow-50" },
   popup_redpacket:{ icon: <Bell className="w-5 h-5" />,        color: "text-rose-600",    bg: "bg-rose-50" },
+  floating_window: { icon: <PanelTop className="w-5 h-5" />,   color: "text-sky-600",     bg: "bg-sky-50" },
 };
 
 function getComponentTypeIcon(typeKey: string): { icon: React.ReactNode; color: string; bg: string } {
