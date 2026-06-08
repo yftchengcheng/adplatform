@@ -307,14 +307,14 @@ export function FloatingWindowTemplate({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* 流光层 - 旋转的锥形渐变，滑入完成后播放一次 */}
+      {/* 流光层 - 使用 @property 驱动 conic-gradient 角度，窄亮带沿边框流动一圈 */}
       {showGlow && (
         <span
           className="absolute"
           style={{
             inset: `-${Math.max(20 * scale, 12)}px`,
-            background: `conic-gradient(from 0deg, transparent 0%, transparent 60%, rgba(48,135,255,0.7) 75%, rgba(100,180,255,0.9) 85%, transparent 100%)`,
-            animation: "glow-spin 1.5s linear forwards",
+            background: `conic-gradient(from var(--glow-angle, 0deg), transparent 0%, transparent 75%, rgba(48,135,255,0.15) 82%, rgba(100,180,255,0.5) 88%, rgba(255,255,255,0.8) 91%, rgba(100,180,255,0.5) 94%, rgba(48,135,255,0.15) 98%, transparent 100%)`,
+            animation: "glow-travel 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards",
           }}
         />
       )}
@@ -410,11 +410,17 @@ export function FloatingWindowTemplate({
   if (previewMode) {
     return (
       <div className="relative w-full h-full">
-        {/* 流光边框动画 keyframes */}
+        {/* 流光边框动画 - @property 驱动角度旋转 + 优雅消退 */}
         <style>{`
-          @keyframes glow-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); opacity: 0; }
+          @property --glow-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+          }
+          @keyframes glow-travel {
+            0% { --glow-angle: 0deg; opacity: 1; }
+            80% { opacity: 1; }
+            100% { --glow-angle: 360deg; opacity: 0; }
           }
         `}</style>
 
@@ -453,11 +459,17 @@ export function FloatingWindowTemplate({
   // 非预览模式 - 全屏透明浮层 + flexbox 定位
   return (
     <>
-      {/* 流光边框动画 keyframes */}
+      {/* 流光边框动画 - @property 驱动角度旋转 + 优雅消退 */}
       <style>{`
-        @keyframes glow-spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); opacity: 0; }
+        @property --glow-angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+        @keyframes glow-travel {
+          0% { --glow-angle: 0deg; opacity: 1; }
+          80% { opacity: 1; }
+          100% { --glow-angle: 360deg; opacity: 0; }
         }
       `}</style>
       {!isClosed && (
