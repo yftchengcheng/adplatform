@@ -678,7 +678,7 @@ function ConfigContent() {
                       </div>
 
                       {/* App content */}
-                      <div className={`h-[calc(100%-28px)] ${isRedpacketRainComponent ? 'flex flex-col items-center justify-center bg-transparent' : isFloatingWindowComponent ? 'relative overflow-visible' : 'flex items-center justify-center overflow-hidden'}`}>
+                      <div className={`h-[calc(100%-28px)] ${isRedpacketRainComponent ? 'flex flex-col items-center justify-center bg-transparent' : isFloatingWindowComponent ? 'relative overflow-hidden' : 'flex items-center justify-center overflow-hidden'}`}>
                         {isRedpacketRainComponent ? (
                           <div className="w-full px-4">
                             <RedpacketRainTemplate
