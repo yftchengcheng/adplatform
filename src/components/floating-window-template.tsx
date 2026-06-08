@@ -89,7 +89,8 @@ export function FloatingWindowTemplate({
   const [isPaused, setIsPaused] = useState(false);
 
   // 获取有效的推广卖点
-  const validPoints = finalConfig.promotionPoints.filter(p => p.text);
+  const safePoints = Array.isArray(finalConfig.promotionPoints) ? finalConfig.promotionPoints : [];
+  const validPoints = safePoints.filter(p => p.text);
   const hasMultiplePoints = validPoints.length > 1;
 
   // 宏替换函数
