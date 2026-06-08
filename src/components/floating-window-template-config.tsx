@@ -391,8 +391,27 @@ export function FloatingWindowTemplateConfigPanel({
     onChange?.(newConfig);
   };
 
-  // 处理标题模式切换（与推广卡片一致：只切换UI状态，不修改配置数据）
-  // handleTitleInput 会在用户输入时根据 titleMode 正确设置 titleMacro/title
+  // 处理标题模式切换 - 切换时清空另一模式的值（AGENTS.md规范）
+  const handleTitleModeChange = (mode: "input" | "macro") => {
+    setTitleMode(mode);
+    if (mode === "macro") {
+      // 切换到宏模式：清空title，让用户输入宏值
+      updateConfig({ title: "", titleMacro: "" });
+    } else {
+      // 切换到输入模式：清空titleMacro，让用户输入标题
+      updateConfig({ title: "", titleMacro: "" });
+    }
+  };
+
+  // 处理图标模式切换 - 切换时清空另一模式的值
+  const handleIconModeChange = (mode: "input" | "macro") => {
+    setIconMode(mode);
+    if (mode === "macro") {
+      updateConfig({ iconUrl: "", iconMacro: "" });
+    } else {
+      updateConfig({ iconUrl: "", iconMacro: "" });
+    }
+  };
 
   // 添加推广卖点
   const addPromotionPoint = () => {
@@ -434,14 +453,14 @@ export function FloatingWindowTemplateConfigPanel({
   // 处理标题输入
   const handleTitleInput = (value: string) => {
     if (titleMode === "macro") {
-      updateConfig({ titleMacro: value, title: value });
+      updateConfig({ titleMacro: value });
     } else {
-      updateConfig({ title: value, titleMacro: "" });
+      updateConfig({ title: value });
     }
   };
 
-  // 获取各输入值
-  const getTitleValue = () => titleMode === "macro" ? (config.titleMacro || config.title || "") : (config.title || "");
+  // 获取各输入值 - 宏模式下只显示宏值，输入模式下只显示标题
+  const getTitleValue = () => titleMode === "macro" ? (config.titleMacro || "") : (config.title || "");
 
   return (
     <div className="space-y-4">
@@ -508,9 +527,7 @@ export function FloatingWindowTemplateConfigPanel({
               macroValue={config.iconMacro || ""}
               macroOnChange={(v) => updateConfig({ iconMacro: v, iconUrl: "" })}
               mode={iconMode}
-              onModeChange={(m) => {
-                setIconMode(m);
-              }}
+              onModeChange={handleIconModeChange}
             />
 
             {/* 卡片标题 */}
@@ -519,7 +536,7 @@ export function FloatingWindowTemplateConfigPanel({
                 <label className="text-sm font-medium text-gray-700">
                   卡片标题<span className="text-red-500 ml-1">*</span>
                 </label>
-                <ModeToggle value={titleMode} onChange={setTitleMode} />
+                <ModeToggle value={titleMode} onChange={handleTitleModeChange} />
               </div>
               <div className="flex items-center gap-2">
                 <Input

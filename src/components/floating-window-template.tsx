@@ -110,14 +110,14 @@ export function FloatingWindowTemplate({
     return str.includes('${') || str.startsWith('$') || /\{[a-zA-Z_]\w*\}/.test(str);
   };
 
-  // 解析图标 - 与推广卡片一致：有 iconMacro 则使用宏模式
+  // 解析图标 - 有 iconMacro 则使用宏模式
   const resolveIcon = (): string | undefined => {
     if (finalConfig.iconMacro) {
       const resolved = resolveMacro(finalConfig.iconMacro);
       if (hasUnresolvedMacro(resolved)) {
         return finalConfig.iconUrl || undefined;
       }
-      return resolved;
+      return resolved || finalConfig.iconUrl || undefined;
     }
     if (finalConfig.iconUrl) {
       return finalConfig.iconUrl;
@@ -125,12 +125,13 @@ export function FloatingWindowTemplate({
     return undefined;
   };
 
-  // 解析标题 - 与推广卡片一致：有 titleMacro 则使用宏模式
+  // 解析标题 - 有 titleMacro 则使用宏模式
   const resolveTitle = (): string => {
     if (finalConfig.titleMacro) {
       const resolved = resolveMacro(finalConfig.titleMacro);
       if (hasUnresolvedMacro(resolved)) {
-        return finalConfig.title;
+        // 宏未解析：回退到 title，如果 title 也为空则显示宏原始值
+        return finalConfig.title || finalConfig.titleMacro;
       }
       return resolved;
     }
@@ -142,7 +143,7 @@ export function FloatingWindowTemplate({
     if (point.textMacro) {
       const resolved = resolveMacro(point.textMacro);
       if (hasUnresolvedMacro(resolved)) {
-        return point.text;
+        return point.text || point.textMacro;
       }
       return resolved;
     }
