@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { openLandingPage } from "./landing-page-config";
 
@@ -279,143 +279,82 @@ export function FloatingWindowTemplate({
         height: `${100 * scale}px`,
         transform: getAnimationTransform(),
         transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        background: "linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)",
-        boxShadow: "0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
+        background: "rgba(255, 255, 255, 0.9)",
+        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
         borderRadius: previewMode ? `${12 * scale}px` : (isMiddleBottom ? "0 12px 12px 0" : "12px"),
+        backdropFilter: "blur(8px)",
       }}
       onClick={(e) => e.stopPropagation()}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* 左侧图标色块背景 - 品牌色渐变 */}
-      <div
-        className="absolute left-0 top-0 bottom-0"
-        style={{
-          width: `${56 * scale}px`,
-          background: "linear-gradient(135deg, #3087FF 0%, #1A6DF2 100%)",
-          borderRadius: previewMode ? `${12 * scale}px 0 0 ${12 * scale}px` : (isMiddleBottom ? "0" : "12px 0 0 12px"),
-        }}
-      />
-
       {/* 关闭按钮 */}
       <button
         onClick={handleClose}
-        className="absolute flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 z-10 transition-all duration-200"
+        className="absolute flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 z-10 transition-colors duration-200 cursor-pointer"
         style={{
           top: `${4 * scale}px`,
           right: `${4 * scale}px`,
-          width: `${18 * scale}px`,
-          height: `${18 * scale}px`,
+          width: `${20 * scale}px`,
+          height: `${20 * scale}px`,
           borderRadius: `${4 * scale}px`,
         }}
         aria-label="关闭浮窗"
       >
-        <X style={{ width: `${10 * scale}px`, height: `${10 * scale}px` }} />
+        <X style={{ width: `${12 * scale}px`, height: `${12 * scale}px` }} />
       </button>
 
-      {/* 内容 - 水平布局 */}
+      {/* 内容 - 左图右文水平布局 */}
       <div
-        className="relative flex items-center h-full"
-        style={{ padding: `${10 * scale}px`, gap: `${10 * scale}px` }}
+        className="flex items-center h-full"
+        style={{ padding: `${8 * scale}px`, gap: `${8 * scale}px` }}
       >
-        {/* 左侧：图标区域 - 白色圆形底 */}
+        {/* 左侧：图标 */}
         <div
-          className="relative flex-shrink-0 flex items-center justify-center"
+          className="flex-shrink-0 flex items-center justify-center rounded overflow-hidden"
           style={{
             width: `${40 * scale}px`,
             height: `${40 * scale}px`,
+            backgroundColor: "#F3F4F6",
           }}
         >
-          <div
-            className="w-full h-full rounded-full bg-white/25 flex items-center justify-center overflow-hidden shadow-sm"
-            style={{
-              boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-            }}
-          >
-            {iconSrc ? (
-              <img
-                src={iconSrc}
-                alt="图标"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-white/90 font-medium" style={{ fontSize: `${12 * scale}px` }}>
-                IC
-              </span>
-            )}
-          </div>
+          {iconSrc ? (
+            <img
+              src={iconSrc}
+              alt="图标"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <ImageIcon style={{ width: `${20 * scale}px`, height: `${20 * scale}px` }} className="text-gray-300" />
+          )}
         </div>
 
         {/* 中间：标题 + 推广卖点 */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: `${3 * scale}px` }}>
+        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: `${2 * scale}px` }}>
           {/* 标题 */}
-          <p className="text-gray-800 font-medium truncate leading-tight" style={{ fontSize: `${13 * scale}px` }}>
+          <p className="text-gray-500 truncate leading-tight" style={{ fontSize: `${12 * scale}px` }}>
             {resolveTitle()}
           </p>
 
-          {/* 推广卖点（带导航） */}
-          <div className="flex items-center" style={{ gap: `${2 * scale}px` }}>
-            {hasMultiplePoints && (
-              <button
-                onClick={handlePrev}
-                className="flex items-center justify-center text-gray-300 hover:text-gray-500 flex-shrink-0 transition-colors duration-200"
-                style={{ width: `${14 * scale}px`, height: `${14 * scale}px` }}
-                aria-label="上一条卖点"
-              >
-                <ChevronLeft style={{ width: `${10 * scale}px`, height: `${10 * scale}px` }} />
-              </button>
-            )}
-
-            <p className="text-gray-400 truncate flex-1 leading-tight" style={{ fontSize: `${11 * scale}px` }}>
-              {resolvePointText(currentPoint)}
-            </p>
-
-            {hasMultiplePoints && (
-              <button
-                onClick={handleNext}
-                className="flex items-center justify-center text-gray-300 hover:text-gray-500 flex-shrink-0 transition-colors duration-200"
-                style={{ width: `${14 * scale}px`, height: `${14 * scale}px` }}
-                aria-label="下一条卖点"
-              >
-                <ChevronRight style={{ width: `${10 * scale}px`, height: `${10 * scale}px` }} />
-              </button>
-            )}
-
-            {/* 卖点指示器 */}
-            {hasMultiplePoints && (
-              <div className="flex items-center flex-shrink-0" style={{ gap: `${2 * scale}px`, marginLeft: `${4 * scale}px` }}>
-                {validPoints.map((_, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "rounded-full transition-all duration-300",
-                      i === currentIndex ? "bg-blue-500" : "bg-gray-200"
-                    )}
-                    style={{
-                      width: i === currentIndex ? `${8 * scale}px` : `${4 * scale}px`,
-                      height: `${4 * scale}px`,
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          {/* 推广卖点 */}
+          <p className="text-gray-600 truncate leading-tight" style={{ fontSize: `${10 * scale}px` }}>
+            {resolvePointText(currentPoint)}
+          </p>
         </div>
 
         {/* 右侧：行动号召按钮 */}
         <button
           onClick={handleButtonClick}
-          className="flex-shrink-0 text-white rounded-full flex items-center justify-center whitespace-nowrap font-medium hover:opacity-90 active:scale-95 transition-all duration-200"
+          className="flex-shrink-0 text-white rounded flex items-center justify-center whitespace-nowrap cursor-pointer hover:opacity-90 transition-opacity duration-200"
           style={{
-            height: `${28 * scale}px`,
-            paddingLeft: `${14 * scale}px`,
-            paddingRight: `${14 * scale}px`,
-            fontSize: `${11 * scale}px`,
-            background: "linear-gradient(135deg, #3087FF 0%, #1A6DF2 100%)",
-            boxShadow: "0 2px 8px rgba(48, 135, 255, 0.35)",
+            height: `${20 * scale}px`,
+            paddingLeft: `${8 * scale}px`,
+            paddingRight: `${8 * scale}px`,
+            fontSize: `${10 * scale}px`,
+            backgroundColor: "#3087FF",
           }}
         >
           {finalConfig.buttonText}
@@ -429,20 +368,19 @@ export function FloatingWindowTemplate({
     return (
       <div className="w-full flex items-center justify-center">
         <div
-          className="relative rounded-2xl overflow-hidden"
+          className="relative rounded-2xl overflow-hidden bg-gray-100"
           style={{
             width: "260px",
             height: "312px",
-            background: "linear-gradient(180deg, #EEF2FF 0%, #F8FAFC 50%, #F1F5F9 100%)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(0,0,0,0.06)",
+            boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.06)",
           }}
         >
-          {/* 模拟手机屏幕内容 - 仿消息列表 */}
+          {/* 模拟手机屏幕内容 */}
           <div className="absolute inset-0 flex flex-col items-center justify-start pt-6 px-4 gap-2">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="w-full rounded-lg bg-white/60"
+                className="w-full rounded-lg bg-white/70"
                 style={{ height: `${36 * scale}px` }}
               />
             ))}
