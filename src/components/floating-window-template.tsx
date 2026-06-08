@@ -89,7 +89,9 @@ export function FloatingWindowTemplate({
   const [isPaused, setIsPaused] = useState(false);
   const [glowPhase, setGlowPhase] = useState<"none" | "card" | "button">("none");
   const [glowProgress, setGlowProgress] = useState(0); // 0~1 卡片流光进度
+  const [buttonGlowProgress, setButtonGlowProgress] = useState(0); // 0~1 按钮流光进度
   const cardRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   // 获取有效的推广卖点
   const safePoints = Array.isArray(finalConfig.promotionPoints) ? finalConfig.promotionPoints : [];
@@ -233,6 +235,23 @@ export function FloatingWindowTemplate({
         setGlowPhase("button");
         setGlowProgress(0);
       }
+    };
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [glowPhase]);
+
+  // 按钮边框流光动画 - 光带沿四条边持续顺时针转圈
+  useEffect(() => {
+    if (glowPhase !== "button") return;
+    const duration = 1000; // 1s 跑一圈
+    let startTime = performance.now();
+    let rafId: number;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = (elapsed % duration) / duration;
+      setButtonGlowProgress(progress);
+      rafId = requestAnimationFrame(animate);
     };
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
@@ -450,23 +469,37 @@ export function FloatingWindowTemplate({
 
         {/* 右侧：行动号召按钮（含流光边框） */}
         <div
+          ref={buttonRef}
           className="flex-shrink-0 relative"
           style={{
             borderRadius: `${Math.max(6 * scale, 4)}px`,
             overflow: 'hidden',
+            padding: `${Math.max(2 * scale, 1)}px`,
           }}
         >
-          {/* 按钮流光层 - 七彩光带持续顺时针转圈 */}
-          {glowPhase === "button" && (
-            <span
-              className="absolute"
-              style={{
-                inset: `-${Math.max(2 * scale, 1)}px`,
-                background: `conic-gradient(from var(--glow-angle, 0deg), transparent 0%, transparent 55%, #ff0000 62%, #ff8800 67%, #ffff00 72%, #00ff00 76%, #0088ff 80%, #8800ff 84%, #ff00ff 88%, transparent 100%)`,
-                animation: "glow-loop 1s linear infinite",
-              }}
-            />
-          )}
+          {/* 按钮流光层 - 七彩光带沿边框持续顺时针转圈 */}
+          {glowPhase === "button" && buttonRef.current && (() => {
+            const bw = buttonRef.current.offsetWidth;
+            const bh = buttonRef.current.offsetHeight;
+            const glowLen = Math.max(30, (2 * (bw + bh)) * 0.2);
+            const pos = getGlowPosition(buttonGlowProgress, bw, bh);
+            return (
+              <span
+                className="absolute pointer-events-none"
+                style={{
+                  left: `${pos.x - glowLen / 2}px`,
+                  top: `${pos.y - 6}px`,
+                  width: `${glowLen}px`,
+                  height: '12px',
+                  background: 'linear-gradient(90deg, transparent, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff, transparent)',
+                  borderRadius: '6px',
+                  transform: `rotate(${pos.rotation}deg)`,
+                  filter: 'blur(2px)',
+                  boxShadow: '0 0 8px 2px rgba(255,100,0,0.6), 0 0 16px 4px rgba(0,100,255,0.3)',
+                }}
+              />
+            );
+          })()}
           <button
             onClick={handleButtonClick}
             className="relative text-white rounded flex items-center justify-center whitespace-nowrap cursor-pointer hover:opacity-90 transition-opacity duration-200 font-medium"
@@ -491,19 +524,6 @@ export function FloatingWindowTemplate({
   if (previewMode) {
     return (
       <div className="relative w-full h-full">
-        {/* 按钮流光动画 - @property 驱动角度旋转 */}
-        <style>{`
-          @property --glow-angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-          }
-          @keyframes glow-loop {
-            0% { --glow-angle: 0deg; }
-            100% { --glow-angle: 360deg; }
-          }
-        `}</style>
-
         {/* 模拟手机屏幕内容 */}
         <div className="absolute inset-0 flex flex-col items-center justify-start pt-6 px-4 gap-2">
           {[1, 2, 3].map((i) => (
@@ -539,18 +559,6 @@ export function FloatingWindowTemplate({
   // 非预览模式 - 全屏透明浮层 + flexbox 定位
   return (
     <>
-      {/* 按钮流光动画 - @property 驱动角度旋转 */}
-      <style>{`
-        @property --glow-angle {
-          syntax: '<angle>';
-          initial-value: 0deg;
-          inherits: false;
-        }
-        @keyframes glow-loop {
-          0% { --glow-angle: 0deg; }
-          100% { --glow-angle: 360deg; }
-        }
-      `}</style>
       {!isClosed && (
         <div
           className="fixed inset-0 z-50 flex flex-col"
