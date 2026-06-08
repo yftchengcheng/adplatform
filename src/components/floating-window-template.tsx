@@ -393,7 +393,7 @@ export function FloatingWindowTemplate({
               "absolute z-20",
               position === "top" && "top-0 left-0 right-0",
               position === "bottom" && "bottom-0 left-0 right-0",
-              position === "middle_bottom" && "bottom-[30%] left-0"
+              position === "middle_bottom" && "bottom-[25%] left-0"
             )}
             style={{
               display: "flex",
@@ -417,7 +417,7 @@ export function FloatingWindowTemplate({
           "fixed z-50",
           position === "top" && "top-0 left-0 right-0",
           position === "bottom" && "bottom-0 left-0 right-0",
-          position === "middle_bottom" && "bottom-[30%] left-0"
+          position === "middle_bottom" && "bottom-[25%] left-0"
         )}
         style={{
           display: "flex",
