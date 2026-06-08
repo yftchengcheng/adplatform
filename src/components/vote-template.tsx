@@ -249,7 +249,7 @@ export function VoteTemplate({
         className={cn(
           previewMode
             ? "absolute inset-0"
-            : "fixed inset-0 z-50 bg-black/50",
+            : "fixed inset-0 z-40",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
@@ -260,13 +260,13 @@ export function VoteTemplate({
       <div
         className={cn(
           previewMode
-            ? "w-full max-w-[280px] mx-auto"
-            : "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2",
+            ? "w-[240px]"
+            : "fixed left-0 top-1/2 z-50 -translate-y-1/2 w-[240px]",
           "transition-all duration-300",
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
       >
-        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ minHeight: previewMode ? "auto" : 160 }}>
           {/* Close Button */}
             <button
               onClick={onClose}
