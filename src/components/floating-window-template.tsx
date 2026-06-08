@@ -525,16 +525,6 @@ export function FloatingWindowTemplate({
   if (previewMode) {
     return (
       <div className="relative w-full h-full">
-        {/* 模拟手机屏幕内容 */}
-        <div className="absolute inset-0 flex flex-col items-center justify-start pt-6 px-4 gap-2">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="w-full rounded-lg bg-gray-100"
-              style={{ height: "36px" }}
-            />
-          ))}
-        </div>
 
         {/* 全屏透明浮层 - 通过 flexbox 定位卡片 */}
         {!isClosed && (
