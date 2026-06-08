@@ -341,11 +341,12 @@ export function FloatingWindowTemplate({
 
   // 根据位置获取浮窗宽度
   const getWindowWidth = () => {
+    const isMiddle = finalConfig.position === "middle";
     if (previewMode) {
-      // 预览模式：用百分比填充父容器（手机外框由配置页/列表页提供）
-      return "100%";
+      // 预览模式：中部75%宽度，其余100%
+      return isMiddle ? "75%" : "100%";
     }
-    return "640px";
+    return isMiddle ? "480px" : "640px";
   };
 
   // 缩放比例（预览模式下文字和图标需要等比缩小）
