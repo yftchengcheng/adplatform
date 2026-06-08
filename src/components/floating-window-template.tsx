@@ -291,30 +291,30 @@ export function FloatingWindowTemplate({
       {/* 关闭按钮 */}
       <button
         onClick={handleClose}
-        className="absolute flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 z-10 transition-colors duration-200 cursor-pointer"
+        className="absolute flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100/50 z-10 transition-colors duration-200 cursor-pointer"
         style={{
-          top: `${4 * scale}px`,
-          right: `${4 * scale}px`,
-          width: `${20 * scale}px`,
-          height: `${20 * scale}px`,
-          borderRadius: `${4 * scale}px`,
+          top: `${Math.max(4 * scale, 3)}px`,
+          right: `${Math.max(4 * scale, 3)}px`,
+          width: `${Math.max(20 * scale, 16)}px`,
+          height: `${Math.max(20 * scale, 16)}px`,
+          borderRadius: `${Math.max(4 * scale, 3)}px`,
         }}
         aria-label="关闭浮窗"
       >
-        <X style={{ width: `${12 * scale}px`, height: `${12 * scale}px` }} />
+        <X style={{ width: `${Math.max(12 * scale, 10)}px`, height: `${Math.max(12 * scale, 10)}px` }} />
       </button>
 
       {/* 内容 - 左图右文水平布局 */}
       <div
         className="flex items-center h-full"
-        style={{ padding: `${8 * scale}px`, gap: `${8 * scale}px` }}
+        style={{ padding: `${Math.max(8 * scale, 6)}px`, gap: `${Math.max(8 * scale, 5)}px` }}
       >
         {/* 左侧：图标 */}
         <div
           className="flex-shrink-0 flex items-center justify-center rounded overflow-hidden"
           style={{
-            width: `${40 * scale}px`,
-            height: `${40 * scale}px`,
+            width: `${Math.max(48 * scale, 24)}px`,
+            height: `${Math.max(48 * scale, 24)}px`,
             backgroundColor: "#F3F4F6",
           }}
         >
@@ -328,19 +328,19 @@ export function FloatingWindowTemplate({
               }}
             />
           ) : (
-            <ImageIcon style={{ width: `${20 * scale}px`, height: `${20 * scale}px` }} className="text-gray-300" />
+            <ImageIcon style={{ width: `${Math.max(24 * scale, 14)}px`, height: `${Math.max(24 * scale, 14)}px` }} className="text-gray-400" />
           )}
         </div>
 
         {/* 中间：标题 + 推广卖点 */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: `${2 * scale}px` }}>
+        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: `${Math.max(2 * scale, 2)}px` }}>
           {/* 标题 */}
-          <p className="text-gray-500 truncate leading-tight" style={{ fontSize: `${12 * scale}px` }}>
+          <p className="text-gray-800 font-medium truncate leading-tight" style={{ fontSize: `${Math.max(12 * scale, 10)}px` }}>
             {resolveTitle()}
           </p>
 
           {/* 推广卖点 */}
-          <p className="text-gray-600 truncate leading-tight" style={{ fontSize: `${10 * scale}px` }}>
+          <p className="text-gray-500 truncate leading-tight" style={{ fontSize: `${Math.max(10 * scale, 9)}px` }}>
             {resolvePointText(currentPoint)}
           </p>
         </div>
@@ -348,13 +348,14 @@ export function FloatingWindowTemplate({
         {/* 右侧：行动号召按钮 */}
         <button
           onClick={handleButtonClick}
-          className="flex-shrink-0 text-white rounded flex items-center justify-center whitespace-nowrap cursor-pointer hover:opacity-90 transition-opacity duration-200"
+          className="flex-shrink-0 text-white rounded flex items-center justify-center whitespace-nowrap cursor-pointer hover:opacity-90 transition-opacity duration-200 font-medium"
           style={{
-            height: `${20 * scale}px`,
-            paddingLeft: `${8 * scale}px`,
-            paddingRight: `${8 * scale}px`,
-            fontSize: `${10 * scale}px`,
+            height: `${Math.max(24 * scale, 18)}px`,
+            paddingLeft: `${Math.max(8 * scale, 6)}px`,
+            paddingRight: `${Math.max(8 * scale, 6)}px`,
+            fontSize: `${Math.max(10 * scale, 9)}px`,
             backgroundColor: "#3087FF",
+            borderRadius: `${Math.max(4 * scale, 3)}px`,
           }}
         >
           {finalConfig.buttonText}
