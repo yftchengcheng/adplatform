@@ -306,13 +306,16 @@ export function FloatingWindowTemplate({
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (previewMode) {
-      // 预览模式下，关闭后重新播放动画
+      // 预览模式下，先播放关闭动画，然后通知父组件切换
       setIsAnimating(false);
-      setIsClosed(true);
       setTimeout(() => {
+        onClose?.();
+        // 重置状态以便下次展示
         setIsClosed(false);
-        setIsAnimating(true);
-      }, 800);
+        setGlowPhase("none");
+        setGlowProgress(0);
+        setButtonGlowProgress(0);
+      }, 300);
     } else {
       setIsAnimating(false);
       onClose?.();
