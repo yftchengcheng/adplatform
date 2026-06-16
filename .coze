@@ -2,9 +2,11 @@
 requires = ["nodejs-24"]
 
 [dev]
-build = ["bash", "./scripts-cms/dev.sh"]
-run = ["bash", "./scripts-cms/dev.sh"]
+build = ["bash", "./scripts/prepare.sh"]
+run = ["bash", "./scripts/dev.sh"]
+deps = ["git"] # -> apt install git
 
 [deploy]
-build = ["bash", "./scripts-cms/build.sh"]
-run = ["bash", "./scripts-cms/start.sh"]
+build = ["bash","./scripts/build.sh"]
+run = ["bash","./scripts/start.sh"]
+deps = ["git"] # -> apt install git
