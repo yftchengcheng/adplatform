@@ -188,44 +188,41 @@ export function CouponTemplate({
             !previewMode && (isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0")
           )}
           style={{
-            // 票券腰身：左右中央高度内凹 8%（5 点近似弧线）
+            // 票券腰身：左右中央高度内凹 18%（5 点近似弧线，更明显的票券感）
             clipPath:
-              "polygon(0% 0%, 100% 0%, 100% 35%, 98% 40%, 92% 50%, 98% 60%, 100% 65%, 100% 100%, 0% 100%, 0% 65%, 2% 60%, 8% 50%, 2% 40%, 0% 35%)",
-            background: "rgba(255, 255, 255, 0.08)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            border: "1px solid rgba(255, 255, 255, 0.25)",
+              "polygon(0% 0%, 100% 0%, 100% 32%, 94% 38%, 82% 50%, 94% 62%, 100% 68%, 100% 100%, 0% 100%, 0% 68%, 6% 62%, 18% 50%, 6% 38%, 0% 32%)",
+            background: "#E8E9ED",
+            border: "1px solid rgba(0, 0, 0, 0.06)",
             boxShadow:
-              "0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.05)",
+              "0 8px 24px rgba(249, 111, 12, 0.18), 0 2px 4px rgba(0, 0, 0, 0.04)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button - 浅灰底，置于白色顶部区 */}
+          {/* Close Button - 小型圆形，半透白底（融入米白顶区） */}
           <button
             onClick={onClose}
             aria-label="关闭"
-            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full z-20 transition-colors hover:bg-gray-200"
+            className="absolute top-2.5 right-2.5 w-5 h-5 flex items-center justify-center rounded-full z-20 transition-colors hover:bg-white/50"
             style={{
-              background: "rgba(0, 0, 0, 0.06)",
+              background: "rgba(255, 255, 255, 0.4)",
               color: "rgb(75, 85, 99)",
             }}
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
 
-          {/* TOP 白色区 - 活动名称 + 有效期（电商券头部） */}
-          <div className="relative px-5 pt-4 pb-3 flex items-start justify-between">
+          {/* TOP 米白区 - 活动名称 + 有效期（电商券头部） */}
+          <div className="relative px-4 pt-3 pb-2 flex items-start justify-between gap-2">
             <p
-              className="text-[10px] uppercase font-medium"
+              className="text-[11px] font-medium leading-tight flex-1"
               style={{
-                color: "rgb(107, 114, 128)",
-                letterSpacing: "0.15em",
+                color: "rgb(75, 85, 99)",
               }}
             >
               {resolveMacro(finalConfig.title) || "活动名称"}
             </p>
             <span
-              className="text-[9px] text-gray-400"
+              className="text-[10px] text-gray-400 mt-0.5 whitespace-nowrap"
               style={{ fontVariantNumeric: "tabular-nums" }}
             >
               {formatValidDate()}
@@ -242,9 +239,9 @@ export function CouponTemplate({
             >
               <path
                 d="M 0 0.5 Q 32.5 10 65 0.5"
-                stroke="rgba(0, 0, 0, 0.18)"
+                stroke="rgba(0, 0, 0, 0.25)"
                 strokeWidth="1"
-                strokeDasharray="2 2.5"
+                strokeDasharray="3 2"
                 fill="none"
                 strokeLinecap="round"
               />
@@ -265,23 +262,23 @@ export function CouponTemplate({
                 }}
               />
 
-              {/* Left 35% - 30 数字 */}
-              <div className="w-[35%] relative py-4 px-2 flex flex-col items-center justify-center">
+              {/* Left 35% - 30 数字（更大更突出） */}
+              <div className="w-[35%] relative py-7 px-2 flex flex-col items-center justify-center">
                 <DiscountInfoDisplay text={resolveMacro(finalConfig.discountInfo) || "优惠"} />
               </div>
 
               {/* Right 65% - 条件 + 米黄按钮 */}
-              <div className="w-[65%] relative px-4 py-3 flex flex-col items-start justify-center gap-1.5">
-                <span className="text-white/95 text-[13px] font-medium leading-tight">
+              <div className="w-[65%] relative px-4 py-3 flex flex-col items-start justify-center gap-2">
+                <span className="text-white text-[13px] font-medium leading-tight">
                   {resolveMacro(finalConfig.discountCondition) || "优惠条件"}
                 </span>
-                {/* 米黄按钮 - 视觉 CTA（非交互，点击仍由整卡 click area 触发） */}
+                {/* 米黄按钮 - 紧凑圆角胶囊（视觉 CTA） */}
                 <div
-                  className="text-xs font-semibold px-4 py-1.5 rounded-full pointer-events-none"
+                  className="text-xs font-semibold px-3 py-1 rounded-full pointer-events-none"
                   style={{
                     background: "#FDE6C6",
                     color: "#E54001",
-                    boxShadow: "0 1px 3px rgba(229, 64, 1, 0.25)",
+                    boxShadow: "0 1px 2px rgba(229, 64, 1, 0.2)",
                   }}
                 >
                   {resolveButtonText()}
@@ -311,18 +308,19 @@ function DiscountInfoDisplay({ text }: { text: string }) {
     return (
       <div className="flex items-baseline gap-0.5">
         {unit !== "折" && (
-          <span className="text-white/90 text-xs font-medium">¥</span>
+          <span className="text-white text-sm font-semibold self-start">¥</span>
         )}
         <span
-          className="text-white text-3xl font-bold leading-none"
+          className="text-white text-[44px] font-bold leading-none"
           style={{
-            letterSpacing: "-0.02em",
+            letterSpacing: "-0.03em",
             fontVariantNumeric: "tabular-nums",
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
           }}
         >
           {num}
         </span>
-        <span className="text-white/90 text-xs font-medium ml-0.5">
+        <span className="text-white text-sm font-semibold self-end mb-1">
           {unit}
         </span>
       </div>
