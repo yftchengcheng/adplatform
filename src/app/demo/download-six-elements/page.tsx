@@ -7,24 +7,24 @@ import { Label } from "@/components/ui/label";
 import { Settings2, Trash2, Plus } from "lucide-react";
 
 export default function DownloadSixElementsDemoPage() {
-  // 默认数据：仿应用商店下载页
+  // 默认数据：仿应用商店下载页（具体公司 + 具体版本号 + 具体功能）
   const [config, setConfig] = useState<DownloadSixElementsConfig>({
-    appName: "智行火车票",
-    developer: "北京智行科技有限公司",
-    version: "8.6.2",
-    privacyUrl: "https://example.com/privacy",
-    permissionsUrl: "https://example.com/permissions",
+    appName: "铁路12306",
+    developer: "中国铁道科学研究院集团有限公司",
+    version: "5.7.0",
+    privacyUrl: "https://www.12306.cn/index/about/privacy/index.html",
+    permissionsUrl: "https://www.12306.cn/index/about/permission/index.html",
     features: [
-      { text: "全国高铁、动车、普速列车余票实时查询", url: "https://example.com/feature/ticket" },
-      { text: "在线选座、改签、退票一键办理", url: "https://example.com/feature/refund" },
-      { text: "智能中转方案推荐，复杂行程省心", url: "https://example.com/feature/transfer" },
-      { text: "支持微信/支付宝快捷支付，自动出票", url: "https://example.com/feature/pay" },
+      "https://www.12306.cn/index/", // 首页
+      "https://www.12306.cn/mormhweb/", // 学生票
+      "https://www.12306.cn/index/about/help/index.html", // 帮助中心
+      "https://kyfw.12306.cn/otn/login/init", // 登录
     ],
     logoUrl: "",
-    downloadUrl: "https://example.com/download",
+    downloadUrl: "https://www.12306.cn/index/download.html",
     downloadText: "立即下载",
     primaryColor: "#00C06A",
-    ageRating: "4+",
+    ageRating: "3+",
     icpRecord: "https://beian.miit.gov.cn/",
   });
 
@@ -40,7 +40,7 @@ export default function DownloadSixElementsDemoPage() {
       ...prev,
       features: [
         ...(prev.features || []),
-        { id: `feat-${Date.now()}-${(prev.features || []).length}`, text: `新功能 ${(prev.features || []).length + 1}`, url: "" },
+        "",
       ],
     }));
   };
@@ -184,10 +184,10 @@ export default function DownloadSixElementsDemoPage() {
             />
           </div>
 
-          {/* 产品功能（多条） */}
+          {/* 功能（多条 URL） */}
           <div>
             <div className="flex items-center justify-between">
-              <Label className="text-xs text-gray-600">6. 产品功能（多条）</Label>
+              <Label className="text-xs text-gray-600">6. 功能（多条 URL）</Label>
               <button
                 onClick={addFeature}
                 className="h-6 px-2 rounded text-[11px] text-blue-500 hover:text-blue-600 hover:bg-blue-50 flex items-center gap-0.5"
@@ -198,27 +198,16 @@ export default function DownloadSixElementsDemoPage() {
               </button>
             </div>
             <div className="mt-1.5 space-y-1.5">
-              {(config.features || []).map((f, i) => (
+              {(config.features || []).map((url, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <Input
-                    value={f.text}
+                    value={url}
                     onChange={(e) => {
                       const next = [...(config.features || [])];
-                      next[i] = { ...next[i], text: e.target.value };
+                      next[i] = e.target.value;
                       setConfig((prev) => ({ ...prev, features: next }));
                     }}
-                    placeholder={`功能 ${i + 1} 名称`}
-                    maxLength={30}
-                    className="h-8 text-xs flex-1"
-                  />
-                  <Input
-                    value={f.url}
-                    onChange={(e) => {
-                      const next = [...(config.features || [])];
-                      next[i] = { ...next[i], url: e.target.value };
-                      setConfig((prev) => ({ ...prev, features: next }));
-                    }}
-                    placeholder="功能链接（可选）"
+                    placeholder={`功能 ${i + 1} URL`}
                     className="h-8 text-xs flex-1"
                   />
                   <button
@@ -267,7 +256,7 @@ export default function DownloadSixElementsDemoPage() {
                 />
               </div>
               <div>
-                <Label className="text-xs text-gray-600">备案信息（底部 ICP）</Label>
+                <Label className="text-xs text-gray-600">备案（底部 ICP）</Label>
                 <Input
                   value={config.icpRecord || ""}
                   onChange={(e) => updateField("icpRecord", e.target.value)}

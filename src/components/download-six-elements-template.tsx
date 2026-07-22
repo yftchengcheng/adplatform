@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Download,
   Package,
@@ -9,75 +9,78 @@ import {
   KeyRound,
   Sparkles,
   Building2,
-  Globe,
-  Info,
+  ArrowLeft,
+  ExternalLink,
+  AlertCircle,
 } from "lucide-react";
 
 /**
- * DownloadSixElementsTemplate - 应用商店下载六要素（Banner 风格）
+ * DownloadSixElementsTemplate - 应用商店下载六要素
  *
- * 仿应用商店详情页底部下载条，包含：
+ * 6 要素：
  *  1. 应用名称
  *  2. 开发者公司名称
  *  3. 应用版本
- *  4. 隐私协议超链
- *  5. 权限列表超链
- *  6. 产品功能（每条 = text + url）
+ *  4. 隐私协议 URL
+ *  5. 权限列表 URL
+ *  6. 功能 URL 列表（每个功能就是一个 URL）
  *
- * 附加：产品 LOGO（可选，无 URL 时显示占位图标）、下载按钮、适合年龄、备案信息
+ * 附加：LOGO（可选）、下载按钮、适合年龄 chip、备案 URL
  *
- * 设计原则：
- *  - 贴边 Smart App Banner（核心 1 行 ~56px，6 要素收纳在 ⓘ 折叠面板）
- *  - 默认不展开时总体高度 60-80px，远小于屏幕高度，不遮挡广告主体
- *  - 横向布局：LOGO + 名称 + 年龄 + 详情按钮 + 下载按钮
- *  - 有/无 LOGO 自适应（无 LOGO 时显示 Package 占位图标，保持布局稳定）
- *  - 背景透明，内层毛玻璃白底
- *  - 6 要素点击 ⓘ 才展开，不影响主视觉
+ * 交互：
+ *  - 主条平铺全部要素（不留折叠）
+ *  - 点击 隐私/权限/备案/任一功能 → 在「内部浏览器视图」打开
+ *  - 内部浏览器视图：顶部返回 + URL 标题 + iframe + 底部下载按钮
+ *  - iframe 加载失败（X-Frame-Options 拒绝）时降级为「外链打开 + 返回」
+ *
+ * 视觉：
+ *  - 顶部 1 行（LOGO + 名称 + 年龄 + 下载按钮）
+ *  - 底部 1 行（功能 chip × N | 隐私 | 权限 | 备案）
+ *  - 总高 ~110px，贴边窄条，不遮挡广告主体
  */
-
-export interface DownloadSixElementsFeature {
-  text: string;
-  url?: string;
-}
 
 export interface DownloadSixElementsConfig {
   // 6 要素
-  appName: string;            // 1. 应用名称
-  developer: string;          // 2. 开发者公司名称
-  version: string;            // 3. 应用版本
-  privacyUrl: string;         // 4. 隐私协议超链
-  permissionsUrl: string;     // 5. 权限列表超链
-  features: DownloadSixElementsFeature[];  // 6. 产品功能
+  appName: string;
+  developer: string;
+  version: string;
+  privacyUrl: string;
+  permissionsUrl: string;
+  features: string[];           // 6. 功能 URL 列表
 
   // 附加
-  logoUrl?: string;           // 产品 LOGO（可选）
-  downloadUrl?: string;       // 下载链接
-  downloadText?: string;      // 下载按钮文案
-  primaryColor?: string;      // 主色（默认 #00C06A）
-  ageRating?: string;         // 适合年龄（3+ / 4+ / 8+ / 12+ / 16+ / 18+）
-  icpRecord?: string;         // 备案信息（URL）
+  logoUrl?: string;
+  downloadUrl?: string;
+  downloadText?: string;
+  primaryColor?: string;
+  ageRating?: string;
+  icpRecord?: string;           // 备案 URL
 
   // 系统
   macroVariables?: Record<string, string>;
 }
 
 export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
-  appName: "智行火车票",
-  developer: "北京铁路信息技术中心",
-  version: "1.0.0",
-  privacyUrl: "https://example.com/privacy",
-  permissionsUrl: "https://example.com/permissions",
+  // —— 具体公司信息 ——
+  appName: "铁路12306",
+  developer: "中国铁道科学研究院集团有限公司",
+  version: "5.7.0",
+  // —— 6 要素 ——
+  privacyUrl: "https://www.12306.cn/index/about/privacy/index.html",
+  permissionsUrl: "https://www.12306.cn/index/about/permission/index.html",
+  // —— 功能 URL（具体功能页，path 不再是占位 ticket/refund/id）——
   features: [
-    { text: "全国高铁、动车票务查询", url: "https://example.com/feature/ticket" },
-    { text: "30 天内改签退票", url: "https://example.com/feature/refund" },
-    { text: "多证件购票支持", url: "https://example.com/feature/id" },
-    { text: "学生票资质核验", url: "https://example.com/feature/student" },
+    "https://www.12306.cn/index/", // 首页
+    "https://www.12306.cn/mormhweb/", // 学生票
+    "https://www.12306.cn/index/about/help/index.html", // 帮助中心
+    "https://kyfw.12306.cn/otn/login/init", // 登录
   ],
-  logoUrl: "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=200&h=200&fit=crop",
-  downloadUrl: "https://example.com/download",
+  // —— 附加 ——
+  logoUrl: "",
+  downloadUrl: "https://www.12306.cn/index/download.html",
   downloadText: "立即下载",
   primaryColor: "#00C06A",
-  ageRating: "4+",
+  ageRating: "3+",
   icpRecord: "https://beian.miit.gov.cn/",
 };
 
@@ -88,10 +91,34 @@ interface DownloadSixElementsTemplateProps {
   onClose?: () => void;
 }
 
+/**
+ * 从 URL 提取可读的展示文字
+ *  - 优先用 URL 末段（去掉后缀）作为 chip 标签
+ *  - 退化到 host
+ *  - 都没有就用整段 URL
+ */
+function labelFromUrl(rawUrl: string): string {
+  const url = (rawUrl || "").trim();
+  if (!url) return "";
+  try {
+    const u = new URL(url);
+    // 末段 path（去掉 .html 等常见后缀）
+    const last = u.pathname.split("/").filter(Boolean).pop() || "";
+    const cleaned = last.replace(/\.(html?|php|aspx?|jsp)$/i, "");
+    // 末段是纯英文/拼音 → fallback 到 host 主域（"www.12306.cn"）
+    if (!cleaned || /^[a-z0-9_-]+$/i.test(cleaned) && cleaned.length < 6) {
+      return u.hostname.replace(/^www\./, "");
+    }
+    return cleaned;
+  } catch {
+    // 不是合法 URL，原样展示（截断）
+    return url.length > 18 ? url.slice(0, 16) + "…" : url;
+  }
+}
+
 export function DownloadSixElementsTemplate({
   config: rawConfig,
   previewMode = false,
-  onClose,
 }: DownloadSixElementsTemplateProps) {
   const config: DownloadSixElementsConfig = {
     ...defaultDownloadSixElementsConfig,
@@ -114,7 +141,15 @@ export function DownloadSixElementsTemplate({
   } = config;
 
   const [pressed, setPressed] = useState(false);
-  const [detailOpen, setDetailOpen] = useState(false);
+  // 内部浏览器视图状态
+  const [webView, setWebView] = useState<{ url: string; title: string } | null>(null);
+  // iframe 加载失败（X-Frame-Options 拒绝）状态
+  const [iframeError, setIframeError] = useState(false);
+
+  // 打开内部浏览器时重置错误
+  useEffect(() => {
+    if (webView) setIframeError(false);
+  }, [webView]);
 
   // 解析宏变量
   const resolve = (text: string): string => {
@@ -135,27 +170,23 @@ export function DownloadSixElementsTemplate({
     }
   }, [downloadUrl, previewMode]);
 
+  const openWebView = useCallback((url: string, title: string) => {
+    const resolved = resolve(url);
+    if (resolved && resolved.trim()) {
+      setWebView({ url: resolved, title });
+    }
+  }, [resolve]);
+
+  const closeWebView = useCallback(() => setWebView(null), []);
+
   const hasLogo = Boolean(logoUrl && logoUrl.trim());
-  const hasFeatures = features && features.length > 0;
+  const validFeatures = features.filter((u) => u && u.trim());
 
   return (
-    <div className="w-full max-w-[420px] mx-auto">
-      {/* 关闭按钮 - 仅 preview 模式 */}
-      {previewMode && onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 z-30 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-          aria-label="关闭预览"
-        >
-          <X className="w-3 h-3 text-white" />
-        </button>
-      )}
-
-      {/* Smart App Banner 主体 - 总高 ~76px */}
-      <div data-d6e-root className="relative bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200/60 shadow-lg overflow-hidden">
-        {/* 单行主条: LOGO + 名称 + 副标 + 年龄 + 详情按钮 + 下载 */}
-        <div data-d6e-top-row className="flex items-center gap-2.5 p-2.5">
+    <>
+      <div className="w-full max-w-[420px] mx-auto" data-d6e-root>
+        {/* 顶部行: LOGO + 名称 + 年龄 + 下载按钮（核心信息） */}
+        <div data-d6e-top-row className="flex items-center gap-2.5 p-2.5 bg-white/95 backdrop-blur-sm rounded-t-xl border border-gray-200/60">
           {/* LOGO - 有/无 LOGO 自适应（容器固定 44x44） */}
           <div
             className="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center"
@@ -181,11 +212,12 @@ export function DownloadSixElementsTemplate({
           {/* 名称 + 副标 */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-[13px] font-semibold text-gray-900 truncate">
+              <h2 data-d6e-appname className="text-[13px] font-semibold text-gray-900 truncate">
                 {resolve(appName)}
               </h2>
               {ageRating && (
                 <span
+                  data-d6e-age
                   className="px-1 h-[15px] inline-flex items-center rounded text-[9px] font-semibold text-white flex-shrink-0"
                   style={{ backgroundColor: primaryColor }}
                 >
@@ -193,23 +225,11 @@ export function DownloadSixElementsTemplate({
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-gray-500 truncate mt-0.5">
+            <p data-d6e-subline className="text-[10px] text-gray-500 truncate mt-0.5">
               {resolve(developer) || "—"}
               {version ? ` · v${resolve(version)}` : ""}
             </p>
           </div>
-
-          {/* ⓘ 详情按钮（点击展开 6 要素面板） */}
-          <button
-            type="button"
-            onClick={() => setDetailOpen((v) => !v)}
-            className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-            aria-label="查看下载六要素"
-            aria-expanded={detailOpen}
-            data-d6e-toggle
-          >
-            <Info className="w-3.5 h-3.5" />
-          </button>
 
           {/* 下载按钮 */}
           <button
@@ -224,125 +244,191 @@ export function DownloadSixElementsTemplate({
               boxShadow: `0 2px 6px ${primaryColor}40`,
               transform: pressed ? "scale(0.96)" : "scale(1)",
             }}
+            data-d6e-download
           >
             <Download className="w-3 h-3" />
             {downloadText}
           </button>
         </div>
 
-        {/* 6 要素详情面板 - 默认折叠，展开后高度自适应 */}
-        {detailOpen && (
-          <div
-            data-d6e-detail
-            className="border-t border-gray-100 bg-gray-50/60 px-3 py-2.5 space-y-1.5"
-          >
-            {/* 产品功能 - 链接 chip 列表 */}
-            {hasFeatures && (
-              <div className="flex items-start gap-1.5">
-                <Sparkles
-                  className="w-3 h-3 mt-0.5 flex-shrink-0"
-                  style={{ color: primaryColor }}
-                />
-                <div className="flex flex-wrap gap-x-2 gap-y-1 flex-1 min-w-0">
-                  {features.slice(0, 4).map((f, i) => {
-                    const hasUrl = Boolean(f.url && f.url.trim());
-                    const text = (
-                      <span className="inline-flex items-center gap-0.5">
-                        <span className="truncate max-w-[160px]">
-                          {resolve(f.text)}
-                        </span>
-                      </span>
-                    );
-                    if (hasUrl && !previewMode) {
-                      return (
-                        <a
-                          key={i}
-                          href={f.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-gray-600 hover:text-gray-900 hover:underline"
-                        >
-                          {text}
-                        </a>
-                      );
+        {/* 底部链接条：所有要素平铺展示 - 功能 + 隐私 + 权限 + 备案 */}
+        <div
+          data-d6e-link-bar
+          className="flex items-center flex-wrap gap-x-2 gap-y-1 px-2.5 py-1.5 bg-white/95 backdrop-blur-sm rounded-b-xl border-t border-gray-100/80 border-x border-b border-gray-200/60 text-[10px]"
+        >
+          {/* 功能 chips（全部展示，flex-wrap 自动换行） */}
+          {validFeatures.map((u, i) => {
+            const label = labelFromUrl(u);
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => openWebView(u, label || `功能 ${i + 1}`)}
+                className="inline-flex items-center gap-0.5 text-gray-600 hover:text-gray-900 transition-colors"
+                data-d6e-feature
+              >
+                <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
+                <span className="truncate max-w-[100px]">{label || `功能 ${i + 1}`}</span>
+              </button>
+            );
+          })}
+
+          {/* 分割 */}
+          {validFeatures.length > 0 && (privacyUrl || permissionsUrl) && (
+            <span className="text-gray-200">|</span>
+          )}
+
+          {/* 隐私协议 */}
+          {privacyUrl && privacyUrl.trim() && (
+            <button
+              type="button"
+              onClick={() => openWebView(privacyUrl, "隐私协议")}
+              className="inline-flex items-center gap-0.5 text-gray-500 hover:text-gray-900 transition-colors"
+              data-d6e-privacy
+            >
+              <ShieldCheck className="w-2.5 h-2.5" />
+              隐私
+            </button>
+          )}
+
+          {/* 权限列表 */}
+          {permissionsUrl && permissionsUrl.trim() && (
+            <>
+              <span className="text-gray-200">|</span>
+              <button
+                type="button"
+                onClick={() => openWebView(permissionsUrl, "权限列表")}
+                className="inline-flex items-center gap-0.5 text-gray-500 hover:text-gray-900 transition-colors"
+                data-d6e-permissions
+              >
+                <KeyRound className="w-2.5 h-2.5" />
+                权限
+              </button>
+            </>
+          )}
+
+          {/* 备案 */}
+          {icpRecord && icpRecord.trim() && (
+            <>
+              <span className="text-gray-200">|</span>
+              <button
+                type="button"
+                onClick={() => openWebView(icpRecord, "备案信息")}
+                className="inline-flex items-center gap-0.5 text-gray-400 hover:text-gray-700 transition-colors"
+                data-d6e-icp
+                title={icpRecord}
+              >
+                <Building2 className="w-2.5 h-2.5" />
+                备案
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* 内部浏览器视图 Modal */}
+      {webView && (
+        <div
+          data-d6e-webview
+          className="fixed inset-0 z-[100] bg-white flex flex-col"
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* 顶部栏：返回 + 标题 + URL */}
+          <div className="flex items-center gap-2 px-2 py-2 border-b border-gray-200 bg-white flex-shrink-0">
+            <button
+              type="button"
+              onClick={closeWebView}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium"
+              data-d6e-webview-back
+            >
+              <ArrowLeft className="w-4 h-4" />
+              返回
+            </button>
+            <div className="flex-1 min-w-0 text-center">
+              <p className="text-sm font-medium text-gray-900 truncate">{webView.title}</p>
+              <p className="text-[10px] text-gray-400 truncate">{webView.url}</p>
+            </div>
+            <a
+              href={webView.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-gray-500 hover:bg-gray-100 text-xs"
+              title="在外部浏览器打开"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          {/* iframe 主体（flex-1 占满剩余空间） */}
+          <div className="flex-1 relative bg-gray-50">
+            {!iframeError ? (
+              <iframe
+                src={webView.url}
+                className="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                referrerPolicy="no-referrer"
+                title={webView.title}
+                onError={() => setIframeError(true)}
+                onLoad={(e) => {
+                  // 检测 iframe 是否被 X-Frame-Options 拒绝（页面无内容）
+                  try {
+                    const doc = e.currentTarget.contentDocument;
+                    if (!doc || !doc.body || doc.body.children.length === 0) {
+                      setIframeError(true);
                     }
-                    return (
-                      <span
-                        key={i}
-                        className="text-[10px] text-gray-600"
-                      >
-                        {text}
-                      </span>
-                    );
-                  })}
+                  } catch {
+                    // 跨域读取被拒——页面可能正常加载，无需报错
+                  }
+                }}
+                data-d6e-iframe
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                <AlertCircle className="w-12 h-12 text-gray-300 mb-3" />
+                <p className="text-sm text-gray-600 mb-1">该页面不允许嵌入预览</p>
+                <p className="text-xs text-gray-400 mb-4">您可以在外部浏览器打开，或返回广告页面</p>
+                <div className="flex gap-2">
+                  <a
+                    href={webView.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-lg text-white text-sm font-medium"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    外部打开
+                  </a>
+                  <button
+                    type="button"
+                    onClick={closeWebView}
+                    className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50"
+                  >
+                    返回
+                  </button>
                 </div>
               </div>
             )}
-
-            {/* 隐私协议 / 权限列表 / 备案 - 单行链接条 */}
-            <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[10px] text-gray-500">
-              {privacyUrl && (
-                <a
-                  href={privacyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors"
-                >
-                  <ShieldCheck className="w-2.5 h-2.5" />
-                  隐私协议
-                </a>
-              )}
-              {permissionsUrl && (
-                <>
-                  <span className="text-gray-300">|</span>
-                  <a
-                    href={permissionsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors"
-                  >
-                    <KeyRound className="w-2.5 h-2.5" />
-                    权限列表
-                  </a>
-                </>
-              )}
-              {icpRecord && icpRecord.trim() && (
-                <>
-                  <span className="text-gray-300">|</span>
-                  <a
-                    href={icpRecord}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 text-gray-400 hover:text-gray-700 transition-colors truncate max-w-[140px]"
-                    title={icpRecord}
-                  >
-                    <Building2 className="w-2.5 h-2.5" />
-                    备案
-                  </a>
-                </>
-              )}
-            </div>
           </div>
-        )}
-      </div>
 
-      {/* preview 模式下提示水印 - 6 要素在小卡片里以平铺 chip 形式展示（不点开也能看到） */}
-      {previewMode && !detailOpen && hasFeatures && (
-        <div
-          data-d6e-feature-strip
-          className="mt-1.5 px-3 py-1 flex items-center gap-1.5 text-[10px] text-gray-500 overflow-hidden"
-        >
-          <Globe className="w-2.5 h-2.5 flex-shrink-0" />
-          <span className="truncate">
-            {features
-              .slice(0, 3)
-              .map((f) => resolve(f.text))
-              .filter(Boolean)
-              .join(" · ")}
-          </span>
+          {/* 底部固定下载栏 */}
+          <div className="flex-shrink-0 border-t border-gray-200 bg-white p-3">
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="w-full h-10 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              style={{
+                background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
+                boxShadow: `0 2px 8px ${primaryColor}40`,
+              }}
+              data-d6e-webview-download
+            >
+              <Download className="w-4 h-4" />
+              {downloadText}
+            </button>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

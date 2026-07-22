@@ -1,9 +1,13 @@
 "use client";
 
 /**
- * 下载六要素 — 配置面板
- * 最简版：扁平 Input 列表 + 增删功能条目
- * 后续可升级为 SectionCollapse 折叠分组
+ * 下载六要素 — 配置面板（v7）
+ *
+ * 变化：
+ *  - 6. 产品功能 → "功能"（每条仅 1 个 URL 输入框）
+ *  - 备案信息 → "备案"
+ *  - 移除了 text/url 双输入，每个功能就是一个 URL
+ *  - 兼容旧 config：features: {text,url}[] 或 string[]
  */
 
 import { useCallback } from "react";
@@ -21,11 +25,25 @@ interface DownloadSixElementsConfigPanelProps {
 
 const AGE_RATINGS = ["3+", "4+", "8+", "12+", "16+", "18+"];
 
+/**
+ * 归一化 features 字段：兼容 string[] / {text,url}[] / undefined
+ */
+function normalizeFeatures(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((f) => {
+      if (typeof f === "string") return f;
+      if (f && typeof f === "object" && "url" in f) {
+        return (f as { url?: string }).url || "";
+      }
+      return "";
+    })
+    .map((s) => (typeof s === "string" ? s : ""));
+}
+
 export function DownloadSixElementsTemplateConfigPanel({
   config,
   onChange,
-  onSave,
-  onCancel,
 }: DownloadSixElementsConfigPanelProps) {
   const update = useCallback(
     <K extends keyof DownloadSixElementsConfig>(
@@ -37,35 +55,20 @@ export function DownloadSixElementsTemplateConfigPanel({
     [config, onChange]
   );
 
-  // 防御性兜底：从 sessionStorage / Supabase 恢复的旧 config 可能缺少 features 字段
-  const features = config.features ?? [];
-
-  const updateFeatureText = useCallback(
-    (index: number, text: string) => {
-      const next = [...features];
-      const current = next[index];
-      next[index] = typeof current === "string"
-        ? { text: current, url: "" }
-        : { text, url: current.url };
-      update("features", next);
-    },
-    [features, update]
-  );
+  // 防御性兜底 + 归一化（兼容旧版 string[] / {text,url}[]）
+  const features = normalizeFeatures(config.features);
 
   const updateFeatureUrl = useCallback(
     (index: number, url: string) => {
       const next = [...features];
-      const current = next[index];
-      next[index] = typeof current === "string"
-        ? { text: current, url }
-        : { text: current.text, url };
+      next[index] = url;
       update("features", next);
     },
     [features, update]
   );
 
   const addFeature = useCallback(() => {
-    update("features", [...features, { text: "", url: "" }]);
+    update("features", [...features, ""]);
   }, [features, update]);
 
   const removeFeature = useCallback(
@@ -142,11 +145,11 @@ export function DownloadSixElementsTemplateConfigPanel({
         />
       </div>
 
-      {/* 6. 产品功能 */}
+      {/* 6. 功能（仅 URL 输入） */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-gray-700">
-            6. 产品功能
+            6. 功能
           </label>
           <Button
             type="button"
@@ -160,35 +163,28 @@ export function DownloadSixElementsTemplateConfigPanel({
           </Button>
         </div>
         <div className="space-y-2">
-          {features.map((feature, index) => {
-            const f = typeof feature === "string" ? { text: feature, url: "" } : feature;
-            return (
-              <div key={index} className="flex items-center gap-2">
-                <Input
-                  value={f.text}
-                  onChange={(e) => updateFeatureText(index, e.target.value)}
-                  placeholder={`功能 ${index + 1}`}
-                  maxLength={30}
-                  className="flex-1"
-                />
-                <Input
-                  value={f.url}
-                  onChange={(e) => updateFeatureUrl(index, e.target.value)}
-                  placeholder="https://..."
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeFeature(index)}
-                  className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            );
-          })}
+          {features.map((url, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input
+                value={url}
+                onChange={(e) => updateFeatureUrl(index, e.target.value)}
+                placeholder={`功能 ${index + 1} URL，如 https://example.com/feature/refund`}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeFeature(index)}
+                className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50 flex-shrink-0"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          {features.length === 0 && (
+            <p className="text-xs text-gray-400 py-2">点击右上角"添加"新增功能 URL</p>
+          )}
         </div>
       </div>
 
@@ -204,10 +200,10 @@ export function DownloadSixElementsTemplateConfigPanel({
         />
       </div>
 
-      {/* 附加：下载按钮 */}
+      {/* 附加：下载链接 */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">
-          下载链接
+          下载链接（点击下载按钮跳转）
         </label>
         <Input
           value={config.downloadUrl ?? ""}
@@ -215,6 +211,8 @@ export function DownloadSixElementsTemplateConfigPanel({
           placeholder="https://example.com/download"
         />
       </div>
+
+      {/* 附加：下载按钮文案 */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">
           下载按钮文案
@@ -223,19 +221,20 @@ export function DownloadSixElementsTemplateConfigPanel({
           value={config.downloadText ?? "立即下载"}
           onChange={(e) => update("downloadText", e.target.value)}
           placeholder="立即下载"
-          maxLength={8}
         />
       </div>
+
+      {/* 附加：主色 */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">
-          主色（按钮/年龄 chip 颜色）
+          主色（年龄 chip + 下载按钮）
         </label>
         <div className="flex items-center gap-2">
           <input
             type="color"
-            value={config.primaryColor ?? "#00C06A"}
+            value={config.primaryColor || "#00C06A"}
             onChange={(e) => update("primaryColor", e.target.value)}
-            className="w-10 h-9 rounded border border-gray-200 cursor-pointer"
+            className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer"
           />
           <Input
             value={config.primaryColor ?? "#00C06A"}
@@ -248,58 +247,40 @@ export function DownloadSixElementsTemplateConfigPanel({
 
       {/* 附加：适合年龄 */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          适合年龄
-        </label>
+        <label className="text-sm font-medium text-gray-700">适合年龄</label>
         <div className="flex flex-wrap gap-2">
-          {AGE_RATINGS.map((rating) => (
-            <button
-              key={rating}
-              type="button"
-              onClick={() => update("ageRating", rating)}
-              className={`px-3 h-8 text-xs rounded-lg border transition-colors ${
-                config.ageRating === rating
-                  ? "border-blue-500 bg-blue-50 text-blue-600"
-                  : "border-gray-200 text-gray-600 hover:border-gray-300"
-              }`}
-            >
-              {rating}
-            </button>
-          ))}
+          {AGE_RATINGS.map((age) => {
+            const selected = (config.ageRating || "4+") === age;
+            return (
+              <button
+                key={age}
+                type="button"
+                onClick={() => update("ageRating", age)}
+                className={`h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
+                  selected
+                    ? "border-transparent text-white"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300"
+                }`}
+                style={selected ? { backgroundColor: config.primaryColor || "#00C06A" } : undefined}
+              >
+                {age}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* 附加：备案信息 */}
+      {/* 附加：备案（仅 URL） */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          备案信息（可选）
-        </label>
+        <label className="text-sm font-medium text-gray-700">备案</label>
         <Input
           value={config.icpRecord ?? ""}
           onChange={(e) => update("icpRecord", e.target.value || undefined)}
-          placeholder="如 京ICP备12345678号-1"
-          maxLength={40}
+          placeholder="https://beian.miit.gov.cn/"
         />
-        <p className="text-xs text-gray-400">
-          留空则不展示。建议填写完整的 ICP 备案号。
-        </p>
       </div>
-
-      {/* Footer */}
-      {(onSave || onCancel) && (
-        <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100">
-          {onCancel && (
-            <Button variant="outline" onClick={onCancel}>
-              取消
-            </Button>
-          )}
-          {onSave && (
-            <Button onClick={onSave} className="bg-blue-500 hover:bg-blue-600">
-              保存
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
+
+export default DownloadSixElementsTemplateConfigPanel;
