@@ -232,33 +232,37 @@ export function CouponTemplate({
             </p>
           </div>
 
+          {/* 弧形撕开线 - 上下两块被弧形撕开的票券视觉（取代原来的两个圆形凹口）*/}
+          <div className="relative h-3 mx-1 pointer-events-none" aria-hidden>
+            <svg
+              className="absolute inset-0 w-full h-full"
+              viewBox="0 0 100 12"
+              preserveAspectRatio="none"
+              style={{ overflow: "visible" }}
+            >
+              {/* 撕开线阴影 - 紧贴弧线下方，营造"撕开缝"立体感 */}
+              <path
+                d="M 0 0 Q 50 10 100 0"
+                stroke="rgba(0, 0, 0, 0.08)"
+                strokeWidth="1"
+                fill="none"
+              />
+              {/* 撕开线主虚线 - 浅灰虚线，模拟撕开的纸边 */}
+              <path
+                d="M 0 0.5 Q 50 11 100 0.5"
+                stroke="rgba(0, 0, 0, 0.18)"
+                strokeWidth="1"
+                strokeDasharray="2 2.5"
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+
           {/* Main Content - 主体票券区 */}
           <div className="px-4 pb-4">
             <div className="relative flex items-stretch">
-              {/* 左侧凹口半圆（票券"撕开"标记 - 与父级玻璃同质，圆孔透出毛玻璃）*/}
-              <div
-                className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-20"
-                style={{
-                  background: "rgba(255, 255, 255, 0.08)",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                  boxShadow:
-                    "inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.06)",
-                }}
-              />
-              {/* 右侧凹口半圆（票券"撕开"标记 - 与父级玻璃同质）*/}
-              <div
-                className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-20"
-                style={{
-                  background: "rgba(255, 255, 255, 0.08)",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                  boxShadow:
-                    "inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.06)",
-                }}
-              />
-
-              {/* 中央虚线撕开线 */}
+              {/* 中央虚线 - 票券左右两半之间的撕开标记 */}
               <div
                 className="absolute left-1/3 top-2 bottom-2 z-10 pointer-events-none"
                 style={{
