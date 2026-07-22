@@ -332,7 +332,6 @@ export function TreasureboxRainTemplate({
                 </div>
               ))}
 
-            )}
           </div>
           ) : (
             /* Reward Scene */
