@@ -209,7 +209,7 @@ export function AdTemplate({
           : ""
       )}
     >
-      {/* Container - Editorial / Magazine style */}
+      {/* Container - Frosted glass (matches floating-window) */}
       <div
         className={cn(
           previewMode
@@ -223,10 +223,11 @@ export function AdTemplate({
         style={{
           height: 160,
           transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-          backgroundColor: "#FAF8F5",
-          border: "1px solid #E8E4DE",
+          background: "rgba(255, 255, 255, 0.1)",
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+          backdropFilter: "blur(8px)",
           boxShadow:
-            "0 1px 2px rgba(26, 26, 26, 0.04), 0 8px 24px rgba(26, 26, 26, 0.06)",
+            "0 1px 4px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.10)",
         }}
       >
         {/* Top row: brand mark on the left (no decorative text) */}
@@ -316,7 +317,7 @@ export function AdTemplate({
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#1A1A1A";
-              e.currentTarget.style.color = "#FAF8F5";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";

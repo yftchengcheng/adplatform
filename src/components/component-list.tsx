@@ -722,14 +722,7 @@ export function ComponentList() {
               {/* 手机框架 */}
               <div className="relative z-10">
                 <div className="w-[280px] h-[520px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
-                  <div className={`w-full h-full bg-[#F5F2EC] rounded-[2rem] overflow-hidden relative ${
-                    previewComponent?.config && [
-                      "dual_button", "vote", "image", "ecommerce", "coupon", "promotion_card", "game_gift",
-                      "flip_redpacket", "flip_card", "flip_treasure", "treasure_rain",
-                    ].includes(previewComponent?.type || "")
-                      ? "flex items-center justify-center"
-                      : ""
-                  }`}>
+                  <div className={`w-full h-full bg-[#F5F2EC] rounded-[2rem] overflow-hidden relative`}>
                     {/* 支持所有有 config 的组件类型 */}
                     {previewComponent?.config ? (
                       previewComponent?.type === "promotion_card" ? (
