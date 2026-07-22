@@ -702,3 +702,76 @@ v1 修复了"scale 缩放造成的顶部卡顿"，但**仍存在"定位闪现"**
 - ❌ 不要让 opacity 渐入期间 top < 0 — 用户会看到"容器外突然出现"
 - ❌ 不要让 opacity 渐出期间 top = 100% — 红包会"突然消失"在底部边缘
 - ❌ 不要省略 18% 中间关键帧 — 8%→25% 跨度太大，红包从 0px 跳到 20% 不够细腻
+
+---
+
+## 红包雨"不同位置闪烁"修复（v3）
+
+### 用户反馈
+"顶部红包不同位置闪烁是不是修不了"
+
+### 根因（v2 修复后的遗留问题）
+
+v2 修复了"8% 时红包在容器外（-30px）突然 opacity 1"的问题，但**仍存在"不同位置闪烁"**：
+
+```css
+0%   { top: -50px; opacity: 0; }
+8%   { top: 0px;   opacity: 0; }      /* 到达容器顶，仍不可见 */
+18%  { top: 5%;    opacity: 0.5; }    /* 容器内 5%，半透明 */
+25%  { top: 20%;   opacity: 1; }      /* 完全可见 */
+```
+
+18% 关键帧 opacity 0.5 时红包在 top 5%（容器内），25% 时 opacity 1 时红包在 top 20%（容器内）。
+
+**问题**：opacity 从 0.5 → 1 期间（18% → 25%，约 385ms），红包**在容器内顶部 5% → 20% 范围移动**。由于每个红包的 startX 不同（0-85%），**多个红包在容器内顶部不同 top 位置同时渐入**——视觉上是"不同 left 位置 + 不同 top 位置的红包同时渐入"。
+
+**用户感知**：红包在容器内顶部不同位置"突然半透明出现再变实"——这就是"不同位置闪烁"。
+
+### 修复方案：把 opacity 渐入/渐出完全移到容器外（v3）
+
+**核心洞察**：
+- 容器有 `overflow: hidden`，容器外的内容**天然不可见**
+- 利用这个特性，让所有 opacity 渐变**都发生在容器外**（top < 0 或 top > 100%）
+- 容器内的飘落阶段**始终保持 opacity 1**
+
+#### v3 完整 keyframes
+```css
+@keyframes fallRedpacketNatural {
+  0%   { top: -50px;  opacity: 0;   transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+  3%   { top: -30px;  opacity: 1;   transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+  25%  { top: 22%;    opacity: 1;   transform: translate3d(-10px,0,0) scale(1) rotate(calc(var(--rot-step,72deg)*.5)); }
+  50%  { top: 55%;    opacity: 1;   transform: translate3d(0,0,0) scale(1) rotate(calc(var(--rot-step,72deg)*1)); }
+  75%  { top: 80%;    opacity: 1;   transform: translate3d(10px,0,0) scale(1) rotate(calc(var(--rot-step,72deg)*1.5)); }
+  98%  { top: 110%;   opacity: 1;   transform: translate3d(0,0,0) scale(1) rotate(calc(var(--rot-step,72deg)*1.95)); }
+  100% { top: 110%;   opacity: 0;   transform: translate3d(0,0,0) scale(1) rotate(calc(var(--rot-step,72deg)*2)); }
+}
+```
+
+#### 渐入渐出完全在容器外
+| 阶段 | 进度 | top | opacity | 用户感知 |
+|------|------|-----|---------|---------|
+| 容器外淡入 | 0% → 3% | -50px → -30px | 0 → 1 | 不可见（容器外） |
+| 容器内飘落 | 3% → 98% | -30px → 110% | 1 | **完全可见，无渐变** |
+| 容器外淡出 | 98% → 100% | 110% → 110% | 1 → 0 | 不可见（容器外） |
+
+#### 时间分配
+- 0% → 3% = 165ms（5.5s duration 下）：红包在容器外完成 opacity 渐入
+- 3% → 98% ≈ 5.2s：红包在容器内全程 opacity 1（**完全没有透明度变化**）
+- 98% → 100% = 110ms：红包在容器外完成 opacity 渐出
+
+#### 为什么彻底消除"不同位置闪烁"
+- 之前（v2）：opacity 渐入期间红包**在容器内 0% → 20% 位置移动**——用户看到"容器内不同位置出现"
+- 现在（v3）：opacity 渐入期间红包**完全在容器外**——用户根本看不到渐入过程
+- 进入容器时（top = 0%）红包**已经是 opacity 1**——所以**所有红包进入容器时都是"突然完全可见"**，但因为这是**连续的飘落运动**（不是"突变"），用户感知是"红包从顶边进入"
+
+#### 关键技巧
+- **利用 overflow: hidden 天然遮罩**：容器外不可见不需要 opacity 0
+- **容器内永远 opacity 1**：避免任何"渐入"造成的"位置闪烁"
+- **渐入发生在 0% → 3% 极短时间窗口**（165ms）：用户感知不到
+
+### 设计禁忌
+- ❌ 不要让 opacity 渐入期间 top >= 0%（红包会在容器内不同位置"渐入"）
+- ❌ 不要让 opacity 渐入/渐出阶段超过 5%（用户能感知到"突然出现/消失"）
+- ❌ 不要在 keyframes 中间加 opacity 0.5（半透明状态，红包在容器内闪烁）
+- ❌ 不要忽略 0%/3%/98%/100% 这四个关键点（它们是"容器外"的 4 个边界）
+- ❌ 不要让容器无 overflow: hidden（红包会从顶飘到容器外继续飘，看起来很怪）

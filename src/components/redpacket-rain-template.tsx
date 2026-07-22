@@ -411,36 +411,33 @@ export function RedpacketRainTemplate({
                   opacity: 0;
                   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
                 }
-                8% {
-                  top: 0px;
-                  opacity: 0;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.1));
-                }
-                18% {
-                  top: 5%;
-                  opacity: 0.5;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.2));
+                3% {
+                  top: -30px;
+                  opacity: 1;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
                 }
                 25% {
-                  top: 20%;
+                  top: 22%;
                   opacity: 1;
                   transform: translate3d(-10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.5));
                 }
                 50% {
                   top: 55%;
+                  opacity: 1;
                   transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1));
                 }
                 75% {
                   top: 80%;
+                  opacity: 1;
                   transform: translate3d(10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.5));
                 }
-                95% {
-                  top: 100%;
+                98% {
+                  top: 110%;
                   opacity: 1;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.9));
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.95));
                 }
                 100% {
-                  top: 100%;
+                  top: 110%;
                   opacity: 0;
                   transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 2));
                 }
