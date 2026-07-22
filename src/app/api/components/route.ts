@@ -18,6 +18,7 @@ export async function GET() {
         .select("*")
         .order("update_time", { ascending: false }),
       timeoutPromise
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ]) as { data: any; error: any };
 
     if (error) {
@@ -26,6 +27,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ data: data || [] });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error("API error:", err);
     return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });

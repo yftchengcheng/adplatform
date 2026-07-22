@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
       url: response.url,
       filetype: response.filetype,
     });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Fetch error:', error);
     return NextResponse.json(

@@ -134,6 +134,7 @@ export interface TreasureboxRainConfig {
 }
 
 // 模板配置类型
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TreasureboxRainTemplateConfig extends TreasureboxRainConfig {}
 
 // 默认配置

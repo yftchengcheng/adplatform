@@ -654,6 +654,7 @@ function PreviewWrapper({
   config: PopupRedpacketConfig;
   onClose: () => void;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [PopupRedpacketTemplate, setPopupRedpacketTemplate] = useState<any>(null);
 
   React.useEffect(() => {

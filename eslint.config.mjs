@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
   {
     rules: {
       'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
+      'react-hooks/static-components': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/immutability': 'off',
       'no-restricted-syntax': ['error', ...syntaxRules],
     },
   },
@@ -31,6 +35,8 @@ const eslintConfig = defineConfig([
     'dist/**',
     // Script files (CommonJS):
     'scripts/**/*.js',
+    // 沙箱附带的参考项目目录，不属于本项目
+    'source_download/**',
   ]),
 ]);
 

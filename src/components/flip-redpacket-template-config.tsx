@@ -134,6 +134,7 @@ export interface FlipRedpacketConfig {
 }
 
 // 模板配置类型
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface FlipRedpacketTemplateConfig extends FlipRedpacketConfig {}
 
 // 默认配置

@@ -244,7 +244,7 @@ export function FloatingWindowTemplate({
   useEffect(() => {
     if (glowPhase !== "button") return;
     const duration = 1000; // 1s 跑一圈
-    let startTime = performance.now();
+    const startTime = performance.now();
     let rafId: number;
 
     const animate = (now: number) => {
