@@ -14,7 +14,7 @@ import { Check, Download, Shield } from "lucide-react";
  *  5. 权限列表超链
  *  6. 产品功能（多条）
  *
- * 附加：产品 LOGO + 主下载按钮
+ * 附加：产品 LOGO + 主下载按钮 + 适合年龄 + 备案信息
  * 背景：透明（与落地页背景融合）
  */
 
@@ -29,6 +29,8 @@ export interface DownloadSixElementsConfig {
   downloadUrl?: string;         // 下载按钮跳转链接
   downloadText?: string;        // 下载按钮文案（默认"立即下载"）
   primaryColor?: string;        // 主色（默认绿色 #00C06A，模拟应用商店 CTA）
+  ageRating?: string;           // 适合年龄（如 "3+"/"8+"/"12+"/"16+"/"18+"），默认 "4+"
+  icpRecord?: string;           // 备案信息（如 "京ICP备12345678号-1"）
 }
 
 export interface DownloadSixElementsTemplateProps {
@@ -88,6 +90,8 @@ export function DownloadSixElementsTemplate({
     logoUrl,
     downloadText = "立即下载",
     primaryColor = "#00C06A",
+    ageRating = "4+",
+    icpRecord,
   } = config;
 
   return (
@@ -145,11 +149,22 @@ export function DownloadSixElementsTemplate({
           )}
         </div>
 
-        {/* 应用名称 + 副标识 */}
+        {/* 应用名称 + 年龄 + 副标识 */}
         <div className="flex-1 min-w-0">
-          <h2 className="text-base font-semibold text-gray-900 truncate">
-            {appName || "应用名称"}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-gray-900 truncate">
+              {appName || "应用名称"}
+            </h2>
+            {/* 适合年龄 chip */}
+            {ageRating && (
+              <span
+                className="flex-shrink-0 px-1.5 h-4 inline-flex items-center justify-center rounded text-[10px] font-semibold text-white"
+                style={{ backgroundColor: primaryColor }}
+              >
+                {ageRating}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs text-gray-500">应用下载</span>
             <span className="w-1 h-1 rounded-full bg-gray-300" />
@@ -235,6 +250,20 @@ export function DownloadSixElementsTemplate({
             权限列表
           </button>
         </div>
+        {/* 备案信息（最底部） */}
+        {icpRecord && (
+          <div className="mt-2 text-center">
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => previewMode && e.preventDefault()}
+              className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {icpRecord}
+            </a>
+          </div>
+        )}
       </div>
 
       {/* 广告标识（点击收起/展开） - 仿应用商店顶栏 */}

@@ -1126,3 +1126,56 @@ for (let i = 0; i < 18; i++) {
 - ❌ 不要让初始 delay 全是 `Math.random() * 200`（多个 delay 接近 0 → 开局涌入）
 - ❌ 不要用 1.5 圈旋转 + 复杂 calc（视觉上太"机器感"）
 - ❌ 不要 inline `endX` 水平飘动（破坏三条线聚集）
+
+---
+
+## 二十一、下载六要素组件（DownloadSixElements）
+
+### 1. 定位
+仿应用商店底部下载落地页（透明背景），6 要素 + LOGO + 下载按钮 + 适合年龄 + 备案信息。
+
+### 2. 字段顺序（视觉与配置面板同步）
+```
+顶部：LOGO + [应用名称] [4+ chip] + 副标识（应用下载 | 官方正版）
+中段：✓ 产品功能 × 4-5 条
+下载：[    立 即 下 载    ]  渐变 + Download icon
+底部：开发者公司 · v1.0.0
+      隐私协议 | 权限列表
+      京ICP备12345678号-1（外链工信部）
+```
+
+### 3. 适合年龄 chip 设计
+- 位置：紧贴 h2（应用名称）右侧
+- 样式：`px-1.5 h-4 rounded text-[10px] font-semibold text-white`，背景 = 主色
+- 默认值：`4+`
+- 选项：`3+` / `4+` / `8+` / `12+` / `16+` / `18+`
+- 与主色绑定：用户调主色 → 年龄 chip 颜色同步
+
+### 4. 备案信息设计
+- 位置：组件最底行，独立链接
+- 样式：`text-[10px] text-gray-400 hover:text-gray-600`
+- 链接：`https://beian.miit.gov.cn/`（工信部备案查询）
+- 必填判断：未填写不展示（不是所有应用都需 ICP）
+
+### 5. 6 要素 + 附加字段汇总
+
+| 字段 | 类型 | 默认 | 必填 |
+|------|------|------|------|
+| appName | string | "应用名称" | 是 |
+| developer | string | "开发者公司" | 是 |
+| version | string | "1.0.0" | 是 |
+| privacyUrl | string | — | 是 |
+| permissionsUrl | string | — | 是 |
+| features | string[] | [] | 是 |
+| logoUrl | string | — | 否（缺省显示首字母） |
+| downloadUrl | string | — | 否 |
+| downloadText | string | "立即下载" | 否 |
+| primaryColor | string | "#00C06A" | 否 |
+| ageRating | string | "4+" | 否 |
+| icpRecord | string | — | 否 |
+
+### 6. 设计禁忌
+- ❌ 不要把备案信息放到顶部（会抢应用名称焦点）
+- ❌ 不要把年龄 chip 做成红色（红色 = 限制级预警；4+/8+ 是普通分龄标识）
+- ❌ 不要硬编码 ICP 链接域名（统一指向工信部 beian.miit.gov.cn）
+- ❌ 不要给 6 要素添加 icon（简洁的纯文字 + ✓ 即可，避免视觉拥挤）

@@ -25,6 +25,8 @@ export default function DownloadSixElementsDemoPage() {
     downloadUrl: "https://example.com/download",
     downloadText: "立即下载",
     primaryColor: "#00C06A",
+    ageRating: "4+",
+    icpRecord: "京ICP备12345678号-1",
   });
 
   const [newFeature, setNewFeature] = useState("");
@@ -135,6 +137,31 @@ export default function DownloadSixElementsDemoPage() {
             />
           </div>
 
+          {/* 适合年龄 */}
+          <div>
+            <Label className="text-xs text-gray-600">适合年龄（应用名称旁 chip）</Label>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {["3+", "4+", "8+", "12+", "16+", "18+"].map((age) => (
+                <button
+                  key={age}
+                  onClick={() => updateField("ageRating", age)}
+                  className={`h-7 px-2.5 rounded-lg text-xs font-medium transition-all ${
+                    (config.ageRating || "4+") === age
+                      ? "text-white shadow-sm"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                  style={
+                    (config.ageRating || "4+") === age
+                      ? { backgroundColor: config.primaryColor || "#00C06A" }
+                      : undefined
+                  }
+                >
+                  {age}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* 隐私协议链接 */}
           <div>
             <Label className="text-xs text-gray-600">4. 隐私协议超链</Label>
@@ -230,6 +257,15 @@ export default function DownloadSixElementsDemoPage() {
                   value={config.downloadUrl || ""}
                   onChange={(e) => updateField("downloadUrl", e.target.value)}
                   placeholder="https://example.com/download"
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-gray-600">备案信息（底部 ICP）</Label>
+                <Input
+                  value={config.icpRecord || ""}
+                  onChange={(e) => updateField("icpRecord", e.target.value)}
+                  placeholder="如 京ICP备12345678号-1（留空不展示）"
                   className="mt-1.5"
                 />
               </div>
