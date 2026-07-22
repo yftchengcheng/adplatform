@@ -4,7 +4,6 @@ import { useState } from "react";
 import { DownloadSixElementsTemplate, type DownloadSixElementsConfig } from "@/components/download-six-elements-template";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Settings2, Trash2, Plus } from "lucide-react";
 
 export default function DownloadSixElementsDemoPage() {
@@ -29,8 +28,6 @@ export default function DownloadSixElementsDemoPage() {
     icpRecord: "京ICP备12345678号-1",
   });
 
-  const [newFeature, setNewFeature] = useState("");
-
   const updateField = <K extends keyof DownloadSixElementsConfig>(
     key: K,
     value: DownloadSixElementsConfig[K]
@@ -39,10 +36,10 @@ export default function DownloadSixElementsDemoPage() {
   };
 
   const addFeature = () => {
-    const v = newFeature.trim();
-    if (!v) return;
-    setConfig((prev) => ({ ...prev, features: [...(prev.features || []), v] }));
-    setNewFeature("");
+    setConfig((prev) => ({
+      ...prev,
+      features: [...(prev.features || []), `新功能 ${(prev.features || []).length + 1}`],
+    }));
   };
 
   const removeFeature = (idx: number) => {
@@ -186,44 +183,40 @@ export default function DownloadSixElementsDemoPage() {
 
           {/* 产品功能（多条） */}
           <div>
-            <Label className="text-xs text-gray-600">6. 产品功能（多条）</Label>
-            <div className="mt-1.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-gray-600">6. 产品功能（多条）</Label>
+              <button
+                onClick={addFeature}
+                className="h-6 px-2 rounded text-[11px] text-blue-500 hover:text-blue-600 hover:bg-blue-50 flex items-center gap-0.5"
+                aria-label="添加功能"
+              >
+                <Plus className="w-3 h-3" />
+                添加
+              </button>
+            </div>
+            <div className="mt-1.5 space-y-1.5">
               {(config.features || []).map((f, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 bg-gray-50 rounded-lg p-2"
-                >
-                  <span className="text-xs text-gray-400 w-5 flex-shrink-0">
-                    {i + 1}.
-                  </span>
-                  <span className="text-sm text-gray-700 flex-1 truncate">
-                    {f}
-                  </span>
+                <div key={i} className="flex items-center gap-1.5">
+                  <Input
+                    value={f}
+                    onChange={(e) => {
+                      const next = [...(config.features || [])];
+                      next[i] = e.target.value;
+                      setConfig((prev) => ({ ...prev, features: next }));
+                    }}
+                    placeholder={`功能 ${i + 1}`}
+                    maxLength={30}
+                    className="h-8 text-xs flex-1"
+                  />
                   <button
                     onClick={() => removeFeature(i)}
-                    className="text-red-400 hover:text-red-600"
+                    className="w-7 h-7 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
                     aria-label="删除该功能"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               ))}
-              <div className="flex items-center gap-2">
-                <Textarea
-                  value={newFeature}
-                  onChange={(e) => setNewFeature(e.target.value)}
-                  placeholder="新增一条功能描述"
-                  rows={2}
-                  className="flex-1 resize-none"
-                />
-                <button
-                  onClick={addFeature}
-                  className="h-9 px-3 rounded-lg bg-blue-500 text-white text-xs font-medium hover:bg-blue-600 flex items-center gap-1 flex-shrink-0"
-                >
-                  <Plus className="w-3 h-3" />
-                  添加
-                </button>
-              </div>
             </div>
           </div>
 

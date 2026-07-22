@@ -143,31 +143,23 @@ export function DownloadSixElementsTemplate({
       )}
 
       {/* 顶部 LOGO + 应用名称 */}
-      <div className="flex items-center gap-4 px-4 pt-5 pb-4">
-        {/* LOGO 容器：64×64 圆角 */}
-        <div
-          className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden"
-          style={{
-            backgroundColor: logoUrl ? "transparent" : `${primaryColor}1A`,
-            border: logoUrl ? "1px solid rgba(0,0,0,0.05)" : "none",
-          }}
-        >
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+      <div className="flex items-center gap-3 px-4 pt-3 pb-2.5">
+        {/* LOGO 容器：非必填，无 URL 时不渲染 */}
+        {logoUrl && (
+          <div
+            className="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden"
+            style={{
+              border: "1px solid rgba(0,0,0,0.05)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={logoUrl}
               alt={`${appName} logo`}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <span
-              className="text-2xl font-semibold"
-              style={{ color: primaryColor }}
-            >
-              {appName?.charAt(0) || "A"}
-            </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* 应用名称 + 年龄 + 副标识 */}
         <div className="flex-1 min-w-0">
@@ -197,7 +189,7 @@ export function DownloadSixElementsTemplate({
       <div className="h-px bg-gray-100 mx-4" />
 
       {/* 产品功能列表（六要素 #6） */}
-      <div className="px-4 py-3 space-y-2.5">
+      <div className="px-4 py-2 space-y-1.5">
         {features && features.length > 0 ? (
           features.slice(0, 6).map((feature, idx) => (
             <div key={idx} className="flex items-start gap-2.5">
@@ -225,7 +217,7 @@ export function DownloadSixElementsTemplate({
       <div className="h-px bg-gray-100 mx-4" />
 
       {/* 下载按钮 */}
-      <div className="px-4 py-4">
+      <div className="px-4 pt-3 pb-2.5">
         <button
           onClick={handleDownload}
           disabled={!config.downloadUrl && !previewMode}
@@ -240,7 +232,7 @@ export function DownloadSixElementsTemplate({
         </button>
 
         {/* 安全提示（贴近应用商店规范） */}
-        <div className="flex items-center justify-center gap-1.5 mt-2.5">
+        <div className="flex items-center justify-center gap-1.5 mt-1.5">
           <Shield className="w-3 h-3 text-gray-400" />
           <span className="text-xs text-gray-400">
             已通过安全检测 · 无病毒 · 无广告
@@ -249,7 +241,7 @@ export function DownloadSixElementsTemplate({
       </div>
 
       {/* 底部开发者信息 + 超链（六要素 #1-5） */}
-      <div className="px-4 pb-4 pt-3 border-t border-gray-100">
+      <div className="px-4 pb-3 pt-2 border-t border-gray-100">
         <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mb-2">
           <span className="truncate max-w-[180px]">{developer || "开发者公司"}</span>
           <span className="w-1 h-1 rounded-full bg-gray-300" />
@@ -272,7 +264,7 @@ export function DownloadSixElementsTemplate({
         </div>
         {/* 备案信息（最底部） */}
         {icpRecord && (
-          <div className="mt-2 text-center">
+          <div className="mt-1.5 text-center">
             <a
               href="https://beian.miit.gov.cn/"
               target="_blank"
