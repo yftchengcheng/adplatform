@@ -308,19 +308,28 @@ function DiscountInfoDisplay({ text }: { text: string }) {
     return (
       <div className="flex items-baseline gap-0.5">
         {unit !== "折" && (
-          <span className="text-white text-sm font-semibold self-start">¥</span>
+          <span
+            className="text-white font-semibold self-start"
+            style={{ fontSize: "20px", lineHeight: 1, marginTop: "6px" }}
+          >
+            ¥
+          </span>
         )}
         <span
-          className="text-white text-[44px] font-bold leading-none"
+          className="text-white font-bold leading-none"
           style={{
-            letterSpacing: "-0.03em",
+            fontSize: "56px",
+            letterSpacing: "-0.04em",
             fontVariantNumeric: "tabular-nums",
             textShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
           }}
         >
           {num}
         </span>
-        <span className="text-white text-sm font-semibold self-end mb-1">
+        <span
+          className="text-white font-semibold self-end"
+          style={{ fontSize: "18px", lineHeight: 1, marginBottom: "8px" }}
+        >
           {unit}
         </span>
       </div>
