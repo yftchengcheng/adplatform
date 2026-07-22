@@ -116,9 +116,11 @@ export function RedpacketRainTemplate({
   const generateRedpacket = useCallback((): FallingRedpacket => {
     const id = nextIdRef.current++;
     
-    // 随机起始位置（整个屏幕宽度）
-    const startX = Math.random() * 85; // 0-85%
-    
+    // 固定三条飘落线（AGENTS.md 16.5节）+ 微随机 ±5%——避免"杂乱无章闪烁"
+    const FALL_LINES = [15, 50, 85];
+    const baseLine = FALL_LINES[Math.floor(Math.random() * FALL_LINES.length)];
+    const startX = Math.max(5, Math.min(95, baseLine + (Math.random() - 0.5) * 10));
+
     // 随机终点位置（水平飘动，可以左右摆动）
     const drift = (Math.random() - 0.5) * 30; // 左右飘动±15%
     const endX = Math.max(5, Math.min(95, startX + drift));
@@ -407,12 +409,12 @@ export function RedpacketRainTemplate({
             <style jsx>{`
               @keyframes fallRedpacketNatural {
                 0% {
-                  top: -50px;
+                  top: -80px;
                   opacity: 0;
                   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
                 }
-                3% {
-                  top: -30px;
+                6% {
+                  top: -40px;
                   opacity: 1;
                   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
                 }
