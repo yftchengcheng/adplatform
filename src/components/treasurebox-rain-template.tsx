@@ -332,17 +332,8 @@ export function TreasureboxRainTemplate({
                 </div>
               ))}
 
-              {/* Gesture hint */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                <img
-                  src="/treasurebox-gesture.png"
-                  alt="手势提示"
-                  className="w-8 h-auto animate-bounce opacity-70"
-                  style={{ animationDuration: "1s" }}
-                  draggable={false}
-                />
-              </div>
-            </div>
+            )}
+          </div>
           ) : (
             /* Reward Scene */
             <div
@@ -564,17 +555,6 @@ export function TreasureboxRainTemplate({
               />
             </div>
           ))}
-
-          {/* Gesture hint */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <img
-              src="/treasurebox-gesture.png"
-              alt="手势提示"
-              className="w-6 h-auto animate-bounce opacity-70"
-              style={{ animationDuration: "1s" }}
-              draggable={false}
-            />
-          </div>
         </div>
       ) : (
         /* Reward Scene */
