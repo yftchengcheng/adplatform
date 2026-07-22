@@ -215,7 +215,13 @@ export function PromotionTemplate({
   const currentPoint = validPoints[currentIndex] || { text: "" };
 
   return (
-    <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
+    <div
+      className={cn(
+        previewMode
+          ? "w-full absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 flex items-center justify-center"
+          : ""
+      )}
+    >
       {/* Backdrop */}
       <div
         className={cn(
@@ -230,18 +236,33 @@ export function PromotionTemplate({
         {/* Card */}
         <div
           className={cn(
-            "relative w-full max-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden",
+            "relative w-full max-w-[300px] overflow-hidden rounded-2xl",
             "transition-all duration-300",
             !previewMode && (isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0")
           )}
+          style={{
+            background: "rgba(255, 255, 255, 0.08)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.25)",
+            boxShadow:
+              "0 12px 32px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-gray-500 z-10 transition-colors"
+            className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full z-10 transition-all"
+            style={{
+              background: "rgba(255, 255, 255, 0.4)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+              border: "0.5px solid rgba(255, 255, 255, 0.5)",
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.06)",
+            }}
           >
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3 text-gray-500" />
           </button>
 
           {/* Content - Horizontal Layout */}
@@ -251,11 +272,18 @@ export function PromotionTemplate({
             onMouseLeave={() => setIsPaused(false)}
           >
             {/* Left: Icon */}
-            <div className="flex-shrink-0 w-10 h-10 rounded bg-gray-100 overflow-hidden flex items-center justify-center">
+            <div
+              className="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center"
+              style={{
+                background: "rgba(255, 255, 255, 0.35)",
+                boxShadow:
+                  "inset 0 0 0 0.5px rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.04)",
+              }}
+            >
               {iconSrc ? (
-                <img 
-                  src={iconSrc} 
-                  alt="图标" 
+                <img
+                  src={iconSrc}
+                  alt="图标"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
@@ -269,27 +297,27 @@ export function PromotionTemplate({
             {/* Middle: Title + Points */}
             <div className="flex-1 min-w-0 flex flex-col justify-center">
               {/* Title */}
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-[13px] text-gray-600 font-medium truncate tracking-tight">
                 {resolveTitle()}
               </p>
-              
+
               {/* Promotion Point with Navigation */}
               <div className="flex items-center gap-1">
                 {hasMultiplePoints && (
-                  <button 
+                  <button
                     onClick={handlePrev}
                     className="w-3 h-3 flex items-center justify-center text-gray-400 hover:text-gray-600"
                   >
                     <ChevronLeft className="w-2 h-2" />
                   </button>
                 )}
-                
-                <p className="text-[10px] text-gray-600 truncate flex-1">
+
+                <p className="text-[11px] text-gray-500 truncate flex-1 tabular-nums">
                   {resolvePointText(currentPoint)}
                 </p>
-                
+
                 {hasMultiplePoints && (
-                  <button 
+                  <button
                     onClick={handleNext}
                     className="w-3 h-3 flex items-center justify-center text-gray-400 hover:text-gray-600"
                   >
@@ -310,7 +338,9 @@ export function PromotionTemplate({
                       }}
                       className={cn(
                         "h-1 rounded-full transition-all",
-                        index === currentIndex ? "w-2 bg-blue-500" : "w-1 bg-gray-300"
+                        index === currentIndex
+                          ? "w-2 bg-blue-500/80"
+                          : "w-1 bg-gray-300/60"
                       )}
                     />
                   ))}
@@ -321,7 +351,13 @@ export function PromotionTemplate({
             {/* Right: Button */}
             <button
               onClick={handleButtonClick}
-              className="flex-shrink-0 h-5 px-2 bg-[#3087FF] text-white text-[10px] font-medium rounded flex items-center justify-center whitespace-nowrap"
+              className="flex-shrink-0 h-6 px-2.5 text-white text-[11px] font-semibold rounded-md flex items-center justify-center whitespace-nowrap transition-all"
+              style={{
+                background: "linear-gradient(180deg, #3B95FF 0%, #1E6BD9 100%)",
+                boxShadow:
+                  "0 2px 4px rgba(30, 107, 217, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
+                letterSpacing: "0.02em",
+              }}
             >
               {resolveButtonText()}
             </button>
