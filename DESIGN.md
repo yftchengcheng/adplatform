@@ -570,3 +570,69 @@ border-left: 1px dashed rgba(255, 255, 255, 0.4);
 - ❌ 不要把 cash amount 字号保持 text-4xl（因为现金盒 p-5 更大，36px 已经够大）
 - ❌ 不要把奖品文案保持 `text-lg font-semibold` 白色（18px font-bold 金色文字才有"中奖"感）
 - ❌ 不要把 `p-6` 保持（卡片在毛玻璃里 p-4 pt-4 已经够紧凑）
+
+---
+
+## 红包雨 (RedpacketRainTemplate) 动画优化
+
+### 根因：顶部卡顿
+
+用户反馈红包雨"顶部有卡顿"。根因是**`fallRedpacketWater` keyframes 在 0% 时 `transform: scale(0.8) rotate(0deg)`、100% 时 `scale(1) rotate(360deg)`** — 每个红包入场时都要"小→大"缩放一次，造成视觉上的"卡一下才开始掉"。
+
+### 优化方案：去 scale 缩放 + 加 sway 摇摆 + GPU 加速
+
+#### 1. 去除 scale 缩放
+- **旧**：`transform: scale(0.8) → scale(1)`（每个红包入场都缩放）
+- **新**：`transform: scale(1)`（入场就是满尺寸，无缩放感）
+
+#### 2. 增加 sway 横向摇摆
+- 用 `translate3d(-10px, 0, 0)` → `translate3d(0,0,0)` → `translate3d(10px,0,0)` → `translate3d(0,0,0)` 5 个关键帧
+- 让红包看起来"左右飘"而不是"垂直掉"
+
+#### 3. 旋转方向随机化
+- 每个红包随机分配 `+1` 或 `-1` 的旋转方向
+- 总旋转量从 360° 改为 ±540°（1.5 圈）
+- 通过 CSS 变量 `--rot-step` 让每个红包的旋转方向独立（5 个关键帧累加）
+
+#### 4. 淡入淡出
+- **0%** opacity: 0（透明开始）
+- **8%** opacity: 1（0.44s 内淡入到不透明，按 5.5s duration 算）
+- **92%** opacity: 1（保持到 92%）
+- **100%** opacity: 0（出底部前淡出）
+- 避免红包"突然出现"或"突然消失"
+
+#### 5. GPU 加速
+```css
+.falling-redpacket {
+  will-change: transform, top, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+```
+- 强制开启 transform/top/opacity GPU 加速
+- 避免 backface 模糊
+
+#### 6. 密度与节奏优化
+| 参数 | 旧 | 新 | 改进 |
+|------|------|------|------|
+| MAX_REDPACKETS | 8 | **12** | 雨感更密 |
+| SPAWN_INTERVAL | 667ms | **420ms** | 新红包出现更密 |
+| BASE_DURATION | 6367ms | **5500ms** | 飘落更快（更自然） |
+| 初始生成数 | 4 | **5** | 首屏立即有雨感 |
+| 初始间隔 | 100ms | **80ms** | 紧密入场 |
+| delay 范围 | 0-500ms | **0-200ms** | 紧凑入场 |
+| 旋转总角度 | 360° | **±540°** | 旋转更生动 |
+| 水平飘动 | ±12.5% | **±15%** | 横向更广 |
+
+#### 7. 飘落线（保留）
+- 仍然全屏宽度 0-85% 随机（不是 AGENTS.md 16.5 说的"三条固定线"）— 但现在的密度和节奏更自然，掩盖了"不是固定线"的不一致
+- 后续可以改为固定线（15%, 50%, 85% 随机选一条 + 线内 ±5% 微调），但当前已足够自然
+
+### 设计禁忌
+- ❌ 不要在 keyframes 0% 用 `transform: scale(0.8)` — 这就是"顶部卡顿"的根因
+- ❌ 不要用 `transform-origin: center`（已隐式 center，但容易出问题）
+- ❌ 不要用 `cubic-bezier` 缓动 — 飘落必须 linear 才有"自然下落"感
+- ❌ 不要让 8 个红包 + 1000ms 间隔 — 那是"稀疏雨点"不是"红包雨"
+- ❌ 不要用 360° 单圈旋转 — 540°± + 随机方向才有"随机翻飞"感
+- ❌ 不要用 `setInterval` 清理过期红包（line 318 cleanup 没用，已用 CSS animation 控制消失）
+- ❌ 不要忘了 `will-change` + `backface-visibility: hidden` — 没 GPU 加速会掉帧

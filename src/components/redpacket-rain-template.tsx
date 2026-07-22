@@ -105,11 +105,12 @@ export function RedpacketRainTemplate({
   const nextIdRef = useRef(0);
   const containerHeightRef = useRef(500);
 
-  // 红包雨配置
-  const MAX_REDPACKETS = 8; // 最多同时存在8个红包
-  const SPAWN_INTERVAL = 667; // 每667ms生成一个
-  const BASE_DURATION = 6367; // 基础飘落时长6.367秒（6.7秒-0.3秒）
+  // 红包雨配置 - 调整为更自然的密度
+  const MAX_REDPACKETS = 12; // 最多同时存在12个红包（雨感更密）
+  const SPAWN_INTERVAL = 420; // 每420ms生成一个（密度更高）
+  const BASE_DURATION = 5500; // 基础飘落时长5.5秒（更快落地）
   const BASE_SIZE = 36; // 基础红包大小
+  const INITIAL_COUNT = 5; // 初始生成5个红包，让首屏立即有雨感
 
   // 生成随机红包 - 模仿落叶飘落
   const generateRedpacket = useCallback((): FallingRedpacket => {
@@ -119,23 +120,24 @@ export function RedpacketRainTemplate({
     const startX = Math.random() * 85; // 0-85%
     
     // 随机终点位置（水平飘动，可以左右摆动）
-    const drift = (Math.random() - 0.5) * 25; // 左右飘动±12.5%
+    const drift = (Math.random() - 0.5) * 30; // 左右飘动±15%
     const endX = Math.max(5, Math.min(95, startX + drift));
-    
-    // 随机飘落时长（8-14秒），更慢更优雅
-    const duration = BASE_DURATION + (Math.random() - 0.5) * 6000;
-    
+
+    // 随机飘落时长（4.5-7.5秒），更快更自然
+    const duration = BASE_DURATION + (Math.random() - 0.5) * 3000;
+
     // 随机初始旋转角度
     const rotation = (Math.random() - 0.5) * 45; // ±22.5度
-    
-    // 随机旋转速度（飘落过程中旋转），更慢
-    const rotationSpeed = (Math.random() - 0.5) * 80; // 每秒旋转±40度
-    
+
+    // 随机旋转方向（+1 正向 / -1 反向），让红包旋转方向不单调
+    const rotationDirection = Math.random() > 0.5 ? 1 : -1;
+    const rotationAmount = 540 * rotationDirection; // 总旋转±540°（1.5圈）
+
     // 随机大小（32-48像素），稍微大一些更美观
     const size = BASE_SIZE + Math.random() * 16;
-    
-    // 随机延迟（0-500ms），取消入场延迟，直接从引导文案下方开始
-    const delay = Math.random() * 500;
+
+    // 随机延迟（0-200ms），紧凑入场让首屏立即有雨感
+    const delay = Math.random() * 200;
     
     return {
       id,
@@ -145,7 +147,7 @@ export function RedpacketRainTemplate({
       delay,
       duration,
       rotation,
-      rotationSpeed,
+      rotationSpeed: rotationAmount,
       size,
     };
   }, []);
@@ -296,9 +298,9 @@ export function RedpacketRainTemplate({
       containerHeightRef.current = containerRef.current.offsetHeight;
     }
 
-    // 初始生成几个红包，立即开始
-    for (let i = 0; i < 4; i++) {
-      setTimeout(() => addRedpacket(), i * 100);
+    // 初始生成 5 个红包，紧密间隔（80ms）让首屏立即有雨感
+    for (let i = 0; i < INITIAL_COUNT; i++) {
+      setTimeout(() => addRedpacket(), i * 80);
     }
 
     // 定时生成新红包
@@ -394,32 +396,44 @@ export function RedpacketRainTemplate({
 
 
 
-            {/* Falling Redpackets - 流水式持续飘落 */}
+            {/* Falling Redpackets - 自然飘落（去除 scale 缩放造成的顶部卡顿，加 sway 摇摆） */}
             <style jsx>{`
-              @keyframes gestureBounce {
-                0%, 100% {
-                  transform: translateY(0) scale(1);
+              @keyframes fallRedpacketNatural {
+                0% {
+                  top: -50px;
+                  opacity: 0;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+                }
+                8% {
+                  opacity: 1;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(var(--rot-step, 72deg));
+                }
+                25% {
+                  transform: translate3d(-10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 2));
                 }
                 50% {
-                  transform: translateY(8px) scale(0.95);
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 3));
                 }
-              }
-              @keyframes fallRedpacketWater {
-                0% {
-                  top: -60px;
+                75% {
+                  transform: translate3d(10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 4));
+                }
+                92% {
                   opacity: 1;
-                  transform: scale(0.8) rotate(0deg);
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 5));
                 }
                 100% {
                   top: 100%;
-                  opacity: 1;
-                  transform: scale(1) rotate(360deg);
+                  opacity: 0;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 5));
                 }
               }
               .falling-redpacket {
-                animation-name: fallRedpacketWater;
+                animation-name: fallRedpacketNatural;
                 animation-timing-function: linear;
                 animation-iteration-count: infinite;
+                will-change: transform, top, opacity;
+                backface-visibility: hidden;
+                -webkit-backface-visibility: hidden;
               }
             `}</style>
 
@@ -434,7 +448,7 @@ export function RedpacketRainTemplate({
                     height: `${rp.size * 1.17}px`,
                     animationDuration: `${rp.duration}ms`,
                     animationDelay: `${rp.delay}ms`,
-                    ['--end-x' as string]: `${rp.endX}%`,
+                    ['--rot-step' as string]: `${rp.rotationSpeed / 5}deg`,
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
