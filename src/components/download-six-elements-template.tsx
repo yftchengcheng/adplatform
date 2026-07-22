@@ -68,12 +68,12 @@ export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
   // —— 6 要素 ——
   privacyUrl: "https://www.12306.cn/index/about/privacy/index.html",
   permissionsUrl: "https://www.12306.cn/index/about/permission/index.html",
-  // —— 功能 URL（具体功能页，path 不再是占位 ticket/refund/id）——
+  // —— 功能 URL（路径各异以产生有意义的 label）——
   features: [
-    "https://www.12306.cn/index/", // 首页
-    "https://www.12306.cn/mormhweb/", // 学生票
-    "https://www.12306.cn/index/about/help/index.html", // 帮助中心
-    "https://kyfw.12306.cn/otn/login/init", // 登录
+    "https://www.12306.cn/index/",                                    // 首页 → 12306.cn
+    "https://www.12306.cn/mormhweb/",                                 // 学生票 → 12306.cn（path 拼音）
+    "https://www.12306.cn/index/about/help/index.html",               // 帮助中心 → "help"
+    "https://www.12306.cn/动车票务",                                  // 动车票务（中文 path）
   ],
   // —— 附加 ——
   logoUrl: "",
@@ -102,14 +102,21 @@ function labelFromUrl(rawUrl: string): string {
   if (!url) return "";
   try {
     const u = new URL(url);
-    // 末段 path（去掉 .html 等常见后缀）
-    const last = u.pathname.split("/").filter(Boolean).pop() || "";
-    const cleaned = last.replace(/\.(html?|php|aspx?|jsp)$/i, "");
-    // 末段是纯英文/拼音 → fallback 到 host 主域（"www.12306.cn"）
-    if (!cleaned || /^[a-z0-9_-]+$/i.test(cleaned) && cleaned.length < 6) {
-      return u.hostname.replace(/^www\./, "");
+    const host = u.hostname.replace(/^www\./, "");
+    const parts = u.pathname.split("/").filter(Boolean);
+    const last = (parts.pop() || "").replace(/\.(html?|php|aspx?|jsp)$/i, "");
+    // 末段是纯英文字母 / 拼音（无中文）→ 视为不可读，fallback 到 host
+    // 含中文 / 数字混合 / 短下划线连字符 → 保留
+    if (last && !/[\u4e00-\u9fa5]/.test(last) && /^[a-z0-9_-]+$/i.test(last)) {
+      // 末段是常见 index/about/init/login/help 等系统页 → 用 path 上一层
+      const systemPages = ["index", "init", "default", "home", "list"];
+      if (systemPages.includes(last.toLowerCase())) {
+        const parent = parts.filter(Boolean).pop();
+        if (parent) return `${parent}`;
+      }
+      return host;
     }
-    return cleaned;
+    return last || host;
   } catch {
     // 不是合法 URL，原样展示（截断）
     return url.length > 18 ? url.slice(0, 16) + "…" : url;
@@ -136,7 +143,7 @@ export function DownloadSixElementsTemplate({
     downloadUrl,
     downloadText = "立即下载",
     primaryColor = "#00C06A",
-    ageRating,
+    ageRating = "4+",
     icpRecord,
   } = config;
 
@@ -227,7 +234,7 @@ export function DownloadSixElementsTemplate({
               {ageRating && (
                 <span
                   data-d6e-age
-                  className="px-1 h-[15px] inline-flex items-center rounded text-[9px] font-semibold text-white flex-shrink-0"
+                  className="px-1.5 h-[17px] inline-flex items-center rounded text-[10px] font-bold text-white flex-shrink-0 shadow-sm"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {ageRating}
@@ -263,24 +270,28 @@ export function DownloadSixElementsTemplate({
         {/* 底部链接条：所有要素平铺展示 - 功能 + 隐私 + 权限 + 备案 */}
         <div
           data-d6e-link-bar
-          className="flex items-center flex-wrap gap-x-2 gap-y-1 px-2.5 py-1.5 bg-white/95 backdrop-blur-sm rounded-b-xl border-t border-gray-100/80 border-x border-b border-gray-200/60 text-[10px]"
+          className="flex items-center flex-wrap gap-x-2.5 gap-y-1.5 px-3 py-2 bg-gradient-to-b from-gray-50/90 to-white/95 backdrop-blur-sm rounded-b-xl border-t border-gray-200/80 border-x border-b border-gray-200/60 text-[11px] shadow-sm"
         >
           {/* 功能 chips（全部展示，flex-wrap 自动换行） */}
-          {validFeatures.map((u, i) => {
-            const label = labelFromUrl(u);
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => openWebView(u, label || `功能 ${i + 1}`)}
-                className="inline-flex items-center gap-0.5 text-gray-600 hover:text-gray-900 transition-colors"
-                data-d6e-feature
-              >
-                <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
-                <span className="truncate max-w-[100px]">{label || `功能 ${i + 1}`}</span>
-              </button>
-            );
-          })}
+          {validFeatures.length > 0 ? (
+            validFeatures.map((u, i) => {
+              const label = labelFromUrl(u);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => openWebView(u, label || `功能 ${i + 1}`)}
+                  className="inline-flex items-center gap-0.5 text-gray-600 hover:text-gray-900 transition-colors"
+                  data-d6e-feature
+                >
+                  <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
+                  <span className="truncate max-w-[100px]">{label || `功能 ${i + 1}`}</span>
+                </button>
+              );
+            })
+          ) : (
+            <span className="text-[10px] text-gray-300" data-d6e-feature-empty>暂无功能</span>
+          )}
 
           {/* 分割 */}
           {validFeatures.length > 0 && (privacyUrl || permissionsUrl) && (
