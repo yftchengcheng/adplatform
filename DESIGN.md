@@ -1061,3 +1061,68 @@ for (let i = 0; i < 18; i++) {
 - ❌ 不要给光晕加 `pointer-events: auto`（光晕会拦截宝箱点击）
 - ❌ 不要给光晕加 `z-index > 0` 之外的值（光晕遮住飘落宝箱就看不到了）
 - ❌ 不要用 Tailwind `bg-gradient-to-b` 写背景渐变（要 inline style 配合 backdropFilter）
+
+---
+
+## 红包雨动画 v5（参考宝箱雨 v2）
+
+### 用户反馈
+"红包雨能不能参考宝箱雨的动画逻辑" — 之前 v1-v4 多轮修复"顶部闪烁"未解决，最终在宝箱雨 v2 找到了根因（缺 `animation-fill-mode: backwards`），并完整应用到红包雨。
+
+### 关键根因（之前一直未找到）
+**`animation-fill-mode: backwards` 缺失**：
+- inline `style` 没有 `top` 属性，元素默认 `top: 0`（容器顶）
+- keyframes 0% 是 `top: -80px opacity: 0`（容器外）
+- delay 期间（animation 还没启动），元素保持 inline 状态 = **top: 0 opacity: 1**
+- delay 完成后第 1 帧跳到 keyframes 0% = top: -80px opacity: 0
+- **这一帧的跳变 = 用户看到的"顶部定位闪现"**
+
+### 修复方案
+1. **加 `animation-fill-mode: backwards`** — delay 期间元素就处于 0% keyframe 状态
+2. **18 个初始 + 阶梯 delay** — 100ms + i*150ms + ±50ms 抖动，2.65s 全部入场（避免开局涌入）
+3. **三条线 ±3% 微随机** — 比 v4 的 ±5% 更聚集
+4. **duration 2.8-4.2s** — 比之前 4.5-7.5s 更紧凑（参考宝箱雨节奏）
+5. **interval 350ms** — 比之前 420ms 更密
+6. **MAX 12** — 容器内任意时刻 ~6-11 个红包（满密度）
+7. **删除 endX/rotation/rotationSpeed** — 去掉水平飘动+1.5圈旋转，让红包沿三条线垂直下落（与宝箱雨一致）
+8. **keyframes 简化** — 用 ±8° 摇摆 + ±4px translateX 微飘动替代复杂 rotate calc
+
+### 最终 keyframes（v5）
+```css
+@keyframes fallRedpacketNatural {
+  0%   { top: -90px; opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+  6%   { top: -50px; opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  25%  { top: 22%;   opacity: 1; transform: translate3d(-4px, 0, 0) rotate(-8deg); }
+  50%  { top: 55%;   opacity: 1; transform: translate3d(4px, 0, 0) rotate(8deg); }
+  75%  { top: 80%;   opacity: 1; transform: translate3d(-4px, 0, 0) rotate(-8deg); }
+  96%  { top: 110%;  opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  100% { top: 110%;  opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+.falling-redpacket {
+  animation-name: fallRedpacketNatural;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: backwards;  /* 关键 */
+  will-change: transform, top, opacity;
+  backface-visibility: hidden;
+}
+```
+
+### Playwright 验证（v5）
+| 时间点 | 容器内 | 容器内 opacity=1 | 容器外渐入 |
+|---|---|---|---|
+| t=400ms | 0 | — | 0（delay 还没到） |
+| t=1200ms | 4 | 4 ✅ | 3 个（opacity 0.61/0.75/1 渐入中） |
+| t=2500ms | 6 | 6 ✅ | 6 个（opacity 0.08~0.98 渐入中） |
+| t=4500ms | 11 | 11 ✅ | 1 个（csTop=-33px 被 overflow 裁剪） |
+
+三线分布：
+- 15% 线（30-46px 范围）：4 个 ✅
+- 50% 线（123-137px 范围）：4-5 个 ✅
+- 85% 线（214-224px 范围）：3-4 个 ✅
+
+### 设计禁忌（v5 新增）
+- ❌ **不要省略 `animation-fill-mode: backwards`**（这是"顶部闪现"的根本原因）
+- ❌ 不要让初始 delay 全是 `Math.random() * 200`（多个 delay 接近 0 → 开局涌入）
+- ❌ 不要用 1.5 圈旋转 + 复杂 calc（视觉上太"机器感"）
+- ❌ 不要 inline `endX` 水平飘动（破坏三条线聚集）

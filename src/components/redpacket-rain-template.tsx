@@ -65,17 +65,13 @@ const defaultConfig: RedpacketRainConfig = {
   componentName: "点击红包，领取奖品",
 };
 
-// 飘落红包数据结构 - 模仿落叶飘落
+// 飘落红包数据结构 - 参考宝箱雨 v2 思路精简
 interface FallingRedpacket {
   id: number;
-  startX: number;       // 起始X位置（百分比）
-  startY: number;      // 起始Y位置
-  endX: number;         // 终点X位置（水平飘动）
-  delay: number;        // 延迟开始时间
-  duration: number;     // 飘落时长
-  rotation: number;      // 初始旋转角度
-  rotationSpeed: number; // 旋转速度（度/秒）
-  size: number;          // 红包大小
+  startX: number;       // 起始X位置（百分比，三条固定线之一）
+  delay: number;        // 延迟开始时间（ms）
+  duration: number;     // 飘落时长（ms）
+  size: number;         // 红包大小（px）
 }
 
 interface RedpacketRainTemplateProps {
@@ -105,51 +101,34 @@ export function RedpacketRainTemplate({
   const nextIdRef = useRef(0);
   const containerHeightRef = useRef(500);
 
-  // 红包雨配置 - 调整为更自然的密度
-  const MAX_REDPACKETS = 12; // 最多同时存在12个红包（雨感更密）
-  const SPAWN_INTERVAL = 420; // 每420ms生成一个（密度更高）
-  const BASE_DURATION = 5500; // 基础飘落时长5.5秒（更快落地）
-  const BASE_SIZE = 36; // 基础红包大小
-  const INITIAL_COUNT = 5; // 初始生成5个红包，让首屏立即有雨感
+  // 红包雨配置 - 参考宝箱雨 v2 方案（密集但不涌入）
+  const MAX_REDPACKETS = 12;        // 最多同时存在12个
+  const SPAWN_INTERVAL = 350;      // 每350ms生成一个
+  const BASE_DURATION = 3500;      // 基础飘落时长3.5秒（宝箱雨节奏）
+  const BASE_SIZE = 38;             // 基础红包大小
+  const INITIAL_COUNT = 18;         // 初始生成18个，阶梯错开入场
 
-  // 生成随机红包 - 模仿落叶飘落
+  // 生成随机红包 - 严格三条线 + 阶梯错开
   const generateRedpacket = useCallback((): FallingRedpacket => {
     const id = nextIdRef.current++;
-    
-    // 固定三条飘落线（AGENTS.md 16.5节）+ 微随机 ±5%——避免"杂乱无章闪烁"
+
+    // 三条固定飘落线（AGENTS.md 16.5节）+ ±3% 微随机
     const FALL_LINES = [15, 50, 85];
     const baseLine = FALL_LINES[Math.floor(Math.random() * FALL_LINES.length)];
-    const startX = Math.max(5, Math.min(95, baseLine + (Math.random() - 0.5) * 10));
+    const startX = Math.max(5, Math.min(95, baseLine + (Math.random() - 0.5) * 6));
 
-    // 随机终点位置（水平飘动，可以左右摆动）
-    const drift = (Math.random() - 0.5) * 30; // 左右飘动±15%
-    const endX = Math.max(5, Math.min(95, startX + drift));
+    // 飘落时长 2.8-4.2 秒（紧凑节奏）
+    const duration = BASE_DURATION + (Math.random() - 0.5) * 1400;
 
-    // 随机飘落时长（4.5-7.5秒），更快更自然
-    const duration = BASE_DURATION + (Math.random() - 0.5) * 3000;
+    // 大小 32-46 像素
+    const size = BASE_SIZE + (Math.random() - 0.5) * 14;
 
-    // 随机初始旋转角度
-    const rotation = (Math.random() - 0.5) * 45; // ±22.5度
-
-    // 随机旋转方向（+1 正向 / -1 反向），让红包旋转方向不单调
-    const rotationDirection = Math.random() > 0.5 ? 1 : -1;
-    const rotationAmount = 540 * rotationDirection; // 总旋转±540°（1.5圈）
-
-    // 随机大小（32-48像素），稍微大一些更美观
-    const size = BASE_SIZE + Math.random() * 16;
-
-    // 随机延迟（0-200ms），紧凑入场让首屏立即有雨感
-    const delay = Math.random() * 200;
-    
+    // delay 由调用方传入（阶梯或间隔），这里不设
     return {
       id,
       startX,
-      startY: -50,
-      endX,
-      delay,
+      delay: 0,
       duration,
-      rotation,
-      rotationSpeed: rotationAmount,
       size,
     };
   }, []);
@@ -292,6 +271,7 @@ export function RedpacketRainTemplate({
   }, [isOpen, previewMode]);
 
   // 开始生成红包
+  // 初始生成 + interval 持续补一个 - 参考宝箱雨 v2
   useEffect(() => {
     if (!isVisible || isClaimed) return;
 
@@ -300,12 +280,25 @@ export function RedpacketRainTemplate({
       containerHeightRef.current = containerRef.current.offsetHeight;
     }
 
-    // 初始生成 5 个红包，紧密间隔（80ms）让首屏立即有雨感
+    // 初始 18 个红包，阶梯错开入场（100ms + 150ms*i + ±50ms 抖动）
+    // 关键：避免 5 个 0-400ms 集中涌入造成的"开局卡顿"
+    const initialDelays: number[] = [];
     for (let i = 0; i < INITIAL_COUNT; i++) {
-      setTimeout(() => addRedpacket(), i * 80);
+      const d = 100 + i * 150 + (Math.random() - 0.5) * 100;
+      initialDelays.push(d);
     }
+    initialDelays.forEach((d) => {
+      setTimeout(() => {
+        setFallingRedpackets((prev) => {
+          if (prev.length >= MAX_REDPACKETS) {
+            return [...prev.slice(1), { ...generateRedpacket(), delay: 0 }];
+          }
+          return [...prev, { ...generateRedpacket(), delay: 0 }];
+        });
+      }, d);
+    });
 
-    // 定时生成新红包
+    // 定时补一个
     const interval = setInterval(() => {
       if (!isClaimed) {
         addRedpacket();
@@ -313,7 +306,7 @@ export function RedpacketRainTemplate({
     }, SPAWN_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [isVisible, isClaimed, addRedpacket]);
+  }, [isVisible, isClaimed, addRedpacket, generateRedpacket]);
 
   // 清理过期红包
   useEffect(() => {
@@ -382,14 +375,58 @@ export function RedpacketRainTemplate({
           <X className="w-3 h-3 text-white" />
         </button>
 
-        {/* Redpacket Rain Scene */}
+        {/* Redpacket Rain Scene - 暗紫磨砂玻璃 + 金红光晕 */}
         {!isClaimed ? (
-          <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
-            {/* Guide Text */}
+          <div
+            ref={containerRef}
+            className="flex-1 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(180deg, rgba(26, 10, 46, 0.55) 0%, rgba(45, 27, 78, 0.55) 100%)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255, 255, 255, 0.18)",
+              boxShadow:
+                "0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 215, 0, 0.08)",
+            }}
+          >
+            {/* 金色光晕 - 左上 */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: "-60px",
+                left: "-60px",
+                width: "220px",
+                height: "220px",
+                background: "radial-gradient(circle, rgba(255, 215, 0, 0.32) 0%, rgba(255, 215, 0, 0) 70%)",
+                filter: "blur(20px)",
+              }}
+            />
+            {/* 红色光晕 - 右下 */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                bottom: "-60px",
+                right: "-60px",
+                width: "240px",
+                height: "240px",
+                background: "radial-gradient(circle, rgba(255, 75, 75, 0.30) 0%, rgba(255, 75, 75, 0) 70%)",
+                filter: "blur(22px)",
+              }}
+            />
+            {/* Guide Text - 金色磨砂 chip */}
             <div className="absolute top-6 left-0 right-0 z-10">
               <div className="relative flex flex-col items-center">
-                <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 whitespace-nowrap">
-                  <p className="text-white text-sm font-semibold text-center drop-shadow-lg animate-pulse">
+                <div
+                  className="relative rounded-full px-4 py-2 whitespace-nowrap"
+                  style={{
+                    background: "linear-gradient(90deg, rgba(255, 215, 0, 0.20) 0%, rgba(255, 200, 50, 0.25) 50%, rgba(255, 215, 0, 0.20) 100%)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255, 215, 0, 0.30)",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+                  }}
+                >
+                  <p className="text-yellow-50 text-sm font-semibold text-center drop-shadow-lg animate-pulse">
                     {resolveGuideText()}
                   </p>
                 </div>
@@ -398,56 +435,54 @@ export function RedpacketRainTemplate({
 
 
 
-            {/* Falling Redpackets - 修复顶部定位闪现：
-                0% 红包在容器外 top:-50px opacity:0
-                8% 红包已到达容器顶 top:0px（但仍 opacity:0，隐藏在容器外下方）
-                18% 红包刚进入容器 5%（已部分可见 opacity:0.4）
-                中段正常飘落
-                95% 红包接近容器底 100%（仍 opacity:1）
-                100% 红包已离开容器 opacity:0
-                关键：opacity 渐入时红包已在容器内，避免"顶部定位闪现" */}
+            {/* Falling Redpackets - v5 借鉴宝箱雨 v2 方案：
+                关键修复：animation-fill-mode: backwards（解决 delay 期间 top:0 闪现）
+                关键帧：容器外淡入/淡出（-90px→-50px 完成 opacity 0→1）
+                摇摆：±8° 替代 1.5 圈旋转 + translateX(±4px) 微飘动
+                节奏：3-4.2s（宝箱雨节奏），无 scale 渐变 */}
             <style jsx>{`
               @keyframes fallRedpacketNatural {
                 0% {
-                  top: -80px;
+                  top: -90px;
                   opacity: 0;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+                  transform: translate3d(0, 0, 0) rotate(0deg);
                 }
                 6% {
-                  top: -40px;
+                  top: -50px;
                   opacity: 1;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+                  transform: translate3d(0, 0, 0) rotate(0deg);
                 }
                 25% {
                   top: 22%;
                   opacity: 1;
-                  transform: translate3d(-10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.5));
+                  transform: translate3d(-4px, 0, 0) rotate(-8deg);
                 }
                 50% {
                   top: 55%;
                   opacity: 1;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1));
+                  transform: translate3d(4px, 0, 0) rotate(8deg);
                 }
                 75% {
                   top: 80%;
                   opacity: 1;
-                  transform: translate3d(10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.5));
+                  transform: translate3d(-4px, 0, 0) rotate(-8deg);
                 }
-                98% {
+                96% {
                   top: 110%;
                   opacity: 1;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.95));
+                  transform: translate3d(0, 0, 0) rotate(0deg);
                 }
                 100% {
                   top: 110%;
                   opacity: 0;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 2));
+                  transform: translate3d(0, 0, 0) rotate(0deg);
                 }
               }
               .falling-redpacket {
                 animation-name: fallRedpacketNatural;
                 animation-timing-function: linear;
                 animation-iteration-count: infinite;
+                animation-fill-mode: backwards;
                 will-change: transform, top, opacity;
                 backface-visibility: hidden;
                 -webkit-backface-visibility: hidden;
@@ -465,7 +500,6 @@ export function RedpacketRainTemplate({
                     height: `${rp.size * 1.17}px`,
                     animationDuration: `${rp.duration}ms`,
                     animationDelay: `${rp.delay}ms`,
-                    ['--rot-step' as string]: `${rp.rotationSpeed / 5}deg`,
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -482,18 +516,65 @@ export function RedpacketRainTemplate({
             })}
           </div>
         ) : (
-          /* Reward Claimed Scene */
-          <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
+          /* Reward Claimed Scene - 暖橙磨砂玻璃 + 橙金光晕 */
+          <div
+            className="flex-1 flex flex-col items-center justify-center p-6 relative"
+            style={{
+              background: "linear-gradient(180deg, rgba(255, 245, 230, 0.55) 0%, rgba(255, 228, 204, 0.55) 100%)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255, 200, 130, 0.30)",
+              boxShadow:
+                "0 8px 32px rgba(255, 140, 60, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 0 1px rgba(255, 215, 0, 0.10)",
+            }}
+          >
+            {/* 橙色光晕 - 右上 */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: "-40px",
+                right: "-40px",
+                width: "200px",
+                height: "200px",
+                background: "radial-gradient(circle, rgba(255, 165, 80, 0.40) 0%, rgba(255, 165, 80, 0) 70%)",
+                filter: "blur(20px)",
+              }}
+            />
+            {/* 金色光晕 - 左下 */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                bottom: "-40px",
+                left: "-40px",
+                width: "200px",
+                height: "200px",
+                background: "radial-gradient(circle, rgba(255, 215, 0, 0.35) 0%, rgba(255, 215, 0, 0) 70%)",
+                filter: "blur(20px)",
+              }}
+            />
             {/* Reward Content */}
-            <div className="w-full max-w-[345px] space-y-4">
+            <div className="w-full max-w-[345px] space-y-4 relative z-10">
               {/* Reward Image or Cash */}
               {finalConfig.rewardType === "cash" ? (
-                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-4 text-center shadow-lg">
-                  <p className="text-white/80 text-xs mb-1">恭喜获得</p>
-                  <p className="text-white text-3xl font-bold">¥{resolveCashAmount()}</p>
+                <div
+                  className="rounded-2xl p-4 text-center"
+                  style={{
+                    background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                    boxShadow: "0 6px 20px rgba(255, 165, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 -2px 0 rgba(180, 100, 0, 0.20)",
+                    border: "1px solid rgba(255, 215, 0, 0.50)",
+                  }}
+                >
+                  <p className="text-white/85 text-xs mb-1 drop-shadow">恭喜获得</p>
+                  <p className="text-white text-3xl font-bold drop-shadow-lg">¥{resolveCashAmount()}</p>
                 </div>
               ) : (
-                <div className="rounded-2xl overflow-hidden shadow-lg">
+                <div
+                  className="rounded-2xl overflow-hidden"
+                  style={{
+                    boxShadow: "0 6px 20px rgba(0, 0, 0, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.25)",
+                    border: "1px solid rgba(255, 200, 130, 0.35)",
+                  }}
+                >
                   {resolveCustomRewardImage() ? (
                     <img
                       src={resolveCustomRewardImage()}
@@ -518,10 +599,15 @@ export function RedpacketRainTemplate({
                 {resolveSpecialNote()}
               </p>
 
-              {/* Claim Button */}
+              {/* Claim Button - 立体红渐变 */}
               <button
                 onClick={handleClaim}
-                className="w-full py-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-shadow text-sm"
+                className="w-full py-2.5 text-white font-semibold rounded-2xl transition-all text-sm active:scale-[0.98]"
+                style={{
+                  background: "linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%)",
+                  boxShadow: "0 4px 14px rgba(255, 71, 87, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 -2px 0 rgba(180, 30, 50, 0.25)",
+                  border: "1px solid rgba(255, 120, 120, 0.50)",
+                }}
               >
                 立即领取
               </button>
