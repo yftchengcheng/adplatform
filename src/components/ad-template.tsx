@@ -205,87 +205,143 @@ export function AdTemplate({
     <div
       className={cn(
         previewMode
-          ? "absolute left-0 top-1/2 -translate-y-1/2 w-[240px] h-[160px] overflow-hidden rounded-r-2xl"
+          ? "absolute left-0 top-1/2 -translate-y-1/2 w-[240px] h-[160px] overflow-hidden rounded-2xl"
           : ""
       )}
     >
-      {/* Preview background decoration (only in previewMode) */}
-      {previewMode && (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100" />
-          <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-blue-300/40 blur-2xl" />
-          <div className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full bg-pink-300/40 blur-2xl" />
-        </>
-      )}
-
-      {/* Container */}
+      {/* Container - Editorial / Magazine style */}
       <div
         className={cn(
           previewMode
-            ? "relative w-[240px] h-[160px] bg-white/40 backdrop-blur-xl rounded-r-2xl border border-white/60 shadow-xl overflow-hidden"
-            : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] bg-white/75 backdrop-blur-xl rounded-r-2xl border border-white/40 shadow-2xl shadow-black/10 overflow-hidden",
+            ? "relative w-[240px] h-[160px] rounded-2xl overflow-hidden"
+            : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] rounded-2xl overflow-hidden",
           "transition-all duration-300 flex flex-col",
           isOpen || previewMode
-            ? "translate-x-0 scale-100 opacity-100"
-            : "-translate-x-2 scale-95 opacity-0"
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-1 scale-95 opacity-0"
         )}
         style={{
           height: 160,
           transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+          backgroundColor: "#FAF8F5",
+          border: "1px solid #E8E4DE",
+          boxShadow:
+            "0 1px 2px rgba(26, 26, 26, 0.04), 0 8px 24px rgba(26, 26, 26, 0.06)",
         }}
       >
-          {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white/50 hover:bg-white/80 transition-all duration-200 z-10"
-              aria-label="关闭"
+        {/* Top row: brand dot + AD label */}
+        <div className="flex items-center justify-between px-3 pt-2.5">
+          {/* Brand dot - 4x4 editorial mark */}
+          <div className="flex items-center gap-1.5">
+            <span
+              className="block w-1 h-1 rounded-full"
+              style={{ backgroundColor: "#C9A961" }}
+              aria-hidden
+            />
+            <span
+              className="text-[8px] font-medium uppercase"
+              style={{ color: "#6B6B6B", letterSpacing: "0.2em" }}
             >
-              <X className="w-3 h-3 text-gray-500" />
-            </button>
-
-          {/* Content */}
-          <div className="flex-1 px-2.5 pt-2 pb-1 flex flex-col justify-center">
-            {/* Title */}
-            <h2 className="text-xs font-bold text-gray-900 pr-5 leading-tight">
-              {finalConfig.title}
-            </h2>
-
-            {/* Subtitle */}
-            <p className="mt-0.5 text-[10px] text-gray-600 leading-relaxed">
-              {finalConfig.subtitle}
-            </p>
+              Edit{"'"}s Pick
+            </span>
           </div>
+          {/* AD label - top right */}
+          <span
+            className="text-[8px] font-medium uppercase"
+            style={{ color: "#6B6B6B", letterSpacing: "0.2em" }}
+          >
+            AD
+          </span>
+        </div>
 
-          {/* Buttons */}
-          <div className="px-2.5 pb-2 space-y-1">
-            <button
-              onClick={handleButton1Click}
-              className={cn(
-                "w-full h-7 rounded-lg text-white font-medium text-[11px]",
-                "bg-gradient-to-r from-blue-500 to-blue-600",
-                "hover:from-blue-600 hover:to-blue-700",
-                "active:scale-[0.98] transition-all duration-150",
-                "shadow-md shadow-blue-500/25",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
-            >
-              {finalConfig.button1.text}
-            </button>
+        {/* Content - title + subtitle */}
+        <div className="flex-1 px-3 pt-1.5 pb-1 flex flex-col justify-center min-h-0">
+          <h2
+            className="text-[13px] font-semibold leading-tight tracking-tight truncate"
+            style={{ color: "#1A1A1A" }}
+          >
+            {finalConfig.title}
+          </h2>
+          {/* Hairline divider */}
+          <div
+            className="my-1.5 h-px w-6"
+            style={{ backgroundColor: "#C9A961" }}
+            aria-hidden
+          />
+          <p
+            className="text-[10px] leading-relaxed tracking-wide uppercase line-clamp-2"
+            style={{ color: "#6B6B6B" }}
+          >
+            {finalConfig.subtitle}
+          </p>
+        </div>
 
-            <button
-              onClick={handleButton2Click}
-              className={cn(
-                "w-full h-7 rounded-lg text-white font-medium text-[11px]",
-                "bg-gradient-to-r from-blue-500 to-blue-600",
-                "hover:from-blue-600 hover:to-blue-700",
-                "active:scale-[0.98] transition-all duration-150",
-                "shadow-md shadow-blue-500/25",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
-            >
-              {finalConfig.button2.text}
-            </button>
-          </div>
+        {/* Close Button - top right corner, but on top of AD label */}
+        <button
+          onClick={onClose}
+          className="group absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full transition-all duration-300 z-10"
+          style={{ backgroundColor: "rgba(232, 228, 222, 0.6)" }}
+          aria-label="关闭"
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#1A1A1A";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "rgba(232, 228, 222, 0.6)";
+          }}
+        >
+          <X
+            className="w-3 h-3 transition-all duration-300 group-hover:rotate-90 group-hover:text-white"
+            style={{ color: "#1A1A1A" }}
+          />
+        </button>
+
+        {/* Buttons - Editorial: primary = black, secondary = outline */}
+        <div className="px-3 pb-2.5 flex gap-1.5">
+          <button
+            onClick={handleButton1Click}
+            className="group/btn flex-1 h-7 rounded text-white font-medium text-[10px] tracking-widest uppercase active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "#1A1A1A",
+              letterSpacing: "0.12em",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#1E3A5F";
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(26, 26, 26, 0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#1A1A1A";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+            disabled={!finalConfig.button1.text}
+          >
+            {finalConfig.button1.text}
+          </button>
+
+          <button
+            onClick={handleButton2Click}
+            className="group/btn2 flex-1 h-7 rounded font-medium text-[10px] tracking-widest uppercase active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "transparent",
+              color: "#1A1A1A",
+              border: "1px solid #1A1A1A",
+              letterSpacing: "0.12em",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#1A1A1A";
+              e.currentTarget.style.color = "#FAF8F5";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#1A1A1A";
+            }}
+            disabled={!finalConfig.button2.text}
+          >
+            {finalConfig.button2.text}
+          </button>
+        </div>
       </div>
 
       {/* Image Modal (for show_image action) */}
