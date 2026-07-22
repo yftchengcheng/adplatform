@@ -318,6 +318,13 @@ function ConfigContent() {
     }
   }, []);
 
+  // 当异步加载的 components 到位、editingComponent 由 null 变为有值时，同步 config
+  React.useEffect(() => {
+    if (editingComponent?.config) {
+      setConfig(editingComponent.config as unknown as AllConfigTypes);
+    }
+  }, [editingComponent]);
+
   // 预览重置计数器（用于动态组件如红包雨的重置）
   const [previewResetKey, setPreviewResetKey] = React.useState(0);
 

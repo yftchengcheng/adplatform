@@ -68,28 +68,28 @@ function VoteOptionBar({
     <button
       onClick={onSelect}
       className={cn(
-        "relative w-full h-10 rounded-lg border-2 overflow-hidden transition-all duration-300",
+        "relative w-full h-9 rounded-md border overflow-hidden transition-all duration-300",
         selected
-          ? "border-blue-500 bg-blue-50"
-          : "border-blue-500 bg-white hover:bg-blue-50"
+          ? "border-blue-400/60 bg-white/15"
+          : "border-blue-200/40 bg-white/5 hover:bg-white/10"
       )}
     >
       {/* 进度条背景 */}
       <div
         className={cn(
           "absolute inset-y-0 left-0 transition-all duration-500 ease-out",
-          selected ? "bg-blue-500" : "bg-blue-200"
+          selected ? "bg-blue-500/80" : "bg-blue-300/40"
         )}
         style={{ width: `${progressWidth}%` }}
       />
 
       {/* 内容 */}
-      <div className="relative flex items-center justify-between h-full px-2.5">
+      <div className="relative flex items-center justify-between h-full px-3">
         {/* 左侧：按钮文字 */}
         <span
           className={cn(
-            "font-medium text-[11px]",
-            selected ? "text-white" : "text-blue-600"
+            "font-medium text-[11px] tracking-wide",
+            selected ? "text-white" : "text-blue-900/80"
           )}
         >
           {option.buttonText}
@@ -98,8 +98,8 @@ function VoteOptionBar({
         {/* 右侧：百分比 */}
         <span
           className={cn(
-            "font-semibold text-[11px]",
-            selected ? "text-white" : "text-gray-600"
+            "font-medium text-[11px] tabular-nums",
+            selected ? "text-white" : "text-gray-900/60"
           )}
         >
           {percentage}%
@@ -266,33 +266,49 @@ export function VoteTemplate({
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
       >
-        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ height: 160 }}>
+        <div
+          className="relative rounded-2xl overflow-hidden"
+          style={{
+            background: "rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.04)",
+            height: 160,
+          }}
+        >
           {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full transition-all duration-200 z-10 hover:rotate-90"
+              style={{
+                background: "rgba(255, 255, 255, 0.3)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+              }}
               aria-label="关闭"
             >
-              <X className="w-3 h-3 text-gray-500" />
+              <X className="w-3 h-3 text-gray-700" />
             </button>
 
           {/* Content */}
-          <div className="px-3 pt-2 pb-2">
+          <div className="px-3 pt-2.5 pb-2">
             {/* Title */}
-            <h2 className="text-xs font-bold text-gray-900 pr-6 leading-tight truncate">
+            <h2 className="text-xs font-semibold text-gray-900 pr-6 leading-tight truncate tracking-tight">
               {finalConfig.title}
             </h2>
 
             {/* Subtitle */}
             {finalConfig.subtitle && (
-              <p className="mt-0.5 text-[10px] text-gray-500 leading-tight truncate">
+              <p className="mt-0.5 text-[10px] text-gray-600/80 leading-tight truncate tracking-wide">
                 {finalConfig.subtitle}
               </p>
             )}
           </div>
 
           {/* Vote Options */}
-          <div className="px-3 pb-2 space-y-1.5">
+          <div className="px-3 pb-2.5 space-y-1.5">
             {finalConfig.options.map((option, index) => (
               <VoteOptionBar
                 key={option.id}
