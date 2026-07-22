@@ -861,3 +861,86 @@ style={{
 - ❌ 不要让 `0% opacity: 1` + `top: -60px`（容器外就突然出现，顶部闪烁）
 - ❌ 不要随机散点（startX 用 15/50/85 三条固定线 + 微随机）
 - ❌ 不要超过 8 个并发（太多看起来像"雨帘"而非"雨滴"）
+
+---
+
+## 宝箱雨顶部卡顿 + 稀疏修复（v2）
+
+### 用户反馈
+- 刚打开时或顶部出现"一堆卡顿的宝箱"（视觉闪现）
+- 雨感太稀疏，希望"密集"
+
+### 根因（v1 优化后的遗留问题）
+
+#### 1. delay 期间 top: 0 闪现（核心）
+v1 的 inline style 写了 `top: 0`，但 keyframes 0% 是 `top: -90px opacity: 0`。
+- `animation-fill-mode` 默认 `none` → **delay 期间元素保持 inline `top: 0 opacity: 1`**
+- delay 完成后，浏览器立刻跳到 0% keyframe `-90px opacity: 0`
+- 这 1 frame 的跳变 = 用户看到的"卡顿/顶部闪现"
+
+#### 2. delay 随机导致开局涌入
+- v1 delay 范围 `0-2000ms` 随机 → 多个 delay 接近 0 的宝箱几乎同时入场
+- 开局瞬间 3-4 个宝箱同时在容器顶部 -90px → -50px 之间集中出现 = "卡顿"
+
+#### 3. 数量不够密
+- 10 初始 + 700ms 补一个 + 7 并发上限
+- 任意时刻容器内可见约 4-5 个 → 视觉上"零星飘落"而非"雨"
+
+### 修复方案（v2）
+
+#### 1. animation-fill-mode: backwards（核心修复）
+```typescript
+style={{
+  left: `${tb.x}%`,
+  // 移除 inline top: 0
+  animation: `fallTreasureboxWater ${duration}ms linear ${delay}ms infinite both`,
+  animationFillMode: 'backwards',
+  // ...
+}}
+```
+- `backwards` 让 delay 期间元素使用 0% keyframe 状态
+- delay 期间：top: -90px, opacity: 0（容器外不可见）
+- 永远不会出现"top: 0 闪现"→ 彻底消除顶部卡顿
+
+#### 2. delay 严格阶梯错开
+```typescript
+for (let i = 0; i < 18; i++) {
+  treasureboxes.push({
+    delay: 100 + i * 150 + (Math.random() - 0.5) * 100,
+    // i=0: 100ms ±50
+    // i=1: 250ms ±50
+    // i=17: 2650ms ±50
+    // ...
+  });
+}
+```
+- 第 1 个 delay=100ms（让用户先看到空白，然后陆续入场）
+- 之后每 150ms 一个阶梯 + ±50ms 抖动
+- 18 个全部入场需要 2.65s（不会开局瞬间涌入）
+
+#### 3. 密度提升
+| 参数 | v1 | v2 | 效果 |
+|---|---|---|---|
+| 初始数量 | 10 | 18 | 入场更"满" |
+| 补一个间隔 | 700ms | 350ms | 持续高密度 |
+| 并发上限 | 7 | 12 | 容器内始终 6+ 个 |
+| 飘落时长 | 3.5-4.5s | 2.8-4s | 节奏更紧凑 |
+| delay 范围 | 0-2000ms 随机 | 100-2750ms 阶梯 | 开局不会涌入 |
+
+### Playwright 验证（v2）
+| 时间点 | 容器外 | 容器内 opacity=1 |
+|---|---|---|
+| t=600ms | 12（全部 -90px opacity:0） | 0（delay 中） |
+| t=1500ms | 10 | 2 |
+| t=3000ms | 6 | **6**（密集期） |
+
+- ✅ delay 期间所有元素 csTop=-90px opacity:0（**无 top:0 闪现**）
+- ✅ fillMode 全为 `backwards`
+- ✅ 容器内 6 个宝箱全部 opacity=1.0
+- ✅ 任意时刻 6+ 个可见，雨感密集
+
+### 设计禁忌（v2 新增）
+- ❌ 不要 inline `top: 0` 但 keyframes 0% 是 `-90px`（delay 期间会闪现 top:0）
+- ❌ 不要省略 `animation-fill-mode: backwards`（delay 期间元素保持 inline 状态）
+- ❌ 不要让初始 delay 全是 `Math.random() * 2000`（多个 delay 接近 0 → 开局涌入）
+- ❌ 不要并发上限 < 6（视觉上太稀疏不像"雨"）

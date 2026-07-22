@@ -142,7 +142,7 @@ export function TreasureboxRainTemplate({
     return finalConfig.rewardImageUrl || "";
   }, [finalConfig.rewardImageMacro, finalConfig.rewardImageUrl, finalConfig.macroVariables]);
 
-  // 生成飘落宝箱 - 三条固定线 + 容器外淡入/淡出
+  // 生成飘落宝箱 - 三条固定线 + 容器外淡入/淡出 + 严格错开 delay
   const generateFallingTreasureboxes = useCallback(() => {
     const treasureboxes: FallingTreasurebox[] = [];
     const FALL_LINES = [15, 50, 85];
@@ -150,12 +150,14 @@ export function TreasureboxRainTemplate({
       FALL_LINES[Math.floor(Math.random() * FALL_LINES.length)] +
       (Math.random() - 0.5) * 6;
 
-    for (let i = 0; i < 10; i++) {
+    // 18 个初始，delay 严格按 150ms 阶梯 + ±50ms 微随机
+    // 第 1 个 delay 100ms 起步，避免开局瞬间涌入造成卡顿
+    for (let i = 0; i < 18; i++) {
       treasureboxes.push({
         id: `tb-${Date.now()}-${i}`,
         x: getStartX(),
-        delay: Math.random() * 2000,
-        duration: 3500 + Math.random() * 1000,
+        delay: 100 + i * 150 + (Math.random() - 0.5) * 100,
+        duration: 2800 + Math.random() * 1200, // 2.8-4s，更密
         scale: 0.85 + Math.random() * 0.15,
       });
     }
@@ -169,7 +171,7 @@ export function TreasureboxRainTemplate({
       const treasureboxes = generateFallingTreasureboxes();
       setFallingTreasureboxes(treasureboxes);
 
-      // 定期添加新的宝箱
+      // 定期添加新的宝箱 - 350ms 节奏更密集，并发上限 12
       const interval = setInterval(() => {
         setFallingTreasureboxes((prev) => {
           const FALL_LINES = [15, 50, 85];
@@ -180,12 +182,12 @@ export function TreasureboxRainTemplate({
             id: `tb-${Date.now()}-${Math.random()}`,
             x: startX,
             delay: 0,
-            duration: 3500 + Math.random() * 1000,
+            duration: 2800 + Math.random() * 1200,
             scale: 0.85 + Math.random() * 0.15,
           };
-          return [...prev.slice(-7), newTreasurebox]; // 保持最多7个，节奏更舒缓
+          return [...prev.slice(-11), newTreasurebox]; // 保持最多12个（prev保留11+新增1）
         });
-      }, 700);
+      }, 350);
 
       return () => clearInterval(interval);
     }
@@ -262,9 +264,8 @@ export function TreasureboxRainTemplate({
                   className="absolute cursor-pointer hover:scale-110 transition-transform"
                   style={{
                     left: `${tb.x}%`,
-                    top: 0,
-                    animation: `fallTreasureboxWater ${tb.duration}ms linear infinite`,
-                    animationDelay: `${tb.delay}ms`,
+                    animation: `fallTreasureboxWater ${tb.duration}ms linear ${tb.delay}ms infinite both`,
+                    animationFillMode: 'backwards',
                     ['--tb-scale' as React.CSSProperties['--tb-scale']]: tb.scale,
                     willChange: 'top, opacity, transform',
                     backfaceVisibility: 'hidden',
@@ -380,16 +381,15 @@ export function TreasureboxRainTemplate({
             }
           `}</style>
 
-          {fallingTreasureboxes.slice(0, 6).map((tb) => (
+          {fallingTreasureboxes.slice(0, 12).map((tb) => (
             <div
               key={tb.id}
               onClick={handleTreasureboxClick}
               className="absolute cursor-pointer hover:scale-110 transition-transform"
               style={{
                 left: `${tb.x}%`,
-                top: 0,
-                animation: `fallTreasureboxWaterPreview ${tb.duration}ms linear infinite`,
-                animationDelay: `${tb.delay}ms`,
+                animation: `fallTreasureboxWaterPreview ${tb.duration}ms linear ${tb.delay}ms infinite both`,
+                animationFillMode: 'backwards',
                 ['--tb-scale' as React.CSSProperties['--tb-scale']]: tb.scale * 0.8,
                 willChange: 'top, opacity, transform',
                 backfaceVisibility: 'hidden',
