@@ -169,12 +169,12 @@ export function CouponTemplate({
   if (!isVisible && previewMode === false) return null;
 
   return (
-    <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
+    <div className={cn(previewMode ? "absolute inset-0 flex items-center justify-center" : "")}>
       {/* Backdrop */}
       <div
         className={cn(
           previewMode
-            ? "flex items-center justify-center w-full max-w-sm"
+            ? "w-full h-full flex items-center justify-center"
             : "fixed inset-0 z-50 bg-black/50",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
