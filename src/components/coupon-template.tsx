@@ -181,18 +181,19 @@ export function CouponTemplate({
         )}
         onClick={!previewMode ? onClose : undefined}
       >
-        {/* Coupon Card - 票券腰身 + 4:3 比例（匹配 demo-C2-c 票券比例 1.715） */}
+        {/* Coupon Card - 票券腰身 10% + 4:3 比例（匹配 demo-C2-c） */}
         <div
           className={cn(
             "relative w-full max-w-[400px] transition-all duration-300 flex flex-col",
             !previewMode && (isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0")
           )}
           style={{
-            // 4:3 比例 (按 demo-C2-c: 票券区域 2127x1240 ≈ 1.715)
+            // 4:3 比例（按用户要求）
             aspectRatio: "4 / 3",
-            // 票券腰身：左右中央高度内凹 18%（5 点近似弧线，更明显的票券感）
+            // 票券腰身：左右中央高度内凹 10%（按 demo-C2-c 实际 10.5%）
+            // 位置：上腰身 25%，下腰身 65%（更紧凑、更接近 demo）
             clipPath:
-              "polygon(0% 0%, 100% 0%, 100% 32%, 94% 38%, 82% 50%, 94% 62%, 100% 68%, 100% 100%, 0% 100%, 0% 68%, 6% 62%, 18% 50%, 6% 38%, 0% 32%)",
+              "polygon(0% 0%, 100% 0%, 100% 41.5%, 95.5% 44.5%, 89.5% 47.5%, 95.5% 50.5%, 100% 53.5%, 100% 71.5%, 95.5% 74.5%, 89.5% 77.5%, 95.5% 80.5%, 100% 83.5%, 100% 100%, 0% 100%, 0% 83.5%, 4.5% 80.5%, 10.5% 77.5%, 4.5% 74.5%, 0% 71.5%, 0% 53.5%, 4.5% 50.5%, 10.5% 47.5%, 4.5% 44.5%, 0% 41.5%)",
             background: "#E8E9ED",
             border: "1px solid rgba(0, 0, 0, 0.06)",
             boxShadow:
@@ -231,29 +232,18 @@ export function CouponTemplate({
             </span>
           </div>
 
-          {/* TOP 米白区结束 - 不再有撕开线在中间 */}
+          {/* 水平撕开虚线 - 在米白顶和橙红之间（按 demo 真实位置），横穿整个宽度，浅灰白色 */}
+          <div
+            className="h-[1px] w-full pointer-events-none"
+            style={{
+              borderTop: "1px dashed rgba(120, 120, 130, 0.55)",
+              background: "transparent",
+            }}
+            aria-hidden
+          />
 
           {/* 主体橙色区 - flex 布局（匹配 demo-C2-c 结构） */}
           <div className="flex-1 flex flex-col relative" style={{ background: "#F96F0C" }}>
-            {/* 水平撕开虚线 - 主体第一行（按 demo 位置 ~25%），仅右 65% 避开 30 文字 */}
-            <div className="h-7 relative pointer-events-none" aria-hidden>
-              <svg
-                className="absolute top-1/2 -translate-y-1/2 right-0 h-3"
-                viewBox="0 0 65 12"
-                preserveAspectRatio="none"
-                style={{ overflow: "visible", width: "65%" }}
-              >
-                <path
-                  d="M 0 0.5 Q 32.5 10 65 0.5"
-                  stroke="rgba(0, 0, 0, 0.4)"
-                  strokeWidth="1.2"
-                  strokeDasharray="3 2"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-
             {/* 主体内容：30 + 满100立减 + 立即领取 */}
             <div className="flex-1 relative flex items-stretch">
               {/* 垂直虚线 - 30 区域和条件区域之间的分隔 */}
