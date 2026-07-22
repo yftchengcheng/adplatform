@@ -51,6 +51,7 @@ const COMPONENT_TYPE_NAMES: Record<string, string> = {
   promotion_card: "推广卡片",
   game_gift: "游戏礼包码",
   floating_window: "浮窗",
+  download_six_elements: "下载六要素",
 };
 
 function getComponentTypeName(componentType: string): string {

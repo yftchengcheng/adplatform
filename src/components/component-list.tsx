@@ -330,6 +330,8 @@ export function ComponentList() {
       coupon: "优惠券磁贴",
       promotion_card: "推广卡片",
       game_gift: "游戏礼包码",
+      floating_window: "浮窗",
+      download_six_elements: "下载六要素",
     };
     return typeMap[type] || type;
   };
@@ -433,6 +435,8 @@ export function ComponentList() {
                   <SelectItem value="coupon">优惠券磁贴</SelectItem>
                   <SelectItem value="promotion_card">推广卡片</SelectItem>
                   <SelectItem value="game_gift">游戏礼包码</SelectItem>
+                  <SelectItem value="floating_window">浮窗</SelectItem>
+                  <SelectItem value="download_six_elements">下载六要素</SelectItem>
                 </SelectContent>
               </Select>
 

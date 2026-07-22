@@ -23,6 +23,7 @@ import {
   Sparkles,
   MousePointerClick,
   PanelTop,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,6 +50,7 @@ const iconMap: Record<string, React.ReactNode> = {
   "bell": <Bell className="w-10 h-10" />,
   "vote": <CheckSquare className="w-10 h-10" />,
   "panel-top": <PanelTop className="w-10 h-10" />,
+  "package": <Package className="w-10 h-10" />,
 };
 
 export default function ComponentCreatePage() {

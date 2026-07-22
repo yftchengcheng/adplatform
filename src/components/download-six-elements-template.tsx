@@ -40,6 +40,26 @@ export interface DownloadSixElementsTemplateProps {
   onClose?: () => void;
 }
 
+export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
+  appName: "智行火车票",
+  developer: "北京智行科技有限公司",
+  version: "8.6.2",
+  privacyUrl: "https://example.com/privacy",
+  permissionsUrl: "https://example.com/permissions",
+  features: [
+    "智能抢票，多车次实时监控",
+    "极速出票，告别排队",
+    "在线选座，座位随心选",
+    "24小时客服，全程贴心",
+  ],
+  logoUrl: undefined,
+  downloadUrl: "https://example.com/download",
+  downloadText: "立即下载",
+  primaryColor: "#00C06A",
+  ageRating: "4+",
+  icpRecord: "京ICP备12345678号-1",
+};
+
 export function DownloadSixElementsTemplate({
   config,
   previewMode = false,

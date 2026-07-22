@@ -16,7 +16,8 @@ export type ComponentType =
   | "coupon"            // 优惠券磁贴
   | "promotion_card"    // 推广卡片
   | "game_gift"         // 游戏礼包码
-  | "floating_window"   // 浮窗;
+  | "floating_window"   // 浮窗
+  | "download_six_elements"; // 下载六要素
 
 // 组件样式模板（用于选择页面）
 export interface ComponentStyleTemplate {
@@ -144,6 +145,13 @@ export const componentStyleTemplates: ComponentStyleTemplate[] = [
     description: "弹窗形式展示红包",
     icon: "bell",
   },
+  {
+    id: "download_six_elements",
+    name: "下载六要素",
+    category: "static",
+    description: "应用商店下载落地页（应用名称/开发者/版本/隐私/权限/功能）",
+    icon: "package",
+  },
 ];
 export type ComponentStatus = "enabled" | "disabled";
 
@@ -171,6 +179,7 @@ export const ComponentTypeMap: Record<ComponentType, string> = {
   promotion_card: "推广卡片",
   game_gift: "游戏礼包码",
   floating_window: "浮窗",
+  download_six_elements: "下载六要素",
 };
 
 // 组件状态映射
