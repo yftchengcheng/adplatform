@@ -202,12 +202,27 @@ export function AdTemplate({
   if (!isVisible && !previewMode) return null;
 
   return (
-    <div className={cn(previewMode ? "absolute left-0 top-1/2 -translate-y-1/2" : "")}>
+    <div
+      className={cn(
+        previewMode
+          ? "absolute left-0 top-1/2 -translate-y-1/2 w-[240px] h-[160px] overflow-hidden rounded-r-2xl"
+          : ""
+      )}
+    >
+      {/* Preview background decoration (only in previewMode) */}
+      {previewMode && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100" />
+          <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-blue-300/40 blur-2xl" />
+          <div className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full bg-pink-300/40 blur-2xl" />
+        </>
+      )}
+
       {/* Container */}
       <div
         className={cn(
           previewMode
-            ? "w-[240px] bg-white/80 backdrop-blur-xl rounded-r-2xl border border-white/50 shadow-xl overflow-hidden"
+            ? "relative w-[240px] h-[160px] bg-white/40 backdrop-blur-xl rounded-r-2xl border border-white/60 shadow-xl overflow-hidden"
             : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] bg-white/75 backdrop-blur-xl rounded-r-2xl border border-white/40 shadow-2xl shadow-black/10 overflow-hidden",
           "transition-all duration-300 flex flex-col",
           isOpen || previewMode
