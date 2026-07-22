@@ -446,3 +446,127 @@ border-left: 1px dashed rgba(255, 255, 255, 0.4);
 - ❌ 不要把奖品文案保留纯白（白色文字在深紫上不抢眼，金色渐变才是"中奖"）
 - ❌ 不要把领取按钮用 Tailwind `bg-gradient-to-r`（r 是横长渐变，180deg 竖向渐变更立体）
 - ❌ 不要忘了 wrapper 用 absolute 居中（flex 居中在状态栏下不精确）
+
+---
+
+## 翻卡 (FlipCardTemplate) 设计方向
+
+### 气质与意象
+
+> 扑克牌魔术师用蓝色聚光灯把三张牌照得发亮：你点中其中一张，牌翻过来露出金灿灿的「恭喜获得 iPhone15」金色文字。深紫的暗夜舞台上，两束蓝紫色光晕从卡片角落渗出——神秘、寻宝、高端。
+
+锚点：**「魔术扑克 + 蓝紫光晕」**——区别于翻红包的"金红喜庆"、翻宝箱的"金红宝藏"。翻卡是"神秘魔术师"感，强调"翻牌"的悬念。
+
+### 视觉策略
+- **整体布局**：外层绝对居中（`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2`），避开 28px 状态栏视觉中心
+- **背景**：与翻红包/翻宝箱同款暗紫磨砂玻璃（`rgba(26,10,46,0.55)` + `blur(14px)` + 1px 18%白边 + 三层投影）
+- **节日光晕装饰**（灵魂，区别于其他）：左上角 120×120 蓝色光晕（`radial-gradient(circle, rgba(96,165,250,0.35) 0%, rgba(96,165,250,0) 70%)` + blur(8px)）+ 右下角 140×140 紫色光晕（`rgba(168,85,247,0.30)` + blur(10px)）
+- **关闭按钮**：毛玻璃（`rgba(255,255,255,0.18)` + `blur(8px)` + 30%白边）28×28
+- **引导文案 chip 蓝紫色**（区别于翻宝箱的红色）：`linear-gradient(135deg, rgba(59,130,246,0.85) 0%, rgba(124,58,237,0.85) 100%)` + 蓝色投影 + inset 白高光 + 25%白边
+- **卡牌图片**：w-[80px] + `drop-shadow(0 8px 16px rgba(59,130,246,0.35))` 蓝色软投影
+- **提示文字**：11px font-medium + tracking-wider + white/60（"点击卡牌翻出惊喜"）
+- **现金奖励**：rounded-2xl p-4 + 金色 135deg 渐变 + 蓝色阴影 + 0.5px 30%白边 + 30% 字号
+- **奖励图**：rounded-2xl + 8px 投影 + 0.5px 25%白边
+- **奖品文案**：17px font-bold + 金色渐变文字（`text-transparent bg-clip-text` + `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)`）
+- **特殊说明**：12px font-light + white/65 + px-2（避免贴边）
+- **领取按钮**：竖向红色渐变 + 红色投影 + inset 白高光 + 0.5px 20%白边 + 15px font-semibold + 0.05em letter-spacing
+
+### 配色方案
+| 元素 | 颜色 | 意象来源 |
+|------|------|---------|
+| 容器背景 | `linear-gradient(180deg, rgba(26,10,46,0.55) 0%, rgba(45,27,78,0.55) 100%)` | 暗紫磨砂玻璃 |
+| 容器模糊 | `blur(14px)` | 比卡片型磁贴 8px 更强 |
+| 容器边框 | `1px solid rgba(255,255,255,0.18)` | 深色背景配柔和白边 |
+| 蓝色光晕 | `radial-gradient(circle, rgba(96,165,250,0.35) 0%, rgba(96,165,250,0) 70%)` + blur(8px) | 蓝色聚光灯 |
+| 紫色光晕 | `radial-gradient(circle, rgba(168,85,247,0.30) 0%, rgba(168,85,247,0) 70%)` + blur(10px) | 紫色神秘感 |
+| 关闭按钮 | `rgba(255,255,255,0.18)` + blur(8px) + 30%白边 | 统一毛玻璃 |
+| 引导 chip | `linear-gradient(135deg, rgba(59,130,246,0.85) 0%, rgba(124,58,237,0.85) 100%)` | 蓝紫渐变魔术牌 |
+| 卡牌投影 | `drop-shadow(0 8px 16px rgba(59,130,246,0.35))` | 蓝光打牌 |
+| 现金奖励 | `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)` | 金砖 |
+| 奖品文案 | `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)` | 金色中奖文字 |
+| 领取按钮 | `linear-gradient(180deg, #FF6B6B 0%, #E0383B 100%)` | 红色召唤 |
+
+### 字体排版
+- 引导文案：13px font-semibold + tracking-wide
+- 提示文字：11px font-medium + tracking-wider
+- 现金「恭喜获得」：12px font-medium + tracking-wide
+- 现金 ¥ 金额：30px font-bold + tracking-tight + tabular-nums
+- 奖品文案：17px font-bold（金色）
+- 特殊说明：12px font-light
+- 领取按钮：15px font-semibold + letter-spacing 0.05em
+
+### 动效与交互
+- 保留卡牌翻转：0.6s ease-in-out，rotateY 0→90→0，scale 1→1.1→1
+- 保留手势抖动：0.3s scaleX 1→0→1 + rotateY 0→90→0
+- 保留入场动画：translateY full→0 + opacity 0→1（500ms）
+- 保留领奖场景 fadeIn：0.4s opacity 0→1 + scale 0.9→1
+
+### 设计禁忌
+- ❌ 不要用红色光晕（红色是翻红包/翻宝箱的"喜"色，翻卡是"神秘"）
+- ❌ 不要把背景改成 8% 白毛玻璃（这是其他亮色磁贴的"亮玻璃"，翻卡是"暗紫奢华"）
+- ❌ 不要去掉蓝色+紫色双光晕（这是翻卡区别于翻红包/翻宝箱的灵魂）
+- ❌ 不要用 `text-base` 14px 灰色作为奖品文案（17px font-bold 金色文字才有"中奖"感）
+- ❌ 不要把卡牌用 `shadow-lg`（硬投影会破坏卡的悬浮感，用蓝色 drop-shadow 软投影）
+- ❌ 不要忘了 `p-2 pt-3` → `p-2 pt-4`（给顶部光晕留出空间）
+- ❌ 不要忘了 wrapper 用 absolute 居中（flex 居中在状态栏下不精确）
+
+---
+
+## 翻宝箱 (TreasureboxTemplate) 设计方向
+
+### 气质与意象
+
+> 古墓丽影的金色宝藏仪式：深紫色的夜幕上，两个金色和红色的光晕从角落晕开，卡片中间是三个金光闪闪的宝箱，黄色投影让它们像悬浮在金色雾气中。打开宝箱后是金灿灿的「恭喜获得 Airpods」金色文字。
+
+锚点：**「古墓宝藏 + 金红光晕」**——区别于翻红包的"红包节日"、翻卡的"魔术神秘"。翻宝箱是"金红宝藏"感，强调"开启"的动作。
+
+### 视觉策略
+- **整体布局**：外层绝对居中（`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2`），避开 28px 状态栏视觉中心
+- **背景**：与翻红包/翻卡同款暗紫磨砂玻璃（`rgba(26,10,46,0.55)` + `blur(14px)` + 1px 18%白边 + 三层投影）
+- **节日光晕装饰**（灵魂）：左上角 120×120 **金色**光晕（`radial-gradient(circle, rgba(255,215,0,0.40) 0%, rgba(255,215,0,0) 70%)` + blur(8px)）+ 右下角 140×140 **红色**光晕（`rgba(255,75,87,0.32)` + blur(10px)）
+- **关闭按钮**：毛玻璃（与翻卡一致）28×28
+- **引导文案 chip 红色**（与翻红包一致，区别于翻卡的蓝紫）：`linear-gradient(135deg, rgba(255,75,87,0.85) 0%, rgba(220,38,38,0.85) 100%)` + 红色投影 + inset 白高光 + 25%白边
+- **宝箱图片**：w-[100px] + `drop-shadow(0 8px 16px rgba(255,215,0,0.35))` 金色软投影
+- **提示文字**：11px font-medium + tracking-wider + white/60
+- **现金奖励**：rounded-2xl p-5（金色渐变 + 阴影 + 高光）+ 4xl 字号（比翻卡 30px 大）
+- **奖励图**：rounded-2xl + 8px 投影 + 0.5px 25%白边
+- **奖品文案**：18px font-bold（比翻卡 17px 大）+ 金色渐变
+- **特殊说明**：12px font-light
+- **领取按钮**：竖向红色渐变（同翻卡一致）
+
+### 配色方案
+| 元素 | 颜色 | 意象来源 |
+|------|------|---------|
+| 容器背景 | `linear-gradient(180deg, rgba(26,10,46,0.55) 0%, rgba(45,27,78,0.55) 100%)` | 暗紫磨砂玻璃 |
+| 容器模糊 | `blur(14px)` | 比卡片型磁贴 8px 更强 |
+| 容器边框 | `1px solid rgba(255,255,255,0.18)` | 暗紫配柔和白边 |
+| **金色**光晕 | `radial-gradient(circle, rgba(255,215,0,0.40) 0%, rgba(255,215,0,0) 70%)` + blur(8px) | **金宝藏光** |
+| **红色**光晕 | `radial-gradient(circle, rgba(255,75,87,0.32) 0%, rgba(255,75,87,0) 70%)` + blur(10px) | **红包喜气** |
+| 关闭按钮 | `rgba(255,255,255,0.18)` + blur(8px) + 30%白边 | 统一毛玻璃 |
+| 引导 chip | `linear-gradient(135deg, rgba(255,75,87,0.85) 0%, rgba(220,38,38,0.85) 100%)` | 红色喜庆 chip |
+| 宝箱投影 | `drop-shadow(0 8px 16px rgba(255,215,0,0.35))` | **金光**打宝箱 |
+| 现金奖励 | `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)` | 金砖 |
+| 奖品文案 | `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)` | 金色中奖文字 |
+| 领取按钮 | `linear-gradient(180deg, #FF6B6B 0%, #E0383B 100%)` | 红色召唤 |
+
+### 字体排版
+- 引导文案：13px font-semibold + tracking-wide
+- 提示文字：11px font-medium + tracking-wider
+- 现金「恭喜获得」：12px font-medium + tracking-wide
+- 现金 ¥ 金额：36px font-bold（**比翻卡 30px 大**，因为宝箱图比卡牌图大）
+- 奖品文案：18px font-bold（**比翻卡 17px 大**）
+- 特殊说明：12px font-light
+- 领取按钮：15px font-semibold + letter-spacing 0.05em
+
+### 动效与交互
+- 保留宝箱抖动：animate-shake（左右摇动）
+- 保留宝箱翻转：0.6s rotateY 0→90→0
+- 保留入场动画 + fadeIn（同翻卡）
+
+### 设计禁忌
+- ❌ 不要用蓝色/紫色光晕（蓝紫是翻卡的"神秘"色，金红才是翻宝箱的"宝藏"色）
+- ❌ 不要把背景改成 8% 白毛玻璃
+- ❌ 不要去掉金色+红色双光晕（这是翻宝箱的灵魂）
+- ❌ 不要把 cash amount 字号保持 text-4xl（因为现金盒 p-5 更大，36px 已经够大）
+- ❌ 不要把奖品文案保持 `text-lg font-semibold` 白色（18px font-bold 金色文字才有"中奖"感）
+- ❌ 不要把 `p-6` 保持（卡片在毛玻璃里 p-4 pt-4 已经够紧凑）

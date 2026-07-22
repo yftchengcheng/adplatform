@@ -182,7 +182,7 @@ export function FlipCardTemplate({
     <div
       className={cn(
         previewMode
-          ? "w-full rounded-2xl overflow-hidden"
+          ? "absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-full px-4 flex items-center justify-center"
           : "fixed inset-0 z-50 bg-black/80 flex items-end justify-center"
       )}
       onClick={() => !previewMode && onClose?.()}
@@ -191,32 +191,82 @@ export function FlipCardTemplate({
       <div
         className={cn(
           previewMode
-            ? "relative w-full rounded-2xl overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]"
-            : "relative w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden mb-4 bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]",
+            ? "relative w-full rounded-3xl overflow-hidden"
+            : "relative w-full max-w-sm rounded-3xl overflow-hidden mb-4",
           "transition-all duration-500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}
+        style={{
+          background: "linear-gradient(180deg, rgba(26, 10, 46, 0.55) 0%, rgba(45, 27, 78, 0.55) 100%)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          border: "1px solid rgba(255, 255, 255, 0.18)",
+          boxShadow:
+            "0 16px 40px rgba(15, 5, 30, 0.45), 0 2px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 节日光晕装饰 - 蓝色+紫色（神秘寻宝感） */}
+        <div
+          aria-hidden
+          className="absolute pointer-events-none"
+          style={{
+            top: "-12px",
+            left: "-12px",
+            width: "120px",
+            height: "120px",
+            background: "radial-gradient(circle, rgba(96, 165, 250, 0.35) 0%, rgba(96, 165, 250, 0) 70%)",
+            filter: "blur(8px)",
+            zIndex: 0,
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute pointer-events-none"
+          style={{
+            bottom: "-12px",
+            right: "-12px",
+            width: "140px",
+            height: "140px",
+            background: "radial-gradient(circle, rgba(168, 85, 247, 0.30) 0%, rgba(168, 85, 247, 0) 70%)",
+            filter: "blur(10px)",
+            zIndex: 0,
+          }}
+        />
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+          aria-label="关闭"
+          className="absolute top-2 right-2 z-20 w-7 h-7 flex items-center justify-center rounded-full transition-all hover:opacity-80"
+          style={{
+            background: "rgba(255, 255, 255, 0.18)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "0.5px solid rgba(255, 255, 255, 0.30)",
+          }}
         >
-          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         {/* Content */}
-        <div className="p-2 pt-3 flex flex-col items-center relative">
+        <div className="p-2 pt-4 flex flex-col items-center relative z-10">
           {!showReward ? (
             /* 翻卡场景 */
             <>
               {/* 引导文案 */}
-              <div className="mt-2 mb-2 text-center">
-                <div className="bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                  <p className="text-white text-sm font-semibold animate-pulse">
+              <div className="mt-3 mb-3 text-center">
+                <div
+                  className="rounded-full px-4 py-1.5"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(124, 58, 237, 0.85) 100%)",
+                    boxShadow: "0 4px 12px rgba(59, 130, 246, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.30)",
+                    border: "0.5px solid rgba(255, 255, 255, 0.25)",
+                  }}
+                >
+                  <p className="text-white text-[13px] font-semibold tracking-wide animate-pulse">
                     {resolveGuideText()}
                   </p>
                 </div>
@@ -233,6 +283,9 @@ export function FlipCardTemplate({
                       "hover:scale-105 active:scale-95"
                     )}
                     onClick={handleCardClick}
+                    style={{
+                      filter: "drop-shadow(0 8px 16px rgba(59, 130, 246, 0.35))",
+                    }}
                   >
                     {/* 手势提示 */}
                     {gestureIndex === index && (
@@ -259,6 +312,11 @@ export function FlipCardTemplate({
                 ))}
               </div>
 
+              {/* 提示文字 */}
+              <p className="mt-3 text-white/60 text-[11px] font-medium tracking-wider text-center">
+                点击卡牌翻出惊喜
+              </p>
+
             </>
           ) : (
             /* 领奖场景 */
@@ -267,15 +325,32 @@ export function FlipCardTemplate({
               <div className="mb-3 text-center">
                 {finalConfig.rewardType === "cash" ? (
                   /* 现金奖励 */
-                  <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-4 shadow-lg">
-                    <p className="text-white/80 text-sm mb-1">恭喜获得</p>
-                    <p className="text-white text-3xl font-bold">
+                  <div
+                    className="rounded-2xl p-4"
+                    style={{
+                      background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                      boxShadow:
+                        "0 8px 24px rgba(255, 165, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(180, 100, 0, 0.30)",
+                      border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                    }}
+                  >
+                    <p className="text-white/85 text-[12px] font-medium tracking-wide mb-0.5">恭喜获得</p>
+                    <p
+                      className="text-white text-3xl font-bold tracking-tight"
+                      style={{ fontVariantNumeric: "tabular-nums", textShadow: "0 2px 4px rgba(180, 100, 0, 0.30)" }}
+                    >
                       ¥{resolveCashAmount()}
                     </p>
                   </div>
                 ) : (
                   /* 自定义图片奖励 */
-                  <div className="rounded-xl overflow-hidden shadow-lg">
+                  <div
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.30), 0 2px 6px rgba(0, 0, 0, 0.12)",
+                      border: "0.5px solid rgba(255, 255, 255, 0.25)",
+                    }}
+                  >
                     {resolveRewardImage() ? (
                       <img
                         src={resolveRewardImage()}
@@ -283,8 +358,8 @@ export function FlipCardTemplate({
                         className="w-[280px] h-auto object-contain"
                       />
                     ) : (
-                      <div className="w-[280px] h-[150px] bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400">奖励图片</span>
+                      <div className="w-[280px] h-[150px] bg-white/10 flex items-center justify-center">
+                        <span className="text-white/50">奖励图片</span>
                       </div>
                     )}
                   </div>
@@ -292,19 +367,31 @@ export function FlipCardTemplate({
               </div>
 
               {/* 奖品文案 */}
-              <p className="text-white text-base font-semibold mb-2">
+              <p
+                className="text-[17px] font-bold mb-1.5 text-transparent bg-clip-text"
+                style={{
+                  backgroundImage: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                }}
+              >
                 {resolveRewardText()}
               </p>
 
               {/* 特殊说明 */}
-              <p className="text-white/70 text-sm mb-6">
+              <p className="text-white/65 text-[12px] font-light mb-4 text-center px-2">
                 {resolveSpecialNote()}
               </p>
 
               {/* 领取按钮 */}
               <button
                 onClick={handleClaim}
-                className="w-full py-3 px-6 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white text-base font-semibold rounded-xl hover:from-[#FF5252] hover:to-[#FF3D3D] transition-all active:scale-95 shadow-lg"
+                className="w-full py-2.5 px-6 text-white text-[15px] font-semibold rounded-2xl active:scale-95 transition-all"
+                style={{
+                  background: "linear-gradient(180deg, #FF6B6B 0%, #E0383B 100%)",
+                  boxShadow:
+                    "0 6px 16px rgba(255, 75, 87, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 -2px 0 rgba(180, 30, 30, 0.30)",
+                  border: "0.5px solid rgba(255, 255, 255, 0.20)",
+                  letterSpacing: "0.05em",
+                }}
               >
                 立即领取
               </button>
