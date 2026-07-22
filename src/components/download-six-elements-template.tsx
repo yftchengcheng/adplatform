@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Check, Download, Package, X } from "lucide-react";
+import {
+  Download,
+  Package,
+  X,
+  ShieldCheck,
+  KeyRound,
+  Sparkles,
+  Building2,
+  Globe,
+  Info,
+} from "lucide-react";
 
 /**
  * DownloadSixElementsTemplate - 应用商店下载六要素（Banner 风格）
@@ -17,11 +27,12 @@ import { Check, Download, Package, X } from "lucide-react";
  * 附加：产品 LOGO（可选，无 URL 时显示占位图标）、下载按钮、适合年龄、备案信息
  *
  * 设计原则：
- *  - 紧凑 banner（高度 ~120px），不占满手机屏
- *  - 横向布局：LOGO + 名称 + 评分 + 下载按钮
+ *  - 贴边 Smart App Banner（核心 1 行 ~56px，6 要素收纳在 ⓘ 折叠面板）
+ *  - 默认不展开时总体高度 60-80px，远小于屏幕高度，不遮挡广告主体
+ *  - 横向布局：LOGO + 名称 + 年龄 + 详情按钮 + 下载按钮
  *  - 有/无 LOGO 自适应（无 LOGO 时显示 Package 占位图标，保持布局稳定）
  *  - 背景透明，内层毛玻璃白底
- *  - 6 要素全部展示，功能列表压缩为 1 行
+ *  - 6 要素点击 ⓘ 才展开，不影响主视觉
  */
 
 export interface DownloadSixElementsFeature {
@@ -103,6 +114,7 @@ export function DownloadSixElementsTemplate({
   } = config;
 
   const [pressed, setPressed] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   // 解析宏变量
   const resolve = (text: string): string => {
@@ -124,6 +136,7 @@ export function DownloadSixElementsTemplate({
   }, [downloadUrl, previewMode]);
 
   const hasLogo = Boolean(logoUrl && logoUrl.trim());
+  const hasFeatures = features && features.length > 0;
 
   return (
     <div className="w-full max-w-[420px] mx-auto">
@@ -131,7 +144,7 @@ export function DownloadSixElementsTemplate({
       {previewMode && onClose && (
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+          className="absolute top-2 right-2 z-30 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
           aria-label="关闭预览"
         >
@@ -139,13 +152,13 @@ export function DownloadSixElementsTemplate({
         </button>
       )}
 
-      {/* 主体 banner */}
-      <div data-d6e-root className="bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-lg overflow-hidden">
-        {/* 顶部行: LOGO + 名称 + 下载按钮（核心信息 56px） */}
-        <div data-d6e-top-row className="flex items-center gap-3 p-3">
-          {/* LOGO - 有/无 LOGO 自适应 */}
+      {/* Smart App Banner 主体 - 总高 ~76px */}
+      <div data-d6e-root className="relative bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200/60 shadow-lg overflow-hidden">
+        {/* 单行主条: LOGO + 名称 + 副标 + 年龄 + 详情按钮 + 下载 */}
+        <div data-d6e-top-row className="flex items-center gap-2.5 p-2.5">
+          {/* LOGO - 有/无 LOGO 自适应（容器固定 44x44） */}
           <div
-            className="flex-shrink-0 w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center"
+            className="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center"
             style={{
               backgroundColor: hasLogo ? "transparent" : `${primaryColor}1A`,
             }}
@@ -168,12 +181,12 @@ export function DownloadSixElementsTemplate({
           {/* 名称 + 副标 */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-sm font-semibold text-gray-900 truncate">
+              <h2 className="text-[13px] font-semibold text-gray-900 truncate">
                 {resolve(appName)}
               </h2>
               {ageRating && (
                 <span
-                  className="px-1 h-4 inline-flex items-center rounded text-[10px] font-semibold text-white flex-shrink-0"
+                  className="px-1 h-[15px] inline-flex items-center rounded text-[9px] font-semibold text-white flex-shrink-0"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {ageRating}
@@ -181,9 +194,22 @@ export function DownloadSixElementsTemplate({
               )}
             </div>
             <p className="text-[10px] text-gray-500 truncate mt-0.5">
-              {developer} · 官方正版
+              {resolve(developer) || "—"}
+              {version ? ` · v${resolve(version)}` : ""}
             </p>
           </div>
+
+          {/* ⓘ 详情按钮（点击展开 6 要素面板） */}
+          <button
+            type="button"
+            onClick={() => setDetailOpen((v) => !v)}
+            className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            aria-label="查看下载六要素"
+            aria-expanded={detailOpen}
+            data-d6e-toggle
+          >
+            <Info className="w-3.5 h-3.5" />
+          </button>
 
           {/* 下载按钮 */}
           <button
@@ -192,10 +218,10 @@ export function DownloadSixElementsTemplate({
             onMouseDown={() => setPressed(true)}
             onMouseUp={() => setPressed(false)}
             onMouseLeave={() => setPressed(false)}
-            className="flex-shrink-0 h-8 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1 transition-transform"
+            className="flex-shrink-0 h-7 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1 transition-transform"
             style={{
               background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
-              boxShadow: `0 2px 8px ${primaryColor}40`,
+              boxShadow: `0 2px 6px ${primaryColor}40`,
               transform: pressed ? "scale(0.96)" : "scale(1)",
             }}
           >
@@ -204,80 +230,118 @@ export function DownloadSixElementsTemplate({
           </button>
         </div>
 
-        {/* 产品功能列表 - 紧凑横排（每行 1 行，截断到 4 条） */}
-        {features.length > 0 && (
-          <div className="px-3 pb-2 flex items-center gap-x-3 gap-y-1 flex-wrap border-t border-gray-100/60 pt-1.5">
-            {features.slice(0, 4).map((f, i) => {
-              const hasUrl = Boolean(f.url && f.url.trim());
-              const Inner = (
-                <span className="flex items-center gap-0.5">
-                  <Check className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
-                  <span className="truncate">{resolve(f.text)}</span>
-                </span>
-              );
-              if (hasUrl && !previewMode) {
-                return (
-                  <a
-                    key={i}
-                    href={f.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    {Inner}
-                  </a>
-                );
-              }
-              return (
-                <span
-                  key={i}
-                  className="text-[10px] text-gray-600"
-                >
-                  {Inner}
-                </span>
-              );
-            })}
-          </div>
-        )}
+        {/* 6 要素详情面板 - 默认折叠，展开后高度自适应 */}
+        {detailOpen && (
+          <div
+            data-d6e-detail
+            className="border-t border-gray-100 bg-gray-50/60 px-3 py-2.5 space-y-1.5"
+          >
+            {/* 产品功能 - 链接 chip 列表 */}
+            {hasFeatures && (
+              <div className="flex items-start gap-1.5">
+                <Sparkles
+                  className="w-3 h-3 mt-0.5 flex-shrink-0"
+                  style={{ color: primaryColor }}
+                />
+                <div className="flex flex-wrap gap-x-2 gap-y-1 flex-1 min-w-0">
+                  {features.slice(0, 4).map((f, i) => {
+                    const hasUrl = Boolean(f.url && f.url.trim());
+                    const text = (
+                      <span className="inline-flex items-center gap-0.5">
+                        <span className="truncate max-w-[160px]">
+                          {resolve(f.text)}
+                        </span>
+                      </span>
+                    );
+                    if (hasUrl && !previewMode) {
+                      return (
+                        <a
+                          key={i}
+                          href={f.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-gray-600 hover:text-gray-900 hover:underline"
+                        >
+                          {text}
+                        </a>
+                      );
+                    }
+                    return (
+                      <span
+                        key={i}
+                        className="text-[10px] text-gray-600"
+                      >
+                        {text}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-        {/* 底部分割 */}
-        <div className="px-3 py-1.5 border-t border-gray-100/60 flex items-center justify-between text-[10px]">
-          <span className="text-gray-500 truncate">v{version}</span>
-          <div className="flex items-center gap-1.5 text-gray-500 flex-shrink-0 ml-2">
-            <a
-              href={privacyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-900 transition-colors"
-            >
-              隐私协议
-            </a>
-            <span className="text-gray-300">|</span>
-            <a
-              href={permissionsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-900 transition-colors"
-            >
-              权限列表
-            </a>
-            {icpRecord && icpRecord.trim() && (
-              <>
-                <span className="text-gray-300">|</span>
+            {/* 隐私协议 / 权限列表 / 备案 - 单行链接条 */}
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[10px] text-gray-500">
+              {privacyUrl && (
                 <a
-                  href={icpRecord}
+                  href={privacyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-700 transition-colors truncate max-w-[120px]"
-                  title={icpRecord}
+                  className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors"
                 >
-                  备案
+                  <ShieldCheck className="w-2.5 h-2.5" />
+                  隐私协议
                 </a>
-              </>
-            )}
+              )}
+              {permissionsUrl && (
+                <>
+                  <span className="text-gray-300">|</span>
+                  <a
+                    href={permissionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors"
+                  >
+                    <KeyRound className="w-2.5 h-2.5" />
+                    权限列表
+                  </a>
+                </>
+              )}
+              {icpRecord && icpRecord.trim() && (
+                <>
+                  <span className="text-gray-300">|</span>
+                  <a
+                    href={icpRecord}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 text-gray-400 hover:text-gray-700 transition-colors truncate max-w-[140px]"
+                    title={icpRecord}
+                  >
+                    <Building2 className="w-2.5 h-2.5" />
+                    备案
+                  </a>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* preview 模式下提示水印 - 6 要素在小卡片里以平铺 chip 形式展示（不点开也能看到） */}
+      {previewMode && !detailOpen && hasFeatures && (
+        <div
+          data-d6e-feature-strip
+          className="mt-1.5 px-3 py-1 flex items-center gap-1.5 text-[10px] text-gray-500 overflow-hidden"
+        >
+          <Globe className="w-2.5 h-2.5 flex-shrink-0" />
+          <span className="truncate">
+            {features
+              .slice(0, 3)
+              .map((f) => resolve(f.text))
+              .filter(Boolean)
+              .join(" · ")}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

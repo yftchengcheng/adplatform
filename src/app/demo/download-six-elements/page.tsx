@@ -81,7 +81,7 @@ export default function DownloadSixElementsDemoPage() {
             style={{
               background:
                 "linear-gradient(135deg, #FFE9D6 0%, #FFD1B0 40%, #FFB890 100%)",
-              minHeight: 560,
+              minHeight: 280,
             }}
           >
             <DownloadSixElementsTemplate
