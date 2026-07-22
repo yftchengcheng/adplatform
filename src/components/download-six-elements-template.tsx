@@ -1,58 +1,68 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Check, Download, Shield } from "lucide-react";
+import { Check, Download, Package, X } from "lucide-react";
 
 /**
- * DownloadSixElementsTemplate - 应用商店下载六要素
+ * DownloadSixElementsTemplate - 应用商店下载六要素（Banner 风格）
  *
- * 仿应用商店下载落地页结构，包含：
+ * 仿应用商店详情页底部下载条，包含：
  *  1. 应用名称
  *  2. 开发者公司名称
  *  3. 应用版本
  *  4. 隐私协议超链
  *  5. 权限列表超链
- *  6. 产品功能（多条）
+ *  6. 产品功能（每条 = text + url）
  *
- * 附加：产品 LOGO + 主下载按钮 + 适合年龄 + 备案信息
- * 背景：透明（与落地页背景融合）
+ * 附加：产品 LOGO（可选，无 URL 时显示占位图标）、下载按钮、适合年龄、备案信息
+ *
+ * 设计原则：
+ *  - 紧凑 banner（高度 ~120px），不占满手机屏
+ *  - 横向布局：LOGO + 名称 + 评分 + 下载按钮
+ *  - 有/无 LOGO 自适应（无 LOGO 时显示 Package 占位图标，保持布局稳定）
+ *  - 背景透明，内层毛玻璃白底
+ *  - 6 要素全部展示，功能列表压缩为 1 行
  */
 
-export interface DownloadSixElementsConfig {
-  appName: string;              // 应用名称
-  developer: string;            // 开发者公司名称
-  version: string;              // 应用版本
-  privacyUrl: string;           // 隐私协议超链
-  permissionsUrl: string;       // 权限列表超链
-  features: Array<{ text: string; url: string }>;  // 产品功能（多条，每条 = 文案 + 链接）
-  logoUrl?: string;             // 产品 LOGO（可缺省；为空时不渲染 LOGO 块）
-  downloadUrl?: string;         // 下载按钮跳转链接
-  downloadText?: string;        // 下载按钮文案（默认"立即下载"）
-  primaryColor?: string;        // 主色（默认绿色 #00C06A，模拟应用商店 CTA）
-  ageRating?: string;           // 适合年龄（如 "3+"/"8+"/"12+"/"16+"/"18+"），默认 "4+"
-  icpRecord?: string;           // 备案链接（填的就是 URL，渲染为可点击外链；留空不展示）
+export interface DownloadSixElementsFeature {
+  text: string;
+  url?: string;
 }
 
-export interface DownloadSixElementsTemplateProps {
-  config: DownloadSixElementsConfig;
-  previewMode?: boolean;
-  isOpen?: boolean;
-  onClose?: () => void;
+export interface DownloadSixElementsConfig {
+  // 6 要素
+  appName: string;            // 1. 应用名称
+  developer: string;          // 2. 开发者公司名称
+  version: string;            // 3. 应用版本
+  privacyUrl: string;         // 4. 隐私协议超链
+  permissionsUrl: string;     // 5. 权限列表超链
+  features: DownloadSixElementsFeature[];  // 6. 产品功能
+
+  // 附加
+  logoUrl?: string;           // 产品 LOGO（可选）
+  downloadUrl?: string;       // 下载链接
+  downloadText?: string;      // 下载按钮文案
+  primaryColor?: string;      // 主色（默认 #00C06A）
+  ageRating?: string;         // 适合年龄（3+ / 4+ / 8+ / 12+ / 16+ / 18+）
+  icpRecord?: string;         // 备案信息（URL）
+
+  // 系统
+  macroVariables?: Record<string, string>;
 }
 
 export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
   appName: "智行火车票",
-  developer: "北京智行科技有限公司",
-  version: "8.6.2",
+  developer: "北京铁路信息技术中心",
+  version: "1.0.0",
   privacyUrl: "https://example.com/privacy",
   permissionsUrl: "https://example.com/permissions",
   features: [
-    { text: "智能抢票，多车次实时监控", url: "https://example.com/feature/ticket" },
-    { text: "极速出票，告别排队", url: "https://example.com/feature/quick" },
-    { text: "在线选座，座位随心选", url: "https://example.com/feature/seat" },
-    { text: "24小时客服，全程贴心", url: "https://example.com/feature/service" },
+    { text: "全国高铁、动车票务查询", url: "https://example.com/feature/ticket" },
+    { text: "30 天内改签退票", url: "https://example.com/feature/refund" },
+    { text: "多证件购票支持", url: "https://example.com/feature/id" },
+    { text: "学生票资质核验", url: "https://example.com/feature/student" },
   ],
-  logoUrl: undefined,
+  logoUrl: "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=200&h=200&fit=crop",
   downloadUrl: "https://example.com/download",
   downloadText: "立即下载",
   primaryColor: "#00C06A",
@@ -60,286 +70,214 @@ export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
   icpRecord: "https://beian.miit.gov.cn/",
 };
 
+interface DownloadSixElementsTemplateProps {
+  config?: Partial<DownloadSixElementsConfig>;
+  previewMode?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
 export function DownloadSixElementsTemplate({
-  config,
+  config: rawConfig,
   previewMode = false,
-  isOpen = true,
   onClose,
 }: DownloadSixElementsTemplateProps) {
-  const [showAdLabel, setShowAdLabel] = useState(true);
-
-  const handleDownload = useCallback(() => {
-    if (config.downloadUrl) {
-      window.open(config.downloadUrl, "_blank", "noopener,noreferrer");
-    }
-  }, [config.downloadUrl]);
-
-  const handlePrivacy = useCallback(
-    (e: React.MouseEvent) => {
-      if (previewMode) {
-        e.preventDefault();
-        return;
-      }
-      if (config.privacyUrl) {
-        window.open(config.privacyUrl, "_blank", "noopener,noreferrer");
-      }
-    },
-    [config.privacyUrl, previewMode]
-  );
-
-  const handlePermissions = useCallback(
-    (e: React.MouseEvent) => {
-      if (previewMode) {
-        e.preventDefault();
-        return;
-      }
-      if (config.permissionsUrl) {
-        window.open(config.permissionsUrl, "_blank", "noopener,noreferrer");
-      }
-    },
-    [config.permissionsUrl, previewMode]
-  );
-
-  if (!isOpen) return null;
+  const config: DownloadSixElementsConfig = {
+    ...defaultDownloadSixElementsConfig,
+    ...rawConfig,
+  };
 
   const {
     appName,
     developer,
     version,
+    privacyUrl,
+    permissionsUrl,
     features,
     logoUrl,
+    downloadUrl,
     downloadText = "立即下载",
     primaryColor = "#00C06A",
-    ageRating = "4+",
+    ageRating,
     icpRecord,
   } = config;
 
+  const [pressed, setPressed] = useState(false);
+
+  // 解析宏变量
+  const resolve = (text: string): string => {
+    if (!text || !config.macroVariables) return text;
+    let r = text;
+    Object.entries(config.macroVariables).forEach(([k, v]) => {
+      r = r.replace(new RegExp(`\\$\\{${k}\\}`, "g"), v);
+      r = r.replace(new RegExp(`$${k}`, "g"), v);
+    });
+    return r;
+  };
+
+  const handleDownload = useCallback(() => {
+    if (previewMode) return;
+    const url = resolve(downloadUrl || "");
+    if (url) {
+      try { window.open(url, "_blank"); } catch {}
+    }
+  }, [downloadUrl, previewMode]);
+
+  const hasLogo = Boolean(logoUrl && logoUrl.trim());
+
   return (
-    <div
-      className="relative w-full max-w-[420px] mx-auto"
-      style={{ backgroundColor: "transparent" }}
-    >
-      {/* 关闭按钮（预览模式/全屏模式显示） */}
-      {(previewMode || onClose) && (
+    <div className="w-full max-w-[420px] mx-auto">
+      {/* 关闭按钮 - 仅 preview 模式 */}
+      {previewMode && onClose && (
         <button
           onClick={onClose}
-          className="absolute -top-2 -right-2 z-30 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/80 text-white transition-colors"
-          aria-label="关闭"
+          className="absolute top-2 right-2 z-20 w-6 h-6 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+          aria-label="关闭预览"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <X className="w-3 h-3 text-white" />
         </button>
       )}
 
-      {/* 顶部 LOGO + 应用名称 */}
-      <div className="flex items-center gap-3 px-4 pt-3 pb-2.5">
-        {/* LOGO 容器：非必填，无 URL 时不渲染 */}
-        {logoUrl && (
+      {/* 主体 banner */}
+      <div data-d6e-root className="bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-lg overflow-hidden">
+        {/* 顶部行: LOGO + 名称 + 下载按钮（核心信息 56px） */}
+        <div data-d6e-top-row className="flex items-center gap-3 p-3">
+          {/* LOGO - 有/无 LOGO 自适应 */}
           <div
-            className="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden"
+            className="flex-shrink-0 w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center"
             style={{
-              border: "1px solid rgba(0,0,0,0.05)",
+              backgroundColor: hasLogo ? "transparent" : `${primaryColor}1A`,
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={logoUrl}
-              alt={`${appName} logo`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-
-        {/* 应用名称 + 年龄 + 副标识 */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-gray-900 truncate">
-              {appName || "应用名称"}
-            </h2>
-            {/* 适合年龄 chip */}
-            {ageRating && (
-              <span
-                className="flex-shrink-0 px-1.5 h-4 inline-flex items-center justify-center rounded text-[10px] font-semibold text-white"
-                style={{ backgroundColor: primaryColor }}
-              >
-                {ageRating}
-              </span>
+            {hasLogo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={appName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <Package className="w-5 h-5" style={{ color: primaryColor }} />
             )}
           </div>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-gray-500">应用下载</span>
-            <span className="w-1 h-1 rounded-full bg-gray-300" />
-            <span className="text-xs text-gray-500">官方正版</span>
-          </div>
-        </div>
-      </div>
 
-      {/* 分割线 */}
-      <div className="h-px bg-gray-100 mx-4" />
-
-      {/* 产品功能列表（六要素 #6） */}
-      <div className="px-4 py-2 space-y-1.5">
-        {features && features.length > 0 ? (
-          features.slice(0, 6).map((feature, idx) => {
-            // 兼容旧 string 格式
-            const text = typeof feature === "string" ? feature : feature.text;
-            const url = typeof feature === "string" ? "" : feature.url;
-            const inner = (
-              <>
-                <div
-                  className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5"
-                  style={{ backgroundColor: `${primaryColor}1A` }}
+          {/* 名称 + 副标 */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-sm font-semibold text-gray-900 truncate">
+                {resolve(appName)}
+              </h2>
+              {ageRating && (
+                <span
+                  className="px-1 h-4 inline-flex items-center rounded text-[10px] font-semibold text-white flex-shrink-0"
+                  style={{ backgroundColor: primaryColor }}
                 >
-                  <Check
-                    className="w-2.5 h-2.5"
-                    style={{ color: primaryColor }}
-                    strokeWidth={3}
-                  />
-                </div>
-                <span className="text-sm text-gray-700 leading-relaxed flex-1">
-                  {text}
+                  {ageRating}
                 </span>
-              </>
-            );
-            return url ? (
-              <a
-                key={idx}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-start gap-2.5 hover:opacity-80 transition-opacity"
-              >
-                {inner}
-              </a>
-            ) : (
-              <div key={idx} className="flex items-start gap-2.5">
-                {inner}
-              </div>
-            );
-          })
-        ) : (
-          <p className="text-sm text-gray-400">暂无功能介绍</p>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-500 truncate mt-0.5">
+              {developer} · 官方正版
+            </p>
+          </div>
+
+          {/* 下载按钮 */}
+          <button
+            type="button"
+            onClick={handleDownload}
+            onMouseDown={() => setPressed(true)}
+            onMouseUp={() => setPressed(false)}
+            onMouseLeave={() => setPressed(false)}
+            className="flex-shrink-0 h-8 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1 transition-transform"
+            style={{
+              background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
+              boxShadow: `0 2px 8px ${primaryColor}40`,
+              transform: pressed ? "scale(0.96)" : "scale(1)",
+            }}
+          >
+            <Download className="w-3 h-3" />
+            {downloadText}
+          </button>
+        </div>
+
+        {/* 产品功能列表 - 紧凑横排（每行 1 行，截断到 4 条） */}
+        {features.length > 0 && (
+          <div className="px-3 pb-2 flex items-center gap-x-3 gap-y-1 flex-wrap border-t border-gray-100/60 pt-1.5">
+            {features.slice(0, 4).map((f, i) => {
+              const hasUrl = Boolean(f.url && f.url.trim());
+              const Inner = (
+                <span className="flex items-center gap-0.5">
+                  <Check className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
+                  <span className="truncate">{resolve(f.text)}</span>
+                </span>
+              );
+              if (hasUrl && !previewMode) {
+                return (
+                  <a
+                    key={i}
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    {Inner}
+                  </a>
+                );
+              }
+              return (
+                <span
+                  key={i}
+                  className="text-[10px] text-gray-600"
+                >
+                  {Inner}
+                </span>
+              );
+            })}
+          </div>
         )}
-      </div>
 
-      {/* 分割线 */}
-      <div className="h-px bg-gray-100 mx-4" />
-
-      {/* 下载按钮 */}
-      <div className="px-4 pt-3 pb-2.5">
-        <button
-          onClick={handleDownload}
-          disabled={!config.downloadUrl && !previewMode}
-          className="w-full h-12 rounded-xl text-white text-base font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
-          style={{
-            background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}E6 100%)`,
-            boxShadow: `0 4px 12px ${primaryColor}40, inset 0 1px 0 rgba(255,255,255,0.2)`,
-          }}
-        >
-          <Download className="w-4 h-4" strokeWidth={2.5} />
-          {downloadText}
-        </button>
-
-        {/* 安全提示（贴近应用商店规范） */}
-        <div className="flex items-center justify-center gap-1.5 mt-1.5">
-          <Shield className="w-3 h-3 text-gray-400" />
-          <span className="text-xs text-gray-400">
-            已通过安全检测 · 无病毒 · 无广告
-          </span>
-        </div>
-      </div>
-
-      {/* 底部开发者信息 + 超链（六要素 #1-5） */}
-      <div className="px-4 pb-3 pt-2 border-t border-gray-100">
-        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mb-2">
-          <span className="truncate max-w-[180px]">{developer || "开发者公司"}</span>
-          <span className="w-1 h-1 rounded-full bg-gray-300" />
-          <span className="text-gray-400">v{version || "1.0.0"}</span>
-        </div>
-        <div className="flex items-center justify-center gap-4 text-xs">
-          <button
-            onClick={handlePrivacy}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            隐私协议
-          </button>
-          <span className="w-px h-3 bg-gray-200" />
-          <button
-            onClick={handlePermissions}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            权限列表
-          </button>
-        </div>
-        {/* 备案信息（最底部） */}
-        {icpRecord && (
-          <div className="mt-1.5 text-center">
+        {/* 底部分割 */}
+        <div className="px-3 py-1.5 border-t border-gray-100/60 flex items-center justify-between text-[10px]">
+          <span className="text-gray-500 truncate">v{version}</span>
+          <div className="flex items-center gap-1.5 text-gray-500 flex-shrink-0 ml-2">
             <a
-              href={icpRecord}
+              href={privacyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => previewMode && e.preventDefault()}
-              className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors"
+              className="hover:text-gray-900 transition-colors"
             >
-              {icpRecord}
+              隐私协议
             </a>
-          </div>
-        )}
-      </div>
-
-      {/* 广告标识（点击收起/展开） - 仿应用商店顶栏 */}
-      {showAdLabel && !previewMode && (
-        <div className="absolute -top-9 left-0 right-0 flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <span
-              className="px-1.5 py-0.5 rounded text-[10px] font-medium text-white"
-              style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+            <span className="text-gray-300">|</span>
+            <a
+              href={permissionsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-900 transition-colors"
             >
-              广告
-            </span>
-            <span className="text-[10px] text-gray-600">|</span>
-            <button className="text-[10px] text-gray-600 hover:text-gray-800">
-              反馈
-            </button>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-gray-600">
-              28<span className="ml-0.5">秒后可领奖励</span>
-            </span>
-            <button
-              onClick={() => setShowAdLabel(false)}
-              className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-black/5"
-              aria-label="关闭广告标识"
-            >
-              <svg
-                className="w-2.5 h-2.5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+              权限列表
+            </a>
+            {icpRecord && icpRecord.trim() && (
+              <>
+                <span className="text-gray-300">|</span>
+                <a
+                  href={icpRecord}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-gray-700 transition-colors truncate max-w-[120px]"
+                  title={icpRecord}
+                >
+                  备案
+                </a>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
