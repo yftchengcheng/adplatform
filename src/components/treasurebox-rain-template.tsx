@@ -142,18 +142,21 @@ export function TreasureboxRainTemplate({
     return finalConfig.rewardImageUrl || "";
   }, [finalConfig.rewardImageMacro, finalConfig.rewardImageUrl, finalConfig.macroVariables]);
 
-  // 生成飘落宝箱
+  // 生成飘落宝箱 - 三条固定线 + 容器外淡入/淡出
   const generateFallingTreasureboxes = useCallback(() => {
     const treasureboxes: FallingTreasurebox[] = [];
-    const positions = [15, 50, 85]; // 三条垂直轨迹位置
+    const FALL_LINES = [15, 50, 85];
+    const getStartX = () =>
+      FALL_LINES[Math.floor(Math.random() * FALL_LINES.length)] +
+      (Math.random() - 0.5) * 6;
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 10; i++) {
       treasureboxes.push({
         id: `tb-${Date.now()}-${i}`,
-        x: positions[i % 3],
-        delay: Math.random() * 3000,
-        duration: 3000 + Math.random() * 1000,
-        scale: 0.8 + Math.random() * 0.4,
+        x: getStartX(),
+        delay: Math.random() * 2000,
+        duration: 3500 + Math.random() * 1000,
+        scale: 0.85 + Math.random() * 0.15,
       });
     }
     return treasureboxes;
@@ -169,17 +172,20 @@ export function TreasureboxRainTemplate({
       // 定期添加新的宝箱
       const interval = setInterval(() => {
         setFallingTreasureboxes((prev) => {
-          const positions = [15, 50, 85];
+          const FALL_LINES = [15, 50, 85];
+          const startX =
+            FALL_LINES[Math.floor(Math.random() * FALL_LINES.length)] +
+            (Math.random() - 0.5) * 6;
           const newTreasurebox: FallingTreasurebox = {
             id: `tb-${Date.now()}-${Math.random()}`,
-            x: positions[Math.floor(Math.random() * 3)],
+            x: startX,
             delay: 0,
-            duration: 3000 + Math.random() * 1000,
-            scale: 0.8 + Math.random() * 0.4,
+            duration: 3500 + Math.random() * 1000,
+            scale: 0.85 + Math.random() * 0.15,
           };
-          return [...prev.slice(-10), newTreasurebox]; // 保持最多10个
+          return [...prev.slice(-7), newTreasurebox]; // 保持最多7个，节奏更舒缓
         });
-      }, 500);
+      }, 700);
 
       return () => clearInterval(interval);
     }
@@ -236,16 +242,16 @@ export function TreasureboxRainTemplate({
               {/* Falling Treasureboxes - 流水式持续飘落 */}
               <style jsx>{`
                 @keyframes fallTreasureboxWater {
-                  0% {
-                    top: -60px;
-                    opacity: 1;
-                    transform: scale(0.8) rotate(0deg);
-                  }
-                  100% {
-                    top: 100%;
-                    opacity: 1;
-                    transform: scale(1) rotate(360deg);
-                  }
+                  /* 0% 宝箱在容器外更远，opacity 0 */
+                  0%   { top: -90px; opacity: 0; transform: scale(var(--tb-scale, 1)) translateX(0px) rotate(0deg); }
+                  /* 6% 仍容器外（-50px），opacity 已 1，避免顶部闪烁 */
+                  6%   { top: -50px; opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(3px) rotate(8deg); }
+                  25%  { top: 22%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(-3px) rotate(-8deg); }
+                  50%  { top: 50%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(3px) rotate(8deg); }
+                  75%  { top: 78%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(-3px) rotate(-8deg); }
+                  92%  { top: 96%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(2px) rotate(5deg); }
+                  /* 100% 容器外 10%，opacity 0，平滑消失 */
+                  100% { top: 110%;  opacity: 0; transform: scale(var(--tb-scale, 1)) translateX(0px) rotate(0deg); }
                 }
               `}</style>
 
@@ -259,7 +265,9 @@ export function TreasureboxRainTemplate({
                     top: 0,
                     animation: `fallTreasureboxWater ${tb.duration}ms linear infinite`,
                     animationDelay: `${tb.delay}ms`,
-                    transform: `scale(${tb.scale})`,
+                    ['--tb-scale' as React.CSSProperties['--tb-scale']]: tb.scale,
+                    willChange: 'top, opacity, transform',
+                    backfaceVisibility: 'hidden',
                     zIndex: 10,
                   }}
                 >
@@ -362,16 +370,13 @@ export function TreasureboxRainTemplate({
           {/* Falling Treasureboxes - 流水式持续飘落 */}
           <style jsx>{`
             @keyframes fallTreasureboxWaterPreview {
-              0% {
-                top: -60px;
-                opacity: 1;
-                transform: scale(0.8) rotate(0deg);
-              }
-              100% {
-                top: 100%;
-                opacity: 1;
-                transform: scale(1) rotate(360deg);
-              }
+              0%   { top: -90px; opacity: 0; transform: scale(var(--tb-scale, 1)) translateX(0px) rotate(0deg); }
+              6%   { top: -50px; opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(2px) rotate(8deg); }
+              25%  { top: 22%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(-2px) rotate(-8deg); }
+              50%  { top: 50%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(2px) rotate(8deg); }
+              75%  { top: 78%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(-2px) rotate(-8deg); }
+              92%  { top: 96%;   opacity: 1; transform: scale(var(--tb-scale, 1)) translateX(1px) rotate(5deg); }
+              100% { top: 110%;  opacity: 0; transform: scale(var(--tb-scale, 1)) translateX(0px) rotate(0deg); }
             }
           `}</style>
 
@@ -385,7 +390,9 @@ export function TreasureboxRainTemplate({
                 top: 0,
                 animation: `fallTreasureboxWaterPreview ${tb.duration}ms linear infinite`,
                 animationDelay: `${tb.delay}ms`,
-                transform: `scale(${tb.scale * 0.8})`,
+                ['--tb-scale' as React.CSSProperties['--tb-scale']]: tb.scale * 0.8,
+                willChange: 'top, opacity, transform',
+                backfaceVisibility: 'hidden',
                 zIndex: 10,
               }}
             >

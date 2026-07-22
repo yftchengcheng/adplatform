@@ -775,3 +775,89 @@ v2 修复了"8% 时红包在容器外（-30px）突然 opacity 1"的问题，但
 - ❌ 不要在 keyframes 中间加 opacity 0.5（半透明状态，红包在容器内闪烁）
 - ❌ 不要忽略 0%/3%/98%/100% 这四个关键点（它们是"容器外"的 4 个边界）
 - ❌ 不要让容器无 overflow: hidden（红包会从顶飘到容器外继续飘，看起来很怪）
+
+---
+
+## 宝箱雨 (TreasureboxRainTemplate) 飘落动画优化
+
+### 与红包雨的区别
+- **节奏更舒缓**：3-4s 飘落、700ms 补一个、最多 7 个并发（红包雨是 2-3s + 420ms + 12 个）
+- **旋转幅度小**：±8 度（红包雨 ±15 度），宝箱感更稳重
+- **三段式摇摆**：translateX(±3px)，左右各一次摇摆
+- **背景更深紫**：`from-[#1a0a2e] to-[#2d1b4e]`
+
+### 根因（参考红包雨 v1-v3）
+1. **`0% { top: -60px; opacity: 1; transform: scale(0.8) rotate(0deg); }`** — 容器外就 opacity 1，突然出现
+2. **`transform: scale(0.8) → scale(1) rotate(360deg)`** — 入场缩放 + 旋转一圈，叠加 scale 渐变与 opacity 突变
+3. **inline `transform: scale(${tb.scale})` 与 keyframes transform 冲突** — inline 永远不生效，keyframes 旋转 360 度太剧烈
+
+### 优化方案（v1 应用：去 scale + 摇摆 + 容器外淡入）
+
+#### 1. 去除 scale 渐变
+```css
+0%   { transform: scale(var(--tb-scale, 1)) translateX(0) rotate(0deg); }
+100% { transform: scale(var(--tb-scale, 1)) translateX(0) rotate(0deg); }
+```
+- 用 CSS 变量 `--tb-scale` 保留每个宝箱的"大小差异感"
+- scale 不再渐变，避免入场缩放
+
+#### 2. translateX 摇摆代替 rotate 360
+```css
+0%   { transform: scale(var(--tb-scale, 1)) translateX(0px) rotate(0deg); }
+6%   { transform: scale(var(--tb-scale, 1)) translateX(3px) rotate(8deg); }
+25%  { transform: scale(var(--tb-scale, 1)) translateX(-3px) rotate(-8deg); }
+50%  { transform: scale(var(--tb-scale, 1)) translateX(3px) rotate(8deg); }
+75%  { transform: scale(var(--tb-scale, 1)) translateX(-3px) rotate(-8deg); }
+92%  { transform: scale(var(--tb-scale, 1)) translateX(2px) rotate(5deg); }
+```
+- 旋转只 ±8 度（更稳重，不是"打转"）
+- 左右各 1 次摇摆（25% / 50% 翻转方向）
+- 旋转 0 → 8 → -8 → 8 → -8 → 5 → 0 形成"自然摇摆"轨迹
+
+#### 3. 容器外淡入/淡出（参考红包雨 v3 思路）
+```css
+0%   { top: -90px; opacity: 0; ... }     /* 容器外 90px，opacity 0 */
+6%   { top: -50px; opacity: 1; ... }     /* 仍容器外 50px，opacity 已 1 */
+25%  { top: 22%;   opacity: 1; ... }
+50%  { top: 50%;   opacity: 1; ... }
+75%  { top: 78%;   opacity: 1; ... }
+92%  { top: 96%;   opacity: 1; ... }
+100% { top: 110%;  opacity: 0; ... }     /* 容器外 10%，opacity 0 */
+```
+- 渐入发生在 -90px → -50px（容器外），用户视觉路径上 0% → 6% 永远不可见
+- 渐出发生在 96% → 110%（容器外 10%），用户看不到"消失瞬间"
+
+#### 4. 三条飘落线 + 微随机
+```typescript
+const FALL_LINES = [15, 50, 85];
+const startX = FALL_LINES[Math.floor(Math.random() * FALL_LINES.length)] + (Math.random() - 0.5) * 6;
+```
+- 三条固定线 ±3% 微随机，避免"机械化"对齐感
+- 12 个宝箱分布：每条线 4 个左右
+
+#### 5. 密度与节奏优化
+| 参数 | 优化前 | 优化后 | 效果 |
+|---|---|---|---|
+| 初始数量 | 15 | 10 | 入场不再"倾盆" |
+| 并发上限 | 10 | 7 | 节奏更舒缓 |
+| 补一个间隔 | 500ms | 700ms | 宝箱"陆续飘落" |
+| 飘落时长 | 3-4s | 3.5-4.5s | 缓慢下坠 |
+
+#### 6. GPU 加速
+```typescript
+style={{
+  ...
+  willChange: 'top, opacity, transform',
+  backfaceVisibility: 'hidden',
+}}
+```
+- 三个高频变化属性（top / opacity / transform）都开启 GPU 合成
+- 隐藏背面避免半透明下露底
+
+### 设计禁忌
+- ❌ 不要用 `transform: scale(0.8) → scale(1)` 让宝箱入场放大（视觉上像"小→大"）
+- ❌ 不要 `rotate(360deg)` 全圈旋转（视觉上像"打转"，不像"飘落"）
+- ❌ 不要 inline `transform: scale(...)` 与 keyframes transform 冲突（会一个不生效）
+- ❌ 不要让 `0% opacity: 1` + `top: -60px`（容器外就突然出现，顶部闪烁）
+- ❌ 不要随机散点（startX 用 15/50/85 三条固定线 + 微随机）
+- ❌ 不要超过 8 个并发（太多看起来像"雨帘"而非"雨滴"）
