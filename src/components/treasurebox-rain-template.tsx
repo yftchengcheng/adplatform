@@ -229,11 +229,61 @@ export function TreasureboxRainTemplate({
         <div className="flex-1 flex flex-col">
           {/* Rain Scene */}
           {!isClaimed ? (
-            <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]">
+            <div
+              ref={containerRef}
+              className="flex-1 relative overflow-hidden"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(26, 10, 46, 0.55) 0%, rgba(45, 27, 78, 0.55) 100%)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                border: "1px solid rgba(255, 255, 255, 0.18)",
+                boxShadow:
+                  "0 16px 40px rgba(15, 5, 30, 0.45), 0 2px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
+              }}
+            >
+              {/* 节日光晕装饰 - 金色+红色（宝箱宝藏感） */}
+              <div
+                aria-hidden
+                className="absolute pointer-events-none"
+                style={{
+                  top: "-40px",
+                  left: "-40px",
+                  width: "240px",
+                  height: "240px",
+                  background:
+                    "radial-gradient(circle, rgba(255, 215, 0, 0.30) 0%, rgba(255, 215, 0, 0) 70%)",
+                  filter: "blur(20px)",
+                  zIndex: 0,
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute pointer-events-none"
+                style={{
+                  bottom: "-40px",
+                  right: "-40px",
+                  width: "260px",
+                  height: "260px",
+                  background:
+                    "radial-gradient(circle, rgba(255, 75, 87, 0.25) 0%, rgba(255, 75, 87, 0) 70%)",
+                  filter: "blur(22px)",
+                  zIndex: 0,
+                }}
+              />
+
               {/* Guide Text */}
               <div className="absolute top-8 left-0 right-0 z-10">
                 <div className="relative flex flex-col items-center">
-                  <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 whitespace-nowrap">
+                  <div
+                    className="relative rounded-full px-4 py-2 whitespace-nowrap"
+                    style={{
+                      background: "rgba(255, 215, 0, 0.18)",
+                      backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)",
+                      border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                    }}
+                  >
                     <p className="text-white text-sm font-semibold text-center drop-shadow-lg animate-pulse">
                       {resolveGuideText()}
                     </p>
@@ -295,12 +345,61 @@ export function TreasureboxRainTemplate({
             </div>
           ) : (
             /* Reward Scene */
-            <div className="relative flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-6">
-              <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
+            <div
+              className="relative flex-1 flex flex-col items-center justify-center p-6"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255, 245, 230, 0.55) 0%, rgba(255, 228, 204, 0.55) 100%)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                border: "1px solid rgba(255, 200, 130, 0.30)",
+                boxShadow:
+                  "0 16px 40px rgba(180, 100, 0, 0.30), 0 2px 8px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.40)",
+              }}
+            >
+              {/* 暖色光晕 - 橙+金（领奖喜庆感） */}
+              <div
+                aria-hidden
+                className="absolute pointer-events-none"
+                style={{
+                  top: "-40px",
+                  right: "-40px",
+                  width: "240px",
+                  height: "240px",
+                  background:
+                    "radial-gradient(circle, rgba(255, 165, 0, 0.30) 0%, rgba(255, 165, 0, 0) 70%)",
+                  filter: "blur(22px)",
+                  zIndex: 0,
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute pointer-events-none"
+                style={{
+                  bottom: "-40px",
+                  left: "-40px",
+                  width: "220px",
+                  height: "220px",
+                  background:
+                    "radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, rgba(255, 215, 0, 0) 70%)",
+                  filter: "blur(20px)",
+                  zIndex: 0,
+                }}
+              />
+
+              <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn relative z-10">
                 {/* 奖励展示 */}
                 <div className="mb-6 text-center">
                   {finalConfig.rewardType === "cash" ? (
-                    <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-6 shadow-lg">
+                    <div
+                      className="rounded-2xl p-6"
+                      style={{
+                        background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                        boxShadow:
+                          "0 8px 24px rgba(255, 165, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(180, 100, 0, 0.30)",
+                        border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                      }}
+                    >
                       <p className="text-white/80 text-sm mb-1">恭喜获得</p>
                       <p className="text-white text-4xl font-bold">¥{resolveCashAmount()}</p>
                     </div>
@@ -312,7 +411,15 @@ export function TreasureboxRainTemplate({
                       draggable={false}
                     />
                   ) : (
-                    <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-2xl p-6 shadow-lg">
+                    <div
+                      className="rounded-2xl p-6"
+                      style={{
+                        background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                        boxShadow:
+                          "0 8px 24px rgba(255, 165, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(180, 100, 0, 0.30)",
+                        border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                      }}
+                    >
                       <p className="text-white/80 text-sm mb-1">恭喜获得</p>
                       <p className="text-white text-4xl font-bold">神秘奖品</p>
                     </div>
@@ -328,7 +435,13 @@ export function TreasureboxRainTemplate({
                 {/* 领取按钮 */}
                 <button
                   onClick={handleClaim}
-                  className="w-full py-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                  className="w-full py-3 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                  style={{
+                    background: "linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%)",
+                    boxShadow:
+                      "0 6px 16px rgba(255, 75, 87, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 -2px 0 rgba(180, 30, 30, 0.30)",
+                    border: "0.5px solid rgba(255, 255, 255, 0.20)",
+                  }}
                 >
                   立即领取
                 </button>
@@ -356,11 +469,57 @@ export function TreasureboxRainTemplate({
 
       {/* Rain Scene */}
       {!isClaimed ? (
-        <div ref={containerRef} className="relative overflow-hidden bg-gradient-to-b from-[#1a0a2e] to-[#2d1b4e]" style={{ height: "300px" }}>
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden"
+          style={{ height: "300px",
+            background: "linear-gradient(180deg, rgba(26, 10, 46, 0.55) 0%, rgba(45, 27, 78, 0.55) 100%)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+            boxShadow: "0 16px 40px rgba(15, 5, 30, 0.45), 0 2px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
+          }}
+        >
+          {/* 节日光晕装饰 - 金+红（宝箱宝藏感） */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              top: "-30px",
+              left: "-30px",
+              width: "180px",
+              height: "180px",
+              background: "radial-gradient(circle, rgba(255, 215, 0, 0.30) 0%, rgba(255, 215, 0, 0) 70%)",
+              filter: "blur(16px)",
+              zIndex: 0,
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              bottom: "-30px",
+              right: "-30px",
+              width: "200px",
+              height: "200px",
+              background: "radial-gradient(circle, rgba(255, 75, 87, 0.25) 0%, rgba(255, 75, 87, 0) 70%)",
+              filter: "blur(18px)",
+              zIndex: 0,
+            }}
+          />
+
           {/* Guide Text */}
           <div className="absolute top-2 left-0 right-0 z-10">
             <div className="relative flex flex-col items-center">
-              <div className="relative bg-gradient-to-r from-black/40 via-black/30 to-black/40 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white/20 whitespace-nowrap">
+              <div
+                className="relative rounded-full px-3 py-1.5 whitespace-nowrap"
+                style={{
+                  background: "rgba(255, 215, 0, 0.18)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                }}
+              >
                 <p className="text-white text-xs font-semibold text-center drop-shadow-lg animate-pulse">
                   {resolveGuideText()}
                 </p>
@@ -419,12 +578,58 @@ export function TreasureboxRainTemplate({
         </div>
       ) : (
         /* Reward Scene */
-        <div className="relative bg-gradient-to-b from-[#FFF5E6] to-[#FFE4CC] p-4" style={{ height: "300px" }}>
-          <div className="w-full h-full flex flex-col items-center justify-center">
+        <div
+          className="relative p-4"
+          style={{
+            height: "300px",
+            background: "linear-gradient(180deg, rgba(255, 245, 230, 0.55) 0%, rgba(255, 228, 204, 0.55) 100%)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            border: "1px solid rgba(255, 200, 130, 0.30)",
+            boxShadow: "0 16px 40px rgba(180, 100, 0, 0.30), 0 2px 8px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.40)",
+          }}
+        >
+          {/* 暖色光晕 - 橙+金（领奖喜庆感） */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              top: "-30px",
+              right: "-30px",
+              width: "180px",
+              height: "180px",
+              background: "radial-gradient(circle, rgba(255, 165, 0, 0.30) 0%, rgba(255, 165, 0, 0) 70%)",
+              filter: "blur(18px)",
+              zIndex: 0,
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              bottom: "-30px",
+              left: "-30px",
+              width: "160px",
+              height: "160px",
+              background: "radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, rgba(255, 215, 0, 0) 70%)",
+              filter: "blur(16px)",
+              zIndex: 0,
+            }}
+          />
+
+          <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
             {/* 奖励展示 */}
             <div className="mb-4 text-center">
               {finalConfig.rewardType === "cash" ? (
-                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-4 shadow-lg">
+                <div
+                  className="rounded-xl p-4"
+                  style={{
+                    background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                    boxShadow:
+                      "0 8px 24px rgba(255, 165, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(180, 100, 0, 0.30)",
+                    border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                  }}
+                >
                   <p className="text-white/80 text-xs mb-1">恭喜获得</p>
                   <p className="text-white text-2xl font-bold">¥{resolveCashAmount()}</p>
                 </div>
@@ -436,7 +641,15 @@ export function TreasureboxRainTemplate({
                   draggable={false}
                 />
               ) : (
-                <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-xl p-4 shadow-lg">
+                <div
+                  className="rounded-xl p-4"
+                  style={{
+                    background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                    boxShadow:
+                      "0 8px 24px rgba(255, 165, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(180, 100, 0, 0.30)",
+                    border: "0.5px solid rgba(255, 255, 255, 0.30)",
+                  }}
+                >
                   <p className="text-white/80 text-xs mb-1">恭喜获得</p>
                   <p className="text-white text-2xl font-bold">神秘奖品</p>
                 </div>
@@ -452,7 +665,13 @@ export function TreasureboxRainTemplate({
             {/* 领取按钮 */}
             <button
               onClick={handleClaim}
-              className="w-full py-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF4757] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="w-full py-2 text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+              style={{
+                background: "linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%)",
+                boxShadow:
+                  "0 6px 16px rgba(255, 75, 87, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 -2px 0 rgba(180, 30, 30, 0.30)",
+                border: "0.5px solid rgba(255, 255, 255, 0.20)",
+              }}
             >
               立即领取
             </button>

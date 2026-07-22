@@ -944,3 +944,120 @@ for (let i = 0; i < 18; i++) {
 - ❌ 不要省略 `animation-fill-mode: backwards`（delay 期间元素保持 inline 状态）
 - ❌ 不要让初始 delay 全是 `Math.random() * 2000`（多个 delay 接近 0 → 开局涌入）
 - ❌ 不要并发上限 < 6（视觉上太稀疏不像"雨"）
+
+---
+
+## 宝箱雨毛玻璃化（v3 容器风格）
+
+### 用户需求
+"宝箱雨的组件背景毛玻璃样式"
+
+### 设计语言
+宝箱雨主题 = 宝藏 + 节日（金+红调），与"翻宝箱"同色系但需要**适应雨场景**（飘落 + 领奖两个场景）。
+
+### 飘落场景（暗紫磨砂玻璃）
+```tsx
+<div
+  className="flex-1 relative overflow-hidden"
+  style={{
+    background: "linear-gradient(180deg, rgba(26, 10, 46, 0.55) 0%, rgba(45, 27, 78, 0.55) 100%)",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    boxShadow: "0 16px 40px rgba(15, 5, 30, 0.45), 0 2px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
+  }}
+>
+```
+
+#### 节日光晕（4 角装饰）
+```tsx
+{/* 左上 - 金色光晕（宝箱宝藏感） */}
+<div className="absolute pointer-events-none" style={{
+  top: "-30px", left: "-30px", width: "180px", height: "180px",
+  background: "radial-gradient(circle, rgba(255, 215, 0, 0.30) 0%, rgba(255, 215, 0, 0) 70%)",
+  filter: "blur(16px)", zIndex: 0,
+}} />
+{/* 右下 - 红色光晕 */}
+<div className="absolute pointer-events-none" style={{
+  bottom: "-30px", right: "-30px", width: "200px", height: "200px",
+  background: "radial-gradient(circle, rgba(255, 75, 87, 0.25) 0%, rgba(255, 75, 87, 0) 70%)",
+  filter: "blur(18px)", zIndex: 0,
+}} />
+```
+
+### 引导文案 chip（金色磨砂）
+```tsx
+<div className="rounded-full px-3 py-1.5" style={{
+  background: "rgba(255, 215, 0, 0.18)",
+  backdropFilter: "blur(8px)",
+  WebkitBackdropFilter: "blur(8px)",
+  border: "0.5px solid rgba(255, 255, 255, 0.30)",
+}}>
+```
+
+### 领奖场景（暖橙磨砂玻璃）
+```tsx
+<div
+  className="relative flex-1 flex flex-col items-center justify-center p-6"
+  style={{
+    background: "linear-gradient(180deg, rgba(255, 245, 230, 0.55) 0%, rgba(255, 228, 204, 0.55) 100%)",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
+    border: "1px solid rgba(255, 200, 130, 0.30)",
+    boxShadow: "0 16px 40px rgba(180, 100, 0, 0.30), 0 2px 8px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.40)",
+  }}
+>
+```
+
+#### 暖色光晕（橙+金 4 角）
+```tsx
+{/* 右上 - 橙色光晕（领奖喜庆感） */}
+<div className="absolute pointer-events-none" style={{
+  top: "-30px", right: "-30px", width: "180px", height: "180px",
+  background: "radial-gradient(circle, rgba(255, 165, 0, 0.30) 0%, rgba(255, 165, 0, 0) 70%)",
+  filter: "blur(18px)", zIndex: 0,
+}} />
+{/* 左下 - 金色光晕 */}
+<div className="absolute pointer-events-none" style={{
+  bottom: "-30px", left: "-30px", width: "160px", height: "160px",
+  background: "radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, rgba(255, 215, 0, 0) 70%)",
+  filter: "blur(16px)", zIndex: 0,
+}} />
+```
+
+### 奖励卡片（升级立体感）
+```tsx
+<div
+  className="rounded-2xl p-6"
+  style={{
+    background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+    boxShadow: "0 8px 24px rgba(255, 165, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(180, 100, 0, 0.30)",
+    border: "0.5px solid rgba(255, 255, 255, 0.30)",
+  }}
+>
+```
+
+### 领取按钮（升级立体感）
+```tsx
+<button
+  className="w-full py-3 text-white rounded-xl font-semibold"
+  style={{
+    background: "linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%)",
+    boxShadow: "0 6px 16px rgba(255, 75, 87, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 -2px 0 rgba(180, 30, 30, 0.30)",
+    border: "0.5px solid rgba(255, 255, 255, 0.20)",
+  }}
+>
+```
+
+### Playwright 验证（v3）
+| 容器 | bg | backdropFilter | 边框 | 尺寸 |
+|---|---|---|---|---|
+| 飘落场景 | `linear-gradient(rgba(26,10,46,0.55) → rgba(45,27,78,0.55))` | `blur(14px)` | `1px solid rgba(255,255,255,0.18)` | 264×300 ✅ |
+| 引导文案 chip | `rgba(255,215,0,0.18)` | `blur(8px)` | `1px solid rgba(255,255,255,0.30)` | 136×30 ✅ |
+
+### 设计禁忌（v3 新增）
+- ❌ 不要在飘落场景用纯深紫渐变（没有磨砂玻璃感，跟不上"翻系列"风格）
+- ❌ 不要在领奖场景用纯暖橙渐变（领奖也要磨砂）
+- ❌ 不要给光晕加 `pointer-events: auto`（光晕会拦截宝箱点击）
+- ❌ 不要给光晕加 `z-index > 0` 之外的值（光晕遮住飘落宝箱就看不到了）
+- ❌ 不要用 Tailwind `bg-gradient-to-b` 写背景渐变（要 inline style 配合 backdropFilter）
