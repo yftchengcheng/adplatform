@@ -208,7 +208,13 @@ export function GameGiftTemplate({
   })();
 
   return (
-    <div className={cn(previewMode ? "w-full flex items-center justify-center" : "")}>
+    <div
+      className={cn(
+        previewMode
+          ? "w-full absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 flex items-center justify-center"
+          : ""
+      )}
+    >
       {/* Backdrop */}
       <div
         className={cn(
@@ -220,34 +226,63 @@ export function GameGiftTemplate({
         )}
         onClick={!previewMode ? onClose : undefined}
       >
-        {/* Card */}
+        {/* Card - Glass */}
         <div
           className={cn(
-            "relative w-full max-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden",
+            "relative w-full max-w-[320px] overflow-hidden rounded-2xl",
             "transition-all duration-300",
             !previewMode && (isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0")
           )}
+          style={{
+            background: "rgba(255, 255, 255, 0.08)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.25)",
+            boxShadow:
+              "0 12px 32px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button */}
+          {/* Close Button - Glass */}
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-gray-500 z-10 transition-colors"
+            aria-label="关闭"
+            className="absolute top-2.5 right-2.5 w-6 h-6 flex items-center justify-center rounded-full z-10 transition-all hover:opacity-80"
+            style={{
+              background: "rgba(255, 255, 255, 0.4)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+              border: "0.5px solid rgba(255, 255, 255, 0.5)",
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.06)",
+            }}
           >
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3 text-gray-600" />
           </button>
 
           {/* Content */}
-          <div className="p-3 space-y-2">
-            {/* Component Name */}
-            <p className="text-xs text-gray-500">
+          <div className="p-3.5 space-y-2.5">
+            {/* Component Name - 顶部小标 */}
+            <p
+              className="text-[10px] uppercase font-medium pr-6"
+              style={{
+                color: "rgb(107, 114, 128)",
+                letterSpacing: "0.15em",
+              }}
+            >
               {resolveComponentName()}
             </p>
 
             {/* Left & Right Row */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center">
               {/* Left: Logo */}
-              <div className="flex-shrink-0 w-[67px] h-[67px] rounded bg-gray-100 overflow-hidden">
+              <div
+                className="flex-shrink-0 w-[56px] h-[56px] rounded-xl overflow-hidden flex items-center justify-center"
+                style={{
+                  background: "rgba(255, 255, 255, 0.45)",
+                  boxShadow:
+                    "inset 0 0 0 0.5px rgba(255, 255, 255, 0.4), 0 2px 6px rgba(0, 0, 0, 0.06)",
+                }}
+              >
                 {logoSrc ? (
                   <img
                     src={logoSrc}
@@ -258,42 +293,57 @@ export function GameGiftTemplate({
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                    Logo
-                  </div>
+                  <span className="text-gray-400 text-[10px]">Logo</span>
                 )}
               </div>
 
               {/* Right: Info */}
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
+              <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
                 {/* App Name */}
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-[15px] font-semibold text-gray-900 truncate leading-tight tracking-tight">
                   {resolveAppName()}
                 </p>
 
                 {/* App Description */}
-                <p className="text-xs text-gray-500 line-clamp-2">
+                <p className="text-xs text-gray-600 line-clamp-2 leading-snug">
                   {resolveAppDescription()}
                 </p>
 
                 {/* Package Name & Gift Code */}
-                <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                <div className="flex items-center gap-1.5 mt-0.5">
                   {resolveAppPackageName() && (
-                    <span className="truncate">{resolveAppPackageName()}</span>
+                    <span className="text-[10px] text-gray-500 truncate font-mono">
+                      {resolveAppPackageName()}
+                    </span>
                   )}
                   {resolveGiftCode() && (
-                    <span className="text-blue-500 truncate">码: {resolveGiftCode()}</span>
+                    <span
+                      className="text-[10px] font-medium text-blue-600 truncate px-1.5 py-0.5 rounded tabular-nums"
+                      style={{
+                        background: "rgba(59, 130, 246, 0.12)",
+                        border: "0.5px solid rgba(59, 130, 246, 0.28)",
+                      }}
+                    >
+                      码: {resolveGiftCode()}
+                    </span>
                   )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Bottom: Download Button */}
-          <div className="px-3 pb-3">
+          {/* Bottom: Download Button - 蓝渐变 CTA */}
+          <div className="px-3.5 pb-3.5">
             <button
               onClick={handleDownloadClick}
-              className="w-full h-7 bg-[#3087FF] text-white text-xs font-medium rounded flex items-center justify-center"
+              className="w-full h-9 text-white text-[13px] font-semibold rounded-lg flex items-center justify-center transition-all hover:opacity-95"
+              style={{
+                background: "linear-gradient(180deg, #3B97FF 0%, #2079F0 100%)",
+                boxShadow:
+                  "0 4px 12px rgba(48, 135, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.30)",
+                border: "0.5px solid rgba(255, 255, 255, 0.18)",
+                letterSpacing: "0.02em",
+              }}
             >
               立即下载
             </button>

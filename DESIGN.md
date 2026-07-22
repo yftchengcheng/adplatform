@@ -331,3 +331,53 @@ border-left: 1px dashed rgba(255, 255, 255, 0.4);
 - ❌ 不要让图标区直接放图（要加半透白底和 inset 边框）
 - ❌ 不要让卖点字号跟标题一样（卖点是辅助信息）
 - ❌ 不要做 4 段折线的"票券腰身"（推广卡片不是票券，推广卡片是悬浮气泡）
+
+---
+
+## 游戏礼包码 (GameGiftTemplate) 设计方向
+
+### 气质与意象
+
+> App Store 的编辑推荐卡：左上方一个精致的圆角 logo 嵌在半透白底里，旁边是加粗的游戏名（小号 15px），下面是浅灰的简短描述，最底部一条蓝色渐变的「立即下载」按钮横贯全宽。整个卡片像一块漂浮在 iPhone 主屏上的玻璃卡，手指一点就能下载。
+
+锚点：**「下载卡片」**——区别于推广卡片的"窄长气泡"、电商的"商品橱窗"、优惠券的"票券"。游戏礼包码是"轻巧的下载入口"，重点是「点一下就能下载」。
+
+### 视觉策略
+- **整体布局**：上方小标（componentName，10px uppercase + letter-spacing 0.15em）+ 中部左 logo 右信息 + 底部全宽 CTA
+- **左 logo**：56×56px（比推广卡 44 大，比原版 67 小），圆角 rounded-xl，半透白底 0.45 + inset 0.5px 40%白边 + 微阴影（"嵌在玻璃里的 app icon"）
+- **中部信息**：游戏名 15px font-semibold text-gray-900 + 描述 12px text-gray-600 + 包名 10px mono 灰色 + 礼包码 10px 蓝色 chip
+- **底部 CTA**：全宽蓝渐变按钮（`linear-gradient(180deg, #3B97FF 0%, #2079F0 100%)` + 蓝投影 0 4px 12px rgba(48,135,255,0.35) + inset 白高光 0 1px 0 rgba(255,255,255,0.30) + 0.5px 18%白边）
+
+### 配色方案
+| 元素 | 颜色 | 意象来源 |
+|------|------|---------|
+| 容器 | `rgba(255,255,255,0.08)` + blur(8px) + 1px 25%白边 | "漂浮在主屏上的玻璃卡" |
+| 容器阴影 | `0 12px 32px rgba(0,0,0,0.12)` + `0 1px 4px rgba(0,0,0,0.04)` + inset 白高光 | "被内容抬起来的感觉" |
+| 关闭按钮 | `rgba(255,255,255,0.4)` + blur(4px) + 0.5px 50%白边 | 跟其他磁贴统一 |
+| Logo 背景 | `rgba(255,255,255,0.45)` + inset 0.5px 40%白边 + 0 2px 6px 6%黑阴影 | "玻璃卡里的玻璃槽" |
+| 顶部小标 | `text-gray-500 text-[10px] uppercase tracking-[0.15em]` | 跟优惠券一致 |
+| 游戏名 | `text-gray-900 text-[15px] font-semibold tracking-tight` | 比推广 13 大，强调主标 |
+| 描述 | `text-gray-600 text-xs line-clamp-2` | 比推广 11 大，比电商 30 字符短 |
+| 包名 | `text-gray-500 text-[10px] font-mono` | monospace 跟代码感 |
+| 礼包码 chip | `text-blue-600 text-[10px] font-medium` + 12%蓝底 + 0.5px 28%蓝边 + tabular-nums | "像 App Store 兑换码" |
+| CTA | `linear-gradient(180deg, #3B97FF 0%, #2079F0 100%)` + 蓝投影 + inset 白高光 | "蓝色召唤按钮" |
+
+### 字体排版
+- 游戏名 15px（比推广 13px 大，因为是主标）
+- 描述 12px line-clamp-2（限制两行避免过高）
+- 包名 10px mono（包名是技术字段，monospace 强化技术感）
+- 礼包码 10px tabular-nums（数字等宽，「码: 112123131」对齐好看）
+- CTA 13px font-semibold + letter-spacing 0.02em（"立即下载"四字不挤）
+
+### 动效与交互
+- CTA 按钮 hover 透明度降低（已有 transition-all）
+- 关闭按钮 hover 透明度降低
+- 包名 + 礼包码同行显示，间距 1.5（gap-1.5）
+
+### 设计禁忌
+- ❌ 不要用 67px 的大 logo（会跟描述区比例失衡，56px 更精致）
+- ❌ 不要把游戏名做成 14px 灰色（15px font-semibold 黑色才是主标）
+- ❌ 不要把包名做成 sans-serif（包名是技术字段，mono 字体强化技术感）
+- ❌ 不要把礼包码做成纯文本蓝色（chip 样式有底色和边框，才像"兑换码"）
+- ❌ 不要把 CTA 做成纯色蓝（渐变 + 投影 + 高光才是精致感）
+- ❌ 不要把卡片做太高（紧凑 + CTA 是灵魂）
