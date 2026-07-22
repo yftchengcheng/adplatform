@@ -105,6 +105,8 @@ export default function ComponentCreatePage() {
       router.push("/components/config?type=popup_redpacket");
     } else if (template.id === "floating_window") {
       router.push("/components/config?type=floating_window");
+    } else if (template.id === "download_six_elements") {
+      router.push("/components/config?type=download_six_elements");
     } else {
       // 其他组件类型可以后续扩展
       alert(`您选择了 "${template.name}" 组件，配置页面开发中...`);
