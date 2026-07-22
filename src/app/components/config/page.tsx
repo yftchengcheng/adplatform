@@ -666,7 +666,7 @@ function ConfigContent() {
                 {/* Phone frame */}
                 <div className="relative z-10">
                   <div className="w-[280px] h-[520px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
-                    <div className={`w-full h-full ${isRedpacketRainComponent ? 'bg-transparent' : 'bg-white'} rounded-[2rem] overflow-hidden relative`}>
+                    <div className={`w-full h-full ${isRedpacketRainComponent ? 'bg-transparent' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} rounded-[2rem] overflow-hidden relative`}>
                       {/* Status bar */}
                       <div className="h-7 bg-white flex items-end justify-between px-5 pb-0.5">
                         <span className="text-[9px] font-medium text-gray-900">9:41</span>
