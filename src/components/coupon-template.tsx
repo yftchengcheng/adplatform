@@ -181,109 +181,176 @@ export function CouponTemplate({
         )}
         onClick={!previewMode ? onClose : undefined}
       >
-        {/* Coupon Card - 票券腰身 10% + 4:3 比例（匹配 demo-C2-c） */}
+        {/* Coupon Card - Glass container */}
         <div
           className={cn(
-            "relative w-full max-w-[400px] transition-all duration-300 flex flex-col",
+            "relative w-full max-w-[300px] overflow-hidden rounded-2xl transition-all duration-300",
             !previewMode && (isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0")
           )}
           style={{
-            // 4:3 比例（按用户要求）
-            aspectRatio: "4 / 3",
-            // 票券腰身：左右中央高度内凹 10%（按 demo-C2-c 实际 10.5%）
-            // 位置：上腰身 25%，下腰身 65%（更紧凑、更接近 demo）
-            clipPath:
-              "polygon(0% 0%, 100% 0%, 100% 41.5%, 95.5% 44.5%, 89.5% 47.5%, 95.5% 50.5%, 100% 53.5%, 100% 84%, 95.5% 87%, 89.5% 90%, 95.5% 93%, 100% 96%, 100% 100%, 0% 100%, 0% 96%, 4.5% 93%, 10.5% 90%, 4.5% 87%, 0% 84%, 0% 53.5%, 4.5% 50.5%, 10.5% 47.5%, 4.5% 44.5%, 0% 41.5%)",
-            background: "#E8E9ED",
-            border: "1px solid rgba(0, 0, 0, 0.06)",
+            background: "rgba(255, 255, 255, 0.08)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.25)",
             boxShadow:
-              "0 8px 24px rgba(249, 111, 12, 0.18), 0 2px 4px rgba(0, 0, 0, 0.04)",
+              "0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.05)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button - 小型圆形，半透白底（融入米白顶区） */}
+          {/* Close Button - Glass */}
           <button
             onClick={onClose}
             aria-label="关闭"
-            className="absolute top-2.5 right-2.5 w-5 h-5 flex items-center justify-center rounded-full z-20 transition-colors hover:bg-white/50"
+            className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full z-10 transition-colors"
             style={{
               background: "rgba(255, 255, 255, 0.4)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+              border: "1px solid rgba(255, 255, 255, 0.5)",
               color: "rgb(75, 85, 99)",
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.6)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.4)";
+            }}
           >
-            <X className="w-3 h-3" />
+            <X className="w-3.5 h-3.5" />
           </button>
 
-          {/* TOP 米白区 - 活动名称 + 有效期（电商券头部，固定高度匹配 4:3 比例） */}
-          <div className="relative h-[50px] px-4 pt-3 pb-2 flex items-start justify-between gap-2">
+          {/* Activity Title - 顶部小标 */}
+          <div className="px-5 pt-4 pb-2">
             <p
-              className="text-[11px] font-medium leading-tight flex-1"
+              className="text-[10px] uppercase font-medium"
               style={{
-                color: "rgb(75, 85, 99)",
+                color: "rgb(107, 114, 128)",
+                letterSpacing: "0.15em",
               }}
             >
               {resolveMacro(finalConfig.title) || "活动名称"}
             </p>
-            <span
-              className="text-[10px] text-gray-400 mt-0.5 whitespace-nowrap"
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {formatValidDate()}
-            </span>
           </div>
 
-          {/* 水平撕开虚线 - 在米白顶和橙红之间（按 demo 真实位置），横穿整个宽度，浅灰白色 */}
-          <div
-            className="h-[1px] w-full pointer-events-none"
-            style={{
-              borderTop: "1px dashed rgba(120, 120, 130, 0.55)",
-              background: "transparent",
-            }}
-            aria-hidden
-          />
+          {/* 弧形撕开线 - 上下两块被弧形撕开的票券视觉（取代原来的两个圆形凹口）*/}
+          <div className="relative h-3 mx-1 pointer-events-none" aria-hidden>
+            <svg
+              className="absolute inset-0 w-full h-full"
+              viewBox="0 0 100 12"
+              preserveAspectRatio="none"
+              style={{ overflow: "visible" }}
+            >
+              {/* 撕开线阴影 - 紧贴弧线下方，营造"撕开缝"立体感 */}
+              <path
+                d="M 0 0 Q 50 10 100 0"
+                stroke="rgba(0, 0, 0, 0.08)"
+                strokeWidth="1"
+                fill="none"
+              />
+              {/* 撕开线主虚线 - 浅灰虚线，模拟撕开的纸边 */}
+              <path
+                d="M 0 0.5 Q 50 11 100 0.5"
+                stroke="rgba(0, 0, 0, 0.18)"
+                strokeWidth="1"
+                strokeDasharray="2 2.5"
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
 
-          {/* 主体橙色区 - flex 布局（匹配 demo-C2-c 结构） */}
-          <div className="flex-1 flex flex-col relative" style={{ background: "#F96F0C" }}>
-            {/* 主体内容：30 + 满100立减 + 立即领取（grid 布局精确 y 位置） */}
-            <div className="flex-1 relative grid" style={{ gridTemplateColumns: "35% 65%", gridTemplateRows: "55% 45%" }}>
-              {/* 垂直虚线 - 30 区域和条件区域之间的分隔（贯穿整个主体高度） */}
+          {/* Main Content - 主体票券区 */}
+          <div className="px-4 pb-4">
+            <div className="relative flex items-stretch">
+              {/* 中央虚线 - 票券左右两半之间的撕开标记 */}
               <div
-                className="absolute top-3 bottom-3 z-10 pointer-events-none"
-                style={{ left: "35%", borderLeft: "1px dashed rgba(255, 255, 255, 0.5)" }}
+                className="absolute left-1/3 top-2 bottom-2 z-10 pointer-events-none"
+                style={{
+                  borderLeft: "1px dashed rgba(255, 255, 255, 0.55)",
+                }}
               />
 
-              {/* (1,1) Left 35% 顶部 - 30 数字（居中） */}
-              <div className="relative flex flex-col items-center justify-center py-2 px-2">
+              {/* Left Side - Discount Amount (1/3) */}
+              <div
+                className="w-1/3 relative py-4 px-2 flex flex-col items-center justify-center overflow-hidden"
+                style={{
+                  borderTopLeftRadius: "10px",
+                  borderBottomLeftRadius: "10px",
+                  background:
+                    "linear-gradient(135deg, #F87D79 0%, #E85D5A 100%)",
+                  boxShadow:
+                    "inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(232,93,90,0.25)",
+                }}
+              >
+                {/* 顶部 inset 高光 */}
+                <div
+                  className="absolute inset-x-0 top-0 h-1/2 pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%)",
+                    borderTopLeftRadius: "10px",
+                  }}
+                />
+                {/* 优惠信息：数字 vs 单位 */}
                 <DiscountInfoDisplay text={resolveMacro(finalConfig.discountInfo) || "优惠"} />
               </div>
 
-              {/* (1,2) Right 65% 顶部 - 满100立减条件（居中） */}
-              <div className="relative flex items-center justify-start px-4 py-2">
-                <span className="text-white text-[13px] font-medium leading-tight">
-                  {resolveMacro(finalConfig.discountCondition) || "优惠条件"}
-                </span>
-              </div>
-
-              {/* (2,1-2) 整行底部 - 米黄按钮（居中，跨越整宽） */}
-              <div className="col-span-2 relative flex items-center justify-center px-4 pb-1">
+              {/* Right Side - Info (2/3) */}
+              <div
+                className="w-2/3 relative px-4 py-3 flex flex-col justify-between overflow-hidden"
+                style={{
+                  borderTopRightRadius: "10px",
+                  borderBottomRightRadius: "10px",
+                  background:
+                    "linear-gradient(135deg, #F87D79 0%, #E85D5A 100%)",
+                  boxShadow:
+                    "inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(232,93,90,0.25)",
+                }}
+              >
+                {/* 顶部 inset 高光 */}
                 <div
-                  className="text-xs font-semibold px-4 py-1.5 rounded-full pointer-events-none"
+                  className="absolute inset-x-0 top-0 h-1/2 pointer-events-none"
                   style={{
-                    background: "#FDE6C6",
-                    color: "#E54001",
-                    boxShadow: "0 1px 3px rgba(229, 64, 1, 0.25)",
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%)",
+                    borderTopRightRadius: "10px",
                   }}
-                >
-                  {resolveButtonText()}
+                />
+
+                {/* Top: Button Text */}
+                <div>
+                  <span
+                    className="text-white text-base font-semibold whitespace-nowrap"
+                    style={{ letterSpacing: "0.02em" }}
+                  >
+                    {resolveButtonText()}
+                  </span>
+                </div>
+
+                {/* Middle: Discount Condition */}
+                <div>
+                  <span className="text-white/90 text-xs line-clamp-1">
+                    {resolveMacro(finalConfig.discountCondition) || "优惠条件"}
+                  </span>
+                </div>
+
+                {/* Bottom: Valid Date */}
+                <div>
+                  <span
+                    className="text-white/80 text-[10px] whitespace-nowrap truncate"
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                  >
+                    有效期: {formatValidDate()}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Click Area - 整张卡片可点击 */}
+          {/* Click Area */}
           <button
             onClick={handleButtonClick}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             aria-label="点击领取优惠券"
           />
         </div>
@@ -301,28 +368,18 @@ function DiscountInfoDisplay({ text }: { text: string }) {
     return (
       <div className="flex items-baseline gap-0.5">
         {unit !== "折" && (
-          <span
-            className="text-white font-semibold self-start"
-            style={{ fontSize: "20px", lineHeight: 1, marginTop: "6px" }}
-          >
-            ¥
-          </span>
+          <span className="text-white/90 text-xs font-medium">¥</span>
         )}
         <span
-          className="text-white font-bold leading-none"
+          className="text-white text-3xl font-bold leading-none"
           style={{
-            fontSize: "56px",
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.02em",
             fontVariantNumeric: "tabular-nums",
-            textShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
           }}
         >
           {num}
         </span>
-        <span
-          className="text-white font-semibold self-end"
-          style={{ fontSize: "18px", lineHeight: 1, marginBottom: "8px" }}
-        >
+        <span className="text-white/90 text-xs font-medium ml-0.5">
           {unit}
         </span>
       </div>
