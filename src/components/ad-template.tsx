@@ -207,17 +207,22 @@ export function AdTemplate({
       <div
         className={cn(
           previewMode
-            ? "w-[240px] bg-white rounded-r-2xl shadow-xl overflow-hidden"
-            : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] bg-white rounded-r-2xl shadow-2xl overflow-hidden",
+            ? "w-[240px] bg-white/80 backdrop-blur-xl rounded-r-2xl border border-white/50 shadow-xl overflow-hidden"
+            : "fixed left-0 top-1/2 -translate-y-1/2 z-50 w-[240px] bg-white/75 backdrop-blur-xl rounded-r-2xl border border-white/40 shadow-2xl shadow-black/10 overflow-hidden",
           "transition-all duration-300 flex flex-col",
-          isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
+          isOpen || previewMode
+            ? "translate-x-0 scale-100 opacity-100"
+            : "-translate-x-2 scale-95 opacity-0"
         )}
-        style={{ height: 160 }}
+        style={{
+          height: 160,
+          transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
       >
           {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md border border-white/50 hover:bg-white/80 transition-all duration-200 z-10"
               aria-label="关闭"
             >
               <X className="w-3 h-3 text-gray-500" />
