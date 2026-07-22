@@ -303,12 +303,12 @@ function ConfigContent() {
   // 初始化配置（编辑模式加载已有配置，新建模式使用默认配置）
   // 注意：不在 useState 初始化器中读取 sessionStorage，避免 SSR/客户端 hydration 不匹配
   const [config, setConfig] = useState<AllConfigTypes>(() => {
-    // 优先使用编辑组件的配置
+    const fallback = componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+    // 优先使用编辑组件的配置，但用 defaultConfig 兜底缺失字段（旧数据/旧版本 config 可能缺字段）
     if (editingComponent?.config) {
-      return editingComponent.config as unknown as AllConfigTypes;
+      return { ...fallback, ...editingComponent.config } as unknown as AllConfigTypes;
     }
-    // 使用默认配置（sessionStorage 在客户端 useEffect 中恢复）
-    return componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+    return fallback;
   });
 
   // 客户端挂载后从 sessionStorage 恢复配置
@@ -318,7 +318,9 @@ function ConfigContent() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved) as unknown as AllConfigTypes;
-          setConfig(parsed);
+          // 同样用 defaultConfig 兜底，避免旧 config 缺字段
+          const fallback = componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+          setConfig({ ...fallback, ...parsed } as unknown as AllConfigTypes);
         } catch {
           // ignore parse errors
         }
@@ -329,7 +331,8 @@ function ConfigContent() {
   // 当异步加载的 components 到位、editingComponent 由 null 变为有值时，同步 config
   React.useEffect(() => {
     if (editingComponent?.config) {
-      setConfig(editingComponent.config as unknown as AllConfigTypes);
+      const fallback = componentConfigMap[type]?.defaultConfig || defaultAdConfig;
+      setConfig({ ...fallback, ...editingComponent.config } as unknown as AllConfigTypes);
     }
   }, [editingComponent]);
 

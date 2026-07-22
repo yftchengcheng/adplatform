@@ -37,42 +37,45 @@ export function DownloadSixElementsTemplateConfigPanel({
     [config, onChange]
   );
 
+  // 防御性兜底：从 sessionStorage / Supabase 恢复的旧 config 可能缺少 features 字段
+  const features = config.features ?? [];
+
   const updateFeatureText = useCallback(
     (index: number, text: string) => {
-      const next = [...config.features];
+      const next = [...features];
       const current = next[index];
       next[index] = typeof current === "string"
         ? { text: current, url: "" }
         : { text, url: current.url };
       update("features", next);
     },
-    [config.features, update]
+    [features, update]
   );
 
   const updateFeatureUrl = useCallback(
     (index: number, url: string) => {
-      const next = [...config.features];
+      const next = [...features];
       const current = next[index];
       next[index] = typeof current === "string"
         ? { text: current, url }
         : { text: current.text, url };
       update("features", next);
     },
-    [config.features, update]
+    [features, update]
   );
 
   const addFeature = useCallback(() => {
-    update("features", [...config.features, { text: "", url: "" }]);
-  }, [config.features, update]);
+    update("features", [...features, { text: "", url: "" }]);
+  }, [features, update]);
 
   const removeFeature = useCallback(
     (index: number) => {
       update(
         "features",
-        config.features.filter((_, i) => i !== index)
+        features.filter((_, i) => i !== index)
       );
     },
-    [config.features, update]
+    [features, update]
   );
 
   return (
@@ -157,7 +160,7 @@ export function DownloadSixElementsTemplateConfigPanel({
           </Button>
         </div>
         <div className="space-y-2">
-          {config.features.map((feature, index) => {
+          {features.map((feature, index) => {
             const f = typeof feature === "string" ? { text: feature, url: "" } : feature;
             return (
               <div key={index} className="flex items-center gap-2">
