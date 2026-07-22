@@ -180,7 +180,16 @@ export function DownloadSixElementsTemplate({
   const closeWebView = useCallback(() => setWebView(null), []);
 
   const hasLogo = Boolean(logoUrl && logoUrl.trim());
-  const validFeatures = features.filter((u) => u && u.trim());
+  // 兼容旧数据 features: {text,url}[] / string[] / 缺失
+  const validFeatures: string[] = (Array.isArray(features) ? features : [])
+    .map((f: unknown) => {
+      if (typeof f === "string") return f;
+      if (f && typeof f === "object" && "url" in (f as Record<string, unknown>)) {
+        return String((f as { url: unknown }).url ?? "");
+      }
+      return "";
+    })
+    .filter((u) => u && u.trim());
 
   return (
     <>
