@@ -251,11 +251,11 @@ export function CouponTemplate({
             </svg>
           </div>
 
-          {/* 主体橙色区 - 电商橙 #FF6B35 平铺 */}
+          {/* 主体橙色区 - 电商橙 #F96F0C 平铺（匹配 demo-C2-c 实际色） */}
           <div className="relative">
             <div
               className="relative flex items-stretch"
-              style={{ background: "#FF6B35" }}
+              style={{ background: "#F96F0C" }}
             >
               {/* 垂直虚线 - 30 区域和条件区域之间的分隔 */}
               <div
@@ -279,9 +279,9 @@ export function CouponTemplate({
                 <div
                   className="text-xs font-semibold px-4 py-1.5 rounded-full pointer-events-none"
                   style={{
-                    background: "#FFF5E6",
-                    color: "#C73E1D",
-                    boxShadow: "0 1px 3px rgba(199, 62, 29, 0.25)",
+                    background: "#FDE6C6",
+                    color: "#E54001",
+                    boxShadow: "0 1px 3px rgba(229, 64, 1, 0.25)",
                   }}
                 >
                   {resolveButtonText()}
