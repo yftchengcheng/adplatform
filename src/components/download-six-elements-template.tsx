@@ -150,12 +150,36 @@ export function DownloadSixElementsTemplate({
   const [pressed, setPressed] = useState(false);
   // 内部浏览器视图状态
   const [webView, setWebView] = useState<{ url: string; title: string } | null>(null);
-  // iframe 加载失败（X-Frame-Options 拒绝）状态
+  // iframe 加载状态
   const [iframeError, setIframeError] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
 
   // 打开内部浏览器时重置错误
   useEffect(() => {
-    if (webView) setIframeError(false);
+    if (webView) {
+      setIframeError(false);
+      setIframeLoading(true);
+    }
+  }, [webView]);
+
+  // iframe 加载超时（5 秒）→ 强制显示 fallback
+  useEffect(() => {
+    if (!webView) return;
+    const t = setTimeout(() => {
+      setIframeLoading(false);
+      setIframeError(true);
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [webView]);
+
+  // ESC 键关闭 webview
+  useEffect(() => {
+    if (!webView) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setWebView(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [webView]);
 
   // 解析宏变量
@@ -382,6 +406,21 @@ export function DownloadSixElementsTemplate({
 
           {/* iframe 主体（flex-1 占满剩余空间） */}
           <div className="flex-1 relative bg-gray-50">
+            {/* 加载中（5 秒超时）→ 强制显示 fallback */}
+            {iframeLoading && !iframeError && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-gray-50">
+                <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-3" />
+                <p className="text-sm text-gray-500">正在加载 {webView.title}...</p>
+                <button
+                  type="button"
+                  onClick={closeWebView}
+                  className="mt-4 px-4 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-white"
+                >
+                  取消加载
+                </button>
+              </div>
+            )}
+
             {!iframeError ? (
               <iframe
                 src={webView.url}
@@ -389,22 +428,30 @@ export function DownloadSixElementsTemplate({
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                 referrerPolicy="no-referrer"
                 title={webView.title}
-                onError={() => setIframeError(true)}
-                onLoad={(e) => {
-                  // 检测 iframe 是否被 X-Frame-Options 拒绝（页面无内容）
-                  try {
-                    const doc = e.currentTarget.contentDocument;
-                    if (!doc || !doc.body || doc.body.children.length === 0) {
-                      setIframeError(true);
+                onError={() => {
+                  setIframeError(true);
+                  setIframeLoading(false);
+                }}
+                onLoad={() => {
+                  // 5 秒超时机制会自动切 fallback；onLoad 后短暂延迟清 loading
+                  // 若页面视觉上有内容（通过 doc.body 检测），立即清 loading
+                  // 否则保持 loading 状态直到 5s 超时强制 fallback
+                  setTimeout(() => {
+                    const iframe = document.querySelector('[data-d6e-iframe]') as HTMLIFrameElement | null;
+                    try {
+                      const doc = iframe?.contentDocument;
+                      if (doc && doc.body && doc.body.children.length > 0) {
+                        setIframeLoading(false);
+                      }
+                    } catch {
+                      // 跨域读取被拒——可能是正常加载，保持 loading 直到超时
                     }
-                  } catch {
-                    // 跨域读取被拒——页面可能正常加载，无需报错
-                  }
+                  }, 800);
                 }}
                 data-d6e-iframe
               />
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-gray-50">
                 <AlertCircle className="w-12 h-12 text-gray-300 mb-3" />
                 <p className="text-sm text-gray-600 mb-1">该页面不允许嵌入预览</p>
                 <p className="text-xs text-gray-400 mb-4">您可以在外部浏览器打开，或返回广告页面</p>
