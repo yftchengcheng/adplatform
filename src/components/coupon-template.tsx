@@ -235,20 +235,26 @@ export function CouponTemplate({
           {/* Main Content - 主体票券区 */}
           <div className="px-4 pb-4">
             <div className="relative flex items-stretch">
-              {/* 左侧凹口半圆（票券"撕开"标记）*/}
+              {/* 左侧凹口半圆（票券"撕开"标记 - 与父级玻璃同质，圆孔透出毛玻璃）*/}
               <div
                 className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-20"
                 style={{
-                  background: "rgba(255, 255, 255, 0.95)",
-                  boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.04)",
+                  background: "rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  boxShadow:
+                    "inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.06)",
                 }}
               />
-              {/* 右侧凹口半圆 */}
+              {/* 右侧凹口半圆（票券"撕开"标记 - 与父级玻璃同质）*/}
               <div
                 className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-20"
                 style={{
-                  background: "rgba(255, 255, 255, 0.95)",
-                  boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.04)",
+                  background: "rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  boxShadow:
+                    "inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.06)",
                 }}
               />
 
