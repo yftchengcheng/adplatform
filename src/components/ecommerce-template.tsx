@@ -192,30 +192,48 @@ export function EcommerceTemplate({
           isOpen || previewMode ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}
         style={{
-          width: previewMode ? undefined : 240,
-          height: previewMode ? undefined : 100,
+          width: previewMode ? undefined : 256,
+          height: previewMode ? undefined : 104,
         }}
       >
         <div
-          className="relative bg-white rounded-r-2xl shadow-xl overflow-hidden"
+          className="relative rounded-r-2xl overflow-hidden"
           style={{
-            width: previewMode ? "100%" : 240,
-            height: previewMode ? "auto" : 100,
+            width: previewMode ? "100%" : 256,
+            height: previewMode ? "auto" : 104,
+            background: "rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            borderLeft: "none",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.04)",
           }}
         >
-          {/* Close Button */}
+          {/* Close Button - 毛玻璃态 */}
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100/80 hover:bg-gray-200 transition-colors z-10"
+            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full transition-colors z-10"
+            style={{
+              background: "rgba(255, 255, 255, 0.3)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(255, 255, 255, 0.4)",
+            }}
             aria-label="关闭"
           >
-            <X className="w-3.5 h-3.5 text-gray-500" />
+            <X className="w-3.5 h-3.5 text-gray-600" />
           </button>
 
           {/* Content - 左图右文 */}
-          <div className="flex items-center p-2 gap-2" style={previewMode ? {} : { height: 100 }}>
+          <div className="flex items-center p-3 gap-3" style={previewMode ? {} : { height: 104 }}>
             {/* 左侧图片 */}
-            <div className="flex-shrink-0 w-[64px] h-[64px] rounded-lg overflow-hidden bg-gray-100">
+            <div
+              className="flex-shrink-0 w-[72px] h-[72px] rounded-lg overflow-hidden"
+              style={{
+                background: "rgba(255, 255, 255, 0.4)",
+                border: "1px solid rgba(255, 255, 255, 0.5)",
+                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.3)",
+              }}
+            >
               {imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -231,21 +249,34 @@ export function EcommerceTemplate({
             </div>
 
             {/* 右侧文字内容 */}
-            <div className="flex-1 min-w-0 flex flex-col justify-between h-[64px] overflow-hidden">
+            <div className="flex-1 min-w-0 flex flex-col justify-between h-[72px] overflow-hidden">
               {/* 标题 */}
-              <h3 className="text-[11px] font-medium text-gray-900 leading-tight line-clamp-1 truncate">
+              <h3
+                className="font-medium text-gray-900 leading-tight line-clamp-1 truncate"
+                style={{ fontSize: 13, letterSpacing: "-0.01em" }}
+              >
                 {resolveTitle()}
               </h3>
 
               {/* 文案内容 */}
-              <p className="text-[10px] text-gray-500 leading-snug line-clamp-1 flex-1 overflow-hidden">
+              <p
+                className="text-gray-600 leading-snug line-clamp-1 flex-1 overflow-hidden"
+                style={{ fontSize: 11 }}
+              >
                 {resolveContent()}
               </p>
 
-              {/* 按钮 */}
+              {/* 按钮 - 电商专属红，精致化 */}
               <button
                 onClick={handleButtonClick}
-                className="w-full px-3 py-0.5 bg-red-500 text-white text-xs font-normal rounded-lg hover:bg-red-600 transition-colors"
+                className="w-full text-white font-medium rounded transition-all hover:brightness-110 hover:shadow-md"
+                style={{
+                  background: "linear-gradient(180deg, #DC2626 0%, #B91C1C 100%)",
+                  fontSize: 11,
+                  padding: "4px 12px",
+                  letterSpacing: "0.02em",
+                  boxShadow: "0 1px 2px rgba(220,38,38,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
+                }}
               >
                 {resolveButtonText()}
               </button>
