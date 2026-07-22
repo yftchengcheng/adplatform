@@ -229,32 +229,17 @@ export function AdTemplate({
             "0 1px 2px rgba(26, 26, 26, 0.04), 0 8px 24px rgba(26, 26, 26, 0.06)",
         }}
       >
-        {/* Top row: brand dot + AD label */}
-        <div className="flex items-center justify-between px-3 pt-2.5">
-          {/* Brand dot - 4x4 editorial mark */}
-          <div className="flex items-center gap-1.5">
-            <span
-              className="block w-1 h-1 rounded-full"
-              style={{ backgroundColor: "#C9A961" }}
-              aria-hidden
-            />
-            <span
-              className="text-[8px] font-medium uppercase"
-              style={{ color: "#6B6B6B", letterSpacing: "0.2em" }}
-            >
-              Edit{"'"}s Pick
-            </span>
-          </div>
-          {/* AD label - top right */}
+        {/* Top row: brand mark on the left (no decorative text) */}
+        <div className="flex items-center px-3 pt-2.5 h-6">
+          {/* 4x4 brand mark - decorative, no text content */}
           <span
-            className="text-[8px] font-medium uppercase"
-            style={{ color: "#6B6B6B", letterSpacing: "0.2em" }}
-          >
-            AD
-          </span>
+            className="block w-1 h-1 rounded-full"
+            style={{ backgroundColor: "#C9A961" }}
+            aria-hidden
+          />
         </div>
 
-        {/* Content - title + subtitle */}
+        {/* Content - title + subtitle (from config) */}
         <div className="flex-1 px-3 pt-1.5 pb-1 flex flex-col justify-center min-h-0">
           <h2
             className="text-[13px] font-semibold leading-tight tracking-tight truncate"
