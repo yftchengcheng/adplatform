@@ -37,17 +37,32 @@ export function DownloadSixElementsTemplateConfigPanel({
     [config, onChange]
   );
 
-  const updateFeature = useCallback(
-    (index: number, value: string) => {
+  const updateFeatureText = useCallback(
+    (index: number, text: string) => {
       const next = [...config.features];
-      next[index] = value;
+      const current = next[index];
+      next[index] = typeof current === "string"
+        ? { text: current, url: "" }
+        : { text, url: current.url };
+      update("features", next);
+    },
+    [config.features, update]
+  );
+
+  const updateFeatureUrl = useCallback(
+    (index: number, url: string) => {
+      const next = [...config.features];
+      const current = next[index];
+      next[index] = typeof current === "string"
+        ? { text: current, url }
+        : { text: current.text, url };
       update("features", next);
     },
     [config.features, update]
   );
 
   const addFeature = useCallback(() => {
-    update("features", [...config.features, ""]);
+    update("features", [...config.features, { text: "", url: "" }]);
   }, [config.features, update]);
 
   const removeFeature = useCallback(
@@ -142,26 +157,35 @@ export function DownloadSixElementsTemplateConfigPanel({
           </Button>
         </div>
         <div className="space-y-2">
-          {config.features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input
-                value={feature}
-                onChange={(e) => updateFeature(index, e.target.value)}
-                placeholder={`功能 ${index + 1}`}
-                maxLength={30}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removeFeature(index)}
-                className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
+          {config.features.map((feature, index) => {
+            const f = typeof feature === "string" ? { text: feature, url: "" } : feature;
+            return (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={f.text}
+                  onChange={(e) => updateFeatureText(index, e.target.value)}
+                  placeholder={`功能 ${index + 1}`}
+                  maxLength={30}
+                  className="flex-1"
+                />
+                <Input
+                  value={f.url}
+                  onChange={(e) => updateFeatureUrl(index, e.target.value)}
+                  placeholder="https://..."
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeFeature(index)}
+                  className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            );
+          })}
         </div>
       </div>
 

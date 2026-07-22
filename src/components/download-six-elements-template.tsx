@@ -24,13 +24,13 @@ export interface DownloadSixElementsConfig {
   version: string;              // 应用版本
   privacyUrl: string;           // 隐私协议超链
   permissionsUrl: string;       // 权限列表超链
-  features: string[];           // 产品功能（多条，建议 3-5 条）
-  logoUrl?: string;             // 产品 LOGO（可缺省，默认用首字母占位）
+  features: Array<{ text: string; url: string }>;  // 产品功能（多条，每条 = 文案 + 链接）
+  logoUrl?: string;             // 产品 LOGO（可缺省；为空时不渲染 LOGO 块）
   downloadUrl?: string;         // 下载按钮跳转链接
   downloadText?: string;        // 下载按钮文案（默认"立即下载"）
   primaryColor?: string;        // 主色（默认绿色 #00C06A，模拟应用商店 CTA）
   ageRating?: string;           // 适合年龄（如 "3+"/"8+"/"12+"/"16+"/"18+"），默认 "4+"
-  icpRecord?: string;           // 备案信息（如 "京ICP备12345678号-1"）
+  icpRecord?: string;           // 备案链接（填的就是 URL，渲染为可点击外链；留空不展示）
 }
 
 export interface DownloadSixElementsTemplateProps {
@@ -47,17 +47,17 @@ export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
   privacyUrl: "https://example.com/privacy",
   permissionsUrl: "https://example.com/permissions",
   features: [
-    "智能抢票，多车次实时监控",
-    "极速出票，告别排队",
-    "在线选座，座位随心选",
-    "24小时客服，全程贴心",
+    { text: "智能抢票，多车次实时监控", url: "https://example.com/feature/ticket" },
+    { text: "极速出票，告别排队", url: "https://example.com/feature/quick" },
+    { text: "在线选座，座位随心选", url: "https://example.com/feature/seat" },
+    { text: "24小时客服，全程贴心", url: "https://example.com/feature/service" },
   ],
   logoUrl: undefined,
   downloadUrl: "https://example.com/download",
   downloadText: "立即下载",
   primaryColor: "#00C06A",
   ageRating: "4+",
-  icpRecord: "京ICP备12345678号-1",
+  icpRecord: "https://beian.miit.gov.cn/",
 };
 
 export function DownloadSixElementsTemplate({
@@ -191,23 +191,44 @@ export function DownloadSixElementsTemplate({
       {/* 产品功能列表（六要素 #6） */}
       <div className="px-4 py-2 space-y-1.5">
         {features && features.length > 0 ? (
-          features.slice(0, 6).map((feature, idx) => (
-            <div key={idx} className="flex items-start gap-2.5">
-              <div
-                className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5"
-                style={{ backgroundColor: `${primaryColor}1A` }}
+          features.slice(0, 6).map((feature, idx) => {
+            // 兼容旧 string 格式
+            const text = typeof feature === "string" ? feature : feature.text;
+            const url = typeof feature === "string" ? "" : feature.url;
+            const inner = (
+              <>
+                <div
+                  className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5"
+                  style={{ backgroundColor: `${primaryColor}1A` }}
+                >
+                  <Check
+                    className="w-2.5 h-2.5"
+                    style={{ color: primaryColor }}
+                    strokeWidth={3}
+                  />
+                </div>
+                <span className="text-sm text-gray-700 leading-relaxed flex-1">
+                  {text}
+                </span>
+              </>
+            );
+            return url ? (
+              <a
+                key={idx}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-start gap-2.5 hover:opacity-80 transition-opacity"
               >
-                <Check
-                  className="w-2.5 h-2.5"
-                  style={{ color: primaryColor }}
-                  strokeWidth={3}
-                />
+                {inner}
+              </a>
+            ) : (
+              <div key={idx} className="flex items-start gap-2.5">
+                {inner}
               </div>
-              <span className="text-sm text-gray-700 leading-relaxed flex-1">
-                {feature}
-              </span>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-sm text-gray-400">暂无功能介绍</p>
         )}
@@ -266,7 +287,7 @@ export function DownloadSixElementsTemplate({
         {icpRecord && (
           <div className="mt-1.5 text-center">
             <a
-              href="https://beian.miit.gov.cn/"
+              href={icpRecord}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => previewMode && e.preventDefault()}

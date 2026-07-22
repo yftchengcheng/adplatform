@@ -15,17 +15,17 @@ export default function DownloadSixElementsDemoPage() {
     privacyUrl: "https://example.com/privacy",
     permissionsUrl: "https://example.com/permissions",
     features: [
-      "全国高铁、动车、普速列车余票实时查询",
-      "在线选座、改签、退票一键办理",
-      "智能中转方案推荐，复杂行程省心",
-      "支持微信/支付宝快捷支付，自动出票",
+      { text: "全国高铁、动车、普速列车余票实时查询", url: "https://example.com/feature/ticket" },
+      { text: "在线选座、改签、退票一键办理", url: "https://example.com/feature/refund" },
+      { text: "智能中转方案推荐，复杂行程省心", url: "https://example.com/feature/transfer" },
+      { text: "支持微信/支付宝快捷支付，自动出票", url: "https://example.com/feature/pay" },
     ],
     logoUrl: "",
     downloadUrl: "https://example.com/download",
     downloadText: "立即下载",
     primaryColor: "#00C06A",
     ageRating: "4+",
-    icpRecord: "京ICP备12345678号-1",
+    icpRecord: "https://beian.miit.gov.cn/",
   });
 
   const updateField = <K extends keyof DownloadSixElementsConfig>(
@@ -38,7 +38,10 @@ export default function DownloadSixElementsDemoPage() {
   const addFeature = () => {
     setConfig((prev) => ({
       ...prev,
-      features: [...(prev.features || []), `新功能 ${(prev.features || []).length + 1}`],
+      features: [
+        ...(prev.features || []),
+        { id: `feat-${Date.now()}-${(prev.features || []).length}`, text: `新功能 ${(prev.features || []).length + 1}`, url: "" },
+      ],
     }));
   };
 
@@ -198,19 +201,29 @@ export default function DownloadSixElementsDemoPage() {
               {(config.features || []).map((f, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <Input
-                    value={f}
+                    value={f.text}
                     onChange={(e) => {
                       const next = [...(config.features || [])];
-                      next[i] = e.target.value;
+                      next[i] = { ...next[i], text: e.target.value };
                       setConfig((prev) => ({ ...prev, features: next }));
                     }}
-                    placeholder={`功能 ${i + 1}`}
+                    placeholder={`功能 ${i + 1} 名称`}
                     maxLength={30}
+                    className="h-8 text-xs flex-1"
+                  />
+                  <Input
+                    value={f.url}
+                    onChange={(e) => {
+                      const next = [...(config.features || [])];
+                      next[i] = { ...next[i], url: e.target.value };
+                      setConfig((prev) => ({ ...prev, features: next }));
+                    }}
+                    placeholder="功能链接（可选）"
                     className="h-8 text-xs flex-1"
                   />
                   <button
                     onClick={() => removeFeature(i)}
-                    className="w-7 h-7 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                    className="w-7 h-7 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded flex-shrink-0"
                     aria-label="删除该功能"
                   >
                     <Trash2 className="w-3 h-3" />
