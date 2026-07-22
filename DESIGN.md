@@ -381,3 +381,68 @@ border-left: 1px dashed rgba(255, 255, 255, 0.4);
 - ❌ 不要把礼包码做成纯文本蓝色（chip 样式有底色和边框，才像"兑换码"）
 - ❌ 不要把 CTA 做成纯色蓝（渐变 + 投影 + 高光才是精致感）
 - ❌ 不要把卡片做太高（紧凑 + CTA 是灵魂）
+
+---
+
+## 翻红包 (FlipRedpacketTemplate) 设计方向
+
+### 气质与意象
+
+> 春节晚会的金色抽奖环节：深紫色的夜空背景上，一左一右两个金色和红色的光晕在卡片角落缓缓晕开，中央是一张半透明的「暗紫磨砂玻璃」卡片，里面三个红包金光闪闪，中间有只小手提示你「点这里」。打开后是金色流光的现金奖章或者「恭喜获得 100 元优惠券」的金色渐变文字。
+
+锚点：**「节日礼盒 + 暗紫磨砂玻璃」**——区别于其他磁贴的"8%白毛玻璃"，翻红包是"暗紫 + 金红双光晕 + 毛玻璃"的奢华节日体验。它是「全屏弹窗」型，不应改成"卡片"。
+
+### 视觉策略
+- **整体布局**：外层绝对居中（`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2`），避开 28px 状态栏视觉中心
+- **背景**：从「深紫实色渐变」（#1a0a2e → #2d1b4e）改成「半透明深紫渐变」（55% 透明度）+ `backdrop-filter: blur(14px)` + 1px 18%白边
+- **节日光晕装饰**：左上角 48x48 金色光晕（`radial-gradient(circle, rgba(255,215,0,0.35) 0%, rgba(255,215,0,0) 70%)` + blur(8px)）+ 右下角 56x56 红色光晕（rgba(255,75,87,0.30) + blur(10px)）
+- **关闭按钮**：从 `rgba(255,255,255,0.25)` 改成「毛玻璃」(`rgba(255,255,255,0.18)` + `blur(8px)` + 0.5px 30%白边)
+- **引导文案 chip**：从「黑色半透 + 白色文字」改成「红色节日 chip」(`linear-gradient(135deg, rgba(255,75,87,0.85) 0%, rgba(220,38,38,0.85) 100%)` + 红色投影 + inset 白高光 + 0.5px 25%白边)
+- **红包图片**：w-[100px] + 加 `drop-shadow-[0_8px_16px_rgba(255,75,87,0.35)]` 红色软投影（"红包金光闪闪"）
+- **现金奖励**：「恭喜获得」+ 大字 ¥金额 — 加 8px 圆角 + 红色投影 + inset 白高光（已经有）+ `text-shadow: 0 2px 4px rgba(180,100,0,0.30)` 让金色立体
+- **奖励图**：圆角 rounded-2xl + 8px 投影 + 0.5px 25%白边
+- **奖品文案**：从「白色粗体」改成「金色渐变文字」(`text-transparent bg-clip-text` + `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)`)
+- **领取按钮**：从「红色横长渐变 + 圆角矩形」改成「红色竖向渐变 + 圆角 2xl」(`linear-gradient(180deg, #FF6B6B 0%, #E0383B 100%)` + 红色投影 + inset 白高光 + inset 红暗色 + 0.5px 20%白边 + letter-spacing 0.05em)
+
+### 配色方案
+| 元素 | 颜色 | 意象来源 |
+|------|------|---------|
+| 容器背景 | `linear-gradient(180deg, rgba(26,10,46,0.55) 0%, rgba(45,27,78,0.55) 100%)` | "夜空暗紫半透明磨砂玻璃" |
+| 容器模糊 | `blur(14px)` | 比其他磁贴 8px 更强（因为深色背景需要更强模糊） |
+| 容器边框 | `1px solid rgba(255,255,255,0.18)` | 比其他磁贴 25% 略低（因为深色背景上白边太亮） |
+| 容器投影 | `0 16px 40px rgba(15,5,30,0.45)` + `0 2px 8px rgba(0,0,0,0.18)` + inset 白高光 | "被金色光抬起来" |
+| 金色光晕 | `radial-gradient(circle, rgba(255,215,0,0.35) 0%, rgba(255,215,0,0) 70%)` + blur(8px) | "春晚聚光灯" |
+| 红色光晕 | `radial-gradient(circle, rgba(255,75,87,0.30) 0%, rgba(255,75,87,0) 70%)` + blur(10px) | "红包喜气" |
+| 关闭按钮 | `rgba(255,255,255,0.18)` + blur(8px) + 30%白边 | 跟其他磁贴统一（但白度比 0.4 低） |
+| 引导 chip | `linear-gradient(135deg, rgba(255,75,87,0.85) 0%, rgba(220,38,38,0.85) 100%)` + 红色投影 | "春节红灯笼 chip" |
+| 红包投影 | `drop-shadow-[0_8px_16px_rgba(255,75,87,0.35)]` | "红包金光闪闪" |
+| 现金奖励 | `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)` | "金砖" |
+| 奖品文案 | `linear-gradient(135deg, #FFD700 0%, #FFA500 100%)` | "金色文字" |
+| 领取按钮 | `linear-gradient(180deg, #FF6B6B 0%, #E0383B 100%)` | "红色召唤按钮" |
+
+### 字体排版
+- 引导文案：13px font-semibold + tracking-wide（比原 14 小）
+- 提示文字：11px font-medium + tracking-wider（更精致）
+- 现金「恭喜获得」：12px font-medium + tracking-wide
+- 现金 ¥ 金额：36px font-bold + tracking-tight + tabular-nums + 0 2px 4px 暗影
+- 奖品文案：18px font-bold（渐变文字）
+- 特殊说明：12px font-light
+- 领取按钮：15px font-semibold + letter-spacing 0.05em
+
+### 动效与交互
+- 红包 hover: scale-105 + 红色 drop-shadow
+- 红包 click: scale-95 + flip 翻转动画
+- 现金奖励 / 奖励图：fadeIn 0.4s 缓出
+- 引导文案 chip：animate-pulse 持续呼吸
+- 节日光晕：静态（不强加动画，让暗紫氛围安静）
+- 关闭按钮：hover opacity-80
+
+### 设计禁忌
+- ❌ 不要把背景改成 8% 白毛玻璃（这是其他磁贴的"亮色玻璃"，翻红包是"暗紫奢华"）
+- ❌ 不要保留深紫实色背景（#1a0a2e 实色），实色不"毛玻璃"
+- ❌ 不要去掉节日光晕（光晕是翻红包的灵魂，删掉就失去"节日感"）
+- ❌ 不要把红包图片删掉 drop-shadow（没有阴影红包就"飘"在卡片里）
+- ❌ 不要把现金奖励保留 `bg-gradient-to-br`（Tailwind 类），要换成 inline style（更精确控制 135deg）
+- ❌ 不要把奖品文案保留纯白（白色文字在深紫上不抢眼，金色渐变才是"中奖"）
+- ❌ 不要把领取按钮用 Tailwind `bg-gradient-to-r`（r 是横长渐变，180deg 竖向渐变更立体）
+- ❌ 不要忘了 wrapper 用 absolute 居中（flex 居中在状态栏下不精确）
