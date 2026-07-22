@@ -636,3 +636,69 @@ border-left: 1px dashed rgba(255, 255, 255, 0.4);
 - ❌ 不要用 360° 单圈旋转 — 540°± + 随机方向才有"随机翻飞"感
 - ❌ 不要用 `setInterval` 清理过期红包（line 318 cleanup 没用，已用 CSS animation 控制消失）
 - ❌ 不要忘了 `will-change` + `backface-visibility: hidden` — 没 GPU 加速会掉帧
+
+---
+
+## 红包雨顶部定位闪现修复（v2）
+
+### 用户反馈
+"对比下，顶部还有红包定位闪现问题"
+
+### 根因（深入）
+v1 修复了"scale 缩放造成的顶部卡顿"，但**仍存在"定位闪现"**：
+
+```css
+0%   { top: -50px; opacity: 0; }
+8%   { /* top 自动插值 = -50px + 7.6% × 容器高 = -30px */ opacity: 1; }
+100% { top: 100%; opacity: 0; }
+```
+
+8% 关键帧**没有显式声明 top**，浏览器自动插值：
+- 0% 红包 top: -50px（在容器外）
+- 8% 红包 top ≈ -30px（**仍然在容器外**！容器边缘到 -50px 算外部）
+- 8% opacity: 1 → **红包突然在容器外完全可见，但 top 是 -30px，部分被裁剪**
+
+**视觉效果**：红包"突然出现在容器顶部边缘"——用户感知是"定位闪现"。
+
+### 修复方案：让 opacity 渐入时红包已完全在容器内
+
+#### 关键改进
+- **8% 必须显式声明 top: 0px**（红包已到达容器顶，但 opacity 仍 0）
+- **新增 18% 关键帧**：top: 5%, opacity: 0.5（红包已在容器内 5%，开始半透明淡入）
+- **25% 关键帧**：top: 20%, opacity: 1（完全可见 20% 位置）
+
+#### 完整 keyframes（v2）
+```css
+@keyframes fallRedpacketNatural {
+  0%   { top: -50px; opacity: 0; transform: rotate(0deg); }
+  8%   { top: 0px; opacity: 0; transform: rotate(0.1×rot-step); }
+  18%  { top: 5%; opacity: 0.5; transform: rotate(0.2×rot-step); }
+  25%  { top: 20%; opacity: 1; transform: rotate(0.5×rot-step); }
+  50%  { top: 55%; transform: rotate(1.0×rot-step); }
+  75%  { top: 80%; transform: rotate(1.5×rot-step); }
+  95%  { top: 100%; opacity: 1; transform: rotate(1.9×rot-step); }
+  100% { top: 100%; opacity: 0; transform: rotate(2.0×rot-step); }
+}
+```
+
+#### 三段式淡入淡出
+| 阶段 | 进度 | top | opacity | 状态 |
+|------|------|-----|---------|------|
+| 容器外飘入 | 0% → 8% | -50px → 0px | 0 → 0 | 不可见，进入容器顶 |
+| 半透明淡入 | 8% → 18% | 0px → 5% | 0 → 0.5 | 刚进入容器，开始淡入 |
+| 完全可见 | 18% → 25% | 5% → 20% | 0.5 → 1 | 淡入完成 |
+| 正常飘落 | 25% → 95% | 20% → 100% | 1 | 完全可见正常飘落 |
+| 出容器淡出 | 95% → 100% | 100% → 100% | 1 → 0 | 离开容器边缘淡出 |
+
+#### 关键洞察
+**opacity 渐入起点必须比 top 进入容器晚一个阶段** — 这样：
+- 红包先在容器外飘一段（不可见）
+- 到达容器顶时**仍不可见**
+- 真正进入容器内（top >= 0）后才开始淡入
+- 用户看到的是"红包从容器内顶部淡入"，而不是"从容器外突然出现"
+
+### 设计禁忌
+- ❌ 不要在 0%/8% 关键帧**只声明 opacity 不声明 top** — 浏览器会自动插值，top 会停留在容器外
+- ❌ 不要让 opacity 渐入期间 top < 0 — 用户会看到"容器外突然出现"
+- ❌ 不要让 opacity 渐出期间 top = 100% — 红包会"突然消失"在底部边缘
+- ❌ 不要省略 18% 中间关键帧 — 8%→25% 跨度太大，红包从 0px 跳到 20% 不够细腻

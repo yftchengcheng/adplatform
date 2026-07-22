@@ -396,7 +396,14 @@ export function RedpacketRainTemplate({
 
 
 
-            {/* Falling Redpackets - 自然飘落（去除 scale 缩放造成的顶部卡顿，加 sway 摇摆） */}
+            {/* Falling Redpackets - 修复顶部定位闪现：
+                0% 红包在容器外 top:-50px opacity:0
+                8% 红包已到达容器顶 top:0px（但仍 opacity:0，隐藏在容器外下方）
+                18% 红包刚进入容器 5%（已部分可见 opacity:0.4）
+                中段正常飘落
+                95% 红包接近容器底 100%（仍 opacity:1）
+                100% 红包已离开容器 opacity:0
+                关键：opacity 渐入时红包已在容器内，避免"顶部定位闪现" */}
             <style jsx>{`
               @keyframes fallRedpacketNatural {
                 0% {
@@ -405,26 +412,37 @@ export function RedpacketRainTemplate({
                   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
                 }
                 8% {
-                  opacity: 1;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(var(--rot-step, 72deg));
+                  top: 0px;
+                  opacity: 0;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.1));
+                }
+                18% {
+                  top: 5%;
+                  opacity: 0.5;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.2));
                 }
                 25% {
-                  transform: translate3d(-10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 2));
+                  top: 20%;
+                  opacity: 1;
+                  transform: translate3d(-10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 0.5));
                 }
                 50% {
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 3));
+                  top: 55%;
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1));
                 }
                 75% {
-                  transform: translate3d(10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 4));
+                  top: 80%;
+                  transform: translate3d(10px, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.5));
                 }
-                92% {
+                95% {
+                  top: 100%;
                   opacity: 1;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 5));
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 1.9));
                 }
                 100% {
                   top: 100%;
                   opacity: 0;
-                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 5));
+                  transform: translate3d(0, 0, 0) scale(1) rotate(calc(var(--rot-step, 72deg) * 2));
                 }
               }
               .falling-redpacket {
