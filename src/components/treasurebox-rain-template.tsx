@@ -41,6 +41,7 @@ export function TreasureboxRainTemplate({
   // 状态
   const [isClaimed, setIsClaimed] = useState(false);
   const [fallingTreasureboxes, setFallingTreasureboxes] = useState<FallingTreasurebox[]>([]);
+  const fallingTreasureboxesRef = useRef<FallingTreasurebox[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -310,13 +311,16 @@ export function TreasureboxRainTemplate({
               {fallingTreasureboxes.map((tb) => (
                 <div
                   key={tb.id}
+                  data-tb-id={tb.id}
                   onClick={handleTreasureboxClick}
                   className="absolute cursor-pointer hover:scale-110 transition-transform"
+                  ref={(el) => {
+                    if (el) el.style.setProperty('--tb-scale', String(tb.scale));
+                  }}
                   style={{
                     left: `${tb.x}%`,
                     animation: `fallTreasureboxWater ${tb.duration}ms linear ${tb.delay}ms infinite both`,
                     animationFillMode: 'backwards',
-                    ['--tb-scale' as React.CSSProperties['--tb-scale']]: tb.scale,
                     willChange: 'top, opacity, transform',
                     backfaceVisibility: 'hidden',
                     zIndex: 10,
@@ -532,6 +536,10 @@ export function TreasureboxRainTemplate({
 
           {fallingTreasureboxes.slice(0, 12).map((tb) => (
             <div
+              data-tb-id={tb.id}
+              ref={(el) => {
+                if (el) el.style.setProperty("--tb-scale", String(tb.scale * 0.8));
+              }}
               key={tb.id}
               onClick={handleTreasureboxClick}
               className="absolute cursor-pointer hover:scale-110 transition-transform"
@@ -539,7 +547,7 @@ export function TreasureboxRainTemplate({
                 left: `${tb.x}%`,
                 animation: `fallTreasureboxWaterPreview ${tb.duration}ms linear ${tb.delay}ms infinite both`,
                 animationFillMode: 'backwards',
-                ['--tb-scale' as React.CSSProperties['--tb-scale']]: tb.scale * 0.8,
+                // --tb-scale 通过 ref callback 设置
                 willChange: 'top, opacity, transform',
                 backfaceVisibility: 'hidden',
                 zIndex: 10,
