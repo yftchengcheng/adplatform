@@ -193,7 +193,7 @@ export function CouponTemplate({
             // 票券腰身：左右中央高度内凹 10%（按 demo-C2-c 实际 10.5%）
             // 位置：上腰身 25%，下腰身 65%（更紧凑、更接近 demo）
             clipPath:
-              "polygon(0% 0%, 100% 0%, 100% 41.5%, 95.5% 44.5%, 89.5% 47.5%, 95.5% 50.5%, 100% 53.5%, 100% 71.5%, 95.5% 74.5%, 89.5% 77.5%, 95.5% 80.5%, 100% 83.5%, 100% 100%, 0% 100%, 0% 83.5%, 4.5% 80.5%, 10.5% 77.5%, 4.5% 74.5%, 0% 71.5%, 0% 53.5%, 4.5% 50.5%, 10.5% 47.5%, 4.5% 44.5%, 0% 41.5%)",
+              "polygon(0% 0%, 100% 0%, 100% 41.5%, 95.5% 44.5%, 89.5% 47.5%, 95.5% 50.5%, 100% 53.5%, 100% 84%, 95.5% 87%, 89.5% 90%, 95.5% 93%, 100% 96%, 100% 100%, 0% 100%, 0% 96%, 4.5% 93%, 10.5% 90%, 4.5% 87%, 0% 84%, 0% 53.5%, 4.5% 50.5%, 10.5% 47.5%, 4.5% 44.5%, 0% 41.5%)",
             background: "#E8E9ED",
             border: "1px solid rgba(0, 0, 0, 0.06)",
             boxShadow:
@@ -244,33 +244,34 @@ export function CouponTemplate({
 
           {/* 主体橙色区 - flex 布局（匹配 demo-C2-c 结构） */}
           <div className="flex-1 flex flex-col relative" style={{ background: "#F96F0C" }}>
-            {/* 主体内容：30 + 满100立减 + 立即领取 */}
-            <div className="flex-1 relative flex items-stretch">
-              {/* 垂直虚线 - 30 区域和条件区域之间的分隔 */}
+            {/* 主体内容：30 + 满100立减 + 立即领取（grid 布局精确 y 位置） */}
+            <div className="flex-1 relative grid" style={{ gridTemplateColumns: "35% 65%", gridTemplateRows: "55% 45%" }}>
+              {/* 垂直虚线 - 30 区域和条件区域之间的分隔（贯穿整个主体高度） */}
               <div
-                className="absolute left-[35%] top-3 bottom-3 z-10 pointer-events-none"
-                style={{
-                  borderLeft: "1px dashed rgba(255, 255, 255, 0.5)",
-                }}
+                className="absolute top-3 bottom-3 z-10 pointer-events-none"
+                style={{ left: "35%", borderLeft: "1px dashed rgba(255, 255, 255, 0.5)" }}
               />
 
-              {/* Left 35% - 30 数字（更大更突出） */}
-              <div className="w-[35%] relative py-7 px-2 flex flex-col items-center justify-center">
+              {/* (1,1) Left 35% 顶部 - 30 数字（居中） */}
+              <div className="relative flex flex-col items-center justify-center py-2 px-2">
                 <DiscountInfoDisplay text={resolveMacro(finalConfig.discountInfo) || "优惠"} />
               </div>
 
-              {/* Right 65% - 条件 + 米黄按钮 */}
-              <div className="w-[65%] relative px-4 py-3 flex flex-col items-start justify-center gap-2">
+              {/* (1,2) Right 65% 顶部 - 满100立减条件（居中） */}
+              <div className="relative flex items-center justify-start px-4 py-2">
                 <span className="text-white text-[13px] font-medium leading-tight">
                   {resolveMacro(finalConfig.discountCondition) || "优惠条件"}
                 </span>
-                {/* 米黄按钮 - 紧凑圆角胶囊（视觉 CTA） */}
+              </div>
+
+              {/* (2,1-2) 整行底部 - 米黄按钮（居中，跨越整宽） */}
+              <div className="col-span-2 relative flex items-center justify-center px-4 pb-1">
                 <div
-                  className="text-xs font-semibold px-3 py-1 rounded-full pointer-events-none"
+                  className="text-xs font-semibold px-4 py-1.5 rounded-full pointer-events-none"
                   style={{
                     background: "#FDE6C6",
                     color: "#E54001",
-                    boxShadow: "0 1px 2px rgba(229, 64, 1, 0.2)",
+                    boxShadow: "0 1px 3px rgba(229, 64, 1, 0.25)",
                   }}
                 >
                   {resolveButtonText()}
