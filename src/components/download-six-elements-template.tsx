@@ -251,7 +251,7 @@ export function DownloadSixElementsTemplate({
             "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease-out",
         }}
       >
-        <div className="w-full max-w-[420px] mx-auto pointer-events-auto border border-gray-200/60 rounded-xl overflow-hidden">
+        <div className="w-full max-w-[420px] mx-auto pointer-events-auto overflow-hidden">
         {/* 顶部行: LOGO + (应用名称 + 公司·版本·年龄) + 下载按钮（核心信息），背景透明 */}
         <div data-d6e-top-row className="flex items-center gap-2.5 p-3 bg-transparent">
           {/* LOGO - 有/无 LOGO 自适应（容器固定 40x40） */}
