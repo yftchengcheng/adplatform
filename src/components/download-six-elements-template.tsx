@@ -261,35 +261,14 @@ export function DownloadSixElementsTemplate({
             )}
           </div>
 
-          {/* LOGO 右侧：应用名称（主）+ 公司·版本（副），垂直堆叠 */}
-          <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-            <h2
-              data-d6e-appname
-              className="w-full text-[14px] font-semibold text-gray-900 truncate"
-              title={resolve(appName)}
-            >
-              {resolve(appName)}
-            </h2>
-            <div
-              data-d6e-subline
-              className="flex items-center gap-1 text-[10px] text-gray-500 min-w-0"
-            >
-              <span
-                data-d6e-developer
-                className="flex-1 min-w-0 truncate"
-                title={resolve(developer)}
-              >
-                {resolve(developer)}
-              </span>
-              <span className="flex-shrink-0 text-gray-300">·</span>
-              <span
-                data-d6e-version
-                className="flex-shrink-0"
-              >
-                v{resolve(version)}
-              </span>
-            </div>
-          </div>
+          {/* LOGO 右侧：应用名称（主），在 LOGO 右侧显示 */}
+          <h2
+            data-d6e-appname
+            className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 truncate"
+            title={resolve(appName)}
+          >
+            {resolve(appName)}
+          </h2>
 
           {/* 下载按钮 - 主条核心 CTA */}
           <button
@@ -309,6 +288,39 @@ export function DownloadSixElementsTemplate({
             <Download className="w-3 h-3" />
             {downloadText}
           </button>
+        </div>
+
+        {/* 独立 subline 行：公司 · 版本 · 年龄（全宽，完整展示不被挤压） */}
+        <div
+          data-d6e-subline
+          className="flex items-center gap-1.5 px-3 py-1.5 mt-1.5 bg-transparent border border-gray-200/60 rounded-xl text-[10px] text-gray-500 min-w-0"
+        >
+          <span
+            data-d6e-developer
+            className="flex-1 min-w-0 truncate"
+            title={resolve(developer)}
+          >
+            {resolve(developer)}
+          </span>
+          <span className="flex-shrink-0 text-gray-300">·</span>
+          <span
+            data-d6e-version
+            className="flex-shrink-0"
+          >
+            v{resolve(version)}
+          </span>
+          {ageRating && (
+            <>
+              <span className="flex-shrink-0 text-gray-300">·</span>
+              <span
+                data-d6e-age
+                className="px-1.5 h-[15px] inline-flex items-center rounded text-[9px] font-bold text-white flex-shrink-0 shadow-sm"
+                style={{ backgroundColor: primaryColor }}
+              >
+                {ageRating}
+              </span>
+            </>
+          )}
         </div>
 
         {/* 链接条 */}
