@@ -156,6 +156,14 @@ export function DownloadSixElementsTemplate({
   // iframe 加载状态
   const [iframeError, setIframeError] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
+  // 进场动画：mounted = true 后从 translateY(100%) 滑入到 0
+  const [mounted, setMounted] = useState(false);
+
+  // 进场动画：下一帧触发上浮过渡
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
 
   // 打开内部浏览器时重置错误
   useEffect(() => {
@@ -227,7 +235,21 @@ export function DownloadSixElementsTemplate({
 
   return (
     <>
-      <div className="w-full max-w-[420px] mx-auto bg-transparent" data-d6e-root>
+      <div
+        data-d6e-root
+        className={
+          previewMode
+            ? "w-full max-w-[420px] mx-auto bg-transparent sticky bottom-0 z-10"
+            : "fixed bottom-0 left-0 right-0 z-50 bg-transparent pointer-events-none"
+        }
+        style={{
+          transform: mounted ? "translateY(0)" : "translateY(100%)",
+          opacity: mounted ? 1 : 0,
+          transition:
+            "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease-out",
+        }}
+      >
+        <div className="w-full max-w-[420px] mx-auto pointer-events-auto">
         {/* 顶部行: LOGO + (应用名称 + 公司·版本·年龄) + 下载按钮（核心信息），背景透明 */}
         <div data-d6e-top-row className="flex items-center gap-2.5 p-3 bg-transparent border border-gray-200/60 rounded-xl">
           {/* LOGO - 有/无 LOGO 自适应（容器固定 40x40） */}
@@ -430,6 +452,7 @@ export function DownloadSixElementsTemplate({
               </button>
             </>
           )}
+        </div>
         </div>
       </div>
 

@@ -86,7 +86,7 @@ export default function DownloadSixElementsDemoPage() {
           >
             <DownloadSixElementsTemplate
               config={config}
-              previewMode={true}
+              previewMode={false}
               isOpen={true}
             />
           </div>
