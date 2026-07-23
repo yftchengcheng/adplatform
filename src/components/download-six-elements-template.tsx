@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   ExternalLink,
   AlertCircle,
+  ChevronDown,
 } from "lucide-react";
 
 /**
@@ -150,6 +151,8 @@ export function DownloadSixElementsTemplate({
   const [pressed, setPressed] = useState(false);
   // 内部浏览器视图状态
   const [webView, setWebView] = useState<{ url: string; title: string } | null>(null);
+  // 功能下拉菜单开关
+  const [featureMenuOpen, setFeatureMenuOpen] = useState(false);
   // iframe 加载状态
   const [iframeError, setIframeError] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
@@ -298,21 +301,50 @@ export function DownloadSixElementsTemplate({
         >
           {/* 功能 chips（全部展示，flex-wrap 自动换行） */}
           {validFeatures.length > 0 ? (
-            validFeatures.map((u, i) => {
-              const label = labelFromUrl(u);
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => openWebView(u, label || `功能 ${i + 1}`)}
-                  className="inline-flex items-center gap-0.5 text-gray-600 hover:text-gray-900 transition-colors"
-                  data-d6e-feature
-                >
-                  <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
-                  <span className="truncate max-w-[100px]">{label || `功能 ${i + 1}`}</span>
-                </button>
-              );
-            })
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setFeatureMenuOpen((v) => !v)}
+                className="inline-flex items-center gap-0.5 text-gray-600 hover:text-gray-900 transition-colors"
+                data-d6e-feature-btn
+              >
+                <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
+                <span>功能</span>
+                <ChevronDown className="w-2.5 h-2.5 ml-0.5 opacity-60" />
+              </button>
+              {featureMenuOpen && (
+                <>
+                  {/* 点击外部关闭 */}
+                  <div
+                    className="fixed inset-0 z-[110]"
+                    onClick={() => setFeatureMenuOpen(false)}
+                  />
+                  <div
+                    data-d6e-feature-menu
+                    className="absolute left-0 bottom-full mb-1.5 min-w-[160px] max-w-[260px] bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-[120]"
+                  >
+                    {validFeatures.map((u, i) => {
+                      const label = labelFromUrl(u);
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setFeatureMenuOpen(false);
+                            openWebView(u, label || `功能 ${i + 1}`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 flex items-center gap-1.5"
+                          data-d6e-feature-item
+                        >
+                          <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
+                          <span className="truncate">{label || `功能 ${i + 1}`}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
             <span className="text-[10px] text-gray-300" data-d6e-feature-empty>暂无功能</span>
           )}
@@ -477,12 +509,12 @@ export function DownloadSixElementsTemplate({
             )}
           </div>
 
-          {/* 底部固定下载栏 */}
-          <div className="flex-shrink-0 border-t border-gray-200 bg-white p-3">
+          {/* 底部固定下载栏：居中下载按钮 */}
+          <div className="flex-shrink-0 border-t border-gray-200 bg-white p-3 flex items-center justify-center">
             <button
               type="button"
               onClick={handleDownload}
-              className="w-full h-10 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              className="w-full max-w-md h-10 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               style={{
                 background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
                 boxShadow: `0 2px 8px ${primaryColor}40`,
