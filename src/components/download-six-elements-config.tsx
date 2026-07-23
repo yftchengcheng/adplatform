@@ -15,6 +15,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DownloadSixElementsConfig } from "./download-six-elements-template";
+import { getStringWidth } from "@/lib/utils";
 
 interface DownloadSixElementsConfigPanelProps {
   config: DownloadSixElementsConfig;
@@ -277,6 +278,22 @@ export function DownloadSixElementsTemplateConfigPanel({
           value={config.icpRecord ?? ""}
           onChange={(e) => update("icpRecord", e.target.value || undefined)}
           placeholder="https://beian.miit.gov.cn/"
+        />
+      </div>
+
+      {/* 系统：组件名称（SDK 内部标识，不渲染到组件视觉） */}
+      <div className="space-y-2 pt-4 mt-2 border-t border-gray-100">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-gray-700">组件名称</label>
+          <span className="text-xs text-gray-400">
+            {getStringWidth(config.componentName ?? "")}/20字符
+          </span>
+        </div>
+        <Input
+          value={config.componentName ?? ""}
+          onChange={(e) => update("componentName", e.target.value || undefined)}
+          placeholder="请输入组件名称"
+          maxLength={20}
         />
       </div>
     </div>

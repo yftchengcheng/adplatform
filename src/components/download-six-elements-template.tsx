@@ -58,6 +58,7 @@ export interface DownloadSixElementsConfig {
   icpRecord?: string;           // 备案 URL
 
   // 系统
+  componentName?: string;       // 组件名称（SDK 内部标识，不渲染到组件视觉）
   macroVariables?: Record<string, string>;
 }
 
@@ -83,6 +84,7 @@ export const defaultDownloadSixElementsConfig: DownloadSixElementsConfig = {
   primaryColor: "#00C06A",
   ageRating: "3+",
   icpRecord: "https://beian.miit.gov.cn/",
+  componentName: "下载六要素-底部",
 };
 
 interface DownloadSixElementsTemplateProps {
