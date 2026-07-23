@@ -359,13 +359,22 @@ export function DownloadSixElementsTemplate({
             <div className="relative">
               <button
                 type="button"
-                onClick={() => setFeatureMenuOpen((v) => !v)}
+                onClick={() => {
+                  // 和"权限"一致：1 个功能时单击直接打开内部浏览器；多个才开下拉
+                  if (validFeatures.length === 1) {
+                    const u = validFeatures[0];
+                    const label = labelFromUrl(u);
+                    openWebView(u, label || "功能");
+                  } else {
+                    setFeatureMenuOpen((v) => !v);
+                  }
+                }}
                 className="inline-flex items-center gap-0.5 text-gray-600 hover:text-gray-900 transition-colors"
                 data-d6e-feature-btn
               >
                 <Sparkles className="w-2.5 h-2.5 flex-shrink-0" style={{ color: primaryColor }} />
                 <span>功能</span>
-                <ChevronDown className="w-2.5 h-2.5 ml-0.5 opacity-60" />
+                {validFeatures.length > 1 && <ChevronDown className="w-2.5 h-2.5 ml-0.5 opacity-60" />}
               </button>
               {featureMenuOpen && (
                 <>
