@@ -252,36 +252,14 @@ export function DownloadSixElementsTemplate({
             )}
           </div>
 
-          {/* 名称 + 副标 */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <h2 data-d6e-appname className="text-[13px] font-semibold text-gray-900 truncate">
-                {resolve(appName)}
-              </h2>
-              {ageRating && (
-                <span
-                  data-d6e-age
-                  className="px-1.5 h-[17px] inline-flex items-center rounded text-[10px] font-bold text-white flex-shrink-0 shadow-sm"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  {ageRating}
-                </span>
-              )}
-            </div>
-            <p data-d6e-subline className="text-[10px] text-gray-500 truncate mt-0.5">
-              {resolve(developer) || "—"}
-              {version ? ` · v${resolve(version)}` : ""}
-            </p>
-          </div>
-
-          {/* 下载按钮 */}
+          {/* 下载按钮 - 主条核心 CTA */}
           <button
             type="button"
             onClick={handleDownload}
             onMouseDown={() => setPressed(true)}
             onMouseUp={() => setPressed(false)}
             onMouseLeave={() => setPressed(false)}
-            className="flex-shrink-0 h-7 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1 transition-transform"
+            className="ml-auto flex-shrink-0 h-7 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1 transition-transform"
             style={{
               background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
               boxShadow: `0 2px 6px ${primaryColor}40`,
@@ -293,6 +271,50 @@ export function DownloadSixElementsTemplate({
             {downloadText}
           </button>
         </div>
+
+        {/* 独立 subline 行：应用名称（主）+ 公司 · 版本（副），全宽展示，不被 LOGO/下载按钮挤压 */}
+        <div
+          data-d6e-subline
+          className="flex flex-col gap-0.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm border-x border-gray-200/60"
+        >
+          <h2
+            data-d6e-appname
+            className="w-full text-[13px] font-semibold text-gray-900 truncate"
+            title={resolve(appName)}
+          >
+            {resolve(appName)}
+          </h2>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              data-d6e-developer
+              className="flex-1 min-w-0 text-[10px] text-gray-500 truncate"
+              title={resolve(developer)}
+            >
+              {resolve(developer)}
+            </span>
+            <span className="text-[10px] text-gray-300">·</span>
+            <span
+              data-d6e-version
+              className="flex-shrink-0 text-[10px] text-gray-500"
+            >
+              v{resolve(version)}
+            </span>
+            {ageRating && (
+              <>
+                <span className="text-[10px] text-gray-300">·</span>
+                <span
+                  data-d6e-age
+                  className="px-1.5 h-[15px] inline-flex items-center rounded text-[9px] font-bold text-white flex-shrink-0 shadow-sm"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {ageRating}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 链接条 */}
 
         {/* 底部链接条：所有要素平铺展示 - 功能 + 隐私 + 权限 + 备案 */}
         <div
