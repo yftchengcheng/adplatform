@@ -228,11 +228,10 @@ export function DownloadSixElementsTemplate({
   return (
     <>
       <div className="w-full max-w-[420px] mx-auto bg-transparent" data-d6e-root>
-        {/* 顶部行: LOGO + (名称+公司·版本·年龄) + 下载按钮（核心信息），背景透明 */}
+        {/* 顶部行: LOGO + (应用名称 + 公司·版本·年龄) + 下载按钮（核心信息），背景透明 */}
         <div data-d6e-top-row className="flex items-center gap-2.5 p-3 bg-transparent border border-gray-200/60 rounded-xl">
-          {/* LOGO - 有/无 LOGO 自适应（容器固定 44x44） */}
-          <div
-            className="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center"
+          {/* LOGO - 有/无 LOGO 自适应（容器固定 40x40） */}
+          <div className="flex-shrink-0 relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center"
             style={{
               backgroundColor: hasLogo ? "transparent" : `${primaryColor}1A`,
             }}
@@ -250,47 +249,45 @@ export function DownloadSixElementsTemplate({
             ) : (
               <Package className="w-5 h-5" style={{ color: primaryColor }} />
             )}
+            {/* 年龄 chip 浮在 LOGO 右上角，不挤占 subline 空间 */}
+            {ageRating && (
+              <span
+                data-d6e-age
+                className="absolute -top-1 -right-1 px-1 h-[14px] inline-flex items-center rounded text-[8px] font-bold text-white shadow-md ring-1 ring-white"
+                style={{ backgroundColor: primaryColor }}
+              >
+                {ageRating}
+              </span>
+            )}
           </div>
 
-          {/* LOGO 右侧：名称（主）+ 公司·版本·年龄（副），垂直堆叠 */}
-          <div
-            data-d6e-subline
-            className="flex-1 min-w-0 flex flex-col gap-0.5"
-          >
+          {/* LOGO 右侧：应用名称（主）+ 公司·版本（副），垂直堆叠 */}
+          <div className="flex-1 min-w-0 flex flex-col gap-0.5">
             <h2
               data-d6e-appname
-              className="w-full text-[13px] font-semibold text-gray-900 truncate"
+              className="w-full text-[14px] font-semibold text-gray-900 truncate"
               title={resolve(appName)}
             >
               {resolve(appName)}
             </h2>
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div
+              data-d6e-subline
+              className="flex items-center gap-1 text-[10px] text-gray-500 min-w-0"
+            >
               <span
                 data-d6e-developer
-                className="flex-1 min-w-0 text-[10px] text-gray-500 truncate"
+                className="flex-1 min-w-0 truncate"
                 title={resolve(developer)}
               >
                 {resolve(developer)}
               </span>
-              <span className="text-[10px] text-gray-300">·</span>
+              <span className="flex-shrink-0 text-gray-300">·</span>
               <span
                 data-d6e-version
-                className="flex-shrink-0 text-[10px] text-gray-500"
+                className="flex-shrink-0"
               >
                 v{resolve(version)}
               </span>
-              {ageRating && (
-                <>
-                  <span className="text-[10px] text-gray-300">·</span>
-                  <span
-                    data-d6e-age
-                    className="px-1.5 h-[15px] inline-flex items-center rounded text-[9px] font-bold text-white flex-shrink-0 shadow-sm"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    {ageRating}
-                  </span>
-                </>
-              )}
             </div>
           </div>
 
