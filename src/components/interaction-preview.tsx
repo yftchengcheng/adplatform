@@ -30,6 +30,7 @@ import { ScratchCardTemplate } from "./scratch-card-template";
 import { PopupRedpacketTemplateConfig } from "./popup-redpacket-template";
 import PopupRedpacketTemplate from "./popup-redpacket-template";
 import { FloatingWindowTemplate, FloatingWindowTemplateConfig, defaultFloatingWindowConfig } from "./floating-window-template";
+import DownloadSixElementsTemplate, { defaultDownloadSixElementsConfig, type DownloadSixElementsConfig } from "./download-six-elements-template";
 
 // ---- 类型定义 ----
 
@@ -258,6 +259,7 @@ const DEFAULT_COMPONENT_CONFIGS: Record<string, Record<string, unknown>> = {
     landingPageUrl: "",
     defaultLandingPageUrl: "",
   },
+  download_six_elements: defaultDownloadSixElementsConfig as unknown as Record<string, unknown>,
 };
 
 // ---- 真实组件渲染 ----
@@ -271,7 +273,7 @@ function RealComponentPreview({
   componentConfig?: Record<string, unknown>;
   onDismiss: () => void;
 }) {
-  const config = componentConfig || DEFAULT_COMPONENT_CONFIGS[componentTypeKey] || DEFAULT_COMPONENT_CONFIGS.dual_button;
+  const config = componentConfig || DEFAULT_COMPONENT_CONFIGS[componentTypeKey] || {};
 
   // 投票组件
   if (componentTypeKey === "vote") {
@@ -441,6 +443,17 @@ function RealComponentPreview({
         isOpen={true}
         onClose={onDismiss}
         previewMode={true}
+      />
+    );
+  }
+
+  if (componentTypeKey === "download_six_elements") {
+    return (
+      <DownloadSixElementsTemplate
+        config={config as unknown as DownloadSixElementsConfig}
+        isOpen={true}
+        previewMode={true}
+        onClose={onDismiss}
       />
     );
   }
