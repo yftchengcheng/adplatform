@@ -78,6 +78,7 @@ import { ScratchCardTemplate as ScratchCardTemplateDefault } from "@/components/
 import { PopupRedpacketConfig } from "@/components/popup-redpacket-config";
 import PopupRedpacketTemplate from "@/components/popup-redpacket-template";
 import { FloatingWindowTemplate, FloatingWindowTemplateConfig } from "@/components/floating-window-template";
+import { DownloadSixElementsTemplate, DownloadSixElementsConfig } from "@/components/download-six-elements-template";
 
 import { useRouter } from "next/navigation";
 
@@ -828,6 +829,13 @@ export function ComponentList() {
                       ) : previewComponent?.type === "floating_window" ? (
                           <FloatingWindowTemplate
                             config={editingPreviewConfig["floating_window"] as unknown as FloatingWindowTemplateConfig || previewComponent.config as unknown as FloatingWindowTemplateConfig}
+                            isOpen={true}
+                            previewMode={true}
+                            onClose={() => setPreviewComponent(null)}
+                          />
+                      ) : previewComponent?.type === "download_six_elements" ? (
+                          <DownloadSixElementsTemplate
+                            config={editingPreviewConfig["download_six_elements"] as unknown as DownloadSixElementsConfig || previewComponent.config as unknown as DownloadSixElementsConfig}
                             isOpen={true}
                             previewMode={true}
                             onClose={() => setPreviewComponent(null)}
