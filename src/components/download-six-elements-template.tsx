@@ -239,7 +239,7 @@ export function DownloadSixElementsTemplate({
         data-d6e-root
         className={
           previewMode
-            ? "w-full max-w-[420px] mx-auto bg-transparent sticky bottom-0 z-10"
+            ? "w-full max-w-[420px] mx-auto bg-transparent absolute bottom-0 left-0 right-0 z-10"
             : "fixed bottom-0 left-0 right-0 z-50 bg-transparent pointer-events-none"
         }
         style={{

@@ -852,11 +852,13 @@ function ConfigContent() {
                             previewMode={true}
                           />
                         ) : isDownloadSixElementsComponent ? (
-                          <DownloadSixElementsTemplate
-                            config={config as unknown as DownloadSixElementsConfig}
-                            isOpen={true}
-                            previewMode={true}
-                          />
+                          <div className="relative w-full h-full">
+                            <DownloadSixElementsTemplate
+                              config={config as unknown as DownloadSixElementsConfig}
+                              isOpen={true}
+                              previewMode={true}
+                            />
+                          </div>
                         ) : (
                           <AdTemplate
                             config={config as AdTemplateConfig}
