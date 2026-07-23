@@ -251,9 +251,9 @@ export function DownloadSixElementsTemplate({
             "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease-out",
         }}
       >
-        <div className="w-full max-w-[420px] mx-auto pointer-events-auto">
+        <div className="w-full max-w-[420px] mx-auto pointer-events-auto border border-gray-200/60 rounded-xl overflow-hidden">
         {/* 顶部行: LOGO + (应用名称 + 公司·版本·年龄) + 下载按钮（核心信息），背景透明 */}
-        <div data-d6e-top-row className="flex items-center gap-2.5 p-3 bg-transparent border border-gray-200/60 rounded-xl">
+        <div data-d6e-top-row className="flex items-center gap-2.5 p-3 bg-transparent">
           {/* LOGO - 有/无 LOGO 自适应（容器固定 40x40） */}
           <div className="flex-shrink-0 relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center"
             style={{
@@ -317,7 +317,7 @@ export function DownloadSixElementsTemplate({
         {/* 独立 subline 行：公司 · 版本 · 年龄（全宽，完整展示不被挤压） */}
         <div
           data-d6e-subline
-          className="flex items-center gap-1.5 px-3 py-1.5 mt-1.5 bg-transparent border border-gray-200/60 rounded-xl text-[10px] text-gray-500 min-w-0"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent border-t border-gray-200/40 text-[10px] text-gray-500 min-w-0"
         >
           <span
             data-d6e-developer
@@ -352,7 +352,7 @@ export function DownloadSixElementsTemplate({
         {/* 底部链接条：所有要素平铺展示 - 功能 + 隐私 + 权限 + 备案 */}
         <div
           data-d6e-link-bar
-          className="flex items-center flex-wrap gap-x-2.5 gap-y-1.5 px-3 py-2 mt-1.5 bg-transparent rounded-xl border border-gray-200/60 text-[11px]"
+          className="flex items-center flex-wrap gap-x-2.5 gap-y-1.5 px-3 py-2 bg-transparent border-t border-gray-200/40 text-[11px]"
         >
           {/* 功能 chips（全部展示，flex-wrap 自动换行） */}
           {validFeatures.length > 0 ? (
